@@ -31,7 +31,9 @@ export default function Header() {
             </a>
           ))}
           <a
-            href="#contato"
+            href="https://wa.me/5543991065129"
+            target="_blank"
+            rel="noopener noreferrer"
             className="text-sm font-semibold px-5 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition"
           >
             Contratar
@@ -62,7 +64,9 @@ export default function Header() {
             </a>
           ))}
           <a
-            href="#contato"
+            href="https://wa.me/5543991065129"
+            target="_blank"
+            rel="noopener noreferrer"
             onClick={() => setOpen(false)}
             className="font-semibold px-5 py-2 rounded-lg bg-primary text-primary-foreground text-center"
           >

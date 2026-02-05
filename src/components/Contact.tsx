@@ -19,22 +19,22 @@ export default function Contact() {
 
           <div className="grid md:grid-cols-3 gap-6 mb-10">
             <a
-              href="https://wa.me/5500000000000"
+              href="https://wa.me/5543991065129"
               target="_blank"
               rel="noopener noreferrer"
               className="flex flex-col items-center gap-3 p-6 rounded-xl bg-secondary/50 hover:bg-secondary transition text-center"
             >
               <Phone className="text-primary" size={24} />
               <span className="text-sm font-medium">WhatsApp</span>
-              <span className="text-muted-foreground text-xs">(00) 00000-0000</span>
+              <span className="text-muted-foreground text-xs">(43) 99106-5129</span>
             </a>
             <a
-              href="mailto:contato@empresa.com"
+              href="mailto:brandifycoo@gmail.com"
               className="flex flex-col items-center gap-3 p-6 rounded-xl bg-secondary/50 hover:bg-secondary transition text-center"
             >
               <Mail className="text-primary" size={24} />
               <span className="text-sm font-medium">E-mail</span>
-              <span className="text-muted-foreground text-xs">contato@empresa.com</span>
+              <span className="text-muted-foreground text-xs">brandifycoo@gmail.com</span>
             </a>
             <div className="flex flex-col items-center gap-3 p-6 rounded-xl bg-secondary/50 text-center">
               <MapPin className="text-primary" size={24} />
@@ -45,7 +45,7 @@ export default function Contact() {
 
           <div className="text-center">
             <a
-              href="https://wa.me/5500000000000"
+              href="https://wa.me/5543991065129"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block px-8 py-3.5 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition"
