@@ -1,10 +1,14 @@
-import { Store, Stethoscope, Scale, Building2 } from "lucide-react";
+import { ShoppingBag, HeartPulse, Gavel, Building2, Utensils, GraduationCap, Dumbbell, Scissors, type LucideIcon } from "lucide-react";
 
-const segments = [
-  { icon: Store, label: "Lojas & Comércios" },
-  { icon: Stethoscope, label: "Clínicas & Consultórios" },
-  { icon: Scale, label: "Advocacias" },
-  { icon: Building2, label: "Empresas em Geral" },
+const segments: { icon: LucideIcon; label: string; desc: string }[] = [
+  { icon: ShoppingBag, label: "Lojas & Comércios", desc: "E-commerces e vitrines digitais" },
+  { icon: HeartPulse, label: "Clínicas & Saúde", desc: "Médicos, dentistas e terapeutas" },
+  { icon: Gavel, label: "Advocacias", desc: "Escritórios de advocacia" },
+  { icon: Building2, label: "Empresas", desc: "Corporativo e institucional" },
+  { icon: Utensils, label: "Restaurantes", desc: "Cardápios e delivery online" },
+  { icon: GraduationCap, label: "Educação", desc: "Escolas e cursos" },
+  { icon: Dumbbell, label: "Academias", desc: "Fitness e personal trainers" },
+  { icon: Scissors, label: "Beleza & Estética", desc: "Salões e clínicas estéticas" },
 ];
 
 export default function Portfolio() {
@@ -23,18 +27,23 @@ export default function Portfolio() {
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {segments.map((s) => (
-            <div
-              key={s.label}
-              className="glass rounded-xl p-8 text-center hover:glow-border transition-all duration-300 group"
-            >
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5 group-hover:bg-primary/20 transition">
-                <s.icon className="text-primary" size={28} />
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+          {segments.map((s, i) => {
+            const Icon = s.icon;
+            return (
+              <div
+                key={s.label}
+                className="glass rounded-xl p-6 text-center hover:glow-border transition-all duration-300 group animate-fade-in"
+                style={{ animationDelay: `${i * 0.06}s` }}
+              >
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mx-auto mb-4 group-hover:from-primary/30 group-hover:to-primary/10 group-hover:scale-110 transition-all duration-300 shadow-lg shadow-primary/10">
+                  <Icon className="text-primary" size={30} strokeWidth={1.6} />
+                </div>
+                <h3 className="font-display font-semibold text-sm mb-1">{s.label}</h3>
+                <p className="text-muted-foreground text-xs">{s.desc}</p>
               </div>
-              <h3 className="font-display font-semibold">{s.label}</h3>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
