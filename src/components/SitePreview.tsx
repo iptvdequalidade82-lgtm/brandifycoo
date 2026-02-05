@@ -1,19 +1,15 @@
 import { ExternalLink } from "lucide-react";
-import previewBruna from "@/assets/preview-brunagomes.png";
 
 const sites = [
   {
     url: "https://ericpimentel.lovable.app",
     label: "ericpimentel.lovable.app",
     title: "Site Institucional",
-    type: "iframe" as const,
   },
   {
-    url: "https://storebrunagomes.lojavirtualnuvem.com.br/",
-    label: "storebrunagomes.lojavirtualnuvem.com.br",
-    title: "Loja Virtual",
-    type: "image" as const,
-    image: previewBruna,
+    url: "https://barber043.lovable.app/",
+    label: "barber043.lovable.app",
+    title: "Site para Barbearia",
   },
 ];
 
@@ -61,23 +57,13 @@ export default function SitePreview() {
 
               {/* Content */}
               <div className="relative w-full" style={{ height: "55vh" }}>
-                {site.type === "iframe" ? (
-                  <iframe
-                    src={site.url}
-                    title={`Preview - ${site.title}`}
-                    className="w-full h-full border-0"
-                    loading="lazy"
-                    sandbox="allow-scripts allow-same-origin"
-                  />
-                ) : (
-                  <a href={site.url} target="_blank" rel="noopener noreferrer" className="block w-full h-full overflow-hidden">
-                    <img
-                      src={site.image}
-                      alt={`Preview - ${site.title}`}
-                      className="w-full h-auto object-cover object-top"
-                    />
-                  </a>
-                )}
+                <iframe
+                  src={site.url}
+                  title={`Preview - ${site.title}`}
+                  className="w-full h-full border-0"
+                  loading="lazy"
+                  sandbox="allow-scripts allow-same-origin"
+                />
               </div>
 
               {/* Label */}
