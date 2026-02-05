@@ -47,7 +47,7 @@ export default function Pricing() {
 
           <div className="px-8 pb-8 md:px-10 md:pb-10 text-center">
             <a
-              href="https://wa.me/5543991065129"
+              href="https://wa.me/5543991065129?text=Ol%C3%A1!%20Fiquei%20interessado%20nos%20servi%C3%A7os%20da%20Brandify%20e%20gostaria%20de%20solicitar%20um%20or%C3%A7amento%20para%20cria%C3%A7%C3%A3o%20de%20site."
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block w-full sm:w-auto px-10 py-3.5 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition"

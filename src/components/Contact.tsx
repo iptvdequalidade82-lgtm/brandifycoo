@@ -19,7 +19,7 @@ export default function Contact() {
 
           <div className="grid md:grid-cols-3 gap-6 mb-10">
             <a
-              href="https://wa.me/5543991065129"
+              href="https://wa.me/5543991065129?text=Ol%C3%A1!%20Fiquei%20interessado%20nos%20servi%C3%A7os%20da%20Brandify%20e%20gostaria%20de%20solicitar%20um%20or%C3%A7amento%20para%20cria%C3%A7%C3%A3o%20de%20site."
               target="_blank"
               rel="noopener noreferrer"
               className="flex flex-col items-center gap-3 p-6 rounded-xl bg-secondary/50 hover:bg-secondary transition text-center"
@@ -45,7 +45,7 @@ export default function Contact() {
 
           <div className="text-center">
             <a
-              href="https://wa.me/5543991065129"
+              href="https://wa.me/5543991065129?text=Ol%C3%A1!%20Fiquei%20interessado%20nos%20servi%C3%A7os%20da%20Brandify%20e%20gostaria%20de%20solicitar%20um%20or%C3%A7amento%20para%20cria%C3%A7%C3%A3o%20de%20site."
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block px-8 py-3.5 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition"
