@@ -29,7 +29,9 @@ export default function Hero() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up" style={{ animationDelay: "0.3s" }}>
           <a
-            href="#contato"
+            href="https://wa.me/5543991065129"
+            target="_blank"
+            rel="noopener noreferrer"
             className="px-8 py-3.5 rounded-lg bg-primary text-primary-foreground font-semibold hover:opacity-90 transition text-center"
           >
             Solicitar Orçamento
