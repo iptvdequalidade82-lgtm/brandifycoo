@@ -1,35 +1,41 @@
 import { Globe, Smartphone, Search, Palette, ShieldCheck, Zap, type LucideIcon } from "lucide-react";
 
-const services: { icon: LucideIcon; title: string; description: string }[] = [
+const services: { icon: LucideIcon; title: string; description: string; accent: string }[] = [
   {
     icon: Globe,
     title: "Sites Institucionais",
-    description: "Sites profissionais para apresentar sua empresa, serviços e diferenciais de forma clara e atrativa.",
+    description: "Apresente sua empresa com um site que transmite credibilidade e profissionalismo.",
+    accent: "from-emerald-500 to-teal-600",
   },
   {
     icon: Smartphone,
     title: "Design Responsivo",
-    description: "Seu site funcionando perfeitamente em celulares, tablets e computadores.",
+    description: "Perfeito em qualquer tela — celular, tablet ou desktop.",
+    accent: "from-blue-500 to-indigo-600",
   },
   {
     icon: Search,
     title: "SEO Otimizado",
-    description: "Estratégias para que seu site apareça nos primeiros resultados do Google.",
+    description: "Seu site no topo do Google, atraindo clientes todos os dias.",
+    accent: "from-amber-500 to-orange-600",
   },
   {
     icon: Palette,
     title: "Identidade Visual",
-    description: "Design personalizado que reflete a identidade e os valores da sua marca.",
+    description: "Design exclusivo que reflete a personalidade da sua marca.",
+    accent: "from-pink-500 to-rose-600",
   },
   {
     icon: ShieldCheck,
     title: "Segurança & SSL",
-    description: "Certificado de segurança e proteção de dados para seus visitantes.",
+    description: "Proteção total para você e seus visitantes navegarem tranquilos.",
+    accent: "from-violet-500 to-purple-600",
   },
   {
     icon: Zap,
     title: "Alta Performance",
-    description: "Sites rápidos e otimizados para oferecer a melhor experiência ao usuário.",
+    description: "Velocidade extrema para não perder nenhum visitante.",
+    accent: "from-cyan-500 to-sky-600",
   },
 ];
 
@@ -46,20 +52,22 @@ export default function Services() {
           </h2>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-border/40 rounded-2xl overflow-hidden">
           {services.map((s, i) => {
             const Icon = s.icon;
             return (
               <div
                 key={s.title}
-                className="glass rounded-xl p-7 hover:glow-border transition-all duration-300 group animate-fade-in"
-                style={{ animationDelay: `${i * 0.08}s` }}
+                className="relative bg-background p-8 group hover:bg-secondary/30 transition-colors duration-300"
               >
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-5 group-hover:from-primary/30 group-hover:to-primary/10 group-hover:scale-110 transition-all duration-300 shadow-lg shadow-primary/10">
-                  <Icon className="text-primary" size={26} strokeWidth={1.8} />
+                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.accent} flex items-center justify-center mb-5 group-hover:scale-105 transition-transform duration-300`}>
+                  <Icon className="text-white" size={20} strokeWidth={2} />
                 </div>
-                <h3 className="font-display text-lg font-semibold mb-2">{s.title}</h3>
+                <h3 className="font-display text-base font-semibold mb-2">{s.title}</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed">{s.description}</p>
+                <span className="absolute top-6 right-6 font-display text-6xl font-bold text-foreground/[0.03] select-none">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
               </div>
             );
           })}
