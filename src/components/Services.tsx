@@ -1,6 +1,6 @@
-import { Globe, Smartphone, Search, Palette, ShieldCheck, Zap } from "lucide-react";
+import { Globe, Smartphone, Search, Palette, ShieldCheck, Zap, type LucideIcon } from "lucide-react";
 
-const services = [
+const services: { icon: LucideIcon; title: string; description: string }[] = [
   {
     icon: Globe,
     title: "Sites Institucionais",
@@ -47,19 +47,22 @@ export default function Services() {
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {services.map((s, i) => (
-            <div
-              key={s.title}
-              className="glass rounded-xl p-6 hover:glow-border transition-all duration-300 group"
-              style={{ animationDelay: `${i * 0.1}s` }}
-            >
-              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition">
-                <s.icon className="text-primary" size={24} />
+          {services.map((s, i) => {
+            const Icon = s.icon;
+            return (
+              <div
+                key={s.title}
+                className="glass rounded-xl p-7 hover:glow-border transition-all duration-300 group animate-fade-in"
+                style={{ animationDelay: `${i * 0.08}s` }}
+              >
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-5 group-hover:from-primary/30 group-hover:to-primary/10 group-hover:scale-110 transition-all duration-300 shadow-lg shadow-primary/10">
+                  <Icon className="text-primary" size={26} strokeWidth={1.8} />
+                </div>
+                <h3 className="font-display text-lg font-semibold mb-2">{s.title}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">{s.description}</p>
               </div>
-              <h3 className="font-display text-lg font-semibold mb-2">{s.title}</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">{s.description}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
