@@ -5,9 +5,6 @@ export default function Pricing() {
     <section id="investimento" className="section-padding">
       <div className="container mx-auto max-w-4xl">
         <div className="text-center mb-12">
-          <p className="text-primary font-medium tracking-widest uppercase text-sm mb-3">
-            Investimento
-          </p>
           <h2 className="font-display text-3xl md:text-4xl font-bold">
             Transparência desde o início
           </h2>

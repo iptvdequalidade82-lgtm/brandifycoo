@@ -20,9 +20,6 @@ export default function Gallery() {
     <section id="galeria" className="section-padding">
       <div className="container mx-auto max-w-6xl">
         <div className="text-center mb-16">
-          <p className="text-primary font-medium tracking-widest uppercase text-sm mb-3">
-            @brandifycoo
-          </p>
           <h2 className="font-display text-3xl md:text-4xl font-bold">
             Nosso conteúdo
           </h2>

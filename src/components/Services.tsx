@@ -13,9 +13,6 @@ export default function Services() {
   return (
     <section id="servicos" className="py-14 md:py-20 px-6">
       <div className="container mx-auto max-w-4xl">
-        <p className="text-primary font-medium tracking-widest uppercase text-sm mb-3 text-center">
-          Serviços
-        </p>
         <h2 className="font-display text-3xl md:text-4xl font-bold text-center mb-10">
           O que oferecemos
         </h2>
