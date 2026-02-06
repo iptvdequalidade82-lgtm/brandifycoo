@@ -3,6 +3,7 @@ import post2 from "@/assets/post-2.jpg";
 import post3 from "@/assets/post-3.jpg";
 import post4 from "@/assets/post-4.jpg";
 import post5 from "@/assets/post-5.jpg";
+import post6 from "@/assets/post-6.jpg";
 import { Instagram } from "lucide-react";
 
 const posts = [
@@ -11,6 +12,7 @@ const posts = [
   { src: post3, alt: "Seu negócio precisa de um site" },
   { src: post4, alt: "Pronto para decolar? Toda grande empresa possui um site" },
   { src: post5, alt: "Marketing digital não é sorte, é estratégia" },
+  { src: post6, alt: "Como parar de atrair curiosos corretamente" },
 ];
 
 export default function Gallery() {
