@@ -1,16 +1,28 @@
 import logo from "@/assets/logo.jpg";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const navLinks = [
   { label: "Início", href: "#inicio" },
   { label: "Serviços", href: "#servicos" },
   { label: "Portfólio", href: "#portfolio" },
+  { label: "Curso", href: "/curso" },
   { label: "Contato", href: "#contato" },
 ];
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleNav = (href: string) => {
+    setOpen(false);
+    if (href.startsWith("/")) {
+      navigate(href);
+    } else {
+      document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 glass">
@@ -22,13 +34,13 @@ export default function Header() {
         {/* Desktop */}
         <nav className="hidden md:flex items-center gap-8">
           {navLinks.map((l) => (
-            <a
+            <button
               key={l.href}
-              href={l.href}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => handleNav(l.href)}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors bg-transparent border-none cursor-pointer"
             >
               {l.label}
-            </a>
+            </button>
           ))}
           <a
             href="https://wa.me/5543991065129?text=Ol%C3%A1!%20Fiquei%20interessado%20nos%20servi%C3%A7os%20da%20Brandify%20e%20gostaria%20de%20solicitar%20um%20or%C3%A7amento%20para%20cria%C3%A7%C3%A3o%20de%20site."
@@ -54,14 +66,13 @@ export default function Header() {
       {open && (
         <nav className="md:hidden glass border-t border-border px-6 pb-6 pt-4 flex flex-col gap-4 animate-fade-in">
           {navLinks.map((l) => (
-            <a
+            <button
               key={l.href}
-              href={l.href}
-              onClick={() => setOpen(false)}
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => handleNav(l.href)}
+              className="text-muted-foreground hover:text-foreground transition-colors bg-transparent border-none cursor-pointer text-left"
             >
               {l.label}
-            </a>
+            </button>
           ))}
           <a
             href="https://wa.me/5543991065129?text=Ol%C3%A1!%20Fiquei%20interessado%20nos%20servi%C3%A7os%20da%20Brandify%20e%20gostaria%20de%20solicitar%20um%20or%C3%A7amento%20para%20cria%C3%A7%C3%A3o%20de%20site."
