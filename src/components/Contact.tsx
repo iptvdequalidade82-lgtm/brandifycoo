@@ -6,9 +6,6 @@ export default function Contact() {
       <div className="container mx-auto max-w-4xl">
         <div className="glass rounded-2xl p-8 md:p-12 glow-border">
           <div className="text-center mb-10">
-            <p className="text-primary font-medium tracking-widest uppercase text-sm mb-3">
-              Contato
-            </p>
             <h2 className="font-display text-3xl md:text-4xl font-bold">
               Vamos criar o seu site?
             </h2>
