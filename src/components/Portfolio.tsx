@@ -1,44 +1,37 @@
 import { ShoppingBag, HeartPulse, Gavel, Building2, Utensils, GraduationCap, Dumbbell, Scissors, type LucideIcon } from "lucide-react";
 
-const segments: { icon: LucideIcon; label: string; accent: string }[] = [
-  { icon: ShoppingBag, label: "Lojas & Comércios", accent: "from-emerald-500 to-teal-600" },
-  { icon: HeartPulse, label: "Clínicas & Saúde", accent: "from-rose-500 to-pink-600" },
-  { icon: Gavel, label: "Advocacias", accent: "from-amber-500 to-orange-600" },
-  { icon: Building2, label: "Empresas", accent: "from-blue-500 to-indigo-600" },
-  { icon: Utensils, label: "Restaurantes", accent: "from-red-500 to-rose-600" },
-  { icon: GraduationCap, label: "Educação", accent: "from-violet-500 to-purple-600" },
-  { icon: Dumbbell, label: "Academias", accent: "from-cyan-500 to-sky-600" },
-  { icon: Scissors, label: "Beleza & Estética", accent: "from-fuchsia-500 to-pink-600" },
+const segments: { icon: LucideIcon; label: string }[] = [
+  { icon: ShoppingBag, label: "Lojas & Comércios" },
+  { icon: HeartPulse, label: "Clínicas & Saúde" },
+  { icon: Gavel, label: "Advocacias" },
+  { icon: Building2, label: "Empresas" },
+  { icon: Utensils, label: "Restaurantes" },
+  { icon: GraduationCap, label: "Educação" },
+  { icon: Dumbbell, label: "Academias" },
+  { icon: Scissors, label: "Beleza & Estética" },
 ];
 
 export default function Portfolio() {
   return (
-    <section id="portfolio" className="section-padding">
-      <div className="container mx-auto max-w-5xl">
-        <div className="text-center mb-16">
-          <p className="text-primary font-medium tracking-widest uppercase text-sm mb-3">
-            Segmentos
-          </p>
-          <h2 className="font-display text-3xl md:text-4xl font-bold">
-            Atendemos diversos ramos
-          </h2>
-          <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
-            Experiência criando sites para os mais variados segmentos.
-          </p>
-        </div>
+    <section id="portfolio" className="py-14 md:py-20 px-6">
+      <div className="container mx-auto max-w-4xl">
+        <p className="text-primary font-medium tracking-widest uppercase text-sm mb-3 text-center">
+          Segmentos
+        </p>
+        <h2 className="font-display text-3xl md:text-4xl font-bold text-center mb-10">
+          Atendemos diversos ramos
+        </h2>
 
-        <div className="flex flex-wrap justify-center gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {segments.map((s) => {
             const Icon = s.icon;
             return (
               <div
                 key={s.label}
-                className="flex items-center gap-3 pl-1.5 pr-5 py-1.5 rounded-full border border-border hover:border-primary/40 bg-secondary/40 hover:bg-secondary/70 transition-all duration-300 group cursor-default"
+                className="flex flex-col items-center gap-2 py-4 px-3 rounded-xl border border-border hover:border-primary/40 bg-secondary/30 hover:bg-secondary/60 transition-all duration-300 group"
               >
-                <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${s.accent} flex items-center justify-center flex-shrink-0`}>
-                  <Icon className="text-white" size={16} strokeWidth={2.2} />
-                </div>
-                <span className="text-sm font-medium text-foreground whitespace-nowrap">{s.label}</span>
+                <Icon className="text-primary group-hover:scale-110 transition-transform duration-300" size={20} strokeWidth={1.8} />
+                <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground transition-colors text-center">{s.label}</span>
               </div>
             );
           })}
