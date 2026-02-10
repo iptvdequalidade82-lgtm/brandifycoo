@@ -1,21 +1,30 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, ExternalLink, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ExternalLink } from "lucide-react";
 import cursoBanner from "@/assets/curso-banner.jpg";
-import cursoLogo from "@/assets/curso-logo.png";
+import novaProfissaoCover from "@/assets/nova-profissao-cover.webp";
 
-const benefits = [
-  "Criação de SaaS na prática em 30 dias",
-  "Suporte especializado por WhatsApp",
-  "Aulas ao vivo via Zoom para tirar dúvidas",
-  "Comunidade engajada para fazer networking",
-  "Acesso imediato",
-  "Garantia de 15 dias",
+const products = [
+  {
+    title: "SaaS na Prática em 30 dias",
+    description: "Aprenda a criar um SaaS do zero em apenas 30 dias com suporte e aulas ao vivo.",
+    price: "R$ 197,00",
+    installments: "",
+    image: cursoBanner,
+    checkoutUrl: "https://pay.cakto.com.br/j3nfmrj_323782?affiliate=QfzSc7Xx",
+    platform: "Cakto",
+  },
+  {
+    title: "Nova Profissão",
+    description: "O treinamento ideal para quem sonha em se tornar um profissional completo no digital.",
+    price: "R$ 699,00",
+    installments: "ou 12x de R$ 71,64",
+    image: novaProfissaoCover,
+    checkoutUrl: "https://pay.kirvano.com/9ee0e4df-b093-4975-b0a8-48d863543762?aff=681f54e8-2253-45ed-a04a-523963130dea",
+    platform: "Kirvano",
+  },
 ];
 
 export default function Curso() {
-  const checkoutUrl =
-    "https://pay.cakto.com.br/j3nfmrj_323782?affiliate=QfzSc7Xx";
-
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -29,72 +38,45 @@ export default function Curso() {
         </Link>
       </div>
 
-      {/* Banner */}
-      <div className="max-w-4xl mx-auto px-6">
-        <div className="rounded-2xl overflow-hidden mb-10 max-h-52">
-          <img
-            src={cursoBanner}
-            alt="SaaS na Prática em 30 dias"
-            className="w-full h-52 object-cover"
-          />
-        </div>
+      <div className="max-w-5xl mx-auto px-6 pb-20">
+        <h1 className="font-display text-3xl md:text-4xl font-bold mb-2">Cursos</h1>
+        <p className="text-muted-foreground mb-10">Invista no seu futuro com nossos cursos selecionados.</p>
 
-        {/* Content */}
-        <div className="flex flex-col md:flex-row gap-10 pb-20">
-          {/* Left - Info */}
-          <div className="flex-1 space-y-6">
-            <div className="flex items-center gap-4">
+        <div className="grid sm:grid-cols-2 gap-6">
+          {products.map((product) => (
+            <div
+              key={product.title}
+              className="rounded-2xl border border-border bg-card overflow-hidden flex flex-col hover:shadow-lg transition-shadow"
+            >
               <img
-                src={cursoLogo}
-                alt="IA Coding Club"
-                className="w-16 h-16 rounded-xl object-cover"
+                src={product.image}
+                alt={product.title}
+                className="w-full h-48 object-cover"
               />
-              <div>
-                <h1 className="font-display text-2xl md:text-3xl font-bold">
-                  SaaS na Prática em 30 dias
-                </h1>
-                <p className="text-muted-foreground text-sm mt-1">
-                  por Matheus da IA
+              <div className="p-5 flex flex-col flex-1">
+                <h2 className="font-display text-xl font-bold mb-1">{product.title}</h2>
+                <p className="text-muted-foreground text-sm mb-4 flex-1">{product.description}</p>
+                <div className="mb-4">
+                  <p className="text-2xl font-bold text-foreground">{product.price}</p>
+                  {product.installments && (
+                    <p className="text-xs text-muted-foreground">{product.installments}</p>
+                  )}
+                </div>
+                <a
+                  href={product.checkoutUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full rounded-xl bg-primary text-primary-foreground font-semibold py-3 hover:opacity-90 transition"
+                >
+                  Quero me inscrever
+                  <ExternalLink size={16} />
+                </a>
+                <p className="text-xs text-muted-foreground text-center mt-2">
+                  Pagamento seguro via {product.platform}
                 </p>
               </div>
             </div>
-
-            <div className="space-y-3">
-              {benefits.map((item) => (
-                <div key={item} className="flex items-start gap-3">
-                  <CheckCircle2
-                    size={18}
-                    className="text-primary mt-0.5 shrink-0"
-                  />
-                  <span className="text-foreground/80 text-sm">{item}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Right - CTA */}
-          <div className="md:w-72 shrink-0">
-            <div className="rounded-2xl border border-border bg-card p-6 space-y-4 sticky top-6">
-              <p className="text-3xl font-bold text-foreground">
-                R$ 197<span className="text-lg font-normal text-muted-foreground">,00</span>
-              </p>
-              <p className="text-sm text-muted-foreground">à vista</p>
-
-              <a
-                href={checkoutUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full rounded-xl bg-primary text-primary-foreground font-semibold py-3 hover:opacity-90 transition"
-              >
-                Quero me inscrever
-                <ExternalLink size={16} />
-              </a>
-
-              <p className="text-xs text-muted-foreground text-center">
-                Pagamento seguro via Cakto
-              </p>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>
