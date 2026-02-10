@@ -31,11 +31,11 @@ export default function Curso() {
 
       {/* Banner */}
       <div className="max-w-4xl mx-auto px-6">
-        <div className="rounded-2xl overflow-hidden mb-10">
+        <div className="rounded-2xl overflow-hidden mb-10 max-h-52">
           <img
             src={cursoBanner}
             alt="SaaS na Prática em 30 dias"
-            className="w-full h-auto object-cover"
+            className="w-full h-52 object-cover"
           />
         </div>
 
