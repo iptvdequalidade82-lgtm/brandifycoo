@@ -52,7 +52,7 @@ export default function Curso() {
         <h1 className="font-display text-3xl md:text-4xl font-bold mb-2">Cursos</h1>
         <p className="text-muted-foreground mb-10">Invista no seu futuro com nossos cursos selecionados.</p>
 
-        <div className="grid sm:grid-cols-2 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.map((product) => (
             <div
               key={product.title}
@@ -81,9 +81,6 @@ export default function Curso() {
                   Quero me inscrever
                   <ExternalLink size={16} />
                 </a>
-                <p className="text-xs text-muted-foreground text-center mt-2">
-                  Pagamento seguro via {product.platform}
-                </p>
               </div>
             </div>
           ))}
