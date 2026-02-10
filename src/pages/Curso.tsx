@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import cursoBanner from "@/assets/curso-banner.jpg";
 import novaProfissaoCover from "@/assets/nova-profissao-cover.webp";
+import dropMilionarioCover from "@/assets/drop-milionario-cover.webp";
 
 const products = [
   {
@@ -20,6 +21,15 @@ const products = [
     installments: "ou 12x de R$ 71,64",
     image: novaProfissaoCover,
     checkoutUrl: "https://pay.kirvano.com/9ee0e4df-b093-4975-b0a8-48d863543762?aff=681f54e8-2253-45ed-a04a-523963130dea",
+    platform: "Kirvano",
+  },
+  {
+    title: "Drop Milionário",
+    description: "Aprenda as estratégias de dropshipping para construir um negócio lucrativo do zero.",
+    price: "R$ 197,90",
+    installments: "ou 12x de R$ 20,28",
+    image: dropMilionarioCover,
+    checkoutUrl: "https://pay.kirvano.com/80931f40-cdd6-42b7-91d2-a9aeb57aa495?aff=cc8503b8-058d-4285-910b-b0fc9746420d",
     platform: "Kirvano",
   },
 ];
