@@ -1,4 +1,5 @@
 import { ShoppingBag, HeartPulse, Gavel, Building2, Utensils, GraduationCap, Dumbbell, Scissors } from "lucide-react";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const segments = [
   { icon: ShoppingBag, label: "Lojas & Comércios", desc: "E-commerces e vitrines digitais para vender mais." },
@@ -12,20 +13,29 @@ const segments = [
 ];
 
 export default function Portfolio() {
+  const { ref, isVisible } = useScrollReveal();
+
   return (
     <section id="portfolio" className="py-14 md:py-20 px-6">
-      <div className="container mx-auto max-w-5xl">
-        <h2 className="font-display text-3xl md:text-4xl font-bold text-center mb-12">
+      <div ref={ref} className="container mx-auto max-w-5xl">
+        <h2
+          className={`font-display text-3xl md:text-4xl font-bold text-center mb-12 transition-all duration-700 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
+        >
           Atendemos diversos ramos
         </h2>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {segments.map((s) => {
+          {segments.map((s, i) => {
             const Icon = s.icon;
             return (
               <div
                 key={s.label}
-                className="p-5 rounded-2xl border border-border/60 bg-card/40 hover:bg-card/70 transition-all duration-300 group"
+                className={`group p-5 rounded-2xl border border-border/60 bg-card/40 hover:bg-card/70 hover:border-primary/30 transition-all duration-500 ${
+                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                }`}
+                style={{ transitionDelay: isVisible ? `${i * 80}ms` : "0ms" }}
               >
                 <Icon className="text-primary mb-3 group-hover:scale-110 transition-transform duration-300" size={20} strokeWidth={1.8} />
                 <h3 className="text-sm font-semibold text-foreground mb-1">{s.label}</h3>

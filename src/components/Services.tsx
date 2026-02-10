@@ -1,4 +1,5 @@
 import { Globe, Smartphone, Search, Palette, ShieldCheck, Zap } from "lucide-react";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const services = [
   { icon: Globe, title: "Sites Institucionais", desc: "Presença digital profissional que transmite credibilidade e fortalece sua marca no mercado." },
@@ -10,22 +11,33 @@ const services = [
 ];
 
 export default function Services() {
+  const { ref, isVisible } = useScrollReveal();
+
   return (
     <section id="servicos" className="py-14 md:py-20 px-6">
-      <div className="container mx-auto max-w-5xl">
-        <h2 className="font-display text-3xl md:text-4xl font-bold text-center mb-12">
+      <div ref={ref} className="container mx-auto max-w-5xl">
+        <h2
+          className={`font-display text-3xl md:text-4xl font-bold text-center mb-12 transition-all duration-700 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
+        >
           O que oferecemos
         </h2>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {services.map((s) => {
+          {services.map((s, i) => {
             const Icon = s.icon;
             return (
               <div
                 key={s.title}
-                className="p-6 rounded-2xl border border-border/60 bg-card/40 hover:bg-card/70 transition-all duration-300"
+                className={`group p-6 rounded-2xl border border-border/60 bg-card/40 hover:bg-card/70 hover:border-primary/30 hover:shadow-[0_0_20px_hsl(210_100%_60%/0.08)] transition-all duration-500 ${
+                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                }`}
+                style={{ transitionDelay: isVisible ? `${i * 100}ms` : "0ms" }}
               >
-                <Icon className="text-primary mb-4" size={22} strokeWidth={1.8} />
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                  <Icon className="text-primary" size={20} strokeWidth={1.8} />
+                </div>
                 <h3 className="font-display text-base font-semibold text-foreground mb-2">{s.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
               </div>
