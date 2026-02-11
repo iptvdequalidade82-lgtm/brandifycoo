@@ -1,35 +1,58 @@
 import { ExternalLink } from "lucide-react";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
+import previewBruna from "@/assets/preview-brunagomes.png";
 
 const sites = [
   {
     url: "https://ericpimentel.lovable.app",
     label: "ericpimentel.lovable.app",
     title: "Site Institucional",
+    screenshot: null,
   },
   {
     url: "https://barber043.lovable.app/",
     label: "barber043.lovable.app",
     title: "Site para Barbearia",
+    screenshot: null,
   },
 ];
 
 export default function SitePreview() {
+  const { ref, isVisible } = useScrollReveal();
+
   return (
     <section id="preview" className="section-padding">
-      <div className="container mx-auto max-w-7xl">
+      <div ref={ref} className="container mx-auto max-w-5xl">
         <div className="text-center mb-12">
-          <h2 className="font-display text-3xl md:text-4xl font-bold">
+          <h2
+            className={`font-display text-3xl md:text-4xl font-bold transition-all duration-700 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
+          >
             Veja nossos projetos
           </h2>
-          <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
-            Navegue pelos sites abaixo como se estivesse acessando de verdade.
+          <p
+            className={`text-muted-foreground mt-4 max-w-xl mx-auto transition-all duration-700 delay-100 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
+          >
+            Clique para acessar os sites que já criamos para nossos clientes.
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
-          {sites.map((site) => (
-            <div key={site.url} className="glass rounded-2xl overflow-hidden glow-border animate-fade-in">
-              {/* Browser top bar */}
+          {sites.map((site, i) => (
+            <a
+              key={site.url}
+              href={site.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`group glass rounded-2xl overflow-hidden glow-border transition-all duration-500 hover:border-primary/40 hover:shadow-[0_0_30px_hsl(210_100%_60%/0.1)] ${
+                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              }`}
+              style={{ transitionDelay: isVisible ? `${i * 150}ms` : "0ms" }}
+            >
+              {/* Browser bar */}
               <div className="flex items-center gap-2 px-4 py-3 bg-secondary/80 border-b border-border">
                 <div className="flex gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-[hsl(0_70%_55%)]" />
@@ -41,33 +64,30 @@ export default function SitePreview() {
                     {site.label}
                   </div>
                 </div>
-                <a
-                  href={site.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label="Abrir site em nova aba"
-                >
-                  <ExternalLink size={13} />
-                </a>
+                <ExternalLink size={13} className="text-muted-foreground group-hover:text-foreground transition-colors" />
               </div>
 
-              {/* Content */}
-              <div className="relative w-full" style={{ height: "55vh" }}>
+              {/* Screenshot placeholder */}
+              <div className="relative w-full aspect-[16/10] bg-secondary/30 flex items-center justify-center overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/30" />
                 <iframe
                   src={site.url}
                   title={`Preview - ${site.title}`}
-                  className="w-full h-full border-0"
+                  className="w-[200%] h-[200%] border-0 pointer-events-none origin-top-left scale-50"
                   loading="lazy"
                   sandbox="allow-scripts allow-same-origin"
+                  tabIndex={-1}
                 />
               </div>
 
               {/* Label */}
-              <div className="px-4 py-3 border-t border-border bg-secondary/40 text-center">
+              <div className="px-5 py-4 border-t border-border bg-secondary/40 flex items-center justify-between">
                 <span className="text-sm font-semibold text-foreground">{site.title}</span>
+                <span className="text-xs text-muted-foreground group-hover:text-primary transition-colors flex items-center gap-1">
+                  Visitar <ExternalLink size={12} />
+                </span>
               </div>
-            </div>
+            </a>
           ))}
         </div>
 

@@ -65,7 +65,7 @@ export default function Hero() {
 
         {/* Stats */}
         <div
-          className="mt-16 flex items-center justify-center gap-8 md:gap-16 animate-fade-up"
+          className="mt-16 flex flex-wrap items-center justify-center gap-6 sm:gap-8 md:gap-16 animate-fade-up"
           style={{ animationDelay: "0.5s" }}
         >
           {[
