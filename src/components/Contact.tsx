@@ -1,5 +1,6 @@
 import { Mail, Phone, MapPin, MessageCircle } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import ContactForm from "@/components/ContactForm";
 
 const whatsappUrl =
   "https://wa.me/5543991065129?text=Ol%C3%A1!%20Fiquei%20interessado%20nos%20servi%C3%A7os%20da%20Brandify%20e%20gostaria%20de%20solicitar%20um%20or%C3%A7amento%20para%20cria%C3%A7%C3%A3o%20de%20site.";
@@ -30,8 +31,9 @@ export default function Contact() {
 
   return (
     <section id="contato" className="section-padding">
-      <div ref={ref} className="container mx-auto max-w-4xl">
+      <div className="container mx-auto max-w-4xl">
         <div
+          ref={ref}
           className={`rounded-2xl overflow-hidden border border-border/60 bg-card/30 backdrop-blur-sm transition-all duration-700 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
@@ -88,6 +90,9 @@ export default function Contact() {
             </div>
           </div>
         </div>
+
+        {/* Contact Form */}
+        <ContactForm />
       </div>
     </section>
   );

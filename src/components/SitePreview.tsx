@@ -1,19 +1,16 @@
 import { ExternalLink } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
-import previewBruna from "@/assets/preview-brunagomes.png";
 
 const sites = [
   {
     url: "https://ericpimentel.lovable.app",
     label: "ericpimentel.lovable.app",
     title: "Site Institucional",
-    screenshot: null,
   },
   {
     url: "https://barber043.lovable.app/",
     label: "barber043.lovable.app",
     title: "Site para Barbearia",
-    screenshot: null,
   },
 ];
 
@@ -67,16 +64,14 @@ export default function SitePreview() {
                 <ExternalLink size={13} className="text-muted-foreground group-hover:text-foreground transition-colors" />
               </div>
 
-              {/* Screenshot placeholder */}
-              <div className="relative w-full aspect-[16/10] bg-secondary/30 flex items-center justify-center overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/30" />
-                <iframe
-                  src={site.url}
-                  title={`Preview - ${site.title}`}
-                  className="w-[200%] h-[200%] border-0 pointer-events-none origin-top-left scale-50"
+              {/* Screenshot via API */}
+              <div className="relative w-full aspect-[16/10] bg-secondary/30 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/30 z-10" />
+                <img
+                  src={`https://image.thum.io/get/width/800/crop/500/${site.url}`}
+                  alt={`Preview - ${site.title}`}
+                  className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
                   loading="lazy"
-                  sandbox="allow-scripts allow-same-origin"
-                  tabIndex={-1}
                 />
               </div>
 
