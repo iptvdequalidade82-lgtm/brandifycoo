@@ -21,15 +21,15 @@ const faqs = [
   },
   {
     q: "Preciso fornecer o conteúdo do site?",
-    a: "Idealmente sim, mas se precisar de ajuda, nossa equipe de copywriting pode criar textos persuasivos para o seu negócio.",
+    a: "Sim, mas se precisar de ajuda, nossa equipe de copywriting pode criar textos profissionais e persuasivos para o seu negócio. Cuidamos de tudo para você!",
   },
   {
-    q: "O que está incluso na hospedagem?",
-    a: "A hospedagem inclui certificado SSL, domínio .com.br, suporte técnico e 1 ajuste mensal no site. O valor é a partir de R$ 120/ano.",
+    q: "A hospedagem e o domínio estão inclusos?",
+    a: "Hospedagem e domínio são cobrados separadamente. A hospedagem custa R$ 240,00/ano (valor fixo) e o domínio a partir de R$ 49,90/ano, variando conforme a extensão escolhida.",
   },
   {
     q: "Vocês fazem manutenção após a entrega?",
-    a: "Sim! Oferecemos 1 ajuste mensal incluso. Para demandas extras, temos planos de manutenção sob medida.",
+    a: "Sim! Todos os planos incluem 1 ajuste mensal. Para demandas extras, temos planos de manutenção sob medida.",
   },
 ];
 
