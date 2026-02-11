@@ -1,4 +1,4 @@
-import { Check, Star } from "lucide-react";
+import { Check, Star, Info } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const plans = [
@@ -76,7 +76,7 @@ export default function Pricing() {
               key={plan.name}
               className={`relative rounded-2xl border bg-card/40 overflow-hidden transition-all duration-500 flex flex-col ${
                 plan.featured
-                  ? "border-primary/50 shadow-[0_0_30px_hsl(210_100%_60%/0.12)]"
+                  ? "border-primary/50 shadow-[0_0_30px_hsl(210_100%_60%/0.12)] md:scale-105"
                   : "border-border/60"
               } ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
               style={{ transitionDelay: isVisible ? `${i * 120}ms` : "0ms" }}
@@ -127,6 +127,23 @@ export default function Pricing() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Hosting & Domain note */}
+        <div
+          className={`mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 p-5 rounded-xl border border-border/50 bg-card/30 transition-all duration-700 delay-300 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
+        >
+          <div className="flex items-start gap-3">
+            <Info className="text-primary mt-0.5 flex-shrink-0" size={18} />
+            <div>
+              <p className="text-sm font-semibold text-foreground">Hospedagem e domínio são cobrados à parte</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Hospedagem: <span className="text-foreground font-medium">R$ 240,00/ano</span> &nbsp;·&nbsp; Domínio: <span className="text-foreground font-medium">a partir de R$ 49,90/ano</span>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
