@@ -37,7 +37,7 @@ export default function Testimonials() {
           {testimonials.map((t, i) => (
             <div
               key={t.name}
-              className={`relative p-6 rounded-2xl border border-border/60 bg-card/40 transition-all duration-500 ${
+              className={`relative p-6 rounded-2xl border border-border/60 bg-card/40 hover:border-primary/30 hover:bg-card/60 hover:-translate-y-1 transition-all duration-500 ${
                 isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               }`}
               style={{ transitionDelay: isVisible ? `${i * 150}ms` : "0ms" }}

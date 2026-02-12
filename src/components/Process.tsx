@@ -47,7 +47,9 @@ export default function Process() {
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Connector line (desktop) */}
+          <div className="hidden lg:block absolute top-[52px] left-[15%] right-[15%] h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
           {steps.map((step, i) => {
             const Icon = step.icon;
             return (

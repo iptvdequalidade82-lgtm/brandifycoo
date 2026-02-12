@@ -74,10 +74,10 @@ export default function Pricing() {
           {plans.map((plan, i) => (
             <div
               key={plan.name}
-              className={`relative rounded-2xl border bg-card/40 overflow-hidden transition-all duration-500 flex flex-col ${
+              className={`relative rounded-2xl border overflow-hidden transition-all duration-500 flex flex-col hover:-translate-y-1 ${
                 plan.featured
-                  ? "border-primary/50 shadow-[0_0_30px_hsl(210_100%_60%/0.12)] md:scale-105"
-                  : "border-border/60"
+                  ? "border-primary/60 bg-primary/[0.04] shadow-[0_0_40px_hsl(210_100%_60%/0.18)] md:scale-[1.06] ring-1 ring-primary/20"
+                  : "border-border/60 bg-card/40 hover:border-primary/30"
               } ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
               style={{ transitionDelay: isVisible ? `${i * 120}ms` : "0ms" }}
             >

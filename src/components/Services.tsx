@@ -30,7 +30,7 @@ export default function Services() {
             return (
               <div
                 key={s.title}
-                className={`group p-6 rounded-2xl border border-border/60 bg-card/40 hover:bg-card/70 hover:border-primary/30 hover:shadow-[0_0_20px_hsl(210_100%_60%/0.08)] transition-all duration-500 ${
+                className={`group p-6 rounded-2xl border border-border/60 bg-card/40 hover:bg-card/70 hover:border-primary/30 hover:shadow-[0_0_30px_hsl(210_100%_60%/0.12)] hover:-translate-y-1 transition-all duration-500 ${
                   isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                 }`}
                 style={{ transitionDelay: isVisible ? `${i * 100}ms` : "0ms" }}
