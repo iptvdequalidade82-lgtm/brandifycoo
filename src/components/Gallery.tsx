@@ -35,16 +35,17 @@ export default function Gallery() {
               href="https://www.instagram.com/brandifycoo"
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative aspect-[4/5] rounded-xl overflow-hidden glass border border-border/50"
+              className="group relative aspect-[4/5] rounded-xl overflow-hidden glass border border-border/50 hover:border-primary/30 transition-all duration-500"
             >
               <img
                 src={post.src}
                 alt={post.alt}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-background/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <Instagram className="text-primary" size={32} />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-end pb-4">
+                <Instagram className="text-primary mb-2" size={24} />
+                <span className="text-xs text-foreground/80 font-medium">Ver no Instagram</span>
               </div>
             </a>
           ))}
