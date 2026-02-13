@@ -84,7 +84,7 @@ export default function Pricing() {
                 <div className="flex items-baseline justify-center gap-1">
                   <span className="font-display text-4xl font-black text-gradient">{plan.price}</span>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">valor único</p>
+                <p className="text-xs text-muted-foreground mt-1">valor único · pagamento via PIX</p>
               </div>
 
               <div className="p-7 flex-1">
