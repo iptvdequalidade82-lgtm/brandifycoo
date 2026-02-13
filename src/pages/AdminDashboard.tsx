@@ -18,6 +18,23 @@ import {
   FileText, DollarSign, Clock, CheckCircle, XCircle, Send
 } from "lucide-react";
 import { toast } from "sonner";
+import { z } from "zod";
+
+const proposalSchema = z.object({
+  clientName: z.string().trim().min(1, "Nome é obrigatório").max(200, "Nome muito longo"),
+  clientEmail: z.string().trim().email("Email inválido").max(255, "Email muito longo"),
+  clientPhone: z.string().trim().max(20, "Telefone muito longo").optional().or(z.literal("")),
+  title: z.string().trim().min(1, "Título é obrigatório").max(200, "Título muito longo"),
+  description: z.string().trim().max(1000, "Descrição muito longa").optional().or(z.literal("")),
+  amountReais: z.string().refine((val) => {
+    const num = parseFloat(val.replace(",", "."));
+    return !isNaN(num) && num > 0 && num <= 1000000;
+  }, "Valor deve ser entre R$ 0,01 e R$ 1.000.000,00"),
+  installments: z.string().refine((val) => {
+    const num = parseInt(val);
+    return !isNaN(num) && num >= 1 && num <= 12;
+  }, "Parcelas devem ser entre 1 e 12"),
+});
 
 interface Proposal {
   id: string;
@@ -91,12 +108,19 @@ const AdminDashboard = () => {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    const cents = Math.round(parseFloat(amountReais.replace(",", ".")) * 100);
-    if (isNaN(cents) || cents <= 0) {
-      toast.error("Valor inválido");
+
+    const validation = proposalSchema.safeParse({
+      clientName, clientEmail, clientPhone, title, description, amountReais, installments,
+    });
+
+    if (!validation.success) {
+      const firstError = validation.error.errors[0]?.message || "Dados inválidos";
+      toast.error(firstError);
       setSubmitting(false);
       return;
     }
+
+    const cents = Math.round(parseFloat(amountReais.replace(",", ".")) * 100);
 
     const { error } = await supabase.from("proposals").insert({
       client_name: clientName.trim(),
