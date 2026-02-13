@@ -127,8 +127,11 @@ export default function Pricing() {
             <Info className="text-accent mt-0.5 flex-shrink-0" size={18} />
             <div>
               <p className="text-sm font-bold text-foreground">Hospedagem e domínio são cobrados à parte</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Hospedagem: <span className="text-foreground font-medium">R$ 240,00/ano</span> &nbsp;·&nbsp; Domínio: <span className="text-foreground font-medium">a partir de R$ 49,90/ano</span>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                Hospedagem: <span className="text-foreground font-medium">R$ 240,00/ano</span> (R$ 120 de instalação + R$ 120 do plano anual) &nbsp;·&nbsp; Domínio: <span className="text-foreground font-medium">a partir de R$ 50,00/ano</span>
+              </p>
+              <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
+                Tudo é configurado na conta do próprio cliente. Na primeira vez, cuidamos de toda a instalação. Nas renovações seguintes, o cliente assume o pagamento da hospedagem e domínio diretamente.
               </p>
             </div>
           </div>
