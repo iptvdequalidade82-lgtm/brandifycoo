@@ -106,7 +106,7 @@ serve(async (req) => {
     const safeDescription = (description || "Serviço Brandify").replace(/[<>"']/g, "").substring(0, 500);
 
     const sessionParams: any = {
-      payment_method_types: ["card", "boleto"],
+      payment_method_types: ["card", "boleto", "pix"],
       customer_email: client_email,
       line_items: [
         {
@@ -128,18 +128,14 @@ serve(async (req) => {
         proposal_id,
         client_name: safeName,
       },
-    };
-
-    // Allow installments on card if > 1
-    if (installments > 1) {
-      sessionParams.payment_method_options = {
+      payment_method_options: {
         card: {
           installments: {
             enabled: true,
           },
         },
-      };
-    }
+      },
+    };
 
     const session = await stripe.checkout.sessions.create(sessionParams);
 

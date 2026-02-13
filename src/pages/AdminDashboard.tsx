@@ -30,10 +30,6 @@ const proposalSchema = z.object({
     const num = parseFloat(val.replace(",", "."));
     return !isNaN(num) && num > 0 && num <= 1000000;
   }, "Valor deve ser entre R$ 0,01 e R$ 1.000.000,00"),
-  installments: z.string().refine((val) => {
-    const num = parseInt(val);
-    return !isNaN(num) && num >= 1 && num <= 12;
-  }, "Parcelas devem ser entre 1 e 12"),
 });
 
 interface Proposal {
@@ -72,7 +68,6 @@ const AdminDashboard = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [amountReais, setAmountReais] = useState("");
-  const [installments, setInstallments] = useState("1");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -102,7 +97,6 @@ const AdminDashboard = () => {
     setTitle("");
     setDescription("");
     setAmountReais("");
-    setInstallments("1");
   };
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -110,7 +104,7 @@ const AdminDashboard = () => {
     setSubmitting(true);
 
     const validation = proposalSchema.safeParse({
-      clientName, clientEmail, clientPhone, title, description, amountReais, installments,
+      clientName, clientEmail, clientPhone, title, description, amountReais,
     });
 
     if (!validation.success) {
@@ -129,7 +123,7 @@ const AdminDashboard = () => {
       title: title.trim(),
       description: description.trim() || null,
       amount_cents: cents,
-      installments: parseInt(installments),
+      installments: 1,
       created_by: user!.id,
     } as any);
 
@@ -151,7 +145,7 @@ const AdminDashboard = () => {
         body: {
           proposal_id: proposal.id,
           amount_cents: proposal.amount_cents,
-          installments: proposal.installments,
+          installments: 1,
           client_name: proposal.client_name,
           client_email: proposal.client_email,
           description: `${proposal.title}${proposal.description ? " - " + proposal.description : ""}`,
@@ -260,11 +254,6 @@ const AdminDashboard = () => {
                     <div className="flex items-center gap-4">
                       <div className="text-right">
                         <p className="text-lg font-bold text-foreground">{formatCurrency(p.amount_cents)}</p>
-                        {p.installments > 1 && (
-                          <p className="text-xs text-muted-foreground">
-                            {p.installments}x de {formatCurrency(p.amount_cents / p.installments)}
-                          </p>
-                        )}
                       </div>
                       <div className="flex gap-1">
                         {p.stripe_checkout_url ? (
@@ -333,15 +322,9 @@ const AdminDashboard = () => {
               <Label htmlFor="pdesc">Descrição (opcional)</Label>
               <Textarea id="pdesc" value={description} onChange={e => setDescription(e.target.value)} rows={2} />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="pamount">Valor (R$)</Label>
-                <Input id="pamount" value={amountReais} onChange={e => setAmountReais(e.target.value)} placeholder="1500,00" required />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="pinst">Parcelas</Label>
-                <Input id="pinst" type="number" min="1" max="12" value={installments} onChange={e => setInstallments(e.target.value)} />
-              </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="pamount">Valor (R$)</Label>
+              <Input id="pamount" value={amountReais} onChange={e => setAmountReais(e.target.value)} placeholder="1500,00" required />
             </div>
             <Button type="submit" className="w-full" disabled={submitting}>
               {submitting ? "Criando..." : "Criar Proposta"}
