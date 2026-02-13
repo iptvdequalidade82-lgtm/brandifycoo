@@ -1,12 +1,22 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
+
+const PaymentSchema = z.object({
+  proposal_id: z.string().uuid("Invalid proposal ID"),
+  amount_cents: z.number().int().positive().max(100_000_000, "Amount too large"),
+  installments: z.number().int().min(1).max(12, "Max 12 installments"),
+  client_name: z.string().trim().min(1).max(200, "Name too long"),
+  client_email: z.string().email("Invalid email").max(255),
+  description: z.string().max(1000).optional().default(""),
+});
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -15,12 +25,6 @@ serve(async (req) => {
 
   try {
     // Verify admin auth
-    const supabaseClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-      { global: { headers: { Authorization: req.headers.get("Authorization")! } } }
-    );
-
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -28,6 +32,12 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      { global: { headers: { Authorization: authHeader } } }
+    );
 
     const token = authHeader.replace("Bearer ", "");
     const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
@@ -61,11 +71,28 @@ serve(async (req) => {
       });
     }
 
-    const { amount_cents, installments, client_name, client_email, description, proposal_id } = await req.json();
+    // Validate and sanitize input
+    const rawBody = await req.json();
+    const parseResult = PaymentSchema.safeParse(rawBody);
+    if (!parseResult.success) {
+      return new Response(
+        JSON.stringify({ error: "Invalid input", details: parseResult.error.flatten().fieldErrors }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
-    if (!amount_cents || amount_cents <= 0) {
-      return new Response(JSON.stringify({ error: "Invalid amount" }), {
-        status: 400,
+    const { amount_cents, installments, client_name, client_email, description, proposal_id } = parseResult.data;
+
+    // Verify proposal exists and belongs to admin
+    const { data: proposal } = await supabaseAdmin
+      .from("proposals")
+      .select("id, created_by")
+      .eq("id", proposal_id)
+      .single();
+
+    if (!proposal) {
+      return new Response(JSON.stringify({ error: "Proposal not found" }), {
+        status: 404,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -74,21 +101,20 @@ serve(async (req) => {
       apiVersion: "2025-08-27.basil",
     });
 
-    // Build payment method types
-    const paymentMethodTypes: string[] = ["card"];
-    // Add PIX for BRL payments
-    paymentMethodTypes.push("boleto");
+    // Sanitize text for Stripe
+    const safeName = client_name.replace(/[<>"']/g, "").substring(0, 200);
+    const safeDescription = (description || "Serviço Brandify").replace(/[<>"']/g, "").substring(0, 500);
 
     const sessionParams: any = {
-      payment_method_types: paymentMethodTypes,
+      payment_method_types: ["card", "boleto"],
       customer_email: client_email,
       line_items: [
         {
           price_data: {
             currency: "brl",
             product_data: {
-              name: description || "Serviço Brandify",
-              description: `Cliente: ${client_name}`,
+              name: safeDescription || "Serviço Brandify",
+              description: `Cliente: ${safeName}`,
             },
             unit_amount: amount_cents,
           },
@@ -99,13 +125,13 @@ serve(async (req) => {
       success_url: `${req.headers.get("origin") || "https://brandifycoo.lovable.app"}/pagamento-sucesso?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get("origin") || "https://brandifycoo.lovable.app"}/`,
       metadata: {
-        proposal_id: proposal_id || "",
-        client_name,
+        proposal_id,
+        client_name: safeName,
       },
     };
 
     // Allow installments on card if > 1
-    if (installments && installments > 1) {
+    if (installments > 1) {
       sessionParams.payment_method_options = {
         card: {
           installments: {
@@ -127,7 +153,7 @@ serve(async (req) => {
   } catch (error: any) {
     console.error("Error creating payment:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: "Internal server error" }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500,
