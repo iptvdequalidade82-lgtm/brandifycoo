@@ -9,11 +9,11 @@ import { motion } from "framer-motion";
 
 const posts = [
   { src: post1, alt: "Vale a pena investir em um site institucional?" },
-  { src: post2, alt: "Atrair clientes sem site profissional é sabor faturamento" },
+  { src: post2, alt: "Atrair clientes sem site profissional" },
   { src: post3, alt: "Seu negócio precisa de um site" },
-  { src: post4, alt: "Pronto para decolar? Toda grande empresa possui um site" },
-  { src: post5, alt: "Marketing digital não é sorte, é estratégia" },
-  { src: post6, alt: "Como parar de atrair curiosos corretamente" },
+  { src: post4, alt: "Toda grande empresa possui um site" },
+  { src: post5, alt: "Marketing digital é estratégia" },
+  { src: post6, alt: "Como atrair clientes corretamente" },
 ];
 
 const container = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } };
@@ -21,8 +21,9 @@ const item = { hidden: { opacity: 0, scale: 0.95 }, show: { opacity: 1, scale: 1
 
 export default function Gallery() {
   return (
-    <section id="galeria" className="section-padding relative">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center_top,hsl(var(--primary)/0.03),transparent_60%)] pointer-events-none" />
+    <section id="galeria" className="section-padding relative overflow-hidden">
+      <div className="absolute bottom-0 left-0 w-[350px] h-[350px] rounded-full bg-primary/5 blur-[130px] pointer-events-none" />
+
       <div className="container mx-auto max-w-6xl relative">
         <div className="text-center mb-16">
           <motion.h2
@@ -30,16 +31,17 @@ export default function Gallery() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6 }}
-            className="font-display text-3xl md:text-4xl font-bold"
+            className="font-display text-3xl md:text-5xl font-black tracking-tight mb-4"
           >
-            Nosso conteúdo
+            Nosso{" "}
+            <span className="text-gradient">conteúdo</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-muted-foreground mt-4 max-w-xl mx-auto"
+            className="text-muted-foreground max-w-xl mx-auto"
           >
             Acompanhe nossas dicas e insights sobre presença digital no Instagram.
           </motion.p>
@@ -59,7 +61,7 @@ export default function Gallery() {
               href="https://www.instagram.com/brandifycoo"
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative aspect-[4/5] rounded-xl overflow-hidden glass border border-border/50 hover:border-primary/30 transition-all duration-500"
+              className="group relative aspect-[4/5] rounded-xl overflow-hidden bg-card/40 border border-border/40 hover:border-primary/40 transition-all duration-500"
             >
               <img
                 src={post.src}
@@ -67,8 +69,8 @@ export default function Gallery() {
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-end pb-4">
-                <Instagram className="text-primary mb-2" size={24} />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-end pb-4">
+                <Instagram className="text-accent mb-2" size={24} />
                 <span className="text-xs text-foreground/80 font-medium">Ver no Instagram</span>
               </div>
             </motion.a>
@@ -86,7 +88,7 @@ export default function Gallery() {
             href="https://www.instagram.com/brandifycoo"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-border text-foreground font-semibold hover:bg-secondary hover:scale-[1.03] transition-all duration-300"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-border/50 text-foreground font-semibold hover:bg-secondary/60 hover:border-primary/30 hover:scale-[1.03] transition-all duration-300 gradient-border"
           >
             <Instagram size={20} />
             Siga no Instagram

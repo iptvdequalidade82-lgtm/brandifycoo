@@ -12,18 +12,25 @@ const item = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0, transiti
 
 export default function Testimonials() {
   return (
-    <section className="py-14 md:py-20 px-6 relative">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,hsl(var(--primary)/0.03),transparent_60%)] pointer-events-none" />
+    <section className="section-padding relative overflow-hidden">
+      <div className="absolute top-0 left-1/3 w-[400px] h-[400px] rounded-full bg-accent/5 blur-[140px] pointer-events-none" />
+
       <div className="container mx-auto max-w-5xl relative">
-        <motion.h2
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
-          className="font-display text-3xl md:text-4xl font-bold text-center mb-12"
+          className="text-center mb-16"
         >
-          O que nossos clientes dizem
-        </motion.h2>
+          <h2 className="font-display text-3xl md:text-5xl font-black tracking-tight mb-4">
+            Resultados{" "}
+            <span className="text-gradient">reais</span>
+          </h2>
+          <p className="text-muted-foreground max-w-xl mx-auto">
+            O que nossos clientes dizem sobre o trabalho da Brandify.
+          </p>
+        </motion.div>
 
         <motion.div
           variants={container}
@@ -36,17 +43,17 @@ export default function Testimonials() {
             <motion.div
               key={t.name}
               variants={item}
-              className="relative p-6 rounded-2xl border border-border/60 bg-card/40 hover:border-primary/30 hover:bg-card/60 hover:-translate-y-1 transition-all duration-500"
+              className="relative p-6 rounded-2xl bg-card/40 backdrop-blur-sm border border-border/40 hover:border-primary/30 hover:-translate-y-1.5 transition-all duration-500 gradient-border"
             >
-              <Quote className="text-primary/20 absolute top-4 right-4" size={32} />
+              <Quote className="text-primary/15 absolute top-4 right-4" size={36} />
               <div className="flex gap-1 mb-4">
                 {Array.from({ length: 5 }).map((_, j) => (
-                  <Star key={j} size={14} className="fill-primary text-primary" />
+                  <Star key={j} size={14} className="fill-accent text-accent" />
                 ))}
               </div>
               <p className="text-sm text-foreground/80 leading-relaxed mb-6">"{t.text}"</p>
               <div>
-                <p className="text-sm font-semibold text-foreground">{t.name}</p>
+                <p className="text-sm font-bold text-foreground">{t.name}</p>
                 <p className="text-xs text-muted-foreground">{t.role}</p>
               </div>
             </motion.div>

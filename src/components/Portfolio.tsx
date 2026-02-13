@@ -17,18 +17,25 @@ const item = { hidden: { opacity: 0, y: 25 }, show: { opacity: 1, y: 0, transiti
 
 export default function Portfolio() {
   return (
-    <section id="portfolio" className="py-14 md:py-20 px-6 relative">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(var(--primary)/0.03),transparent_60%)] pointer-events-none" />
+    <section id="portfolio" className="section-padding relative overflow-hidden">
+      <div className="absolute top-0 left-1/4 w-[400px] h-[400px] rounded-full bg-primary/5 blur-[140px] pointer-events-none" />
+
       <div className="container mx-auto max-w-5xl relative">
-        <motion.h2
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
-          className="font-display text-3xl md:text-4xl font-bold text-center mb-12"
+          className="text-center mb-16"
         >
-          Atendemos diversos ramos
-        </motion.h2>
+          <h2 className="font-display text-3xl md:text-5xl font-black tracking-tight mb-4">
+            Diversos{" "}
+            <span className="text-gradient">segmentos</span>
+          </h2>
+          <p className="text-muted-foreground max-w-xl mx-auto">
+            Experiência comprovada nos mais variados nichos de mercado.
+          </p>
+        </motion.div>
 
         <motion.div
           variants={container}
@@ -43,10 +50,10 @@ export default function Portfolio() {
               <motion.div
                 key={s.label}
                 variants={item}
-                className="group p-5 rounded-2xl border border-border/60 bg-card/40 hover:bg-card/70 hover:border-primary/30 transition-all duration-500"
+                className="group relative p-5 rounded-2xl bg-card/40 backdrop-blur-sm border border-border/40 hover:border-primary/40 hover:shadow-[0_0_30px_hsl(250_100%_65%/0.1)] transition-all duration-500 gradient-border"
               >
-                <Icon className="text-primary mb-3 group-hover:scale-110 transition-transform duration-300" size={20} strokeWidth={1.8} />
-                <h3 className="text-sm font-semibold text-foreground mb-1">{s.label}</h3>
+                <Icon className="text-primary mb-3 group-hover:text-accent group-hover:scale-110 transition-all duration-300" size={20} strokeWidth={1.8} />
+                <h3 className="text-sm font-bold text-foreground mb-1">{s.label}</h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">{s.desc}</p>
               </motion.div>
             );

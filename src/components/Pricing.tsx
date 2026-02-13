@@ -24,25 +24,28 @@ const item = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0, transiti
 
 export default function Pricing() {
   return (
-    <section id="investimento" className="section-padding relative">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,hsl(var(--primary)/0.04),transparent_70%)] pointer-events-none" />
+    <section id="investimento" className="section-padding relative overflow-hidden">
+      <div className="absolute top-1/3 right-0 w-[500px] h-[500px] rounded-full bg-primary/5 blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[300px] h-[300px] rounded-full bg-accent/5 blur-[120px] pointer-events-none" />
+
       <div className="container mx-auto max-w-6xl relative">
-        <div className="text-center mb-14">
+        <div className="text-center mb-16">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6 }}
-            className="font-display text-3xl md:text-4xl font-bold"
+            className="font-display text-3xl md:text-5xl font-black tracking-tight mb-4"
           >
-            Transparência desde o início
+            Investimento{" "}
+            <span className="text-gradient">transparente</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-muted-foreground mt-4 max-w-xl mx-auto"
+            className="text-muted-foreground max-w-xl mx-auto"
           >
             Escolha o plano ideal para o seu negócio. Sem surpresas.
           </motion.p>
@@ -59,27 +62,27 @@ export default function Pricing() {
             <motion.div
               key={plan.name}
               variants={item}
-              className={`relative rounded-2xl border overflow-hidden transition-all duration-500 flex flex-col hover:-translate-y-1 ${
+              className={`relative rounded-2xl overflow-hidden transition-all duration-500 flex flex-col hover:-translate-y-1.5 ${
                 plan.featured
-                  ? "border-primary/60 bg-primary/[0.04] shadow-[0_0_40px_hsl(210_100%_60%/0.18)] md:scale-[1.06] ring-1 ring-primary/20"
-                  : "border-border/60 bg-card/40 hover:border-primary/30"
+                  ? "bg-card/60 backdrop-blur-sm border-2 border-primary/50 shadow-[0_0_50px_hsl(250_100%_65%/0.2)] md:scale-[1.06]"
+                  : "bg-card/40 backdrop-blur-sm border border-border/40 hover:border-primary/30 gradient-border"
               }`}
             >
               {plan.featured && (
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-accent" />
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary" />
               )}
 
-              <div className="p-7 text-center border-b border-border/40">
+              <div className="p-7 text-center border-b border-border/30">
                 {plan.featured && (
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-3">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-primary/15 to-accent/10 text-primary text-xs font-medium mb-3 border border-primary/20">
                     <Star size={12} />
                     Mais popular
                   </div>
                 )}
-                <h3 className="font-display text-lg font-bold text-foreground">{plan.name}</h3>
+                <h3 className="font-display text-lg font-black text-foreground">{plan.name}</h3>
                 <p className="text-xs text-muted-foreground mt-1 mb-4">{plan.desc}</p>
                 <div className="flex items-baseline justify-center gap-1">
-                  <span className="font-display text-4xl font-bold text-gradient">{plan.price}</span>
+                  <span className="font-display text-4xl font-black text-gradient">{plan.price}</span>
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">valor único</p>
               </div>
@@ -88,7 +91,7 @@ export default function Pricing() {
                 <ul className="space-y-3">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-3">
-                      <Check className="text-primary mt-0.5 flex-shrink-0" size={16} strokeWidth={2.5} />
+                      <Check className="text-accent mt-0.5 flex-shrink-0" size={16} strokeWidth={2.5} />
                       <span className="text-sm text-foreground">{f}</span>
                     </li>
                   ))}
@@ -100,10 +103,10 @@ export default function Pricing() {
                   href="https://wa.me/5543991065129?text=Ol%C3%A1!%20Fiquei%20interessado%20nos%20servi%C3%A7os%20da%20Brandify%20e%20gostaria%20de%20solicitar%20um%20or%C3%A7amento%20para%20cria%C3%A7%C3%A3o%20de%20site."
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`block w-full text-center px-6 py-3.5 rounded-xl font-semibold transition-all duration-300 hover:scale-[1.03] ${
+                  className={`block w-full text-center px-6 py-3.5 rounded-xl font-bold transition-all duration-300 hover:scale-[1.03] ${
                     plan.featured
-                      ? "bg-primary text-primary-foreground hover:shadow-[0_0_30px_hsl(210_100%_60%/0.4)]"
-                      : "border border-border/80 text-foreground hover:bg-secondary/60"
+                      ? "bg-gradient-to-r from-primary to-accent text-primary-foreground neon-glow-sm"
+                      : "border border-border/60 text-foreground hover:bg-secondary/60 hover:border-primary/30"
                   }`}
                 >
                   Solicitar Orçamento
@@ -118,12 +121,12 @@ export default function Pricing() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 p-5 rounded-xl border border-border/50 bg-card/30"
+          className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 p-5 rounded-xl border border-border/40 bg-card/30 backdrop-blur-sm gradient-border"
         >
           <div className="flex items-start gap-3">
-            <Info className="text-primary mt-0.5 flex-shrink-0" size={18} />
+            <Info className="text-accent mt-0.5 flex-shrink-0" size={18} />
             <div>
-              <p className="text-sm font-semibold text-foreground">Hospedagem e domínio são cobrados à parte</p>
+              <p className="text-sm font-bold text-foreground">Hospedagem e domínio são cobrados à parte</p>
               <p className="text-xs text-muted-foreground mt-1">
                 Hospedagem: <span className="text-foreground font-medium">R$ 240,00/ano</span> &nbsp;·&nbsp; Domínio: <span className="text-foreground font-medium">a partir de R$ 49,90/ano</span>
               </p>
