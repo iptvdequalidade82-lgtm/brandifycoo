@@ -1,85 +1,69 @@
 import { Check, Star, Info } from "lucide-react";
-import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { motion } from "framer-motion";
 
 const plans = [
   {
-    name: "Essencial",
-    price: "R$ 1.200",
-    desc: "Ideal para quem está começando e precisa de presença online.",
-    features: [
-      "Site de até 3 páginas",
-      "Design responsivo",
-      "Certificado SSL",
-      "Auxílio no registro de domínio",
-      "1 ajuste mensal",
-    ],
+    name: "Essencial", price: "R$ 1.200", desc: "Ideal para quem está começando e precisa de presença online.",
+    features: ["Site de até 3 páginas", "Design responsivo", "Certificado SSL", "Auxílio no registro de domínio", "1 ajuste mensal"],
     featured: false,
   },
   {
-    name: "Profissional",
-    price: "R$ 2.500",
-    desc: "Para negócios que querem se destacar com mais recursos.",
-    features: [
-      "Site de até 6 páginas",
-      "Design personalizado premium",
-      "SEO avançado",
-      "Certificado SSL",
-      "Auxílio no registro de domínio",
-      "1 ajuste mensal",
-    ],
+    name: "Profissional", price: "R$ 2.500", desc: "Para negócios que querem se destacar com mais recursos.",
+    features: ["Site de até 6 páginas", "Design personalizado premium", "SEO avançado", "Certificado SSL", "Auxílio no registro de domínio", "1 ajuste mensal"],
     featured: true,
   },
   {
-    name: "Premium",
-    price: "R$ 4.500",
-    desc: "Solução completa para empresas que exigem o melhor.",
-    features: [
-      "Site ilimitado de páginas",
-      "Design exclusivo do zero",
-      "SEO avançado + Blog",
-      "Certificado SSL",
-      "Auxílio no registro de domínio",
-      "Painel administrativo",
-      "Integrações personalizadas",
-      "1 ajuste mensal",
-    ],
+    name: "Premium", price: "R$ 4.500", desc: "Solução completa para empresas que exigem o melhor.",
+    features: ["Site ilimitado de páginas", "Design exclusivo do zero", "SEO avançado + Blog", "Certificado SSL", "Auxílio no registro de domínio", "Painel administrativo", "Integrações personalizadas", "1 ajuste mensal"],
     featured: false,
   },
 ];
 
-export default function Pricing() {
-  const { ref, isVisible } = useScrollReveal();
+const container = { hidden: {}, show: { transition: { staggerChildren: 0.12 } } };
+const item = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
+export default function Pricing() {
   return (
-    <section id="investimento" className="section-padding">
-      <div ref={ref} className="container mx-auto max-w-6xl">
+    <section id="investimento" className="section-padding relative">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,hsl(var(--primary)/0.04),transparent_70%)] pointer-events-none" />
+      <div className="container mx-auto max-w-6xl relative">
         <div className="text-center mb-14">
-          <h2
-            className={`font-display text-3xl md:text-4xl font-bold transition-all duration-700 ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-            }`}
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6 }}
+            className="font-display text-3xl md:text-4xl font-bold"
           >
             Transparência desde o início
-          </h2>
-          <p
-            className={`text-muted-foreground mt-4 max-w-xl mx-auto transition-all duration-700 delay-100 ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-            }`}
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-muted-foreground mt-4 max-w-xl mx-auto"
           >
             Escolha o plano ideal para o seu negócio. Sem surpresas.
-          </p>
+          </motion.p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          {plans.map((plan, i) => (
-            <div
+        <motion.div
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-80px" }}
+          className="grid md:grid-cols-3 gap-6"
+        >
+          {plans.map((plan) => (
+            <motion.div
               key={plan.name}
+              variants={item}
               className={`relative rounded-2xl border overflow-hidden transition-all duration-500 flex flex-col hover:-translate-y-1 ${
                 plan.featured
                   ? "border-primary/60 bg-primary/[0.04] shadow-[0_0_40px_hsl(210_100%_60%/0.18)] md:scale-[1.06] ring-1 ring-primary/20"
                   : "border-border/60 bg-card/40 hover:border-primary/30"
-              } ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
-              style={{ transitionDelay: isVisible ? `${i * 120}ms` : "0ms" }}
+              }`}
             >
               {plan.featured && (
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-accent" />
@@ -116,7 +100,7 @@ export default function Pricing() {
                   href="https://wa.me/5543991065129?text=Ol%C3%A1!%20Fiquei%20interessado%20nos%20servi%C3%A7os%20da%20Brandify%20e%20gostaria%20de%20solicitar%20um%20or%C3%A7amento%20para%20cria%C3%A7%C3%A3o%20de%20site."
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`block w-full text-center px-6 py-3.5 rounded-xl font-semibold transition-all duration-300 ${
+                  className={`block w-full text-center px-6 py-3.5 rounded-xl font-semibold transition-all duration-300 hover:scale-[1.03] ${
                     plan.featured
                       ? "bg-primary text-primary-foreground hover:shadow-[0_0_30px_hsl(210_100%_60%/0.4)]"
                       : "border border-border/80 text-foreground hover:bg-secondary/60"
@@ -125,15 +109,16 @@ export default function Pricing() {
                   Solicitar Orçamento
                 </a>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
-        {/* Hosting & Domain note */}
-        <div
-          className={`mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 p-5 rounded-xl border border-border/50 bg-card/30 transition-all duration-700 delay-300 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 p-5 rounded-xl border border-border/50 bg-card/30"
         >
           <div className="flex items-start gap-3">
             <Info className="text-primary mt-0.5 flex-shrink-0" size={18} />
@@ -144,7 +129,7 @@ export default function Pricing() {
               </p>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

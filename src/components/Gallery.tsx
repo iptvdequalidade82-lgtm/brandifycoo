@@ -5,6 +5,7 @@ import post4 from "@/assets/post-4.jpg";
 import post5 from "@/assets/post-5.jpg";
 import post6 from "@/assets/post-6.jpg";
 import { Instagram } from "lucide-react";
+import { motion } from "framer-motion";
 
 const posts = [
   { src: post1, alt: "Vale a pena investir em um site institucional?" },
@@ -15,23 +16,46 @@ const posts = [
   { src: post6, alt: "Como parar de atrair curiosos corretamente" },
 ];
 
+const container = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } };
+const item = { hidden: { opacity: 0, scale: 0.95 }, show: { opacity: 1, scale: 1, transition: { duration: 0.4 } } };
+
 export default function Gallery() {
   return (
-    <section id="galeria" className="section-padding">
-      <div className="container mx-auto max-w-6xl">
+    <section id="galeria" className="section-padding relative">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center_top,hsl(var(--primary)/0.03),transparent_60%)] pointer-events-none" />
+      <div className="container mx-auto max-w-6xl relative">
         <div className="text-center mb-16">
-          <h2 className="font-display text-3xl md:text-4xl font-bold">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6 }}
+            className="font-display text-3xl md:text-4xl font-bold"
+          >
             Nosso conteúdo
-          </h2>
-          <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-muted-foreground mt-4 max-w-xl mx-auto"
+          >
             Acompanhe nossas dicas e insights sobre presença digital no Instagram.
-          </p>
+          </motion.p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <motion.div
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-80px" }}
+          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4"
+        >
           {posts.map((post, i) => (
-            <a
+            <motion.a
               key={i}
+              variants={item}
               href="https://www.instagram.com/brandifycoo"
               target="_blank"
               rel="noopener noreferrer"
@@ -47,21 +71,27 @@ export default function Gallery() {
                 <Instagram className="text-primary mb-2" size={24} />
                 <span className="text-xs text-foreground/80 font-medium">Ver no Instagram</span>
               </div>
-            </a>
+            </motion.a>
           ))}
-        </div>
+        </motion.div>
 
-        <div className="text-center mt-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="text-center mt-10"
+        >
           <a
             href="https://www.instagram.com/brandifycoo"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-border text-foreground font-semibold hover:bg-secondary transition"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-border text-foreground font-semibold hover:bg-secondary hover:scale-[1.03] transition-all duration-300"
           >
             <Instagram size={20} />
             Siga no Instagram
           </a>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
