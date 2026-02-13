@@ -49,7 +49,7 @@ export default function Footer() {
                 </a>
               </li>
               <li className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-                <MapPin size={15} /> Londrina, PR
+                <MapPin size={15} /> Jacarezinho, PR
               </li>
             </ul>
           </div>

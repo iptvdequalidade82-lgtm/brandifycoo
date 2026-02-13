@@ -8,7 +8,7 @@ const whatsappUrl =
 const contacts = [
   { icon: Phone, title: "WhatsApp", value: "(43) 99106-5129", href: whatsappUrl },
   { icon: Mail, title: "E-mail", value: "brandifycoo@gmail.com", href: "mailto:brandifycoo@gmail.com" },
-  { icon: MapPin, title: "Localização", value: "Atendimento 100% Online", href: undefined },
+  { icon: MapPin, title: "Localização", value: "Jacarezinho, PR — Atendemos todo o Brasil", href: undefined },
 ];
 
 export default function Contact() {
