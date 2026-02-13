@@ -30,15 +30,6 @@ export default function Hero() {
 
       <div className="relative z-10 container mx-auto text-center max-w-5xl">
         {/* Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-primary/30 bg-primary/5 backdrop-blur-sm text-primary text-xs font-medium tracking-widest uppercase mb-10"
-        >
-          <Sparkles size={14} />
-          Agência de Sites do Futuro
-        </motion.div>
 
         <motion.h1
           initial={{ opacity: 0, y: 40 }}
