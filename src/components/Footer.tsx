@@ -56,9 +56,12 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-border/30 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Brandify. Todos os direitos reservados.
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-muted-foreground">
+              © {new Date().getFullYear()} Brandify. Todos os direitos reservados.
+            </span>
+            <Link to="/admin/login" className="text-xs text-muted-foreground/30 hover:text-muted-foreground transition-colors duration-300">·</Link>
+          </div>
           <div className="flex gap-3">
             <a
               href="https://www.instagram.com/brandifycoo"
