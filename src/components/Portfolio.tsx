@@ -1,5 +1,5 @@
 import { ShoppingBag, HeartPulse, Gavel, Building2, Utensils, GraduationCap, Dumbbell, Scissors } from "lucide-react";
-import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { motion } from "framer-motion";
 
 const segments = [
   { icon: ShoppingBag, label: "Lojas & Comércios", desc: "E-commerces e vitrines digitais para vender mais." },
@@ -12,38 +12,46 @@ const segments = [
   { icon: Scissors, label: "Beleza & Estética", desc: "Páginas para salões, barbearias e clínicas estéticas." },
 ];
 
-export default function Portfolio() {
-  const { ref, isVisible } = useScrollReveal();
+const container = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } };
+const item = { hidden: { opacity: 0, y: 25 }, show: { opacity: 1, y: 0, transition: { duration: 0.45 } } };
 
+export default function Portfolio() {
   return (
-    <section id="portfolio" className="py-14 md:py-20 px-6">
-      <div ref={ref} className="container mx-auto max-w-5xl">
-        <h2
-          className={`font-display text-3xl md:text-4xl font-bold text-center mb-12 transition-all duration-700 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
+    <section id="portfolio" className="py-14 md:py-20 px-6 relative">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(var(--primary)/0.03),transparent_60%)] pointer-events-none" />
+      <div className="container mx-auto max-w-5xl relative">
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+          className="font-display text-3xl md:text-4xl font-bold text-center mb-12"
         >
           Atendemos diversos ramos
-        </h2>
+        </motion.h2>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {segments.map((s, i) => {
+        <motion.div
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-80px" }}
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+        >
+          {segments.map((s) => {
             const Icon = s.icon;
             return (
-              <div
+              <motion.div
                 key={s.label}
-                className={`group p-5 rounded-2xl border border-border/60 bg-card/40 hover:bg-card/70 hover:border-primary/30 transition-all duration-500 ${
-                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-                }`}
-                style={{ transitionDelay: isVisible ? `${i * 80}ms` : "0ms" }}
+                variants={item}
+                className="group p-5 rounded-2xl border border-border/60 bg-card/40 hover:bg-card/70 hover:border-primary/30 transition-all duration-500"
               >
                 <Icon className="text-primary mb-3 group-hover:scale-110 transition-transform duration-300" size={20} strokeWidth={1.8} />
                 <h3 className="text-sm font-semibold text-foreground mb-1">{s.label}</h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">{s.desc}</p>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
