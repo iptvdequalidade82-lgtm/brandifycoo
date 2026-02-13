@@ -13,27 +13,29 @@ const item = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0, transiti
 
 export default function Process() {
   return (
-    <section id="processo" className="section-padding relative">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,hsl(var(--primary)/0.03),transparent_70%)] pointer-events-none" />
+    <section id="processo" className="section-padding relative overflow-hidden">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-accent/5 blur-[150px] pointer-events-none" />
+
       <div className="container mx-auto max-w-5xl relative">
-        <div className="text-center mb-14">
+        <div className="text-center mb-16">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6 }}
-            className="font-display text-3xl md:text-4xl font-bold"
+            className="font-display text-3xl md:text-5xl font-black tracking-tight mb-4"
           >
-            Como trabalhamos
+            Do conceito à{" "}
+            <span className="text-gradient">realidade</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-muted-foreground mt-4 max-w-xl mx-auto"
+            className="text-muted-foreground max-w-xl mx-auto"
           >
-            Um processo simples e transparente do início ao fim.
+            Um processo transparente e eficiente em 4 etapas.
           </motion.p>
         </div>
 
@@ -42,21 +44,23 @@ export default function Process() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-80px" }}
-          className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-6"
+          className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-5"
         >
-          <div className="hidden lg:block absolute top-[52px] left-[15%] right-[15%] h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+          {/* Connector line */}
+          <div className="hidden lg:block absolute top-[56px] left-[12%] right-[12%] h-px bg-gradient-to-r from-primary/30 via-accent/20 to-primary/30" />
+
           {steps.map((step, i) => {
             const Icon = step.icon;
             return (
               <motion.div
                 key={step.title}
                 variants={item}
-                className="relative p-6 rounded-2xl border border-border/50 bg-card/30 text-center transition-all duration-500 hover:border-primary/30 hover:shadow-[0_0_20px_hsl(210_100%_60%/0.08)]"
+                className="relative p-6 rounded-2xl bg-card/40 backdrop-blur-sm border border-border/40 text-center transition-all duration-500 hover:border-primary/40 hover:shadow-[0_0_30px_hsl(250_100%_65%/0.1)] gradient-border"
               >
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground text-xs font-bold flex items-center justify-center shadow-[0_0_15px_hsl(250_100%_65%/0.3)]">
                   {i + 1}
                 </div>
-                <div className="w-12 h-12 mx-auto rounded-xl bg-primary/10 flex items-center justify-center mb-4 mt-2">
+                <div className="w-12 h-12 mx-auto rounded-xl bg-gradient-to-br from-primary/15 to-accent/10 flex items-center justify-center mb-4 mt-2">
                   <Icon className="text-primary" size={22} />
                 </div>
                 <h3 className="font-display text-base font-bold text-foreground mb-2">{step.title}</h3>

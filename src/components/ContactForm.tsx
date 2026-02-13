@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { Send } from "lucide-react";
-import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { motion } from "framer-motion";
 
 export default function ContactForm() {
-  const { ref, isVisible } = useScrollReveal();
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [sent, setSent] = useState(false);
 
@@ -19,13 +18,14 @@ export default function ContactForm() {
   };
 
   return (
-    <div
-      ref={ref}
-      className={`mt-8 p-6 md:p-8 rounded-2xl border border-border/50 bg-card/30 transition-all duration-700 ${
-        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-      }`}
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6, delay: 0.2 }}
+      className="mt-8 p-6 md:p-8 rounded-2xl bg-card/40 backdrop-blur-sm border border-border/40 gradient-border"
     >
-      <h3 className="font-display text-lg font-bold text-foreground mb-1">Envie uma mensagem</h3>
+      <h3 className="font-display text-lg font-black text-foreground mb-1">Envie uma mensagem</h3>
       <p className="text-xs text-muted-foreground mb-5">Preencha o formulário e responderemos pelo WhatsApp.</p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -36,7 +36,7 @@ export default function ContactForm() {
             required
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="w-full px-4 py-3 rounded-xl bg-secondary/50 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-colors"
+            className="w-full px-4 py-3 rounded-xl bg-secondary/40 border border-border/40 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:shadow-[0_0_15px_hsl(250_100%_65%/0.1)] transition-all duration-300"
           />
           <input
             type="email"
@@ -44,7 +44,7 @@ export default function ContactForm() {
             required
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
-            className="w-full px-4 py-3 rounded-xl bg-secondary/50 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-colors"
+            className="w-full px-4 py-3 rounded-xl bg-secondary/40 border border-border/40 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:shadow-[0_0_15px_hsl(250_100%_65%/0.1)] transition-all duration-300"
           />
         </div>
         <textarea
@@ -53,16 +53,16 @@ export default function ContactForm() {
           rows={4}
           value={form.message}
           onChange={(e) => setForm({ ...form, message: e.target.value })}
-          className="w-full px-4 py-3 rounded-xl bg-secondary/50 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-colors resize-none"
+          className="w-full px-4 py-3 rounded-xl bg-secondary/40 border border-border/40 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:shadow-[0_0_15px_hsl(250_100%_65%/0.1)] transition-all duration-300 resize-none"
         />
         <button
           type="submit"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:shadow-[0_0_30px_hsl(210_100%_60%/0.3)] transition-all duration-300"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold text-sm neon-glow-sm hover:scale-[1.03] transition-all duration-300"
         >
           <Send size={16} />
           {sent ? "Enviado!" : "Enviar pelo WhatsApp"}
         </button>
       </form>
-    </div>
+    </motion.div>
   );
 }

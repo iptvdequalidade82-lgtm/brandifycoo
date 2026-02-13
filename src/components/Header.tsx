@@ -24,10 +24,10 @@ export default function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/70 backdrop-blur-2xl border-b border-border/40">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-3xl border-b border-border/30">
       <div className="container mx-auto flex items-center justify-center h-16 px-6 gap-8">
         <a href="#inicio" className="flex items-center gap-3">
-          <img src={logo} alt="Logo" className="h-10 w-10 rounded-full" />
+          <img src={logo} alt="Logo" className="h-10 w-10 rounded-full ring-1 ring-primary/20" />
         </a>
 
         {/* Desktop */}
@@ -36,7 +36,7 @@ export default function Header() {
             <button
               key={l.href}
               onClick={() => handleNav(l.href)}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors bg-transparent border-none cursor-pointer"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-300 bg-transparent border-none cursor-pointer relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-gradient-to-r after:from-primary after:to-accent after:transition-all after:duration-300 hover:after:w-full"
             >
               {l.label}
             </button>
@@ -45,7 +45,7 @@ export default function Header() {
             href="https://wa.me/5543991065129?text=Ol%C3%A1!%20Fiquei%20interessado%20nos%20servi%C3%A7os%20da%20Brandify%20e%20gostaria%20de%20solicitar%20um%20or%C3%A7amento%20para%20cria%C3%A7%C3%A3o%20de%20site."
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm font-semibold px-5 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition"
+            className="text-sm font-semibold px-5 py-2 rounded-lg bg-gradient-to-r from-primary to-accent text-primary-foreground hover:scale-[1.04] neon-glow-sm transition-all duration-300"
           >
             Contratar
           </a>
@@ -63,7 +63,7 @@ export default function Header() {
 
       {/* Mobile menu */}
       {open && (
-        <nav className="md:hidden glass border-t border-border px-6 pb-6 pt-4 flex flex-col gap-4 animate-fade-in">
+        <nav className="md:hidden glass-strong border-t border-border/30 px-6 pb-6 pt-4 flex flex-col gap-4 animate-fade-in">
           {navLinks.map((l) => (
             <button
               key={l.href}
@@ -78,7 +78,7 @@ export default function Header() {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => setOpen(false)}
-            className="font-semibold px-5 py-2 rounded-lg bg-primary text-primary-foreground text-center"
+            className="font-semibold px-5 py-2.5 rounded-lg bg-gradient-to-r from-primary to-accent text-primary-foreground text-center neon-glow-sm"
           >
             Contratar
           </a>
