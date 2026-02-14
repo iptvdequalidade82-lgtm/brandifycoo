@@ -96,13 +96,19 @@ serve(async (req) => {
       });
     }
 
-    const pixKey = Deno.env.get("PIX_PHONE_KEY") || "";
+    let pixKey = Deno.env.get("PIX_PHONE_KEY") || "";
     if (!pixKey) {
       return new Response(JSON.stringify({ error: "PIX key not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    // Ensure phone key has +55 prefix
+    pixKey = pixKey.replace(/\D/g, "");
+    if (!pixKey.startsWith("55")) {
+      pixKey = "55" + pixKey;
+    }
+    pixKey = "+" + pixKey;
 
     const amount = proposal.amount_cents / 100;
     const txId = proposal.id.replace(/-/g, "").substring(0, 25);
