@@ -51,7 +51,7 @@ export default function Portfolio() {
                 whileHover={{ y: -4, transition: { duration: 0.3 } }}
                 className="group relative p-5 rounded-2xl bg-background border border-border gentle-animation hover:shadow-lg"
               >
-                <Icon className="text-[hsl(200,18%,35%)] mb-3 group-hover:text-[hsl(195,25%,28%)] group-hover:scale-110 gentle-animation" size={20} strokeWidth={1.8} />
+                <Icon className="text-[hsl(205,10%,45%)] mb-3 group-hover:text-[hsl(205,12%,30%)] group-hover:scale-110 gentle-animation" size={20} strokeWidth={1.8} />
                 <h3 className="text-sm font-bold text-foreground mb-1">{s.label}</h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">{s.desc}</p>
               </motion.div>
