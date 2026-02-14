@@ -56,11 +56,11 @@ export default function Process() {
                 whileHover={{ y: -4, transition: { duration: 0.3 } }}
                 className="relative p-6 rounded-2xl bg-background border border-border text-center gentle-animation hover:shadow-lg"
               >
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-[hsl(200,20%,18%)] text-white text-xs font-bold flex items-center justify-center shadow-md">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-[hsl(205,12%,25%)] text-white text-xs font-bold flex items-center justify-center shadow-md">
                   {i + 1}
                 </div>
-                <div className="w-12 h-12 mx-auto rounded-xl bg-[hsl(200,15%,92%)] flex items-center justify-center mb-4 mt-2">
-                  <Icon className="text-[hsl(200,18%,35%)]" size={22} />
+                <div className="w-12 h-12 mx-auto rounded-xl bg-[hsl(205,8%,93%)] flex items-center justify-center mb-4 mt-2">
+                  <Icon className="text-[hsl(205,10%,45%)]" size={22} />
                 </div>
                 <h3 className="font-display text-base font-bold text-foreground mb-2">{step.title}</h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">{step.desc}</p>

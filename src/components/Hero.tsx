@@ -56,7 +56,7 @@ export default function Hero() {
             href="https://wa.me/5543991065129?text=Ol%C3%A1!%20Fiquei%20interessado%20nos%20servi%C3%A7os%20da%20Brandify%20e%20gostaria%20de%20solicitar%20um%20or%C3%A7amento%20para%20cria%C3%A7%C3%A3o%20de%20site."
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-[hsl(200,20%,18%)] text-white font-bold text-base gentle-animation"
+            className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-[hsl(205,12%,22%)] text-white font-bold text-base gentle-animation"
           >
             Solicitar Orçamento
             <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -83,7 +83,7 @@ export default function Hero() {
             { value: 24, suffix: "h", label: "Tempo de resposta" },
           ].map((stat) => (
             <div key={stat.label} className="text-center">
-              <p className="font-display text-3xl md:text-4xl font-black text-[hsl(200,20%,18%)] tracking-tight">
+              <p className="font-display text-3xl md:text-4xl font-black text-[hsl(205,10%,22%)] tracking-tight">
                 <AnimatedCounter end={stat.value} suffix={stat.suffix} />
               </p>
               <p className="text-xs md:text-sm text-muted-foreground mt-1.5 tracking-wide">{stat.label}</p>
