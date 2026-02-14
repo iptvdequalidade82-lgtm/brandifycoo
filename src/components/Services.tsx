@@ -16,9 +16,7 @@ const item = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0, transiti
 export default function Services() {
   return (
     <section id="servicos" className="section-padding relative overflow-hidden">
-      {/* Background effects */}
-      <div className="absolute top-0 right-0 w-[400px] h-[400px] rounded-full bg-primary/5 blur-[150px] pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[300px] h-[300px] rounded-full bg-accent/5 blur-[120px] pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[400px] h-[400px] rounded-full bg-white/[0.02] blur-[150px] pointer-events-none" />
 
       <div className="container mx-auto max-w-5xl relative">
         <motion.div
@@ -28,11 +26,11 @@ export default function Services() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="font-display text-3xl md:text-5xl font-black tracking-tight mb-4">
+          <h2 className="font-display text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-4">
             Tecnologia que{" "}
             <span className="text-gradient">transforma</span>
           </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto">
+          <p className="text-white/50 max-w-xl mx-auto">
             Soluções completas de desenvolvimento web com o que há de mais moderno no mercado.
           </p>
         </motion.div>
@@ -50,13 +48,14 @@ export default function Services() {
               <motion.div
                 key={s.title}
                 variants={item}
-                className="group relative p-6 rounded-2xl bg-card/40 backdrop-blur-sm border border-border/40 hover:border-primary/40 hover:shadow-[0_0_40px_hsl(0_0%_100%/0.08)] hover:-translate-y-1.5 transition-all duration-500 gradient-border"
+                whileHover={{ y: -6, transition: { duration: 0.3 } }}
+                className="group relative p-6 rounded-2xl glass gentle-animation"
               >
-                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary/15 to-accent/10 flex items-center justify-center mb-5 group-hover:from-primary/25 group-hover:to-accent/15 transition-all duration-500">
-                  <Icon className="text-primary group-hover:text-accent transition-colors duration-500" size={20} strokeWidth={1.8} />
+                <div className="w-11 h-11 rounded-xl bg-white/[0.06] flex items-center justify-center mb-5 group-hover:bg-white/[0.12] gentle-animation">
+                  <Icon className="text-white/70 group-hover:text-white gentle-animation" size={20} strokeWidth={1.8} />
                 </div>
-                <h3 className="font-display text-base font-bold text-foreground mb-2">{s.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
+                <h3 className="font-display text-base font-bold text-white mb-2">{s.title}</h3>
+                <p className="text-sm text-white/50 leading-relaxed">{s.desc}</p>
               </motion.div>
             );
           })}
