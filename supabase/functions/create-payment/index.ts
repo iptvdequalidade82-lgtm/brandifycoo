@@ -106,7 +106,7 @@ serve(async (req) => {
     const safeDescription = (description || "Serviço Brandify").replace(/[<>"']/g, "").substring(0, 500);
 
     const sessionParams: any = {
-      payment_method_types: ["card", "boleto", "pix"],
+      payment_method_types: ["card", "boleto"],
       customer_email: client_email,
       line_items: [
         {
