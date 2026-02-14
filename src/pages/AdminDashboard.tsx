@@ -15,8 +15,15 @@ import {
 } from "@/components/ui/dialog";
 import {
   LogOut, Plus, Copy, ExternalLink, RefreshCw,
-  FileText, DollarSign, Clock, CheckCircle, XCircle, Send, QrCode
+  FileText, DollarSign, Clock, CheckCircle, XCircle, Send, QrCode, CreditCard, Smartphone
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -68,6 +75,7 @@ const AdminDashboard = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [amountReais, setAmountReais] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<"pix" | "stripe">("pix");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -97,6 +105,7 @@ const AdminDashboard = () => {
     setTitle("");
     setDescription("");
     setAmountReais("");
+    setPaymentMethod("pix");
   };
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -116,7 +125,7 @@ const AdminDashboard = () => {
 
     const cents = Math.round(parseFloat(amountReais.replace(",", ".")) * 100);
 
-    const { error } = await supabase.from("proposals").insert({
+    const { data: inserted, error } = await supabase.from("proposals").insert({
       client_name: clientName.trim(),
       client_email: clientEmail.trim(),
       client_phone: clientPhone.trim() || null,
@@ -125,16 +134,51 @@ const AdminDashboard = () => {
       amount_cents: cents,
       installments: 1,
       created_by: user!.id,
-    } as any);
+    } as any).select().single();
 
-    if (error) {
+    if (error || !inserted) {
       toast.error("Erro ao criar proposta");
-    } else {
-      toast.success("Proposta criada!");
-      setShowForm(false);
-      resetForm();
-      fetchProposals();
+      setSubmitting(false);
+      return;
     }
+
+    if (paymentMethod === "pix") {
+      const origin = window.location.origin;
+      const link = `${origin}/pix/${(inserted as any).id}`;
+      await navigator.clipboard.writeText(link);
+      toast.success("Proposta criada! Link PIX copiado para a área de transferência.");
+    } else {
+      // Generate Stripe link automatically
+      try {
+        const proposal = inserted as any;
+        const { data, error: fnError } = await supabase.functions.invoke("create-payment", {
+          body: {
+            proposal_id: proposal.id,
+            amount_cents: cents,
+            installments: 1,
+            client_name: clientName.trim(),
+            client_email: clientEmail.trim(),
+            description: `${title.trim()}${description.trim() ? " - " + description.trim() : ""}`,
+          },
+        });
+        if (!fnError && data?.url) {
+          await supabase
+            .from("proposals")
+            .update({ stripe_checkout_url: data.url, status: "sent", stripe_session_id: data.session_id } as any)
+            .eq("id", proposal.id);
+          await navigator.clipboard.writeText(data.url);
+          toast.success("Proposta criada! Link Stripe copiado.");
+        } else {
+          toast.success("Proposta criada! Gere o link de pagamento na lista.");
+        }
+      } catch {
+        toast.success("Proposta criada! Gere o link de pagamento na lista.");
+      }
+    }
+
+    setShowForm(false);
+    resetForm();
+    fetchProposals();
     setSubmitting(false);
   };
 
@@ -337,8 +381,43 @@ const AdminDashboard = () => {
               <Label htmlFor="pamount">Valor (R$)</Label>
               <Input id="pamount" value={amountReais} onChange={e => setAmountReais(e.target.value)} placeholder="1500,00" required />
             </div>
+            <div className="space-y-1.5">
+              <Label>Método de Pagamento</Label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod("pix")}
+                  className={`flex items-center gap-2 rounded-lg border p-3 text-sm transition-all ${
+                    paymentMethod === "pix"
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border text-muted-foreground hover:border-primary/50"
+                  }`}
+                >
+                  <Smartphone className="w-4 h-4" />
+                  <div className="text-left">
+                    <p className="font-medium">PIX</p>
+                    <p className="text-xs opacity-70">QR Code direto</p>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod("stripe")}
+                  className={`flex items-center gap-2 rounded-lg border p-3 text-sm transition-all ${
+                    paymentMethod === "stripe"
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border text-muted-foreground hover:border-primary/50"
+                  }`}
+                >
+                  <CreditCard className="w-4 h-4" />
+                  <div className="text-left">
+                    <p className="font-medium">Cartão/Boleto</p>
+                    <p className="text-xs opacity-70">Via checkout</p>
+                  </div>
+                </button>
+              </div>
+            </div>
             <Button type="submit" className="w-full" disabled={submitting}>
-              {submitting ? "Criando..." : "Criar Proposta"}
+              {submitting ? "Criando..." : paymentMethod === "pix" ? "Criar Proposta PIX" : "Criar Proposta"}
             </Button>
           </form>
         </DialogContent>
