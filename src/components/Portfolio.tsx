@@ -50,7 +50,7 @@ export default function Portfolio() {
               <motion.div
                 key={s.label}
                 variants={item}
-                className="group relative p-5 rounded-2xl bg-card/40 backdrop-blur-sm border border-border/40 hover:border-primary/40 hover:shadow-[0_0_30px_hsl(250_100%_65%/0.1)] transition-all duration-500 gradient-border"
+                className="group relative p-5 rounded-2xl bg-card/40 backdrop-blur-sm border border-border/40 hover:border-primary/40 hover:shadow-[0_0_30px_hsl(0_0%_100%/0.06)] transition-all duration-500 gradient-border"
               >
                 <Icon className="text-primary mb-3 group-hover:text-accent group-hover:scale-110 transition-all duration-300" size={20} strokeWidth={1.8} />
                 <h3 className="text-sm font-bold text-foreground mb-1">{s.label}</h3>
