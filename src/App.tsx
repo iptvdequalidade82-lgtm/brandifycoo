@@ -10,6 +10,8 @@ import Curso from "./pages/Curso";
 import TrabalheConosco from "./pages/TrabalheConosco";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminProjects from "./pages/AdminProjects";
+import AdminAgenda from "./pages/AdminAgenda";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PixPayment from "./pages/PixPayment";
 
@@ -28,6 +30,8 @@ const App = () => (
             <Route path="/trabalhe-conosco" element={<TrabalheConosco />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/projetos" element={<AdminProjects />} />
+            <Route path="/admin/agenda" element={<AdminAgenda />} />
             <Route path="/pagamento-sucesso" element={<PaymentSuccess />} />
             <Route path="/pix/:id" element={<PixPayment />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
