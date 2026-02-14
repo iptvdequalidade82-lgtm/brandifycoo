@@ -50,7 +50,7 @@ export default function Services() {
               <motion.div
                 key={s.title}
                 variants={item}
-                className="group relative p-6 rounded-2xl bg-card/40 backdrop-blur-sm border border-border/40 hover:border-primary/40 hover:shadow-[0_0_40px_hsl(250_100%_65%/0.12)] hover:-translate-y-1.5 transition-all duration-500 gradient-border"
+                className="group relative p-6 rounded-2xl bg-card/40 backdrop-blur-sm border border-border/40 hover:border-primary/40 hover:shadow-[0_0_40px_hsl(0_0%_100%/0.08)] hover:-translate-y-1.5 transition-all duration-500 gradient-border"
               >
                 <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary/15 to-accent/10 flex items-center justify-center mb-5 group-hover:from-primary/25 group-hover:to-accent/15 transition-all duration-500">
                   <Icon className="text-primary group-hover:text-accent transition-colors duration-500" size={20} strokeWidth={1.8} />

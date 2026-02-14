@@ -64,7 +64,7 @@ export default function Pricing() {
               variants={item}
               className={`relative rounded-2xl overflow-hidden transition-all duration-500 flex flex-col hover:-translate-y-1.5 ${
                 plan.featured
-                  ? "bg-card/60 backdrop-blur-sm border-2 border-primary/50 shadow-[0_0_50px_hsl(250_100%_65%/0.2)] md:scale-[1.06]"
+                  ? "bg-card/60 backdrop-blur-sm border-2 border-primary/50 shadow-[0_0_50px_hsl(0_0%_100%/0.1)] md:scale-[1.06]"
                   : "bg-card/40 backdrop-blur-sm border border-border/40 hover:border-primary/30 gradient-border"
               }`}
             >

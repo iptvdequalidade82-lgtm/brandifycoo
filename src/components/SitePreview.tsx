@@ -51,7 +51,7 @@ export default function SitePreview() {
               href={site.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="group rounded-2xl overflow-hidden bg-card/40 backdrop-blur-sm border border-border/40 hover:border-primary/40 hover:shadow-[0_0_40px_hsl(250_100%_65%/0.12)] transition-all duration-500 gradient-border"
+              className="group rounded-2xl overflow-hidden bg-card/40 backdrop-blur-sm border border-border/40 hover:border-primary/40 hover:shadow-[0_0_40px_hsl(0_0%_100%/0.08)] transition-all duration-500 gradient-border"
             >
               {/* Browser bar */}
               <div className="flex items-center gap-2 px-4 py-3 bg-secondary/60 border-b border-border/30">

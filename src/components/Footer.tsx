@@ -67,7 +67,7 @@ export default function Footer() {
               href="https://www.instagram.com/brandifycoo"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-9 h-9 rounded-lg border border-border/40 bg-card/40 flex items-center justify-center text-muted-foreground hover:text-accent hover:border-primary/30 hover:shadow-[0_0_15px_hsl(250_100%_65%/0.1)] transition-all duration-300"
+              className="w-9 h-9 rounded-lg border border-border/40 bg-card/40 flex items-center justify-center text-muted-foreground hover:text-accent hover:border-primary/30 hover:shadow-[0_0_15px_hsl(0_0%_100%/0.08)] transition-all duration-300"
               aria-label="Instagram"
             >
               <Instagram size={16} />
@@ -76,7 +76,7 @@ export default function Footer() {
               href="https://wa.me/5543991065129"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-9 h-9 rounded-lg border border-border/40 bg-card/40 flex items-center justify-center text-muted-foreground hover:text-accent hover:border-primary/30 hover:shadow-[0_0_15px_hsl(250_100%_65%/0.1)] transition-all duration-300"
+              className="w-9 h-9 rounded-lg border border-border/40 bg-card/40 flex items-center justify-center text-muted-foreground hover:text-accent hover:border-primary/30 hover:shadow-[0_0_15px_hsl(0_0%_100%/0.08)] transition-all duration-300"
               aria-label="WhatsApp"
             >
               <MessageCircle size={16} />

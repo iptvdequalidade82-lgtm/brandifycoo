@@ -55,9 +55,9 @@ export default function Process() {
               <motion.div
                 key={step.title}
                 variants={item}
-                className="relative p-6 rounded-2xl bg-card/40 backdrop-blur-sm border border-border/40 text-center transition-all duration-500 hover:border-primary/40 hover:shadow-[0_0_30px_hsl(250_100%_65%/0.1)] gradient-border"
+                className="relative p-6 rounded-2xl bg-card/40 backdrop-blur-sm border border-border/40 text-center transition-all duration-500 hover:border-primary/40 hover:shadow-[0_0_30px_hsl(0_0%_100%/0.06)] gradient-border"
               >
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground text-xs font-bold flex items-center justify-center shadow-[0_0_15px_hsl(250_100%_65%/0.3)]">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground text-xs font-bold flex items-center justify-center shadow-[0_0_15px_hsl(0_0%_100%/0.15)]">
                   {i + 1}
                 </div>
                 <div className="w-12 h-12 mx-auto rounded-xl bg-gradient-to-br from-primary/15 to-accent/10 flex items-center justify-center mb-4 mt-2">

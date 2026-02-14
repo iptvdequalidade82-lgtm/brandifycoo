@@ -13,7 +13,7 @@ export default function Hero() {
         <div
           className="absolute inset-0 animate-grid-move"
           style={{
-            backgroundImage: `linear-gradient(hsl(250 100% 65% / 0.3) 1px, transparent 1px), linear-gradient(90deg, hsl(250 100% 65% / 0.3) 1px, transparent 1px)`,
+            backgroundImage: `linear-gradient(hsl(0 0% 100% / 0.3) 1px, transparent 1px), linear-gradient(90deg, hsl(0 0% 100% / 0.3) 1px, transparent 1px)`,
             backgroundSize: '60px 60px',
             height: '200%',
           }}

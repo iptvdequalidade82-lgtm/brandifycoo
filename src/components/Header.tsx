@@ -36,7 +36,7 @@ export default function Header() {
             <button
               key={l.href}
               onClick={() => handleNav(l.href)}
-              className="group relative text-sm text-muted-foreground bg-transparent border-none cursor-pointer transition-all duration-300 hover:text-foreground hover:scale-110 hover:-translate-y-0.5 hover:drop-shadow-[0_0_8px_hsl(250,100%,65%,0.5)] after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-0 after:h-[2px] after:rounded-full after:bg-gradient-to-r after:from-primary after:to-accent after:transition-all after:duration-300 hover:after:w-full"
+              className="group relative text-sm text-muted-foreground bg-transparent border-none cursor-pointer transition-all duration-300 hover:text-foreground hover:scale-110 hover:-translate-y-0.5 hover:drop-shadow-[0_0_8px_hsl(0,0%,100%,0.4)] after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-0 after:h-[2px] after:rounded-full after:bg-gradient-to-r after:from-primary after:to-accent after:transition-all after:duration-300 hover:after:w-full"
             >
               {l.label}
             </button>
