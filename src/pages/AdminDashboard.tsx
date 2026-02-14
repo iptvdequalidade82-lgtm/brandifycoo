@@ -14,8 +14,18 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   LogOut, Plus, Copy, ExternalLink, RefreshCw,
-  FileText, DollarSign, Clock, CheckCircle, XCircle, Send, QrCode, CreditCard, Smartphone
+  FileText, DollarSign, Clock, CheckCircle, XCircle, Send, QrCode, CreditCard, Smartphone, Trash2
 } from "lucide-react";
 import {
   Select,
@@ -60,6 +70,14 @@ const statusConfig: Record<string, { label: string; icon: any; color: string }> 
   cancelled: { label: "Cancelado", icon: XCircle, color: "text-destructive" },
 };
 
+const filterTabs = [
+  { key: "all", label: "Todos" },
+  { key: "draft", label: "Rascunhos" },
+  { key: "sent", label: "Enviados" },
+  { key: "paid", label: "Pagos" },
+  { key: "cancelled", label: "Cancelados" },
+];
+
 const AdminDashboard = () => {
   const { user, isAdmin, isLoading, signOut } = useAuth();
   const navigate = useNavigate();
@@ -67,6 +85,8 @@ const AdminDashboard = () => {
   const [showForm, setShowForm] = useState(false);
   const [loadingProposals, setLoadingProposals] = useState(true);
   const [generatingLink, setGeneratingLink] = useState<string | null>(null);
+  const [activeFilter, setActiveFilter] = useState("all");
+  const [deleteTarget, setDeleteTarget] = useState<Proposal | null>(null);
 
   // Form state
   const [clientName, setClientName] = useState("");
@@ -97,6 +117,10 @@ const AdminDashboard = () => {
     if (!error && data) setProposals(data as unknown as Proposal[]);
     setLoadingProposals(false);
   };
+
+  const filteredProposals = activeFilter === "all"
+    ? proposals
+    : proposals.filter(p => p.status === activeFilter);
 
   const resetForm = () => {
     setClientName("");
@@ -148,7 +172,6 @@ const AdminDashboard = () => {
       navigator.clipboard.writeText(msg);
       toast.success("Mensagem com link PIX copiada! Cole no WhatsApp para enviar.");
     } else {
-      // Generate Stripe link automatically
       try {
         const proposal = inserted as any;
         const { data, error: fnError } = await supabase.functions.invoke("create-payment", {
@@ -180,6 +203,18 @@ const AdminDashboard = () => {
     resetForm();
     fetchProposals();
     setSubmitting(false);
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    const { error } = await supabase.from("proposals").delete().eq("id", deleteTarget.id);
+    if (error) {
+      toast.error("Erro ao excluir proposta");
+    } else {
+      toast.success("Proposta excluída");
+      setProposals(prev => prev.filter(p => p.id !== deleteTarget.id));
+    }
+    setDeleteTarget(null);
   };
 
   const generatePaymentLink = async (proposal: Proposal) => {
@@ -271,7 +306,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Actions */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-foreground">Propostas</h2>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={fetchProposals}>
@@ -283,17 +318,37 @@ const AdminDashboard = () => {
           </div>
         </div>
 
+        {/* Filter Tabs */}
+        <div className="flex gap-1 mb-6 overflow-x-auto pb-1">
+          {filterTabs.map(tab => {
+            const count = tab.key === "all" ? proposals.length : proposals.filter(p => p.status === tab.key).length;
+            return (
+              <button
+                key={tab.key}
+                onClick={() => setActiveFilter(tab.key)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+                  activeFilter === tab.key
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:bg-muted"
+                }`}
+              >
+                {tab.label} ({count})
+              </button>
+            );
+          })}
+        </div>
+
         {/* Proposals list */}
         <div className="space-y-3">
           {loadingProposals ? (
             <div className="text-center py-12 text-muted-foreground">Carregando...</div>
-          ) : proposals.length === 0 ? (
+          ) : filteredProposals.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <FileText className="w-10 h-10 mx-auto mb-3 opacity-40" />
-              <p>Nenhuma proposta ainda</p>
+              <p>{activeFilter === "all" ? "Nenhuma proposta ainda" : "Nenhuma proposta nesta categoria"}</p>
             </div>
           ) : (
-            proposals.map((p) => {
+            filteredProposals.map((p) => {
               const config = statusConfig[p.status] || statusConfig.draft;
               const StatusIcon = config.icon;
               return (
@@ -313,11 +368,9 @@ const AdminDashboard = () => {
                         <p className="text-lg font-bold text-foreground">{formatCurrency(p.amount_cents)}</p>
                       </div>
                       <div className="flex gap-1">
-                        {/* PIX QR Code button - copy link */}
                         <Button variant="outline" size="icon" onClick={() => copyPixLink(p.id)} title="Copiar link PIX">
                           <QrCode className="w-4 h-4" />
                         </Button>
-                        {/* WhatsApp share button */}
                         <Button variant="outline" size="icon" onClick={() => sharePixWhatsApp(p)} title="Enviar PIX via WhatsApp">
                           <Send className="w-4 h-4" />
                         </Button>
@@ -347,6 +400,9 @@ const AdminDashboard = () => {
                             )}
                           </Button>
                         )}
+                        <Button variant="outline" size="icon" onClick={() => setDeleteTarget(p)} title="Excluir proposta" className="text-destructive hover:text-destructive">
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -356,6 +412,24 @@ const AdminDashboard = () => {
           )}
         </div>
       </main>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir proposta?</AlertDialogTitle>
+            <AlertDialogDescription>
+              A proposta "{deleteTarget?.title}" para {deleteTarget?.client_name} será excluída permanentemente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* New Proposal Dialog */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
