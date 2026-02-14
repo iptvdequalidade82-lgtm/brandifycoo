@@ -1,39 +1,22 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import AdminLayout from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
-  LogOut, Plus, Copy, ExternalLink, RefreshCw,
-  FileText, DollarSign, Clock, CheckCircle, XCircle, Send, QrCode, CreditCard, Smartphone, Trash2
+  Plus, Copy, ExternalLink, RefreshCw,
+  FileText, DollarSign, Send, QrCode, CreditCard, Smartphone, Trash2, CheckCircle, XCircle, MessageCircle,
 } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -79,8 +62,7 @@ const filterTabs = [
 ];
 
 const AdminDashboard = () => {
-  const { user, isAdmin, isLoading, signOut } = useAuth();
-  const navigate = useNavigate();
+  const { user } = useAuth();
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [loadingProposals, setLoadingProposals] = useState(true);
@@ -88,7 +70,6 @@ const AdminDashboard = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [deleteTarget, setDeleteTarget] = useState<Proposal | null>(null);
 
-  // Form state
   const [clientName, setClientName] = useState("");
   const [clientEmail, setClientEmail] = useState("");
   const [clientPhone, setClientPhone] = useState("");
@@ -98,15 +79,7 @@ const AdminDashboard = () => {
   const [paymentMethod, setPaymentMethod] = useState<"pix" | "stripe">("pix");
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (!isLoading && (!user || !isAdmin)) {
-      navigate("/admin/login");
-    }
-  }, [user, isAdmin, isLoading, navigate]);
-
-  useEffect(() => {
-    if (isAdmin) fetchProposals();
-  }, [isAdmin]);
+  useEffect(() => { fetchProposals(); }, []);
 
   const fetchProposals = async () => {
     setLoadingProposals(true);
@@ -123,13 +96,8 @@ const AdminDashboard = () => {
     : proposals.filter(p => p.status === activeFilter);
 
   const resetForm = () => {
-    setClientName("");
-    setClientEmail("");
-    setClientPhone("");
-    setTitle("");
-    setDescription("");
-    setAmountReais("");
-    setPaymentMethod("pix");
+    setClientName(""); setClientEmail(""); setClientPhone("");
+    setTitle(""); setDescription(""); setAmountReais(""); setPaymentMethod("pix");
   };
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -139,10 +107,8 @@ const AdminDashboard = () => {
     const validation = proposalSchema.safeParse({
       clientName, clientEmail, clientPhone, title, description, amountReais,
     });
-
     if (!validation.success) {
-      const firstError = validation.error.errors[0]?.message || "Dados inválidos";
-      toast.error(firstError);
+      toast.error(validation.error.errors[0]?.message || "Dados inválidos");
       setSubmitting(false);
       return;
     }
@@ -170,7 +136,7 @@ const AdminDashboard = () => {
       const link = `https://brandifycoo.lovable.app/pix/${(inserted as any).id}`;
       const msg = `Olá ${clientName.trim()}! Segue o link para pagamento via PIX:\n\n${link}\n\nValor: R$ ${parseFloat(amountReais.replace(",", ".")).toFixed(2).replace(".", ",")}\nServiço: ${title.trim()}`;
       navigator.clipboard.writeText(msg);
-      toast.success("Mensagem com link PIX copiada! Cole no WhatsApp para enviar.");
+      toast.success("Mensagem com link PIX copiada!");
     } else {
       try {
         const proposal = inserted as any;
@@ -185,17 +151,16 @@ const AdminDashboard = () => {
           },
         });
         if (!fnError && data?.url) {
-          await supabase
-            .from("proposals")
+          await supabase.from("proposals")
             .update({ stripe_checkout_url: data.url, status: "sent", stripe_session_id: data.session_id } as any)
             .eq("id", proposal.id);
           await navigator.clipboard.writeText(data.url);
           toast.success("Proposta criada! Link Stripe copiado.");
         } else {
-          toast.success("Proposta criada! Gere o link de pagamento na lista.");
+          toast.success("Proposta criada! Gere o link na lista.");
         }
       } catch {
-        toast.success("Proposta criada! Gere o link de pagamento na lista.");
+        toast.success("Proposta criada! Gere o link na lista.");
       }
     }
 
@@ -208,25 +173,20 @@ const AdminDashboard = () => {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     const { error } = await supabase.from("proposals").delete().eq("id", deleteTarget.id);
-    if (error) {
-      toast.error("Erro ao excluir proposta");
-    } else {
+    if (error) toast.error("Erro ao excluir");
+    else {
       toast.success("Proposta excluída");
       setProposals(prev => prev.filter(p => p.id !== deleteTarget.id));
     }
     setDeleteTarget(null);
   };
 
-  const updateStatus = async (proposalId: string, newStatus: string) => {
-    const { error } = await supabase
-      .from("proposals")
-      .update({ status: newStatus } as any)
-      .eq("id", proposalId);
-    if (error) {
-      toast.error("Erro ao atualizar status");
-    } else {
-      toast.success(`Status atualizado para ${statusConfig[newStatus]?.label || newStatus}`);
-      setProposals(prev => prev.map(p => p.id === proposalId ? { ...p, status: newStatus } : p));
+  const updateStatus = async (id: string, newStatus: string) => {
+    const { error } = await supabase.from("proposals").update({ status: newStatus } as any).eq("id", id);
+    if (error) toast.error("Erro ao atualizar");
+    else {
+      toast.success(`Status: ${statusConfig[newStatus]?.label || newStatus}`);
+      setProposals(prev => prev.map(p => p.id === id ? { ...p, status: newStatus } : p));
     }
   };
 
@@ -243,210 +203,162 @@ const AdminDashboard = () => {
           description: `${proposal.title}${proposal.description ? " - " + proposal.description : ""}`,
         },
       });
-
       if (error) throw error;
       if (data?.url) {
-        await supabase
-          .from("proposals")
+        await supabase.from("proposals")
           .update({ stripe_checkout_url: data.url, status: "sent", stripe_session_id: data.session_id } as any)
           .eq("id", proposal.id);
-        toast.success("Link de pagamento gerado!");
+        toast.success("Link gerado!");
         fetchProposals();
       }
     } catch (err: any) {
-      toast.error("Erro ao gerar link: " + (err.message || "tente novamente"));
+      toast.error("Erro: " + (err.message || "tente novamente"));
     }
     setGeneratingLink(null);
   };
 
-  const copyLink = (url: string) => {
-    navigator.clipboard.writeText(url);
-    toast.success("Link copiado!");
-  };
+  const copyLink = (url: string) => { navigator.clipboard.writeText(url); toast.success("Link copiado!"); };
+  const copyPixLink = (id: string) => { navigator.clipboard.writeText(`https://brandifycoo.lovable.app/pix/${id}`); toast.success("Link PIX copiado!"); };
 
-  const copyPixLink = (proposalId: string) => {
-    const link = `https://brandifycoo.lovable.app/pix/${proposalId}`;
-    navigator.clipboard.writeText(link);
-    toast.success("Link PIX copiado!");
-  };
-
-  const sharePixWhatsApp = (proposal: Proposal) => {
-    const link = `https://brandifycoo.lovable.app/pix/${proposal.id}`;
-    const msg = `Olá ${proposal.client_name}! Segue o link para pagamento via PIX:\n\n${link}\n\nValor: ${formatCurrency(proposal.amount_cents)}\nServiço: ${proposal.title}`;
+  const sharePixWhatsApp = (p: Proposal) => {
+    const link = `https://brandifycoo.lovable.app/pix/${p.id}`;
+    const msg = `Olá ${p.client_name}! Segue o link para pagamento via PIX:\n\n${link}\n\nValor: ${formatCurrency(p.amount_cents)}\nServiço: ${p.title}`;
     navigator.clipboard.writeText(msg);
-    toast.success("Mensagem com link PIX copiada! Cole no WhatsApp para enviar.");
+    toast.success("Mensagem copiada!");
+  };
+
+  const openWhatsApp = (phone: string, name: string) => {
+    const cleaned = phone.replace(/\D/g, "");
+    const num = cleaned.startsWith("55") ? cleaned : `55${cleaned}`;
+    window.open(`https://wa.me/${num}?text=${encodeURIComponent(`Olá ${name}! Aqui é da Brandify.`)}`, "_blank");
   };
 
   const formatCurrency = (cents: number) =>
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(cents / 100);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <RefreshCw className="w-6 h-6 text-primary animate-spin" />
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border px-6 py-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold font-heading text-foreground">Painel Brandify</h1>
-          <p className="text-sm text-muted-foreground">{user?.email}</p>
-        </div>
-        <Button variant="ghost" size="sm" onClick={signOut}>
-          <LogOut className="w-4 h-4 mr-2" /> Sair
-        </Button>
-      </header>
-
-      <main className="max-w-6xl mx-auto p-6">
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          {[
-            { label: "Total", value: proposals.length, icon: FileText },
-            { label: "Enviados", value: proposals.filter(p => p.status === "sent").length, icon: Send },
-            { label: "Pagos", value: proposals.filter(p => p.status === "paid").length, icon: CheckCircle },
-            { label: "Faturado", value: formatCurrency(proposals.filter(p => p.status === "paid").reduce((s, p) => s + p.amount_cents, 0)), icon: DollarSign },
-          ].map((stat, i) => (
-            <div key={i} className="glass rounded-xl p-4 glow-border">
-              <stat.icon className="w-5 h-5 text-primary mb-2" />
-              <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-              <p className="text-xs text-muted-foreground">{stat.label}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Actions */}
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-foreground">Propostas</h2>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={fetchProposals}>
-              <RefreshCw className="w-4 h-4" />
-            </Button>
-            <Button size="sm" onClick={() => setShowForm(true)}>
-              <Plus className="w-4 h-4 mr-1" /> Nova Proposta
-            </Button>
+    <AdminLayout>
+      {/* Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        {[
+          { label: "Total", value: proposals.length, icon: FileText },
+          { label: "Enviados", value: proposals.filter(p => p.status === "sent").length, icon: Send },
+          { label: "Pagos", value: proposals.filter(p => p.status === "paid").length, icon: CheckCircle },
+          { label: "Faturado", value: formatCurrency(proposals.filter(p => p.status === "paid").reduce((s, p) => s + p.amount_cents, 0)), icon: DollarSign },
+        ].map((stat, i) => (
+          <div key={i} className="glass rounded-xl p-4 glow-border">
+            <stat.icon className="w-5 h-5 text-primary mb-2" />
+            <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+            <p className="text-xs text-muted-foreground">{stat.label}</p>
           </div>
-        </div>
+        ))}
+      </div>
 
-        {/* Filter Tabs */}
-        <div className="flex gap-1 mb-6 overflow-x-auto pb-1">
-          {filterTabs.map(tab => {
-            const count = tab.key === "all" ? proposals.length : proposals.filter(p => p.status === tab.key).length;
+      {/* Actions */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold text-foreground">Propostas</h2>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={fetchProposals}><RefreshCw className="w-4 h-4" /></Button>
+          <Button size="sm" onClick={() => setShowForm(true)}><Plus className="w-4 h-4 mr-1" /> Nova Proposta</Button>
+        </div>
+      </div>
+
+      {/* Filter Tabs */}
+      <div className="flex gap-1 mb-6 overflow-x-auto pb-1">
+        {filterTabs.map(tab => {
+          const count = tab.key === "all" ? proposals.length : proposals.filter(p => p.status === tab.key).length;
+          return (
+            <button
+              key={tab.key}
+              onClick={() => setActiveFilter(tab.key)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+                activeFilter === tab.key ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
+              }`}
+            >
+              {tab.label} ({count})
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Proposals list */}
+      <div className="space-y-3">
+        {loadingProposals ? (
+          <div className="text-center py-12 text-muted-foreground">Carregando...</div>
+        ) : filteredProposals.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground">
+            <FileText className="w-10 h-10 mx-auto mb-3 opacity-40" />
+            <p>{activeFilter === "all" ? "Nenhuma proposta ainda" : "Nenhuma proposta nesta categoria"}</p>
+          </div>
+        ) : (
+          filteredProposals.map((p) => {
+            const config = statusConfig[p.status] || statusConfig.draft;
+            const StatusIcon = config.icon;
             return (
-              <button
-                key={tab.key}
-                onClick={() => setActiveFilter(tab.key)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-                  activeFilter === tab.key
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:bg-muted"
-                }`}
-              >
-                {tab.label} ({count})
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Proposals list */}
-        <div className="space-y-3">
-          {loadingProposals ? (
-            <div className="text-center py-12 text-muted-foreground">Carregando...</div>
-          ) : filteredProposals.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <FileText className="w-10 h-10 mx-auto mb-3 opacity-40" />
-              <p>{activeFilter === "all" ? "Nenhuma proposta ainda" : "Nenhuma proposta nesta categoria"}</p>
-            </div>
-          ) : (
-            filteredProposals.map((p) => {
-              const config = statusConfig[p.status] || statusConfig.draft;
-              const StatusIcon = config.icon;
-              return (
-                <div key={p.id} className="glass rounded-xl p-5 glow-border">
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <StatusIcon className={`w-4 h-4 ${config.color}`} />
-                        <span className={`text-xs font-medium ${config.color}`}>{config.label}</span>
-                      </div>
-                      <h3 className="font-semibold text-foreground truncate">{p.title}</h3>
-                      <p className="text-sm text-muted-foreground">{p.client_name}{p.client_email ? ` · ${p.client_email}` : ""}</p>
-                      {p.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{p.description}</p>}
+              <div key={p.id} className="glass rounded-xl p-5 glow-border">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <StatusIcon className={`w-4 h-4 ${config.color}`} />
+                      <span className={`text-xs font-medium ${config.color}`}>{config.label}</span>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-foreground">{formatCurrency(p.amount_cents)}</p>
-                      </div>
-                      <div className="flex gap-1">
-                        <Button variant="outline" size="icon" onClick={() => copyPixLink(p.id)} title="Copiar link PIX">
-                          <QrCode className="w-4 h-4" />
+                    <h3 className="font-semibold text-foreground truncate">{p.title}</h3>
+                    <p className="text-sm text-muted-foreground">{p.client_name}{p.client_email ? ` · ${p.client_email}` : ""}</p>
+                    {p.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{p.description}</p>}
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-foreground">{formatCurrency(p.amount_cents)}</p>
+                    </div>
+                    <div className="flex gap-1 flex-wrap">
+                      <Button variant="outline" size="icon" onClick={() => copyPixLink(p.id)} title="Copiar link PIX">
+                        <QrCode className="w-4 h-4" />
+                      </Button>
+                      <Button variant="outline" size="icon" onClick={() => sharePixWhatsApp(p)} title="Enviar PIX via WhatsApp">
+                        <Send className="w-4 h-4" />
+                      </Button>
+                      {p.client_phone && (
+                        <Button variant="outline" size="icon" onClick={() => openWhatsApp(p.client_phone!, p.client_name)} title="WhatsApp direto">
+                          <MessageCircle className="w-4 h-4 text-green-400" />
                         </Button>
-                        <Button variant="outline" size="icon" onClick={() => sharePixWhatsApp(p)} title="Enviar PIX via WhatsApp">
+                      )}
+                      {p.stripe_checkout_url ? (
+                        <>
+                          <Button variant="outline" size="icon" onClick={() => copyLink(p.stripe_checkout_url!)}>
+                            <Copy className="w-4 h-4" />
+                          </Button>
+                          <Button variant="outline" size="icon" asChild>
+                            <a href={p.stripe_checkout_url} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="w-4 h-4" />
+                            </a>
+                          </Button>
+                        </>
+                      ) : (
+                        <Button size="sm" onClick={() => generatePaymentLink(p)} disabled={generatingLink === p.id}>
+                          {generatingLink === p.id ? <RefreshCw className="w-4 h-4 animate-spin" /> : <><DollarSign className="w-4 h-4 mr-1" /> Gerar Link</>}
+                        </Button>
+                      )}
+                      {p.status !== "paid" && (
+                        <Button variant="outline" size="icon" onClick={() => updateStatus(p.id, "paid")} title="Marcar como pago" className="text-green-400 hover:text-green-300 hover:border-green-400/50">
+                          <CheckCircle className="w-4 h-4" />
+                        </Button>
+                      )}
+                      {p.status === "paid" && (
+                        <Button variant="outline" size="icon" onClick={() => updateStatus(p.id, "sent")} title="Reverter" className="text-accent hover:text-accent">
                           <Send className="w-4 h-4" />
                         </Button>
-                        {p.stripe_checkout_url ? (
-                          <>
-                            <Button variant="outline" size="icon" onClick={() => copyLink(p.stripe_checkout_url!)}>
-                              <Copy className="w-4 h-4" />
-                            </Button>
-                            <Button variant="outline" size="icon" asChild>
-                              <a href={p.stripe_checkout_url} target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="w-4 h-4" />
-                              </a>
-                            </Button>
-                          </>
-                        ) : (
-                          <Button
-                            size="sm"
-                            onClick={() => generatePaymentLink(p)}
-                            disabled={generatingLink === p.id}
-                          >
-                            {generatingLink === p.id ? (
-                              <RefreshCw className="w-4 h-4 animate-spin" />
-                            ) : (
-                              <>
-                                <DollarSign className="w-4 h-4 mr-1" /> Gerar Link
-                              </>
-                            )}
-                          </Button>
-                        )}
-                        {p.status !== "paid" && (
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => updateStatus(p.id, "paid")}
-                            title="Marcar como pago"
-                            className="text-green-400 hover:text-green-300 hover:border-green-400/50"
-                          >
-                            <CheckCircle className="w-4 h-4" />
-                          </Button>
-                        )}
-                        {p.status === "paid" && (
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => updateStatus(p.id, "sent")}
-                            title="Reverter para enviado"
-                            className="text-accent hover:text-accent"
-                          >
-                            <Send className="w-4 h-4" />
-                          </Button>
-                        )}
-                        <Button variant="outline" size="icon" onClick={() => setDeleteTarget(p)} title="Excluir proposta" className="text-destructive hover:text-destructive">
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
+                      )}
+                      <Button variant="outline" size="icon" onClick={() => setDeleteTarget(p)} className="text-destructive hover:text-destructive">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
                   </div>
                 </div>
-              );
-            })
-          )}
-        </div>
-      </main>
+              </div>
+            );
+          })
+        )}
+      </div>
 
       {/* Delete Confirmation */}
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
@@ -459,9 +371,7 @@ const AdminDashboard = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Excluir
-            </AlertDialogAction>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Excluir</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -503,35 +413,15 @@ const AdminDashboard = () => {
             <div className="space-y-1.5">
               <Label>Método de Pagamento</Label>
               <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod("pix")}
-                  className={`flex items-center gap-2 rounded-lg border p-3 text-sm transition-all ${
-                    paymentMethod === "pix"
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border text-muted-foreground hover:border-primary/50"
-                  }`}
-                >
+                <button type="button" onClick={() => setPaymentMethod("pix")}
+                  className={`flex items-center gap-2 rounded-lg border p-3 text-sm transition-all ${paymentMethod === "pix" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/50"}`}>
                   <Smartphone className="w-4 h-4" />
-                  <div className="text-left">
-                    <p className="font-medium">PIX</p>
-                    <p className="text-xs opacity-70">QR Code direto</p>
-                  </div>
+                  <div className="text-left"><p className="font-medium">PIX</p><p className="text-xs opacity-70">QR Code direto</p></div>
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod("stripe")}
-                  className={`flex items-center gap-2 rounded-lg border p-3 text-sm transition-all ${
-                    paymentMethod === "stripe"
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border text-muted-foreground hover:border-primary/50"
-                  }`}
-                >
+                <button type="button" onClick={() => setPaymentMethod("stripe")}
+                  className={`flex items-center gap-2 rounded-lg border p-3 text-sm transition-all ${paymentMethod === "stripe" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/50"}`}>
                   <CreditCard className="w-4 h-4" />
-                  <div className="text-left">
-                    <p className="font-medium">Cartão/Boleto</p>
-                    <p className="text-xs opacity-70">Via checkout</p>
-                  </div>
+                  <div className="text-left"><p className="font-medium">Cartão/Boleto</p><p className="text-xs opacity-70">Via checkout</p></div>
                 </button>
               </div>
             </div>
@@ -541,7 +431,7 @@ const AdminDashboard = () => {
           </form>
         </DialogContent>
       </Dialog>
-    </div>
+    </AdminLayout>
   );
 };
 

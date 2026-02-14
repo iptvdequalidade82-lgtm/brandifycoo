@@ -38,6 +38,51 @@ export type Database = {
         }
         Relationships: []
       }
+      projects: {
+        Row: {
+          client_email: string | null
+          client_name: string
+          client_phone: string | null
+          created_at: string
+          created_by: string
+          due_date: string | null
+          id: string
+          notes: string | null
+          plan: Database["public"]["Enums"]["project_plan"]
+          status: Database["public"]["Enums"]["project_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          client_email?: string | null
+          client_name: string
+          client_phone?: string | null
+          created_at?: string
+          created_by: string
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          plan?: Database["public"]["Enums"]["project_plan"]
+          status?: Database["public"]["Enums"]["project_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          client_email?: string | null
+          client_name?: string
+          client_phone?: string | null
+          created_at?: string
+          created_by?: string
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          plan?: Database["public"]["Enums"]["project_plan"]
+          status?: Database["public"]["Enums"]["project_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       proposals: {
         Row: {
           amount_cents: number
@@ -122,6 +167,13 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      project_plan: "essencial" | "profissional" | "premium"
+      project_status:
+        | "briefing"
+        | "design"
+        | "desenvolvimento"
+        | "revisao"
+        | "entregue"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -250,6 +302,14 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      project_plan: ["essencial", "profissional", "premium"],
+      project_status: [
+        "briefing",
+        "design",
+        "desenvolvimento",
+        "revisao",
+        "entregue",
+      ],
     },
   },
 } as const
