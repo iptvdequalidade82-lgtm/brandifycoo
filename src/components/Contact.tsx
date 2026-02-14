@@ -13,22 +13,25 @@ const contacts = [
 
 export default function Contact() {
   return (
-    <section id="contato" className="section-padding relative overflow-hidden bg-secondary">
+    <section id="contato" className="relative py-28 md:py-36 px-6 overflow-hidden bg-[hsl(220,15%,8%)] text-white">
+      {/* Ambient glow */}
+      <div className="absolute bottom-0 left-1/3 w-[500px] h-[500px] rounded-full bg-[hsl(220,80%,55%/0.08)] blur-[140px] pointer-events-none" />
+
       <div className="container mx-auto max-w-4xl relative">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
-          className="rounded-2xl overflow-hidden bg-background border border-border shadow-lg"
+          className="rounded-2xl overflow-hidden border border-white/10 bg-white/[0.04] backdrop-blur-sm shadow-2xl"
         >
           <div className="grid md:grid-cols-5">
-            <div className="md:col-span-2 p-8 md:p-10 bg-foreground text-background border-b md:border-b-0 md:border-r border-border flex flex-col justify-center">
-              <MessageCircle className="opacity-60 mb-4" size={32} />
+            <div className="md:col-span-2 p-8 md:p-10 bg-gradient-to-br from-[hsl(220,80%,55%)] to-[hsl(260,70%,50%)] border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-center">
+              <MessageCircle className="text-white/70 mb-4" size={32} />
               <h2 className="font-display text-2xl md:text-3xl font-black mb-3">
                 Vamos criar o seu site?
               </h2>
-              <p className="opacity-50 text-sm leading-relaxed mb-6">
+              <p className="text-white/60 text-sm leading-relaxed mb-6">
                 Entre em contato e receba um orçamento sem compromisso. Respondemos em até 24h.
               </p>
               <motion.a
@@ -37,7 +40,7 @@ export default function Contact() {
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-background text-foreground font-bold gentle-animation text-sm"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white text-[hsl(230,70%,45%)] font-bold gentle-animation text-sm shadow-lg"
               >
                 <Phone size={16} />
                 Falar no WhatsApp
@@ -62,16 +65,16 @@ export default function Contact() {
                   >
                     <Wrapper
                       {...linkProps}
-                      className={`flex items-center gap-4 p-4 rounded-xl bg-secondary hover:bg-accent border border-border hover:border-foreground/10 gentle-animation ${
+                      className={`flex items-center gap-4 p-4 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 gentle-animation ${
                         c.href ? "cursor-pointer" : ""
                       }`}
                     >
-                      <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center shrink-0">
-                        <Icon className="text-muted-foreground" size={18} />
+                      <div className="w-10 h-10 rounded-lg bg-white/[0.08] flex items-center justify-center shrink-0">
+                        <Icon className="text-white/60" size={18} />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-foreground">{c.title}</p>
-                        <p className="text-xs text-muted-foreground">{c.value}</p>
+                        <p className="text-sm font-bold text-white">{c.title}</p>
+                        <p className="text-xs text-white/40">{c.value}</p>
                       </div>
                     </Wrapper>
                   </motion.div>
