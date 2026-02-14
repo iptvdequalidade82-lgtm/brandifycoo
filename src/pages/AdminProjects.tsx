@@ -30,6 +30,7 @@ interface Project {
   plan: "essencial" | "profissional" | "premium";
   status: "briefing" | "design" | "desenvolvimento" | "revisao" | "entregue";
   notes: string | null;
+  start_date: string | null;
   due_date: string | null;
   created_at: string;
 }
@@ -73,6 +74,7 @@ export default function AdminProjects() {
   const [title, setTitle] = useState("");
   const [plan, setPlan] = useState<"essencial" | "profissional" | "premium">("essencial");
   const [notes, setNotes] = useState("");
+  const [startDate, setStartDate] = useState("");
   const [dueDate, setDueDate] = useState("");
 
   const fetchProjects = async () => {
@@ -93,7 +95,7 @@ export default function AdminProjects() {
 
   const resetForm = () => {
     setClientName(""); setClientPhone(""); setClientEmail("");
-    setTitle(""); setPlan("essencial"); setNotes(""); setDueDate("");
+    setTitle(""); setPlan("essencial"); setNotes(""); setStartDate(""); setDueDate("");
   };
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -110,6 +112,7 @@ export default function AdminProjects() {
       title: title.trim(),
       plan,
       notes: notes.trim() || null,
+      start_date: startDate || null,
       due_date: dueDate || null,
       created_by: user!.id,
     } as any);
@@ -307,9 +310,13 @@ export default function AdminProjects() {
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label>Prazo de Entrega</Label>
-                <Input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} />
+                <Label>Início</Label>
+                <Input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
               </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Prazo de Entrega</Label>
+              <Input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} />
             </div>
             <div className="space-y-1.5">
               <Label>Observações</Label>
