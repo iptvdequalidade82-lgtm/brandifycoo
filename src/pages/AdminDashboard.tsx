@@ -143,10 +143,12 @@ const AdminDashboard = () => {
     }
 
     if (paymentMethod === "pix") {
-      const origin = window.location.origin;
-      const link = `${origin}/pix/${(inserted as any).id}`;
-      window.open(link, "_blank");
-      toast.success("Proposta criada! Página PIX aberta em nova aba.");
+      const link = `https://brandifycoo.lovable.app/pix/${(inserted as any).id}`;
+      navigator.clipboard.writeText(link);
+      const whatsappMsg = encodeURIComponent(`Olá ${clientName.trim()}! Segue o link para pagamento via PIX:\n\n${link}\n\nValor: R$ ${parseFloat(amountReais.replace(",", ".")).toFixed(2).replace(".", ",")}\nServiço: ${title.trim()}`);
+      const whatsappUrl = `https://wa.me/${clientPhone.trim().replace(/\D/g, "")}?text=${whatsappMsg}`;
+      window.open(whatsappUrl, "_blank");
+      toast.success("Link PIX copiado e WhatsApp aberto!");
     } else {
       // Generate Stripe link automatically
       try {
@@ -217,10 +219,16 @@ const AdminDashboard = () => {
   };
 
   const copyPixLink = (proposalId: string) => {
-    const origin = window.location.origin;
-    const link = `${origin}/pix/${proposalId}`;
+    const link = `https://brandifycoo.lovable.app/pix/${proposalId}`;
     navigator.clipboard.writeText(link);
     toast.success("Link PIX copiado!");
+  };
+
+  const sharePixWhatsApp = (proposal: Proposal) => {
+    const link = `https://brandifycoo.lovable.app/pix/${proposal.id}`;
+    const msg = encodeURIComponent(`Olá ${proposal.client_name}! Segue o link para pagamento via PIX:\n\n${link}\n\nValor: ${formatCurrency(proposal.amount_cents)}\nServiço: ${proposal.title}`);
+    const phone = proposal.client_phone?.replace(/\D/g, "") || "";
+    window.open(`https://wa.me/${phone}?text=${msg}`, "_blank");
   };
 
   const formatCurrency = (cents: number) =>
@@ -307,9 +315,13 @@ const AdminDashboard = () => {
                         <p className="text-lg font-bold text-foreground">{formatCurrency(p.amount_cents)}</p>
                       </div>
                       <div className="flex gap-1">
-                        {/* PIX QR Code button - always available */}
+                        {/* PIX QR Code button - copy link */}
                         <Button variant="outline" size="icon" onClick={() => copyPixLink(p.id)} title="Copiar link PIX">
                           <QrCode className="w-4 h-4" />
+                        </Button>
+                        {/* WhatsApp share button */}
+                        <Button variant="outline" size="icon" onClick={() => sharePixWhatsApp(p)} title="Enviar PIX via WhatsApp">
+                          <Send className="w-4 h-4" />
                         </Button>
                         {p.stripe_checkout_url ? (
                           <>
