@@ -75,8 +75,16 @@ serve(async (req) => {
     const rawBody = await req.json();
     const parseResult = PaymentSchema.safeParse(rawBody);
     if (!parseResult.success) {
+      const fieldErrors = parseResult.error.flatten().fieldErrors;
+      const safeErrors: Record<string, string> = {};
+      if (fieldErrors.proposal_id) safeErrors.proposal_id = "ID da proposta inválido";
+      if (fieldErrors.amount_cents) safeErrors.amount = "Valor inválido";
+      if (fieldErrors.client_email) safeErrors.email = "Email inválido";
+      if (fieldErrors.client_name) safeErrors.name = "Nome inválido";
+      if (fieldErrors.installments) safeErrors.installments = "Parcelas inválidas";
+      if (fieldErrors.description) safeErrors.description = "Descrição inválida";
       return new Response(
-        JSON.stringify({ error: "Invalid input", details: parseResult.error.flatten().fieldErrors }),
+        JSON.stringify({ error: "Dados inválidos", fields: safeErrors }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }

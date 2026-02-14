@@ -127,9 +127,9 @@ serve(async (req) => {
       JSON.stringify({
         pix_payload: pixPayload,
         amount_cents: proposal.amount_cents,
-        title: proposal.title,
+        title: "Serviço Brandify",
         client_name: proposal.client_name,
-        description: proposal.description,
+        description: "Pagamento via PIX",
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
