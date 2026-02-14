@@ -2,8 +2,16 @@ import { Mail, Phone, MapPin, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import ContactForm from "@/components/ContactForm";
 
-const whatsappUrl =
-  "https://wa.me/5543991065129?text=Ol%C3%A1!%20Fiquei%20interessado%20nos%20servi%C3%A7os%20da%20Brandify%20e%20gostaria%20de%20solicitar%20um%20or%C3%A7amento%20para%20cria%C3%A7%C3%A3o%20de%20site.";
+const whatsappBase = "https://wa.me/5543991065129?text=";
+
+const quickMessages = [
+  { label: "Quero fazer um orçamento", message: "Olá! Gostaria de fazer um orçamento para criação de site." },
+  { label: "Como funciona?", message: "Olá! Gostaria de saber como funciona o processo de criação de site com vocês." },
+  { label: "O que preciso enviar?", message: "Olá! Gostaria de saber o que preciso enviar para vocês começarem a fazer meu site." },
+  { label: "Como é o contrato?", message: "Olá! Gostaria de entender como funciona o contrato de vocês." },
+];
+
+const whatsappUrl = `${whatsappBase}${encodeURIComponent("Olá! Fiquei interessado nos serviços da Brandify e gostaria de solicitar um orçamento para criação de site.")}`;
 
 const contacts = [
   { icon: Phone, title: "WhatsApp", value: "(43) 99106-5129", href: whatsappUrl },
@@ -80,6 +88,32 @@ export default function Contact() {
                 );
               })}
             </div>
+          </div>
+        </motion.div>
+
+        {/* Quick message options */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="mt-8"
+        >
+          <p className="text-xs text-white/40 mb-3 text-center">Ou envie uma mensagem rápida:</p>
+          <div className="flex flex-wrap justify-center gap-3">
+            {quickMessages.map((qm, i) => (
+              <motion.a
+                key={i}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                href={`${whatsappBase}${encodeURIComponent(qm.message)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2.5 rounded-xl bg-white/[0.06] border border-white/10 hover:border-white/25 hover:bg-white/[0.1] text-white/70 hover:text-white text-xs font-medium gentle-animation"
+              >
+                {qm.label}
+              </motion.a>
+            ))}
           </div>
         </motion.div>
 
