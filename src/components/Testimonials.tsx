@@ -12,9 +12,7 @@ const item = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0, transiti
 
 export default function Testimonials() {
   return (
-    <section className="section-padding relative overflow-hidden">
-      <div className="absolute top-0 left-1/3 w-[400px] h-[400px] rounded-full bg-white/[0.02] blur-[140px] pointer-events-none" />
-
+    <section className="section-padding relative overflow-hidden bg-secondary">
       <div className="container mx-auto max-w-5xl relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -23,11 +21,11 @@ export default function Testimonials() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="font-display text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-4">
+          <h2 className="font-display text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-4 text-foreground">
             Resultados{" "}
             <span className="text-gradient">reais</span>
           </h2>
-          <p className="text-white/50 max-w-xl mx-auto">
+          <p className="text-muted-foreground max-w-xl mx-auto">
             O que nossos clientes dizem sobre o trabalho da Brandify.
           </p>
         </motion.div>
@@ -44,18 +42,18 @@ export default function Testimonials() {
               key={t.name}
               variants={item}
               whileHover={{ y: -6, transition: { duration: 0.3 } }}
-              className="relative p-6 rounded-2xl glass gentle-animation"
+              className="relative p-6 rounded-2xl bg-background border border-border gentle-animation hover:shadow-lg"
             >
-              <Quote className="text-white/5 absolute top-4 right-4" size={36} />
+              <Quote className="text-border absolute top-4 right-4" size={36} />
               <div className="flex gap-1 mb-4">
                 {Array.from({ length: 5 }).map((_, j) => (
-                  <Star key={j} size={14} className="fill-white/50 text-white/50" />
+                  <Star key={j} size={14} className="fill-foreground/30 text-foreground/30" />
                 ))}
               </div>
-              <p className="text-sm text-white/70 leading-relaxed mb-6">"{t.text}"</p>
+              <p className="text-sm text-secondary-foreground leading-relaxed mb-6">"{t.text}"</p>
               <div>
-                <p className="text-sm font-bold text-white">{t.name}</p>
-                <p className="text-xs text-white/40">{t.role}</p>
+                <p className="text-sm font-bold text-foreground">{t.name}</p>
+                <p className="text-xs text-muted-foreground">{t.role}</p>
               </div>
             </motion.div>
           ))}

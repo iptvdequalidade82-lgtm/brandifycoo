@@ -20,9 +20,7 @@ const item = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transiti
 
 export default function FAQ() {
   return (
-    <section id="faq" className="section-padding relative overflow-hidden">
-      <div className="absolute top-1/2 right-0 w-[400px] h-[400px] rounded-full bg-white/[0.02] blur-[140px] pointer-events-none" />
-
+    <section id="faq" className="section-padding relative overflow-hidden bg-background">
       <div className="container mx-auto max-w-3xl relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -31,7 +29,7 @@ export default function FAQ() {
           transition={{ duration: 0.6 }}
           className="text-center mb-14"
         >
-          <h2 className="font-display text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-4">
+          <h2 className="font-display text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-4 text-foreground">
             Perguntas{" "}
             <span className="text-gradient">frequentes</span>
           </h2>
@@ -48,12 +46,12 @@ export default function FAQ() {
               <motion.div key={i} variants={item}>
                 <AccordionItem
                   value={`faq-${i}`}
-                  className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm px-6"
+                  className="rounded-2xl border border-border bg-secondary px-6"
                 >
-                  <AccordionTrigger className="text-sm font-bold text-white hover:no-underline py-5">
+                  <AccordionTrigger className="text-sm font-bold text-foreground hover:no-underline py-5">
                     {faq.q}
                   </AccordionTrigger>
-                  <AccordionContent className="text-sm text-white/50 leading-relaxed pb-5">
+                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed pb-5">
                     {faq.a}
                   </AccordionContent>
                 </AccordionItem>

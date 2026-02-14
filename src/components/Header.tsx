@@ -46,7 +46,7 @@ export default function Header() {
             whileHover={{ scale: 1.05 }}
             src={logo}
             alt="Logo"
-            className="h-10 w-10 rounded-full ring-1 ring-white/20"
+            className="h-10 w-10 rounded-full ring-1 ring-border"
           />
         </a>
 
@@ -56,7 +56,7 @@ export default function Header() {
             <button
               key={l.href}
               onClick={() => handleNav(l.href)}
-              className="text-sm text-white/70 bg-transparent border-none cursor-pointer gentle-animation hover:text-white hover:scale-105 font-medium"
+              className="text-sm text-muted-foreground bg-transparent border-none cursor-pointer gentle-animation hover:text-foreground hover:scale-105 font-medium"
             >
               {l.label}
             </button>
@@ -67,7 +67,7 @@ export default function Header() {
             href="https://wa.me/5543991065129?text=Ol%C3%A1!%20Fiquei%20interessado%20nos%20servi%C3%A7os%20da%20Brandify%20e%20gostaria%20de%20solicitar%20um%20or%C3%A7amento%20para%20cria%C3%A7%C3%A3o%20de%20site."
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm font-semibold px-5 py-2.5 rounded-lg bg-white text-black hover:bg-white/90 gentle-animation"
+            className="text-sm font-semibold px-5 py-2.5 rounded-lg bg-foreground text-background hover:opacity-90 gentle-animation"
           >
             Contratar
           </motion.a>
@@ -75,7 +75,7 @@ export default function Header() {
 
         {/* Mobile toggle */}
         <button
-          className="md:hidden text-white p-2"
+          className="md:hidden text-foreground p-2"
           onClick={() => setOpen(!open)}
           aria-label="Menu"
         >
@@ -90,7 +90,7 @@ export default function Header() {
             <button
               key={l.href}
               onClick={() => handleNav(l.href)}
-              className="text-white/70 hover:text-white gentle-animation bg-transparent border-none cursor-pointer text-left font-medium text-lg px-4 py-3 hover:bg-white/10 rounded-lg"
+              className="text-muted-foreground hover:text-foreground gentle-animation bg-transparent border-none cursor-pointer text-left font-medium text-lg px-4 py-3 hover:bg-accent rounded-lg"
             >
               {l.label}
             </button>
@@ -100,7 +100,7 @@ export default function Header() {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => setOpen(false)}
-            className="font-semibold px-5 py-3 rounded-lg bg-white text-black text-center gentle-animation mt-4"
+            className="font-semibold px-5 py-3 rounded-lg bg-foreground text-background text-center gentle-animation mt-4"
           >
             Contratar
           </a>
