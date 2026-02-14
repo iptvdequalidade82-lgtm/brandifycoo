@@ -12,6 +12,7 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminProjects from "./pages/AdminProjects";
 import AdminAgenda from "./pages/AdminAgenda";
+import AdminLogs from "./pages/AdminLogs";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PixPayment from "./pages/PixPayment";
 
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/projetos" element={<AdminProjects />} />
             <Route path="/admin/agenda" element={<AdminAgenda />} />
+            <Route path="/admin/logs" element={<AdminLogs />} />
             <Route path="/pagamento-sucesso" element={<PaymentSuccess />} />
             <Route path="/pix/:id" element={<PixPayment />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
