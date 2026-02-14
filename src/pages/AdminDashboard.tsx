@@ -217,6 +217,19 @@ const AdminDashboard = () => {
     setDeleteTarget(null);
   };
 
+  const updateStatus = async (proposalId: string, newStatus: string) => {
+    const { error } = await supabase
+      .from("proposals")
+      .update({ status: newStatus } as any)
+      .eq("id", proposalId);
+    if (error) {
+      toast.error("Erro ao atualizar status");
+    } else {
+      toast.success(`Status atualizado para ${statusConfig[newStatus]?.label || newStatus}`);
+      setProposals(prev => prev.map(p => p.id === proposalId ? { ...p, status: newStatus } : p));
+    }
+  };
+
   const generatePaymentLink = async (proposal: Proposal) => {
     setGeneratingLink(proposal.id);
     try {
@@ -398,6 +411,28 @@ const AdminDashboard = () => {
                                 <DollarSign className="w-4 h-4 mr-1" /> Gerar Link
                               </>
                             )}
+                          </Button>
+                        )}
+                        {p.status !== "paid" && (
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => updateStatus(p.id, "paid")}
+                            title="Marcar como pago"
+                            className="text-green-400 hover:text-green-300 hover:border-green-400/50"
+                          >
+                            <CheckCircle className="w-4 h-4" />
+                          </Button>
+                        )}
+                        {p.status === "paid" && (
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => updateStatus(p.id, "sent")}
+                            title="Reverter para enviado"
+                            className="text-accent hover:text-accent"
+                          >
+                            <Send className="w-4 h-4" />
                           </Button>
                         )}
                         <Button variant="outline" size="icon" onClick={() => setDeleteTarget(p)} title="Excluir proposta" className="text-destructive hover:text-destructive">
