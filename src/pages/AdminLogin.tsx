@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -11,8 +11,15 @@ const AdminLogin = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { signIn } = useAuth();
+  const { signIn, isAdmin, user } = useAuth();
   const navigate = useNavigate();
+
+  // Navigate when isAdmin becomes true (e.g. already logged in)
+  useEffect(() => {
+    if (user && isAdmin) {
+      navigate("/admin");
+    }
+  }, [user, isAdmin, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,10 +29,9 @@ const AdminLogin = () => {
     const { error } = await signIn(email, password);
     if (error) {
       setError("Email ou senha incorretos");
-    } else {
-      navigate("/admin");
+      setLoading(false);
     }
-    setLoading(false);
+    // signIn now sets isAdmin synchronously, useEffect will navigate
   };
 
   return (
