@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-white/10 bg-[hsl(30,8%,7%)] text-white pt-14 pb-8 px-6">
+    <footer className="border-t border-white/10 bg-[hsl(200,18%,8%)] text-white pt-14 pb-8 px-6">
       <div className="container mx-auto max-w-6xl">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           <div>
@@ -63,22 +63,10 @@ export default function Footer() {
             <Link to="/admin/login" className="text-xs text-white/10 hover:text-white/30 gentle-animation">·</Link>
           </div>
           <div className="flex gap-3">
-            <a
-              href="https://www.instagram.com/brandifycoo"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-9 h-9 rounded-lg border border-white/10 bg-white/[0.04] flex items-center justify-center text-white/40 hover:text-white hover:border-white/20 hover:bg-white/[0.08] gentle-animation"
-              aria-label="Instagram"
-            >
+            <a href="https://www.instagram.com/brandifycoo" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg border border-white/10 bg-white/[0.04] flex items-center justify-center text-white/40 hover:text-white hover:border-white/20 hover:bg-white/[0.08] gentle-animation" aria-label="Instagram">
               <Instagram size={16} />
             </a>
-            <a
-              href="https://wa.me/5543991065129"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-9 h-9 rounded-lg border border-white/10 bg-white/[0.04] flex items-center justify-center text-white/40 hover:text-white hover:border-white/20 hover:bg-white/[0.08] gentle-animation"
-              aria-label="WhatsApp"
-            >
+            <a href="https://wa.me/5543991065129" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg border border-white/10 bg-white/[0.04] flex items-center justify-center text-white/40 hover:text-white hover:border-white/20 hover:bg-white/[0.08] gentle-animation" aria-label="WhatsApp">
               <MessageCircle size={16} />
             </a>
           </div>
