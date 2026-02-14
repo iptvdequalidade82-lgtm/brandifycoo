@@ -23,10 +23,10 @@ export default function ContactForm() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay: 0.2 }}
-      className="mt-8 p-6 md:p-8 rounded-2xl glass"
+      className="mt-8 p-6 md:p-8 rounded-2xl bg-background border border-border shadow-lg"
     >
-      <h3 className="font-display text-lg font-black text-white mb-1">Envie uma mensagem</h3>
-      <p className="text-xs text-white/40 mb-5">Preencha o formulário e responderemos pelo WhatsApp.</p>
+      <h3 className="font-display text-lg font-black text-foreground mb-1">Envie uma mensagem</h3>
+      <p className="text-xs text-muted-foreground mb-5">Preencha o formulário e responderemos pelo WhatsApp.</p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid sm:grid-cols-2 gap-4">
@@ -36,7 +36,7 @@ export default function ContactForm() {
             required
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-white/25 focus:bg-white/[0.06] gentle-animation"
+            className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground/30 focus:bg-background gentle-animation"
           />
           <input
             type="email"
@@ -44,7 +44,7 @@ export default function ContactForm() {
             required
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
-            className="w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-white/25 focus:bg-white/[0.06] gentle-animation"
+            className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground/30 focus:bg-background gentle-animation"
           />
         </div>
         <textarea
@@ -53,13 +53,13 @@ export default function ContactForm() {
           rows={4}
           value={form.message}
           onChange={(e) => setForm({ ...form, message: e.target.value })}
-          className="w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-white/25 focus:bg-white/[0.06] gentle-animation resize-none"
+          className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground/30 focus:bg-background gentle-animation resize-none"
         />
         <motion.button
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
           type="submit"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-black font-bold text-sm gentle-animation"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-foreground text-background font-bold text-sm gentle-animation"
         >
           <Send size={16} />
           {sent ? "Enviado!" : "Enviar pelo WhatsApp"}

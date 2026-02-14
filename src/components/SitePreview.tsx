@@ -11,9 +11,7 @@ const item = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0, transiti
 
 export default function SitePreview() {
   return (
-    <section id="preview" className="section-padding relative overflow-hidden">
-      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full bg-white/[0.02] blur-[140px] pointer-events-none" />
-
+    <section id="preview" className="section-padding relative overflow-hidden bg-background">
       <div className="container mx-auto max-w-5xl relative">
         <div className="text-center mb-14">
           <motion.h2
@@ -21,7 +19,7 @@ export default function SitePreview() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6 }}
-            className="font-display text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-4"
+            className="font-display text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-4 text-foreground"
           >
             Projetos{" "}
             <span className="text-gradient">em destaque</span>
@@ -31,7 +29,7 @@ export default function SitePreview() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-white/50 max-w-xl mx-auto"
+            className="text-muted-foreground max-w-xl mx-auto"
           >
             Clique para acessar os sites que já criamos para nossos clientes.
           </motion.p>
@@ -52,25 +50,24 @@ export default function SitePreview() {
               href={site.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="group rounded-2xl overflow-hidden glass gentle-animation"
+              className="group rounded-2xl overflow-hidden border border-border bg-background gentle-animation hover:shadow-xl"
             >
               {/* Browser bar */}
-              <div className="flex items-center gap-2 px-4 py-3 bg-white/[0.04] border-b border-white/10">
+              <div className="flex items-center gap-2 px-4 py-3 bg-secondary border-b border-border">
                 <div className="flex gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-[hsl(0_70%_55%)]" />
                   <span className="w-2.5 h-2.5 rounded-full bg-[hsl(45_70%_55%)]" />
                   <span className="w-2.5 h-2.5 rounded-full bg-[hsl(120_50%_45%)]" />
                 </div>
                 <div className="flex-1 mx-2">
-                  <div className="bg-white/[0.04] rounded-md px-3 py-1 text-[10px] text-white/40 text-center truncate">
+                  <div className="bg-background rounded-md px-3 py-1 text-[10px] text-muted-foreground text-center truncate border border-border">
                     {site.label}
                   </div>
                 </div>
-                <ExternalLink size={13} className="text-white/30 group-hover:text-white/70 gentle-animation" />
+                <ExternalLink size={13} className="text-muted-foreground group-hover:text-foreground gentle-animation" />
               </div>
 
-              <div className="relative w-full aspect-[16/10] bg-white/[0.02] overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/40 z-10" />
+              <div className="relative w-full aspect-[16/10] bg-secondary overflow-hidden">
                 <img
                   src={`https://image.thum.io/get/width/800/crop/500/${site.url}`}
                   alt={`Preview - ${site.title}`}
@@ -79,9 +76,9 @@ export default function SitePreview() {
                 />
               </div>
 
-              <div className="px-5 py-4 border-t border-white/10 bg-white/[0.03] flex items-center justify-between">
-                <span className="text-sm font-bold text-white">{site.title}</span>
-                <span className="text-xs text-white/30 group-hover:text-white/60 gentle-animation flex items-center gap-1">
+              <div className="px-5 py-4 border-t border-border bg-secondary flex items-center justify-between">
+                <span className="text-sm font-bold text-foreground">{site.title}</span>
+                <span className="text-xs text-muted-foreground group-hover:text-foreground gentle-animation flex items-center gap-1">
                   Visitar <ExternalLink size={12} />
                 </span>
               </div>
@@ -102,7 +99,7 @@ export default function SitePreview() {
             href="https://wa.me/5543991065129?text=Ol%C3%A1!%20Fiquei%20interessado%20nos%20servi%C3%A7os%20da%20Brandify%20e%20gostaria%20de%20solicitar%20um%20or%C3%A7amento%20para%20cria%C3%A7%C3%A3o%20de%20site."
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block px-8 py-3.5 rounded-xl bg-white text-black font-bold gentle-animation"
+            className="inline-block px-8 py-3.5 rounded-xl bg-foreground text-background font-bold gentle-animation"
           >
             Quero um site assim
           </motion.a>
