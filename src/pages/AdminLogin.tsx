@@ -29,9 +29,8 @@ const AdminLogin = () => {
     const { error } = await signIn(email, password);
     if (error) {
       setError("Email ou senha incorretos");
-      setLoading(false);
     }
-    // signIn now sets isAdmin synchronously, useEffect will navigate
+    setLoading(false);
   };
 
   return (
