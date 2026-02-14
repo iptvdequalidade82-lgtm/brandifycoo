@@ -49,8 +49,8 @@ export default function Services() {
                 whileHover={{ y: -6, transition: { duration: 0.3 } }}
                 className="group relative p-6 rounded-2xl bg-background border border-border gentle-animation hover:shadow-lg"
               >
-                <div className="w-11 h-11 rounded-xl bg-accent flex items-center justify-center mb-5 group-hover:bg-foreground gentle-animation">
-                  <Icon className="text-muted-foreground group-hover:text-background gentle-animation" size={20} strokeWidth={1.8} />
+                <div className="w-11 h-11 rounded-xl bg-[hsl(200,15%,92%)] flex items-center justify-center mb-5 group-hover:bg-[hsl(200,20%,18%)] gentle-animation">
+                  <Icon className="text-[hsl(200,18%,35%)] group-hover:text-white gentle-animation" size={20} strokeWidth={1.8} />
                 </div>
                 <h3 className="font-display text-base font-bold text-foreground mb-2">{s.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
