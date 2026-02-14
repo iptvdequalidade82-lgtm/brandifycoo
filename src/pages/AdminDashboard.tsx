@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
+import RevenueChart from "@/components/admin/RevenueChart";
+import { logActivity } from "@/lib/admin-helpers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -132,6 +134,15 @@ const AdminDashboard = () => {
       return;
     }
 
+    const inserted2 = inserted as any;
+
+    // Log creation
+    logActivity("proposal", inserted2.id, "created", user!.id, {
+      title: title.trim(),
+      client_name: clientName.trim(),
+      amount: formatCurrency(cents),
+    });
+
     if (paymentMethod === "pix") {
       const link = `https://brandifycoo.lovable.app/pix/${(inserted as any).id}`;
       const msg = `Olá ${clientName.trim()}! Segue o link para pagamento via PIX:\n\n${link}\n\nValor: R$ ${parseFloat(amountReais.replace(",", ".")).toFixed(2).replace(".", ",")}\nServiço: ${title.trim()}`;
@@ -182,11 +193,18 @@ const AdminDashboard = () => {
   };
 
   const updateStatus = async (id: string, newStatus: string) => {
+    const oldProposal = proposals.find(p => p.id === id);
     const { error } = await supabase.from("proposals").update({ status: newStatus } as any).eq("id", id);
     if (error) toast.error("Erro ao atualizar");
     else {
       toast.success(`Status: ${statusConfig[newStatus]?.label || newStatus}`);
       setProposals(prev => prev.map(p => p.id === id ? { ...p, status: newStatus } : p));
+      logActivity("proposal", id, "status_changed", user!.id, {
+        title: oldProposal?.title,
+        client_name: oldProposal?.client_name,
+        from: statusConfig[oldProposal?.status || "draft"]?.label || oldProposal?.status,
+        to: statusConfig[newStatus]?.label || newStatus,
+      });
     }
   };
 
@@ -238,6 +256,9 @@ const AdminDashboard = () => {
 
   return (
     <AdminLayout>
+      {/* Revenue Chart */}
+      <RevenueChart proposals={proposals} />
+
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[

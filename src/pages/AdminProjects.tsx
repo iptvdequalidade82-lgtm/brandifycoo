@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
+import ProjectChecklist from "@/components/admin/ProjectChecklist";
+import { logActivity, createDefaultChecklist } from "@/lib/admin-helpers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,7 +19,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Plus, RefreshCw, MessageCircle, Trash2, Crown, Award, Star,
+  Plus, RefreshCw, MessageCircle, Trash2, Crown, Award, Star, ChevronDown, ChevronUp,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -66,6 +68,7 @@ export default function AdminProjects() {
   const [activeFilter, setActiveFilter] = useState("all");
   const [deleteTarget, setDeleteTarget] = useState<Project | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   // Form
   const [clientName, setClientName] = useState("");
@@ -105,7 +108,7 @@ export default function AdminProjects() {
       return;
     }
     setSubmitting(true);
-    const { error } = await supabase.from("projects").insert({
+    const { data: inserted, error } = await supabase.from("projects").insert({
       client_name: clientName.trim(),
       client_phone: clientPhone.trim() || null,
       client_email: clientEmail.trim() || null,
@@ -115,10 +118,17 @@ export default function AdminProjects() {
       start_date: startDate || null,
       due_date: dueDate || null,
       created_by: user!.id,
-    } as any);
-    if (error) {
+    } as any).select().single();
+    if (error || !inserted) {
       toast.error("Erro ao criar projeto");
     } else {
+      const proj = inserted as any;
+      await createDefaultChecklist(proj.id);
+      logActivity("project", proj.id, "created", user!.id, {
+        title: title.trim(),
+        client_name: clientName.trim(),
+        plan,
+      });
       toast.success("Projeto criado!");
       setShowForm(false);
       resetForm();
@@ -128,11 +138,18 @@ export default function AdminProjects() {
   };
 
   const updateStatus = async (id: string, status: string) => {
+    const oldProject = projects.find(p => p.id === id);
     const { error } = await supabase.from("projects").update({ status } as any).eq("id", id);
     if (error) toast.error("Erro ao atualizar");
     else {
       toast.success("Status atualizado");
       setProjects(prev => prev.map(p => p.id === id ? { ...p, status: status as any } : p));
+      logActivity("project", id, "status_changed", user!.id, {
+        title: oldProject?.title,
+        client_name: oldProject?.client_name,
+        from: statusConfig[oldProject?.status || "briefing"]?.label,
+        to: statusConfig[status]?.label || status,
+      });
     }
   };
 
@@ -244,11 +261,22 @@ export default function AdminProjects() {
                         <MessageCircle className="w-4 h-4 text-green-400" />
                       </Button>
                     )}
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setExpandedId(expandedId === p.id ? null : p.id)}
+                      title="Checklist"
+                    >
+                      {expandedId === p.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </Button>
                     <Button variant="outline" size="icon" onClick={() => setDeleteTarget(p)} className="text-destructive hover:text-destructive">
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
+                {expandedId === p.id && (
+                  <ProjectChecklist projectId={p.id} projectTitle={p.title} />
+                )}
               </div>
             );
           })

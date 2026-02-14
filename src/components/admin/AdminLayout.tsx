@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  LogOut, FileText, FolderKanban, CalendarDays, RefreshCw,
+  LogOut, FileText, FolderKanban, CalendarDays, History, RefreshCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -10,6 +10,7 @@ const navItems = [
   { label: "Propostas", icon: FileText, path: "/admin" },
   { label: "Projetos", icon: FolderKanban, path: "/admin/projetos" },
   { label: "Agenda", icon: CalendarDays, path: "/admin/agenda" },
+  { label: "Logs", icon: History, path: "/admin/logs" },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

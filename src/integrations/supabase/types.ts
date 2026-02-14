@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          action: string
+          created_at: string
+          created_by: string
+          details: Json | null
+          entity_id: string
+          entity_type: string
+          id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          created_by: string
+          details?: Json | null
+          entity_id: string
+          entity_type: string
+          id?: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          created_by?: string
+          details?: Json | null
+          entity_id?: string
+          entity_type?: string
+          id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -37,6 +67,44 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      project_checklist: {
+        Row: {
+          checked: boolean
+          checked_at: string | null
+          created_at: string
+          id: string
+          label: string
+          project_id: string
+          sort_order: number
+        }
+        Insert: {
+          checked?: boolean
+          checked_at?: string | null
+          created_at?: string
+          id?: string
+          label: string
+          project_id: string
+          sort_order?: number
+        }
+        Update: {
+          checked?: boolean
+          checked_at?: string | null
+          created_at?: string
+          id?: string
+          label?: string
+          project_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_checklist_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       projects: {
         Row: {
