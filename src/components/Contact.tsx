@@ -13,9 +13,9 @@ const contacts = [
 
 export default function Contact() {
   return (
-    <section id="contato" className="relative py-28 md:py-36 px-6 overflow-hidden bg-[hsl(220,15%,8%)] text-white">
+    <section id="contato" className="relative py-28 md:py-36 px-6 overflow-hidden bg-[hsl(30,8%,10%)] text-white">
       {/* Ambient glow */}
-      <div className="absolute bottom-0 left-1/3 w-[500px] h-[500px] rounded-full bg-[hsl(220,80%,55%/0.08)] blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-0 left-1/3 w-[500px] h-[500px] rounded-full bg-[hsl(25,50%,40%/0.08)] blur-[140px] pointer-events-none" />
 
       <div className="container mx-auto max-w-4xl relative">
         <motion.div
@@ -26,7 +26,7 @@ export default function Contact() {
           className="rounded-2xl overflow-hidden border border-white/10 bg-white/[0.04] backdrop-blur-sm shadow-2xl"
         >
           <div className="grid md:grid-cols-5">
-            <div className="md:col-span-2 p-8 md:p-10 bg-gradient-to-br from-[hsl(220,80%,55%)] to-[hsl(260,70%,50%)] border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-center">
+            <div className="md:col-span-2 p-8 md:p-10 bg-gradient-to-br from-[hsl(25,50%,40%)] to-[hsl(10,42%,32%)] border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-center">
               <MessageCircle className="text-white/70 mb-4" size={32} />
               <h2 className="font-display text-2xl md:text-3xl font-black mb-3">
                 Vamos criar o seu site?
@@ -40,7 +40,7 @@ export default function Contact() {
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white text-[hsl(230,70%,45%)] font-bold gentle-animation text-sm shadow-lg"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white text-[hsl(20,45%,28%)] font-bold gentle-animation text-sm shadow-lg"
               >
                 <Phone size={16} />
                 Falar no WhatsApp

@@ -12,7 +12,7 @@ const item = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0, transiti
 
 export default function Testimonials() {
   return (
-    <section className="section-padding relative overflow-hidden bg-secondary">
+    <section className="section-padding relative overflow-hidden bg-[hsl(40,15%,96%)]">
       <div className="container mx-auto max-w-5xl relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -23,7 +23,7 @@ export default function Testimonials() {
         >
           <h2 className="font-display text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-4 text-foreground">
             Resultados{" "}
-            <span className="text-gradient">reais</span>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-[hsl(25,55%,42%)] to-[hsl(10,45%,35%)]">reais</span>
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
             O que nossos clientes dizem sobre o trabalho da Brandify.
@@ -42,15 +42,15 @@ export default function Testimonials() {
               key={t.name}
               variants={item}
               whileHover={{ y: -6, transition: { duration: 0.3 } }}
-              className="relative p-6 rounded-2xl bg-background border border-border gentle-animation hover:shadow-lg"
+              className="relative p-6 rounded-2xl bg-white border border-[hsl(30,15%,88%)] gentle-animation hover:shadow-xl hover:shadow-[hsl(25,30%,50%/0.08)]"
             >
-              <Quote className="text-border absolute top-4 right-4" size={36} />
+              <Quote className="text-[hsl(30,20%,90%)] absolute top-4 right-4" size={36} />
               <div className="flex gap-1 mb-4">
                 {Array.from({ length: 5 }).map((_, j) => (
-                  <Star key={j} size={14} className="fill-foreground/30 text-foreground/30" />
+                  <Star key={j} size={14} className="fill-[hsl(35,70%,55%)] text-[hsl(35,70%,55%)]" />
                 ))}
               </div>
-              <p className="text-sm text-secondary-foreground leading-relaxed mb-6">"{t.text}"</p>
+              <p className="text-sm text-[hsl(30,8%,25%)] leading-relaxed mb-6">"{t.text}"</p>
               <div>
                 <p className="text-sm font-bold text-foreground">{t.name}</p>
                 <p className="text-xs text-muted-foreground">{t.role}</p>

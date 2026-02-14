@@ -36,7 +36,7 @@ export default function ContactForm() {
             required
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="w-full px-4 py-3 rounded-xl bg-white/[0.06] border border-white/10 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[hsl(220,80%,55%/0.5)] focus:bg-white/[0.08] gentle-animation"
+            className="w-full px-4 py-3 rounded-xl bg-white/[0.06] border border-white/10 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[hsl(30,50%,50%/0.5)] focus:bg-white/[0.08] gentle-animation"
           />
           <input
             type="email"
@@ -44,7 +44,7 @@ export default function ContactForm() {
             required
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
-            className="w-full px-4 py-3 rounded-xl bg-white/[0.06] border border-white/10 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[hsl(220,80%,55%/0.5)] focus:bg-white/[0.08] gentle-animation"
+            className="w-full px-4 py-3 rounded-xl bg-white/[0.06] border border-white/10 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[hsl(30,50%,50%/0.5)] focus:bg-white/[0.08] gentle-animation"
           />
         </div>
         <textarea
@@ -53,13 +53,13 @@ export default function ContactForm() {
           rows={4}
           value={form.message}
           onChange={(e) => setForm({ ...form, message: e.target.value })}
-          className="w-full px-4 py-3 rounded-xl bg-white/[0.06] border border-white/10 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[hsl(220,80%,55%/0.5)] focus:bg-white/[0.08] gentle-animation resize-none"
+          className="w-full px-4 py-3 rounded-xl bg-white/[0.06] border border-white/10 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[hsl(30,50%,50%/0.5)] focus:bg-white/[0.08] gentle-animation resize-none"
         />
         <motion.button
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
           type="submit"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[hsl(220,80%,55%)] to-[hsl(260,70%,50%)] text-white font-bold text-sm gentle-animation shadow-lg"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[hsl(25,55%,42%)] to-[hsl(10,45%,35%)] text-white font-bold text-sm gentle-animation shadow-lg"
         >
           <Send size={16} />
           {sent ? "Enviado!" : "Enviar pelo WhatsApp"}

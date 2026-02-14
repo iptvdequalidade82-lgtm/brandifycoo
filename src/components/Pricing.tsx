@@ -24,18 +24,18 @@ const item = { hidden: { opacity: 0, y: 40 }, show: { opacity: 1, y: 0, transiti
 
 export default function Pricing() {
   return (
-    <section id="investimento" className="relative py-28 md:py-36 px-6 overflow-hidden bg-[hsl(220,15%,8%)] text-white">
-      {/* Animated gradient blobs */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full bg-[hsl(220,80%,55%/0.12)] blur-[150px] pointer-events-none animate-[pulse_6s_ease-in-out_infinite]" />
-      <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full bg-[hsl(270,70%,55%/0.08)] blur-[120px] pointer-events-none animate-[pulse_8s_ease-in-out_infinite]" />
+    <section id="investimento" className="relative py-28 md:py-36 px-6 overflow-hidden bg-[hsl(30,8%,10%)] text-white">
+      {/* Warm ambient blobs */}
+      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full bg-[hsl(25,60%,45%/0.1)] blur-[150px] pointer-events-none animate-[pulse_6s_ease-in-out_infinite]" />
+      <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full bg-[hsl(15,50%,40%/0.07)] blur-[120px] pointer-events-none animate-[pulse_8s_ease-in-out_infinite]" />
       
-      {/* Grid pattern */}
+      {/* Dot pattern */}
       <div className="absolute inset-0 opacity-[0.04] pointer-events-none">
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: `linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px)`,
-            backgroundSize: '60px 60px',
+            backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)`,
+            backgroundSize: '50px 50px',
           }}
         />
       </div>
@@ -60,7 +60,7 @@ export default function Pricing() {
             className="font-display text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-4"
           >
             Escolha o plano{" "}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-[hsl(220,80%,65%)] to-[hsl(270,70%,65%)]">ideal</span>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-[hsl(30,70%,60%)] to-[hsl(15,60%,55%)]">ideal</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -87,12 +87,12 @@ export default function Pricing() {
               whileHover={{ y: -8, transition: { duration: 0.3 } }}
               className={`relative rounded-2xl overflow-hidden gentle-animation flex flex-col ${
                 plan.featured
-                  ? "bg-gradient-to-b from-[hsl(220,80%,55%)] to-[hsl(250,70%,50%)] shadow-[0_20px_60px_-15px_hsl(230,80%,50%/0.4)] md:scale-[1.06] z-10"
+                  ? "bg-gradient-to-b from-[hsl(25,55%,42%)] to-[hsl(12,45%,35%)] shadow-[0_20px_60px_-15px_hsl(20,60%,40%/0.35)] md:scale-[1.06] z-10"
                   : "bg-white/[0.06] border border-white/10 backdrop-blur-sm hover:bg-white/[0.1]"
               }`}
             >
               {plan.featured && (
-                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-white/60 to-transparent" />
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[hsl(35,70%,65%)] to-transparent" />
               )}
 
               <div className={`p-7 text-center border-b ${plan.featured ? "border-white/20" : "border-white/10"}`}>
@@ -114,7 +114,7 @@ export default function Pricing() {
                 <ul className="space-y-3">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-3">
-                      <Check className={`mt-0.5 flex-shrink-0 ${plan.featured ? "text-white/80" : "text-white/40"}`} size={16} strokeWidth={2.5} />
+                      <Check className={`mt-0.5 flex-shrink-0 ${plan.featured ? "text-[hsl(35,70%,70%)]" : "text-white/40"}`} size={16} strokeWidth={2.5} />
                       <span className={`text-sm ${plan.featured ? "text-white/90" : "text-white/70"}`}>{f}</span>
                     </li>
                   ))}
@@ -130,7 +130,7 @@ export default function Pricing() {
                   rel="noopener noreferrer"
                   className={`block w-full text-center px-6 py-3.5 rounded-xl font-bold gentle-animation ${
                     plan.featured
-                      ? "bg-white text-[hsl(230,70%,45%)] shadow-lg"
+                      ? "bg-white text-[hsl(20,50%,30%)] shadow-lg"
                       : "border border-white/20 text-white hover:bg-white/10"
                   }`}
                 >
