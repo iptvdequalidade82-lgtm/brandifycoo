@@ -14,7 +14,7 @@ const contacts = [
 export default function Contact() {
   return (
     <section id="contato" className="section-padding relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-[400px] h-[400px] rounded-full bg-accent/5 blur-[140px] pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[400px] h-[400px] rounded-full bg-white/[0.02] blur-[140px] pointer-events-none" />
 
       <div className="container mx-auto max-w-4xl relative">
         <motion.div
@@ -22,26 +22,28 @@ export default function Contact() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
-          className="rounded-2xl overflow-hidden bg-card/40 backdrop-blur-sm border border-border/40 gradient-border"
+          className="rounded-2xl overflow-hidden glass"
         >
           <div className="grid md:grid-cols-5">
-            <div className="md:col-span-2 p-8 md:p-10 bg-gradient-to-br from-primary/8 to-accent/5 border-b md:border-b-0 md:border-r border-border/30 flex flex-col justify-center">
-              <MessageCircle className="text-accent mb-4" size={32} />
-              <h2 className="font-display text-2xl md:text-3xl font-black mb-3">
+            <div className="md:col-span-2 p-8 md:p-10 bg-white/[0.03] border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-center">
+              <MessageCircle className="text-white/50 mb-4" size={32} />
+              <h2 className="font-display text-2xl md:text-3xl font-black mb-3 text-white">
                 Vamos criar o seu site?
               </h2>
-              <p className="text-muted-foreground text-sm leading-relaxed mb-6">
+              <p className="text-white/40 text-sm leading-relaxed mb-6">
                 Entre em contato e receba um orçamento sem compromisso. Respondemos em até 24h.
               </p>
-              <a
+              <motion.a
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold neon-glow-sm hover:scale-[1.03] transition-all duration-300 text-sm"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white text-black font-bold gentle-animation text-sm"
               >
                 <Phone size={16} />
                 Falar no WhatsApp
-              </a>
+              </motion.a>
             </div>
 
             <div className="md:col-span-3 p-8 md:p-10 flex flex-col justify-center gap-4">
@@ -62,16 +64,16 @@ export default function Contact() {
                   >
                     <Wrapper
                       {...linkProps}
-                      className={`flex items-center gap-4 p-4 rounded-xl bg-secondary/40 hover:bg-secondary/60 border border-border/30 hover:border-primary/30 transition-all duration-500 ${
+                      className={`flex items-center gap-4 p-4 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 gentle-animation ${
                         c.href ? "cursor-pointer" : ""
                       }`}
                     >
-                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/15 to-accent/10 flex items-center justify-center shrink-0">
-                        <Icon className="text-primary" size={18} />
+                      <div className="w-10 h-10 rounded-lg bg-white/[0.06] flex items-center justify-center shrink-0">
+                        <Icon className="text-white/60" size={18} />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-foreground">{c.title}</p>
-                        <p className="text-xs text-muted-foreground">{c.value}</p>
+                        <p className="text-sm font-bold text-white">{c.title}</p>
+                        <p className="text-xs text-white/40">{c.value}</p>
                       </div>
                     </Wrapper>
                   </motion.div>

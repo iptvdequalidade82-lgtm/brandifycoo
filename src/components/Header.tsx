@@ -1,7 +1,8 @@
 import logo from "@/assets/logo.jpg";
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const navLinks = [
   { label: "Início", href: "#inicio" },
@@ -12,7 +13,14 @@ const navLinks = [
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleNav = (href: string) => {
     setOpen(false);
@@ -24,10 +32,22 @@ export default function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-3xl border-b border-border/30">
-      <div className="container mx-auto flex items-center justify-center h-16 px-6 gap-8">
+    <motion.header
+      initial={{ opacity: 0, y: -30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, delay: 0.3 }}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled ? "glass-navbar-scrolled" : "glass-navbar"
+      }`}
+    >
+      <div className="container mx-auto flex items-center justify-between h-16 px-6 lg:px-12">
         <a href="#inicio" className="flex items-center gap-3">
-          <img src={logo} alt="Logo" className="h-10 w-10 rounded-full ring-1 ring-primary/20" />
+          <motion.img
+            whileHover={{ scale: 1.05 }}
+            src={logo}
+            alt="Logo"
+            className="h-10 w-10 rounded-full ring-1 ring-white/20"
+          />
         </a>
 
         {/* Desktop */}
@@ -36,24 +56,26 @@ export default function Header() {
             <button
               key={l.href}
               onClick={() => handleNav(l.href)}
-              className="group relative text-sm text-muted-foreground bg-transparent border-none cursor-pointer transition-all duration-300 hover:text-foreground hover:scale-110 hover:-translate-y-0.5 hover:drop-shadow-[0_0_8px_hsl(0,0%,100%,0.4)] after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-0 after:h-[2px] after:rounded-full after:bg-gradient-to-r after:from-primary after:to-accent after:transition-all after:duration-300 hover:after:w-full"
+              className="text-sm text-white/70 bg-transparent border-none cursor-pointer gentle-animation hover:text-white hover:scale-105 font-medium"
             >
               {l.label}
             </button>
           ))}
-          <a
+          <motion.a
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             href="https://wa.me/5543991065129?text=Ol%C3%A1!%20Fiquei%20interessado%20nos%20servi%C3%A7os%20da%20Brandify%20e%20gostaria%20de%20solicitar%20um%20or%C3%A7amento%20para%20cria%C3%A7%C3%A3o%20de%20site."
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm font-semibold px-5 py-2 rounded-lg bg-gradient-to-r from-primary to-accent text-primary-foreground hover:scale-[1.04] neon-glow-sm transition-all duration-300"
+            className="text-sm font-semibold px-5 py-2.5 rounded-lg bg-white text-black hover:bg-white/90 gentle-animation"
           >
             Contratar
-          </a>
+          </motion.a>
         </nav>
 
         {/* Mobile toggle */}
         <button
-          className="md:hidden text-foreground"
+          className="md:hidden text-white p-2"
           onClick={() => setOpen(!open)}
           aria-label="Menu"
         >
@@ -63,12 +85,12 @@ export default function Header() {
 
       {/* Mobile menu */}
       {open && (
-        <nav className="md:hidden glass-strong border-t border-border/30 px-6 pb-6 pt-4 flex flex-col gap-4 animate-fade-in">
+        <nav className="md:hidden glass-strong px-6 pb-6 pt-4 flex flex-col gap-4 animate-fade-in">
           {navLinks.map((l) => (
             <button
               key={l.href}
               onClick={() => handleNav(l.href)}
-              className="text-muted-foreground hover:text-foreground transition-colors bg-transparent border-none cursor-pointer text-left"
+              className="text-white/70 hover:text-white gentle-animation bg-transparent border-none cursor-pointer text-left font-medium text-lg px-4 py-3 hover:bg-white/10 rounded-lg"
             >
               {l.label}
             </button>
@@ -78,12 +100,12 @@ export default function Header() {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => setOpen(false)}
-            className="font-semibold px-5 py-2.5 rounded-lg bg-gradient-to-r from-primary to-accent text-primary-foreground text-center neon-glow-sm"
+            className="font-semibold px-5 py-3 rounded-lg bg-white text-black text-center gentle-animation mt-4"
           >
             Contratar
           </a>
         </nav>
       )}
-    </header>
+    </motion.header>
   );
 }

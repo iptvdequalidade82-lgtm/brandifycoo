@@ -14,7 +14,7 @@ const item = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0, transiti
 export default function Process() {
   return (
     <section id="processo" className="section-padding relative overflow-hidden">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-accent/5 blur-[150px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-white/[0.02] blur-[150px] pointer-events-none" />
 
       <div className="container mx-auto max-w-5xl relative">
         <div className="text-center mb-16">
@@ -23,7 +23,7 @@ export default function Process() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6 }}
-            className="font-display text-3xl md:text-5xl font-black tracking-tight mb-4"
+            className="font-display text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-4"
           >
             Do conceito à{" "}
             <span className="text-gradient">realidade</span>
@@ -33,7 +33,7 @@ export default function Process() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-muted-foreground max-w-xl mx-auto"
+            className="text-white/50 max-w-xl mx-auto"
           >
             Um processo transparente e eficiente em 4 etapas.
           </motion.p>
@@ -47,7 +47,7 @@ export default function Process() {
           className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-5"
         >
           {/* Connector line */}
-          <div className="hidden lg:block absolute top-[56px] left-[12%] right-[12%] h-px bg-gradient-to-r from-primary/30 via-accent/20 to-primary/30" />
+          <div className="hidden lg:block absolute top-[56px] left-[12%] right-[12%] h-px bg-gradient-to-r from-white/10 via-white/20 to-white/10" />
 
           {steps.map((step, i) => {
             const Icon = step.icon;
@@ -55,16 +55,17 @@ export default function Process() {
               <motion.div
                 key={step.title}
                 variants={item}
-                className="relative p-6 rounded-2xl bg-card/40 backdrop-blur-sm border border-border/40 text-center transition-all duration-500 hover:border-primary/40 hover:shadow-[0_0_30px_hsl(0_0%_100%/0.06)] gradient-border"
+                whileHover={{ y: -4, transition: { duration: 0.3 } }}
+                className="relative p-6 rounded-2xl glass text-center gentle-animation"
               >
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground text-xs font-bold flex items-center justify-center shadow-[0_0_15px_hsl(0_0%_100%/0.15)]">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-white text-black text-xs font-bold flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.15)]">
                   {i + 1}
                 </div>
-                <div className="w-12 h-12 mx-auto rounded-xl bg-gradient-to-br from-primary/15 to-accent/10 flex items-center justify-center mb-4 mt-2">
-                  <Icon className="text-primary" size={22} />
+                <div className="w-12 h-12 mx-auto rounded-xl bg-white/[0.06] flex items-center justify-center mb-4 mt-2">
+                  <Icon className="text-white/70" size={22} />
                 </div>
-                <h3 className="font-display text-base font-bold text-foreground mb-2">{step.title}</h3>
-                <p className="text-xs text-muted-foreground leading-relaxed">{step.desc}</p>
+                <h3 className="font-display text-base font-bold text-white mb-2">{step.title}</h3>
+                <p className="text-xs text-white/40 leading-relaxed">{step.desc}</p>
               </motion.div>
             );
           })}
