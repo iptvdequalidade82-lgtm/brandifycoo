@@ -10,9 +10,9 @@ const faqs = [
   { q: "Qual o prazo de entrega de um site?", a: "O prazo médio é de 7 a 15 dias úteis, dependendo da complexidade do projeto. Sites mais simples podem ficar prontos em até 5 dias." },
   { q: "Como funciona o pagamento?", a: "Trabalhamos com pagamento via Pix ou cartão de crédito. Para projetos acima de R$ 2.000, oferecemos parcelamento em até 3x sem juros." },
   { q: "O site fica responsivo para celular?", a: "Sim! Todos os nossos sites são 100% responsivos e otimizados para qualquer dispositivo — celular, tablet e desktop." },
-  { q: "Preciso fornecer o conteúdo do site?", a: "Sim, mas se precisar de ajuda, nossa equipe de copywriting pode criar textos profissionais e persuasivos para o seu negócio." },
-  { q: "A hospedagem e o domínio estão inclusos?", a: "Hospedagem e domínio são cobrados separadamente. A hospedagem custa R$ 240,00/ano (valor fixo) e o domínio a partir de R$ 49,90/ano." },
-  { q: "Vocês fazem manutenção após a entrega?", a: "Sim! Todos os planos incluem 1 ajuste mensal. Para demandas extras, temos planos de manutenção sob medida." },
+  { q: "Preciso fornecer o conteúdo do site?", a: "Sim, o cliente precisa fornecer o conteúdo do site (textos, imagens, etc.). Caso precise de ajuda, indicamos parceiros especializados em criação de textos, banners e outros materiais." },
+  { q: "A hospedagem e o domínio estão inclusos?", a: "Hospedagem e domínio são cobrados separadamente. A hospedagem custa R$ 240,00 no 1º ano (inclui instalação) e R$ 120,00/ano a partir do 2º ano. O domínio a partir de R$ 40,00/ano." },
+  { q: "Vocês fazem manutenção após a entrega?", a: "Sim! Todos os planos incluem 1 hora de manutenção mensal gratuita, em qualquer dia que conseguir agendar. Caso exceda 1 hora, é cobrado R$ 200,00 por hora adicional." },
 ];
 
 const container = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } };

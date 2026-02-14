@@ -4,17 +4,17 @@ import { motion } from "framer-motion";
 const plans = [
   {
     name: "Essencial", price: "R$ 1.200", desc: "Ideal para quem está começando e precisa de presença online.",
-    features: ["Site de até 3 páginas", "Design responsivo", "Certificado SSL", "Auxílio no registro de domínio", "1 ajuste mensal"],
+    features: ["Site de até 6 páginas", "Design responsivo", "Certificado SSL", "Auxílio no registro de domínio", "1h de manutenção mensal gratuita"],
     featured: false,
   },
   {
     name: "Profissional", price: "R$ 2.500", desc: "Para negócios que querem se destacar com mais recursos.",
-    features: ["Site de até 6 páginas", "Design personalizado premium", "SEO avançado", "Certificado SSL", "Auxílio no registro de domínio", "1 ajuste mensal"],
+    features: ["Site de até 10 páginas", "Design personalizado premium", "SEO avançado", "Certificado SSL", "Auxílio no registro de domínio", "1h de manutenção mensal gratuita"],
     featured: true,
   },
   {
     name: "Premium", price: "R$ 4.500", desc: "Solução completa para empresas que exigem o melhor.",
-    features: ["Site ilimitado de páginas", "Design exclusivo do zero", "SEO avançado + Blog", "Certificado SSL", "Auxílio no registro de domínio", "Painel administrativo", "Integrações personalizadas", "1 ajuste mensal"],
+    features: ["Páginas ilimitadas", "Design exclusivo do zero", "SEO avançado + Blog", "Certificado SSL", "Auxílio no registro de domínio", "Painel administrativo", "Integrações personalizadas", "1h de manutenção mensal gratuita"],
     featured: false,
   },
 ];
@@ -150,7 +150,7 @@ export default function Pricing() {
                 Hospedagem no 1º ano: <span className="text-white/70 font-medium">R$ 240,00</span> (inclui R$ 120 de instalação) &nbsp;·&nbsp; A partir do 2º ano: <span className="text-white/70 font-medium">R$ 120,00/ano</span>
               </p>
               <p className="text-xs text-white/40 mt-1 leading-relaxed">
-                Domínio: <span className="text-white/70 font-medium">a partir de R$ 50,00/ano</span> (valor pode variar conforme o domínio escolhido)
+                Domínio: <span className="text-white/70 font-medium">a partir de R$ 40,00/ano</span> (valor pode variar conforme o domínio escolhido)
               </p>
               <p className="text-xs text-white/40 mt-1.5 leading-relaxed">
                 Tudo é configurado na conta do próprio cliente. Na primeira vez, cuidamos de toda a instalação. Nas renovações seguintes, o cliente assume o pagamento diretamente.
