@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import {
   LogOut, Plus, Copy, ExternalLink, RefreshCw,
-  FileText, DollarSign, Clock, CheckCircle, XCircle, Send
+  FileText, DollarSign, Clock, CheckCircle, XCircle, Send, QrCode
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -172,6 +172,13 @@ const AdminDashboard = () => {
     toast.success("Link copiado!");
   };
 
+  const copyPixLink = (proposalId: string) => {
+    const origin = window.location.origin;
+    const link = `${origin}/pix/${proposalId}`;
+    navigator.clipboard.writeText(link);
+    toast.success("Link PIX copiado!");
+  };
+
   const formatCurrency = (cents: number) =>
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(cents / 100);
 
@@ -256,6 +263,10 @@ const AdminDashboard = () => {
                         <p className="text-lg font-bold text-foreground">{formatCurrency(p.amount_cents)}</p>
                       </div>
                       <div className="flex gap-1">
+                        {/* PIX QR Code button - always available */}
+                        <Button variant="outline" size="icon" onClick={() => copyPixLink(p.id)} title="Copiar link PIX">
+                          <QrCode className="w-4 h-4" />
+                        </Button>
                         {p.stripe_checkout_url ? (
                           <>
                             <Button variant="outline" size="icon" onClick={() => copyLink(p.stripe_checkout_url!)}>
