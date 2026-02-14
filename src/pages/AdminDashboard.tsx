@@ -39,7 +39,7 @@ import { z } from "zod";
 
 const proposalSchema = z.object({
   clientName: z.string().trim().min(1, "Nome é obrigatório").max(200, "Nome muito longo"),
-  clientEmail: z.string().trim().email("Email inválido").max(255, "Email muito longo"),
+  clientEmail: z.string().trim().email("Email inválido").max(255, "Email muito longo").optional().or(z.literal("")),
   clientPhone: z.string().trim().max(20, "Telefone muito longo").optional().or(z.literal("")),
   title: z.string().trim().min(1, "Título é obrigatório").max(200, "Título muito longo"),
   description: z.string().trim().max(1000, "Descrição muito longa").optional().or(z.literal("")),
@@ -52,7 +52,7 @@ const proposalSchema = z.object({
 interface Proposal {
   id: string;
   client_name: string;
-  client_email: string;
+  client_email: string | null;
   client_phone: string | null;
   title: string;
   description: string | null;
@@ -151,7 +151,7 @@ const AdminDashboard = () => {
 
     const { data: inserted, error } = await supabase.from("proposals").insert({
       client_name: clientName.trim(),
-      client_email: clientEmail.trim(),
+      client_email: clientEmail.trim() || null,
       client_phone: clientPhone.trim() || null,
       title: title.trim(),
       description: description.trim() || null,
@@ -180,7 +180,7 @@ const AdminDashboard = () => {
             amount_cents: cents,
             installments: 1,
             client_name: clientName.trim(),
-            client_email: clientEmail.trim(),
+            client_email: clientEmail.trim() || "",
             description: `${title.trim()}${description.trim() ? " - " + description.trim() : ""}`,
           },
         });
@@ -239,7 +239,7 @@ const AdminDashboard = () => {
           amount_cents: proposal.amount_cents,
           installments: 1,
           client_name: proposal.client_name,
-          client_email: proposal.client_email,
+          client_email: proposal.client_email || "",
           description: `${proposal.title}${proposal.description ? " - " + proposal.description : ""}`,
         },
       });
@@ -373,7 +373,7 @@ const AdminDashboard = () => {
                         <span className={`text-xs font-medium ${config.color}`}>{config.label}</span>
                       </div>
                       <h3 className="font-semibold text-foreground truncate">{p.title}</h3>
-                      <p className="text-sm text-muted-foreground">{p.client_name} · {p.client_email}</p>
+                      <p className="text-sm text-muted-foreground">{p.client_name}{p.client_email ? ` · ${p.client_email}` : ""}</p>
                       {p.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{p.description}</p>}
                     </div>
                     <div className="flex items-center gap-4">
@@ -480,8 +480,8 @@ const AdminDashboard = () => {
                 <Input id="cname" value={clientName} onChange={e => setClientName(e.target.value)} required />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="cemail">Email</Label>
-                <Input id="cemail" type="email" value={clientEmail} onChange={e => setClientEmail(e.target.value)} required />
+                <Label htmlFor="cemail">Email (opcional)</Label>
+                <Input id="cemail" type="email" value={clientEmail} onChange={e => setClientEmail(e.target.value)} />
               </div>
             </div>
             <div className="space-y-1.5">

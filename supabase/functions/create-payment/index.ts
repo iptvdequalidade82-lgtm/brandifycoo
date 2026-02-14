@@ -14,7 +14,7 @@ const PaymentSchema = z.object({
   amount_cents: z.number().int().positive().max(100_000_000, "Amount too large"),
   installments: z.number().int().min(1).max(12, "Max 12 installments"),
   client_name: z.string().trim().min(1).max(200, "Name too long"),
-  client_email: z.string().email("Invalid email").max(255),
+  client_email: z.string().email("Invalid email").max(255).optional().default(""),
   description: z.string().max(1000).optional().default(""),
 });
 
@@ -107,7 +107,7 @@ serve(async (req) => {
 
     const sessionParams: any = {
       payment_method_types: ["card", "boleto"],
-      customer_email: client_email,
+      ...(client_email ? { customer_email: client_email } : {}),
       line_items: [
         {
           price_data: {

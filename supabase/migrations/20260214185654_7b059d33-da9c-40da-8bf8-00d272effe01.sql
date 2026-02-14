@@ -1,0 +1,1 @@
+ALTER TABLE public.proposals ALTER COLUMN client_email DROP NOT NULL;

@@ -41,7 +41,7 @@ export type Database = {
       proposals: {
         Row: {
           amount_cents: number
-          client_email: string
+          client_email: string | null
           client_name: string
           client_phone: string | null
           created_at: string
@@ -57,7 +57,7 @@ export type Database = {
         }
         Insert: {
           amount_cents: number
-          client_email: string
+          client_email?: string | null
           client_name: string
           client_phone?: string | null
           created_at?: string
@@ -73,7 +73,7 @@ export type Database = {
         }
         Update: {
           amount_cents?: number
-          client_email?: string
+          client_email?: string | null
           client_name?: string
           client_phone?: string | null
           created_at?: string
