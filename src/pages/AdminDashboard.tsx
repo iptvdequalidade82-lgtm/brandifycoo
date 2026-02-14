@@ -144,11 +144,9 @@ const AdminDashboard = () => {
 
     if (paymentMethod === "pix") {
       const link = `https://brandifycoo.lovable.app/pix/${(inserted as any).id}`;
-      navigator.clipboard.writeText(link);
-      const whatsappMsg = encodeURIComponent(`Olá ${clientName.trim()}! Segue o link para pagamento via PIX:\n\n${link}\n\nValor: R$ ${parseFloat(amountReais.replace(",", ".")).toFixed(2).replace(".", ",")}\nServiço: ${title.trim()}`);
-      const whatsappUrl = `https://wa.me/${clientPhone.trim().replace(/\D/g, "")}?text=${whatsappMsg}`;
-      window.open(whatsappUrl, "_blank");
-      toast.success("Link PIX copiado e WhatsApp aberto!");
+      const msg = `Olá ${clientName.trim()}! Segue o link para pagamento via PIX:\n\n${link}\n\nValor: R$ ${parseFloat(amountReais.replace(",", ".")).toFixed(2).replace(".", ",")}\nServiço: ${title.trim()}`;
+      navigator.clipboard.writeText(msg);
+      toast.success("Mensagem com link PIX copiada! Cole no WhatsApp para enviar.");
     } else {
       // Generate Stripe link automatically
       try {
@@ -226,9 +224,9 @@ const AdminDashboard = () => {
 
   const sharePixWhatsApp = (proposal: Proposal) => {
     const link = `https://brandifycoo.lovable.app/pix/${proposal.id}`;
-    const msg = encodeURIComponent(`Olá ${proposal.client_name}! Segue o link para pagamento via PIX:\n\n${link}\n\nValor: ${formatCurrency(proposal.amount_cents)}\nServiço: ${proposal.title}`);
-    const phone = proposal.client_phone?.replace(/\D/g, "") || "";
-    window.open(`https://wa.me/${phone}?text=${msg}`, "_blank");
+    const msg = `Olá ${proposal.client_name}! Segue o link para pagamento via PIX:\n\n${link}\n\nValor: ${formatCurrency(proposal.amount_cents)}\nServiço: ${proposal.title}`;
+    navigator.clipboard.writeText(msg);
+    toast.success("Mensagem com link PIX copiada! Cole no WhatsApp para enviar.");
   };
 
   const formatCurrency = (cents: number) =>
