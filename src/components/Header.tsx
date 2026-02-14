@@ -40,8 +40,8 @@ export default function Header() {
         scrolled ? "glass-navbar-scrolled" : "glass-navbar"
       }`}
     >
-      <div className="container mx-auto flex items-center justify-between h-16 px-6 lg:px-12">
-        <a href="#inicio" className="flex items-center gap-3">
+      <div className="container mx-auto flex items-center justify-center h-16 px-6 lg:px-12 relative">
+        <a href="#inicio" className="absolute left-6 lg:left-12 flex items-center gap-3">
           <motion.img
             whileHover={{ scale: 1.05 }}
             src={logo}
