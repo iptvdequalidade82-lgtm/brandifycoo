@@ -145,8 +145,8 @@ const AdminDashboard = () => {
     if (paymentMethod === "pix") {
       const origin = window.location.origin;
       const link = `${origin}/pix/${(inserted as any).id}`;
-      await navigator.clipboard.writeText(link);
-      toast.success("Proposta criada! Link PIX copiado para a área de transferência.");
+      window.open(link, "_blank");
+      toast.success("Proposta criada! Página PIX aberta em nova aba.");
     } else {
       // Generate Stripe link automatically
       try {
