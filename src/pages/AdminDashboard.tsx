@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import RevenueChart from "@/components/admin/RevenueChart";
-import { logActivity } from "@/lib/admin-helpers";
+import { logActivity, createDefaultChecklist } from "@/lib/admin-helpers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,8 +16,11 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import {
   Plus, Copy, ExternalLink, RefreshCw,
-  FileText, DollarSign, Send, QrCode, CreditCard, Smartphone, Trash2, CheckCircle, XCircle, MessageCircle,
+  FileText, DollarSign, Send, QrCode, CreditCard, Smartphone, Trash2, CheckCircle, XCircle, MessageCircle, ArrowRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -71,6 +74,14 @@ const AdminDashboard = () => {
   const [generatingLink, setGeneratingLink] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState("all");
   const [deleteTarget, setDeleteTarget] = useState<Proposal | null>(null);
+
+  // Convert to project state
+  const [convertTarget, setConvertTarget] = useState<Proposal | null>(null);
+  const [convertPlan, setConvertPlan] = useState<"essencial" | "profissional" | "premium">("essencial");
+  const [convertStartDate, setConvertStartDate] = useState("");
+  const [convertDueDate, setConvertDueDate] = useState("");
+  const [convertNotes, setConvertNotes] = useState("");
+  const [converting, setConverting] = useState(false);
 
   const [clientName, setClientName] = useState("");
   const [clientEmail, setClientEmail] = useState("");
@@ -193,6 +204,17 @@ const AdminDashboard = () => {
   };
 
   const updateStatus = async (id: string, newStatus: string) => {
+    if (newStatus === "paid") {
+      const proposal = proposals.find(p => p.id === id);
+      if (proposal) {
+        setConvertTarget(proposal);
+        setConvertPlan("essencial");
+        setConvertStartDate(new Date().toISOString().split("T")[0]);
+        setConvertDueDate("");
+        setConvertNotes("");
+        return;
+      }
+    }
     const oldProposal = proposals.find(p => p.id === id);
     const { error } = await supabase.from("proposals").update({ status: newStatus } as any).eq("id", id);
     if (error) toast.error("Erro ao atualizar");
@@ -206,6 +228,53 @@ const AdminDashboard = () => {
         to: statusConfig[newStatus]?.label || newStatus,
       });
     }
+  };
+
+  const handleConvertToProject = async () => {
+    if (!convertTarget || !user) return;
+    setConverting(true);
+
+    // 1. Mark proposal as paid
+    await supabase.from("proposals").update({ status: "paid" } as any).eq("id", convertTarget.id);
+    logActivity("proposal", convertTarget.id, "status_changed", user.id, {
+      title: convertTarget.title,
+      client_name: convertTarget.client_name,
+      from: statusConfig[convertTarget.status]?.label || convertTarget.status,
+      to: "Pago",
+    });
+
+    // 2. Create project from proposal data
+    const { data: project, error } = await supabase.from("projects").insert({
+      client_name: convertTarget.client_name,
+      client_phone: convertTarget.client_phone || null,
+      client_email: convertTarget.client_email || null,
+      title: convertTarget.title,
+      plan: convertPlan,
+      notes: convertNotes.trim() || convertTarget.description || null,
+      start_date: convertStartDate || null,
+      due_date: convertDueDate || null,
+      created_by: user.id,
+    } as any).select().single();
+
+    if (error || !project) {
+      toast.error("Erro ao criar projeto");
+      setConverting(false);
+      return;
+    }
+
+    const proj = project as any;
+    await createDefaultChecklist(proj.id);
+    logActivity("project", proj.id, "created", user.id, {
+      title: convertTarget.title,
+      client_name: convertTarget.client_name,
+      plan: convertPlan,
+      from_proposal: convertTarget.id,
+    });
+
+    toast.success("Proposta paga e projeto criado com sucesso!");
+    setConvertTarget(null);
+    fetchProposals();
+    setConverting(false);
   };
 
   const generatePaymentLink = async (proposal: Proposal) => {
@@ -450,6 +519,70 @@ const AdminDashboard = () => {
               {submitting ? "Criando..." : paymentMethod === "pix" ? "Criar Proposta PIX" : "Criar Proposta"}
             </Button>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Convert to Project Dialog */}
+      <Dialog open={!!convertTarget} onOpenChange={(open) => !open && setConvertTarget(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ArrowRight className="w-5 h-5 text-primary" />
+              Confirmar Pagamento e Criar Projeto
+            </DialogTitle>
+            <DialogDescription>
+              A proposta será marcada como paga e um novo projeto será criado automaticamente.
+            </DialogDescription>
+          </DialogHeader>
+
+          {convertTarget && (
+            <div className="space-y-4">
+              {/* Proposal summary */}
+              <div className="rounded-lg border border-border bg-muted/50 p-4 space-y-1">
+                <p className="text-sm font-medium text-foreground">{convertTarget.title}</p>
+                <p className="text-sm text-muted-foreground">{convertTarget.client_name}</p>
+                <p className="text-lg font-bold text-primary">
+                  {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(convertTarget.amount_cents / 100)}
+                </p>
+              </div>
+
+              {/* Project config */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label>Plano</Label>
+                  <Select value={convertPlan} onValueChange={(v: any) => setConvertPlan(v)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="essencial">⭐ Essencial</SelectItem>
+                      <SelectItem value="profissional">🏆 Profissional</SelectItem>
+                      <SelectItem value="premium">👑 Premium</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Data de Início</Label>
+                  <Input type="date" value={convertStartDate} onChange={e => setConvertStartDate(e.target.value)} />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Prazo de Entrega</Label>
+                <Input type="date" value={convertDueDate} onChange={e => setConvertDueDate(e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Observações do Projeto</Label>
+                <Textarea
+                  value={convertNotes}
+                  onChange={e => setConvertNotes(e.target.value)}
+                  rows={2}
+                  placeholder="Detalhes, pendências, briefing..."
+                />
+              </div>
+
+              <Button onClick={handleConvertToProject} className="w-full" disabled={converting}>
+                {converting ? "Criando projeto..." : "Confirmar Pagamento e Criar Projeto"}
+              </Button>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </AdminLayout>
