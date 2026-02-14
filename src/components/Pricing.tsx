@@ -3,17 +3,17 @@ import { motion } from "framer-motion";
 
 const plans = [
   {
-    name: "Essencial", price: "R$ 1.200", desc: "Ideal para quem está começando e precisa de presença online.",
+    name: "Essencial", price: "R$ 1.200", pricePrefix: "a partir de", desc: "Ideal para quem está começando e precisa de presença online.",
     features: ["Site de até 6 páginas", "Design responsivo", "Certificado SSL", "Auxílio no registro de domínio", "1h de manutenção mensal gratuita"],
     featured: false,
   },
   {
-    name: "Profissional", price: "R$ 2.500", desc: "Para negócios que querem se destacar com mais recursos.",
+    name: "Profissional", price: "R$ 2.500", pricePrefix: "a partir de", desc: "Para negócios que querem se destacar com mais recursos.",
     features: ["Site de até 10 páginas", "Design personalizado premium", "SEO avançado", "Certificado SSL", "Auxílio no registro de domínio", "1h de manutenção mensal gratuita"],
     featured: true,
   },
   {
-    name: "Premium", price: "R$ 4.500", desc: "Solução completa para empresas que exigem o melhor.",
+    name: "Premium", price: "R$ 4.500", pricePrefix: "a partir de", desc: "Solução completa para empresas que exigem o melhor.",
     features: ["Páginas ilimitadas", "Design exclusivo do zero", "SEO avançado + Blog", "Certificado SSL", "Auxílio no registro de domínio", "Painel administrativo", "Integrações personalizadas", "1h de manutenção mensal gratuita"],
     featured: false,
   },
@@ -98,6 +98,7 @@ export default function Pricing() {
                 )}
                 <h3 className="font-display text-lg font-black">{plan.name}</h3>
                 <p className={`text-xs mt-1 mb-4 ${plan.featured ? "text-white/70" : "text-white/40"}`}>{plan.desc}</p>
+                <p className={`text-[10px] uppercase tracking-wider mb-2 ${plan.featured ? "text-white/50" : "text-white/30"}`}>{plan.pricePrefix}</p>
                 <div className="flex items-baseline justify-center gap-1">
                   <span className="font-display text-4xl font-black">{plan.price}</span>
                 </div>
