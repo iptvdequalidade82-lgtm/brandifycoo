@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/select";
 import {
   Plus, Copy, ExternalLink, RefreshCw, Search, Pencil,
-  FileText, DollarSign, Send, Smartphone, Trash2, CheckCircle, XCircle, ArrowRight,
+  FileText, DollarSign, Send, Smartphone, Trash2, CheckCircle, XCircle, ArrowRight, ChevronDown, ChevronUp,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -50,6 +50,10 @@ interface Proposal {
   stripe_checkout_url: string | null;
   cakto_offer_id: string | null;
   cakto_checkout_url: string | null;
+  init_method: string;
+  final_method: string;
+  final_cakto_checkout_url: string | null;
+  final_cakto_offer_id: string | null;
   created_at: string;
 }
 
@@ -78,6 +82,7 @@ const AdminDashboard = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<Proposal | null>(null);
+  const [expandedProposalId, setExpandedProposalId] = useState<string | null>(null);
 
   // Convert to project state
   const [convertTarget, setConvertTarget] = useState<Proposal | null>(null);
@@ -419,6 +424,85 @@ const AdminDashboard = () => {
     toast.success(`Link ${isCakto ? "Cakto" : "PIX"} copiado!`);
   };
 
+  const updateStepMethod = async (proposalId: string, step: "init" | "final", method: "pix" | "cakto") => {
+    const field = step === "init" ? "init_method" : "final_method";
+    const { error } = await supabase.from("proposals").update({ [field]: method } as any).eq("id", proposalId);
+    if (error) { toast.error("Erro ao atualizar método"); return; }
+    toast.success(`Método ${step === "init" ? "inicialização" : "finalização"} atualizado`);
+    setProposals(prev => prev.map(p => p.id === proposalId ? { ...p, [field]: method } : p));
+
+    // If switching to cakto for finalization, generate the link
+    if (step === "final" && method === "cakto") {
+      const proposal = proposals.find(p => p.id === proposalId);
+      if (proposal && !proposal.final_cakto_checkout_url) {
+        generateFinalCaktoLink(proposal);
+      }
+    }
+    if (step === "init" && method === "cakto") {
+      const proposal = proposals.find(p => p.id === proposalId);
+      if (proposal && !proposal.cakto_checkout_url) {
+        generateCaktoLink(proposal);
+      }
+    }
+  };
+
+  const generateFinalCaktoLink = async (proposal: Proposal) => {
+    setGeneratingLink(proposal.id);
+    try {
+      const halfAmount = proposal.amount_cents / 200; // half in reais
+      const { data, error } = await supabase.functions.invoke("create-cakto-payment", {
+        body: {
+          proposal_id: proposal.id,
+          amount_reais: halfAmount,
+          client_name: proposal.client_name,
+          client_email: proposal.client_email || "",
+          description: `${proposal.title} - Finalização`,
+          is_final: true,
+        },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        await supabase.from("proposals").update({ final_cakto_checkout_url: data.url } as any).eq("id", proposal.id);
+        toast.success("Link Cakto de finalização gerado!");
+        fetchProposals();
+      }
+    } catch (err: any) {
+      toast.error("Erro: " + (err.message || "tente novamente"));
+    }
+    setGeneratingLink(null);
+  };
+
+  const getStepLink = (p: Proposal, step: "init" | "final") => {
+    const method = step === "init" ? p.init_method : p.final_method;
+    if (method === "cakto") {
+      return step === "init" ? p.cakto_checkout_url : p.final_cakto_checkout_url;
+    }
+    return `https://brandifycoo.lovable.app/pix/${p.id}?step=${step}`;
+  };
+
+  const copyStepLink = (p: Proposal, step: "init" | "final") => {
+    const link = getStepLink(p, step);
+    if (!link) {
+      toast.error("Link ainda não gerado");
+      return;
+    }
+    navigator.clipboard.writeText(link);
+    const label = step === "init" ? "inicialização" : "finalização";
+    toast.success(`Link de ${label} copiado!`);
+  };
+
+  const copyStepMessage = (p: Proposal, step: "init" | "final") => {
+    const link = getStepLink(p, step);
+    if (!link) { toast.error("Link ainda não gerado"); return; }
+    const method = step === "init" ? p.init_method : p.final_method;
+    const halfAmount = Math.round(p.amount_cents / 2);
+    const label = step === "init" ? "inicialização" : "finalização";
+    const methodLabel = method === "cakto" ? "cartão" : "PIX";
+    const msg = `Olá, ${p.client_name}! 😊\n\nSeu link de pagamento de *${label}* via *${methodLabel}* já está disponível:\n\n${link}\n\n💰 Valor: ${formatCurrency(halfAmount)}\n📋 Serviço: ${p.title}\n\nQualquer dúvida, estou à disposição!`;
+    navigator.clipboard.writeText(msg);
+    toast.success("Mensagem copiada! Cole no WhatsApp.");
+  };
+
   const formatCurrency = (cents: number) =>
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(cents / 100);
 
@@ -494,61 +578,132 @@ const AdminDashboard = () => {
             const config = statusConfig[p.status] || statusConfig.draft;
             const StatusIcon = config.icon;
             return (
-              <div key={p.id} className="glass rounded-xl p-5 glow-border">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <StatusIcon className={`w-4 h-4 ${config.color}`} />
-                      <span className={`text-xs font-medium ${config.color}`}>{config.label}</span>
-                      {p.cakto_checkout_url && <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full font-medium">Cakto</span>}
-                      {!p.cakto_checkout_url && <span className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded-full font-medium">PIX</span>}
+              <div key={p.id} className="glass rounded-xl glow-border overflow-hidden">
+                <div className="p-5">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <StatusIcon className={`w-4 h-4 ${config.color}`} />
+                        <span className={`text-xs font-medium ${config.color}`}>{config.label}</span>
+                      </div>
+                      <h3 className="font-semibold text-foreground truncate">{p.title}</h3>
+                      <p className="text-sm text-muted-foreground">{p.client_name}{p.client_email ? ` · ${p.client_email}` : ""}</p>
+                      {p.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{p.description}</p>}
                     </div>
-                    <h3 className="font-semibold text-foreground truncate">{p.title}</h3>
-                    <p className="text-sm text-muted-foreground">{p.client_name}{p.client_email ? ` · ${p.client_email}` : ""}</p>
-                    {p.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{p.description}</p>}
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <p className="text-lg font-bold text-foreground">{formatCurrency(p.amount_cents)}</p>
-                    </div>
-                    <div className="flex gap-1 flex-wrap">
-                      {/* Main action: Copy payment message */}
-                      {p.cakto_checkout_url ? (
-                        <Button size="sm" onClick={() => copyPaymentMessage(p)} title="Copiar mensagem Cakto" className="gap-1.5">
-                          <Copy className="w-4 h-4" /> Copiar Msg Cakto
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <p className="text-lg font-bold text-foreground">{formatCurrency(p.amount_cents)}</p>
+                        <p className="text-[10px] text-muted-foreground">50% = {formatCurrency(Math.round(p.amount_cents / 2))}</p>
+                      </div>
+                      <div className="flex gap-1 flex-wrap">
+                        {/* Expand payment links */}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setExpandedProposalId(expandedProposalId === p.id ? null : p.id)}
+                          className="gap-1"
+                        >
+                          <DollarSign className="w-4 h-4" />
+                          Links
+                          {expandedProposalId === p.id ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                         </Button>
-                      ) : (
-                        <Button size="sm" onClick={() => copyPaymentMessage(p)} title="Copiar mensagem PIX" className="gap-1.5">
-                          <Copy className="w-4 h-4" /> Copiar Msg PIX
-                        </Button>
-                      )}
 
-                      {/* Copy link */}
-                      <Button variant="outline" size="icon" onClick={() => copyPaymentLink(p)} title={p.cakto_checkout_url ? "Copiar link Cakto" : "Copiar link PIX"}>
-                        <Copy className="w-4 h-4" />
-                      </Button>
-
-
-                      {/* Status actions */}
-                      {p.status !== "paid" && (
-                        <Button variant="outline" size="icon" onClick={() => updateStatus(p.id, "paid")} title="Marcar como pago" className="text-green-400 hover:text-green-300 hover:border-green-400/50">
-                          <CheckCircle className="w-4 h-4" />
+                        {/* Status actions */}
+                        {p.status !== "paid" && (
+                          <Button variant="outline" size="icon" onClick={() => updateStatus(p.id, "paid")} title="Marcar como pago" className="text-green-400 hover:text-green-300 hover:border-green-400/50">
+                            <CheckCircle className="w-4 h-4" />
+                          </Button>
+                        )}
+                        {p.status === "paid" && (
+                          <Button variant="outline" size="icon" onClick={() => updateStatus(p.id, "sent")} title="Reverter" className="text-accent hover:text-accent">
+                            <Send className="w-4 h-4" />
+                          </Button>
+                        )}
+                        <Button variant="outline" size="icon" onClick={() => openEdit(p)} title="Editar">
+                          <Pencil className="w-4 h-4" />
                         </Button>
-                      )}
-                      {p.status === "paid" && (
-                        <Button variant="outline" size="icon" onClick={() => updateStatus(p.id, "sent")} title="Reverter" className="text-accent hover:text-accent">
-                          <Send className="w-4 h-4" />
+                        <Button variant="outline" size="icon" onClick={() => setDeleteTarget(p)} className="text-destructive hover:text-destructive">
+                          <Trash2 className="w-4 h-4" />
                         </Button>
-                      )}
-                      <Button variant="outline" size="icon" onClick={() => openEdit(p)} title="Editar">
-                        <Pencil className="w-4 h-4" />
-                      </Button>
-                      <Button variant="outline" size="icon" onClick={() => setDeleteTarget(p)} className="text-destructive hover:text-destructive">
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
+
+                {/* Expandable payment links section */}
+                {expandedProposalId === p.id && (
+                  <div className="border-t border-border/50 bg-muted/20 p-4 space-y-3">
+                    {/* Inicialização */}
+                    <div className="rounded-lg border border-border/50 p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-semibold text-foreground">📌 Inicialização (50%)</span>
+                        <span className="text-sm font-bold text-foreground">{formatCurrency(Math.round(p.amount_cents / 2))}</span>
+                      </div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-xs text-muted-foreground">Método:</span>
+                        <button
+                          onClick={() => updateStepMethod(p.id, "init", "pix")}
+                          className={`px-2 py-0.5 rounded-full text-[11px] font-medium border transition-all ${
+                            p.init_method === "pix" ? "bg-primary/10 text-primary border-primary/30" : "border-transparent text-muted-foreground/50 hover:text-muted-foreground"
+                          }`}
+                        >
+                          PIX
+                        </button>
+                        <button
+                          onClick={() => updateStepMethod(p.id, "init", "cakto")}
+                          className={`px-2 py-0.5 rounded-full text-[11px] font-medium border transition-all ${
+                            p.init_method === "cakto" ? "bg-primary/10 text-primary border-primary/30" : "border-transparent text-muted-foreground/50 hover:text-muted-foreground"
+                          }`}
+                        >
+                          Cakto
+                        </button>
+                      </div>
+                      <div className="flex gap-1">
+                        <Button size="sm" variant="outline" onClick={() => copyStepLink(p, "init")} className="gap-1 text-xs">
+                          <Copy className="w-3 h-3" /> Copiar Link
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => copyStepMessage(p, "init")} className="gap-1 text-xs">
+                          <Send className="w-3 h-3" /> Copiar Msg
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Finalização */}
+                    <div className="rounded-lg border border-border/50 p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-semibold text-foreground">🏁 Finalização (50%)</span>
+                        <span className="text-sm font-bold text-foreground">{formatCurrency(Math.round(p.amount_cents / 2))}</span>
+                      </div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-xs text-muted-foreground">Método:</span>
+                        <button
+                          onClick={() => updateStepMethod(p.id, "final", "pix")}
+                          className={`px-2 py-0.5 rounded-full text-[11px] font-medium border transition-all ${
+                            p.final_method === "pix" ? "bg-primary/10 text-primary border-primary/30" : "border-transparent text-muted-foreground/50 hover:text-muted-foreground"
+                          }`}
+                        >
+                          PIX
+                        </button>
+                        <button
+                          onClick={() => updateStepMethod(p.id, "final", "cakto")}
+                          className={`px-2 py-0.5 rounded-full text-[11px] font-medium border transition-all ${
+                            p.final_method === "cakto" ? "bg-primary/10 text-primary border-primary/30" : "border-transparent text-muted-foreground/50 hover:text-muted-foreground"
+                          }`}
+                        >
+                          Cakto
+                        </button>
+                      </div>
+                      <div className="flex gap-1">
+                        <Button size="sm" variant="outline" onClick={() => copyStepLink(p, "final")} className="gap-1 text-xs">
+                          <Copy className="w-3 h-3" /> Copiar Link
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => copyStepMessage(p, "final")} className="gap-1 text-xs">
+                          <Send className="w-3 h-3" /> Copiar Msg
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })
