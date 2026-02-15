@@ -676,9 +676,20 @@ const AdminDashboard = () => {
                     </div>
 
                     {/* Inicialização */}
-                    <div className="rounded-lg border border-border/50 p-3">
+                    <div className={`rounded-lg border p-3 ${
+                      p.status === "partial" || p.status === "paid"
+                        ? "border-green-500/30 bg-green-500/5"
+                        : "border-border/50"
+                    }`}>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-semibold text-foreground">📌 Inicialização (50%)</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold text-foreground">📌 Inicialização (50%)</span>
+                          {(p.status === "partial" || p.status === "paid") && (
+                            <span className="flex items-center gap-1 text-[10px] font-medium text-green-400 bg-green-500/10 px-1.5 py-0.5 rounded-full">
+                              <CheckCircle className="w-3 h-3" /> Pago
+                            </span>
+                          )}
+                        </div>
                         <span className="text-sm font-bold text-foreground">{formatCurrency(Math.round(p.amount_cents / 2))}</span>
                       </div>
                       <div className="flex items-center gap-2 mb-2">
@@ -711,9 +722,20 @@ const AdminDashboard = () => {
                     </div>
 
                     {/* Finalização */}
-                    <div className="rounded-lg border border-border/50 p-3">
+                    <div className={`rounded-lg border p-3 ${
+                      p.status === "paid"
+                        ? "border-green-500/30 bg-green-500/5"
+                        : "border-border/50"
+                    }`}>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-semibold text-foreground">🏁 Finalização (50%)</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold text-foreground">🏁 Finalização (50%)</span>
+                          {p.status === "paid" && (
+                            <span className="flex items-center gap-1 text-[10px] font-medium text-green-400 bg-green-500/10 px-1.5 py-0.5 rounded-full">
+                              <CheckCircle className="w-3 h-3" /> Pago
+                            </span>
+                          )}
+                        </div>
                         <span className="text-sm font-bold text-foreground">{formatCurrency(Math.round(p.amount_cents / 2))}</span>
                       </div>
                       <div className="flex items-center gap-2 mb-2">
