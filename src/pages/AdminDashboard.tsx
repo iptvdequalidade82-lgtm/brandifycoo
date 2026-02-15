@@ -71,7 +71,7 @@ const filterTabs = [
 const AdminDashboard = () => {
   const { user } = useAuth();
   const [proposals, setProposals] = useState<Proposal[]>([]);
-  const [projects, setProjects] = useState<Array<{ total_amount_cents: number; amount_received_cents: number; payment_status: string; created_at: string }>>([]);
+  const [projects, setProjects] = useState<Array<{ title: string; client_name: string; plan: string; total_amount_cents: number; amount_received_cents: number; payment_status: string; created_at: string }>>([]);
   const [showForm, setShowForm] = useState(false);
   const [loadingProposals, setLoadingProposals] = useState(true);
   const [generatingLink, setGeneratingLink] = useState<string | null>(null);
@@ -122,7 +122,7 @@ const AdminDashboard = () => {
   const fetchProjects = async () => {
     const { data } = await supabase
       .from("projects")
-      .select("total_amount_cents, amount_received_cents, payment_status, created_at");
+      .select("title, client_name, plan, total_amount_cents, amount_received_cents, payment_status, created_at");
     if (data) setProjects(data as any);
   };
 
