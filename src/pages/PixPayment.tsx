@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { QRCodeSVG } from "qrcode.react";
 import { Copy, CheckCircle, QrCode } from "lucide-react";
@@ -9,6 +9,8 @@ import logoImg from "@/assets/logo.jpg";
 
 const PixPayment = () => {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
+  const step = searchParams.get("step"); // "init" | "final" | null
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [pixData, setPixData] = useState<{
@@ -25,7 +27,7 @@ const PixPayment = () => {
     (async () => {
       try {
         const { data, error: fnError } = await supabase.functions.invoke("generate-pix", {
-          body: { proposal_id: id },
+          body: { proposal_id: id, step: step || undefined },
         });
         if (fnError) throw fnError;
         if (data?.error) throw new Error(data.error);
@@ -36,7 +38,7 @@ const PixPayment = () => {
         setLoading(false);
       }
     })();
-  }, [id]);
+  }, [id, step]);
 
   const handleCopy = () => {
     if (!pixData) return;

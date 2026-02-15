@@ -29,32 +29,28 @@ function tlv(id: string, value: string): string {
 }
 
 function buildPixPayload(pixKey: string, merchantName: string, merchantCity: string, amount: number, txId: string, description: string): string {
-  // Merchant Account Information (ID 26)
   const gui = tlv("00", "br.gov.bcb.pix");
   const key = tlv("01", pixKey);
   const desc = description ? tlv("02", description.substring(0, 72)) : "";
   const merchantAccountInfo = tlv("26", gui + key + desc);
-
-  // Additional Data Field (ID 62)
   const additionalData = tlv("62", tlv("05", txId.substring(0, 25)));
 
   let payload = "";
-  payload += tlv("00", "01"); // Payload Format Indicator
+  payload += tlv("00", "01");
   payload += merchantAccountInfo;
-  payload += tlv("52", "0000"); // Merchant Category Code
-  payload += tlv("53", "986"); // Transaction Currency (BRL)
+  payload += tlv("52", "0000");
+  payload += tlv("53", "986");
 
   if (amount > 0) {
     const amountStr = amount.toFixed(2);
     payload += tlv("54", amountStr);
   }
 
-  payload += tlv("58", "BR"); // Country Code
-  payload += tlv("59", merchantName.substring(0, 25)); // Merchant Name
-  payload += tlv("60", merchantCity.substring(0, 15)); // Merchant City
+  payload += tlv("58", "BR");
+  payload += tlv("59", merchantName.substring(0, 25));
+  payload += tlv("60", merchantCity.substring(0, 15));
   payload += additionalData;
 
-  // CRC placeholder then calculate
   payload += "6304";
   const crc = crc16(payload);
   payload += crc;
@@ -68,7 +64,7 @@ serve(async (req) => {
   }
 
   try {
-    const { proposal_id } = await req.json();
+    const { proposal_id, step } = await req.json();
 
     if (!proposal_id || typeof proposal_id !== "string") {
       return new Response(JSON.stringify({ error: "proposal_id is required" }), {
@@ -103,16 +99,20 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    // Ensure phone key has +55 prefix
     pixKey = pixKey.replace(/\D/g, "");
     if (!pixKey.startsWith("55")) {
       pixKey = "55" + pixKey;
     }
     pixKey = "+" + pixKey;
 
-    const amount = proposal.amount_cents / 100;
+    // If step is provided, charge half the amount
+    const isHalf = step === "init" || step === "final";
+    const amountCents = isHalf ? Math.round(proposal.amount_cents / 2) : proposal.amount_cents;
+    const amount = amountCents / 100;
+    
     const txId = proposal.id.replace(/-/g, "").substring(0, 25);
-    const desc = proposal.title || "Brandify";
+    const stepLabel = step === "init" ? "Inicializacao" : step === "final" ? "Finalizacao" : "";
+    const desc = stepLabel || proposal.title || "Brandify";
 
     const pixPayload = buildPixPayload(
       pixKey,
@@ -123,11 +123,17 @@ serve(async (req) => {
       desc
     );
 
+    const titleLabel = step === "init"
+      ? "Pagamento Inicialização"
+      : step === "final"
+        ? "Pagamento Finalização"
+        : "Serviço Brandify";
+
     return new Response(
       JSON.stringify({
         pix_payload: pixPayload,
-        amount_cents: proposal.amount_cents,
-        title: "Serviço Brandify",
+        amount_cents: amountCents,
+        title: titleLabel,
         client_name: proposal.client_name,
         description: "Pagamento via PIX",
       }),
