@@ -209,18 +209,26 @@ export default function AdminProjects() {
   const formatCurrency = (cents: number) =>
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(cents / 100);
 
-  const markFinalPayment = async (project: Project) => {
+  const updatePaymentStatus = async (project: Project, newStatus: string) => {
+    if (project.payment_status === newStatus) return;
+    const received = newStatus === "full"
+      ? project.total_amount_cents
+      : newStatus === "partial"
+        ? Math.round(project.total_amount_cents / 2)
+        : 0;
     const { error } = await supabase.from("projects").update({
-      amount_received_cents: project.total_amount_cents,
-      payment_status: "full",
+      amount_received_cents: received,
+      payment_status: newStatus,
     } as any).eq("id", project.id);
-    if (error) { toast.error("Erro ao marcar pagamento"); return; }
-    toast.success("Pagamento final registrado!");
-    setProjects(prev => prev.map(p => p.id === project.id ? { ...p, amount_received_cents: project.total_amount_cents, payment_status: "full" } : p));
+    if (error) { toast.error("Erro ao atualizar pagamento"); return; }
+    const labels: Record<string, string> = { pending: "Pendente", partial: "50% Pago", full: "Quitado" };
+    toast.success(`Pagamento: ${labels[newStatus]}`);
+    setProjects(prev => prev.map(p => p.id === project.id ? { ...p, amount_received_cents: received, payment_status: newStatus } : p));
     if (user) {
-      logActivity("project", project.id, "payment_completed", user.id, {
+      logActivity("project", project.id, "payment_updated", user.id, {
         title: project.title,
         client_name: project.client_name,
+        status: labels[newStatus],
         total: formatCurrency(project.total_amount_cents),
       });
     }
@@ -308,36 +316,36 @@ export default function AdminProjects() {
                         Prazo: {new Date(p.due_date).toLocaleDateString("pt-BR")}
                       </p>
                     )}
-                    {/* Payment info */}
+                    {/* Payment status toggle */}
                     {p.total_amount_cents > 0 && (
-                      <div className="flex items-center gap-3 mt-2">
+                      <div className="flex items-center gap-2 mt-2">
                         <span className="text-sm font-bold text-foreground">{formatCurrency(p.total_amount_cents)}</span>
-                        {p.payment_status === "partial" ? (
-                          <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-amber-400/10 text-amber-400 border border-amber-400/20">
-                            <DollarSign className="w-3 h-3" />
-                            {formatCurrency(p.total_amount_cents - p.amount_received_cents)} em aberto
-                          </span>
-                        ) : p.payment_status === "full" ? (
-                          <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-green-400/10 text-green-400 border border-green-400/20">
-                            <CheckCircle className="w-3 h-3" /> Pago integralmente
-                          </span>
-                        ) : null}
+                        <div className="flex gap-1">
+                          {(["pending", "partial", "full"] as const).map(status => {
+                            const labels: Record<string, { label: string; activeClass: string }> = {
+                              pending: { label: "Pendente", activeClass: "bg-muted text-foreground border-border" },
+                              partial: { label: "50% Pago", activeClass: "bg-amber-400/15 text-amber-400 border-amber-400/30" },
+                              full: { label: "Quitado", activeClass: "bg-green-400/15 text-green-400 border-green-400/30" },
+                            };
+                            const cfg = labels[status];
+                            const isActive = p.payment_status === status;
+                            return (
+                              <button
+                                key={status}
+                                onClick={() => updatePaymentStatus(p, status)}
+                                className={`px-2 py-0.5 rounded-full text-[11px] font-medium border transition-all ${
+                                  isActive ? cfg.activeClass : "border-transparent text-muted-foreground/50 hover:text-muted-foreground"
+                                }`}
+                              >
+                                {cfg.label}
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
                     )}
                   </div>
                   <div className="flex items-center gap-1 flex-wrap">
-                    {/* Mark final payment */}
-                    {p.payment_status === "partial" && p.total_amount_cents > 0 && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => markFinalPayment(p)}
-                        className="text-amber-400 hover:text-amber-300 hover:border-amber-400/50 gap-1"
-                        title="Marcar pagamento final recebido"
-                      >
-                        <DollarSign className="w-4 h-4" /> Receber 50% final
-                      </Button>
-                    )}
                     {/* Status progression */}
                     <Select value={p.status} onValueChange={(v) => updateStatus(p.id, v)}>
                       <SelectTrigger className="w-[140px] h-8 text-xs">
