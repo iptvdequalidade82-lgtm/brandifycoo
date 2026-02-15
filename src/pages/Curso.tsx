@@ -36,7 +36,7 @@ const courses = [
       "Gestão de clientes",
       "Certificado de conclusão",
     ],
-    link: "https://wa.me/5543991065129?text=Ol%C3%A1!%20Tenho%20interesse%20no%20curso%20Nova%20Profiss%C3%A3o%20Digital",
+    link: "https://pay.kirvano.com/9ee0e4df-b093-4975-b0a8-48d863543762?aff=681f54e8-2253-45ed-a04a-523963130dea",
     tag: "Novo",
   },
 ];
