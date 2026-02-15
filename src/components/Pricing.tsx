@@ -136,6 +136,90 @@ export default function Pricing() {
           ))}
         </motion.div>
 
+        {/* Nuvemshop Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mt-16 rounded-2xl overflow-hidden border border-white/10 bg-white/[0.06] backdrop-blur-sm"
+        >
+          <div className="p-7 md:p-10 border-b border-white/10">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 text-xs font-medium mb-3">
+                  <Sparkles size={12} />
+                  E-commerce
+                </div>
+                <h3 className="font-display text-2xl md:text-3xl font-black">Loja Virtual — Nuvemshop</h3>
+                <p className="text-white/50 mt-2 max-w-lg">Loja online completa, configurada e pronta para vender. Ideal para quem quer entrar no e-commerce com estrutura profissional.</p>
+              </div>
+              <div className="text-left md:text-right flex-shrink-0">
+                <p className="text-[10px] uppercase tracking-wider text-white/30 mb-1">a partir de</p>
+                <span className="font-display text-4xl font-black">R$ 2.500</span>
+                <p className="text-xs text-white/30 mt-1">valor único · pagamento via PIX</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-7 md:p-10 grid md:grid-cols-2 gap-8">
+            <div>
+              <p className="text-xs uppercase tracking-wider text-white/40 font-medium mb-4">O que está incluso</p>
+              <ul className="space-y-3">
+                {[
+                  "Configuração de layout completa",
+                  "Categorias organizadas",
+                  "Banners inseridos (enviados pelo cliente)",
+                  "Cadastro de produtos incluso",
+                  "A cada 20 produtos adicionais: + R$ 200",
+                  "Integração de estoque (se aplicável)",
+                ].map((f) => (
+                  <li key={f} className="flex items-start gap-3">
+                    <Check className="mt-0.5 flex-shrink-0 text-emerald-400" size={16} strokeWidth={2.5} />
+                    <span className="text-sm text-white/80">{f}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <p className="text-xs uppercase tracking-wider text-white/40 font-medium mb-4">Planos Nuvemshop (mensais)</p>
+              <div className="space-y-3">
+                {[
+                  { name: "Essencial", price: "R$ 69/mês", desc: "Para quem está começando a vender online" },
+                  { name: "Impulso", price: "R$ 164/mês", desc: "Mais recursos e edição avançada do site" },
+                  { name: "Escala", price: "R$ 449/mês", desc: "Máxima personalização e ferramentas de gestão" },
+                ].map((p) => (
+                  <div key={p.name} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.05] border border-white/10">
+                    <div>
+                      <span className="text-sm font-bold text-white">{p.name}</span>
+                      <p className="text-xs text-white/40 mt-0.5">{p.desc}</p>
+                    </div>
+                    <span className="text-sm font-bold text-emerald-400 flex-shrink-0 ml-4">{p.price}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-white/30 mt-4 leading-relaxed">
+                O cliente contrata o plano Nuvemshop diretamente. Tudo é configurado na conta do próprio cliente.
+              </p>
+            </div>
+          </div>
+
+          <div className="px-7 md:px-10 pb-7 md:pb-10">
+            <motion.a
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              href={`https://wa.me/5543991065129?text=${encodeURIComponent('Olá! Tenho interesse na Loja Virtual Nuvemshop.')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block px-8 py-3.5 rounded-xl font-bold bg-emerald-500 text-white hover:bg-emerald-600 gentle-animation"
+            >
+              Solicitar Orçamento
+            </motion.a>
+          </div>
+        </motion.div>
+
+        {/* Hosting note */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
