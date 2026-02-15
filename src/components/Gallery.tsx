@@ -4,6 +4,10 @@ import post3 from "@/assets/post-3.jpg";
 import post4 from "@/assets/post-4.jpg";
 import post5 from "@/assets/post-5.jpg";
 import post6 from "@/assets/post-6.jpg";
+import post7 from "@/assets/post-7.jpg";
+import post8 from "@/assets/post-8.jpg";
+import post9 from "@/assets/post-9.jpg";
+import post10 from "@/assets/post-10.jpg";
 import { Instagram } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -14,6 +18,10 @@ const posts = [
   { src: post4, alt: "Toda grande empresa possui um site" },
   { src: post5, alt: "Marketing digital é estratégia" },
   { src: post6, alt: "Como atrair clientes corretamente" },
+  { src: post7, alt: "Se o Instagram cair hoje, sua loja sobrevive?" },
+  { src: post8, alt: "Atrair clientes sem ter um site profissional" },
+  { src: post9, alt: "O que fazemos? Brandify.co" },
+  { src: post10, alt: "Sua loja vendendo 24h por dia" },
 ];
 
 const container = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } };
