@@ -1,4 +1,4 @@
-import { ArrowRight, Zap } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function CTAFinal() {
@@ -16,11 +16,6 @@ export default function CTAFinal() {
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/25 bg-white/10 text-white/80 text-xs font-medium tracking-widest uppercase mb-8">
-            <Zap size={14} />
-            Comece agora
-          </div>
-
           <h2 className="font-display text-4xl md:text-6xl lg:text-7xl font-black tracking-[-0.03em] mb-6">
             Pronto para ter um site que{" "}
             <span className="underline decoration-brand-accent/40 underline-offset-8">impressiona</span>?
