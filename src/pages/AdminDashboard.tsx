@@ -384,14 +384,14 @@ const AdminDashboard = () => {
   const generateCaktoLink = async (proposal: Proposal) => {
     setGeneratingLink(proposal.id);
     try {
-      const amountReais = proposal.amount_cents / 100;
+      const halfAmount = proposal.amount_cents / 200; // half in reais
       const { data, error } = await supabase.functions.invoke("create-cakto-payment", {
         body: {
           proposal_id: proposal.id,
-          amount_reais: amountReais,
+          amount_reais: halfAmount,
           client_name: proposal.client_name,
           client_email: proposal.client_email || "",
-          description: `${proposal.title}${proposal.description ? " - " + proposal.description : ""}`,
+          description: `${proposal.title} - Inicialização`,
         },
       });
       if (error) throw error;
@@ -474,7 +474,10 @@ const AdminDashboard = () => {
     setGeneratingLink(null);
   };
 
-  const getStepLink = (p: Proposal, step: "init" | "final") => {
+  const getStepLink = (p: Proposal, step: "init" | "final" | "full") => {
+    if (step === "full") {
+      return `https://brandifycoo.lovable.app/pix/${p.id}`;
+    }
     const method = step === "init" ? p.init_method : p.final_method;
     if (method === "cakto") {
       return step === "init" ? p.cakto_checkout_url : p.final_cakto_checkout_url;
@@ -482,25 +485,25 @@ const AdminDashboard = () => {
     return `https://brandifycoo.lovable.app/pix/${p.id}?step=${step}`;
   };
 
-  const copyStepLink = (p: Proposal, step: "init" | "final") => {
+  const copyStepLink = (p: Proposal, step: "init" | "final" | "full") => {
     const link = getStepLink(p, step);
     if (!link) {
       toast.error("Link ainda não gerado");
       return;
     }
     navigator.clipboard.writeText(link);
-    const label = step === "init" ? "inicialização" : "finalização";
+    const label = step === "init" ? "inicialização" : step === "final" ? "finalização" : "valor inteiro";
     toast.success(`Link de ${label} copiado!`);
   };
 
-  const copyStepMessage = (p: Proposal, step: "init" | "final") => {
+  const copyStepMessage = (p: Proposal, step: "init" | "final" | "full") => {
     const link = getStepLink(p, step);
     if (!link) { toast.error("Link ainda não gerado"); return; }
-    const method = step === "init" ? p.init_method : p.final_method;
-    const halfAmount = Math.round(p.amount_cents / 2);
-    const label = step === "init" ? "inicialização" : "finalização";
+    const amount = step === "full" ? p.amount_cents : Math.round(p.amount_cents / 2);
+    const label = step === "init" ? "inicialização" : step === "final" ? "finalização" : "pagamento integral";
+    const method = step === "full" ? "pix" : (step === "init" ? p.init_method : p.final_method);
     const methodLabel = method === "cakto" ? "cartão" : "PIX";
-    const msg = `Olá, ${p.client_name}! 😊\n\nSeu link de pagamento de *${label}* via *${methodLabel}* já está disponível:\n\n${link}\n\n💰 Valor: ${formatCurrency(halfAmount)}\n📋 Serviço: ${p.title}\n\nQualquer dúvida, estou à disposição!`;
+    const msg = `Olá, ${p.client_name}! 😊\n\nSeu link de pagamento de *${label}* via *${methodLabel}* já está disponível:\n\n${link}\n\n💰 Valor: ${formatCurrency(amount)}\n📋 Serviço: ${p.title}\n\nQualquer dúvida, estou à disposição!`;
     navigator.clipboard.writeText(msg);
     toast.success("Mensagem copiada! Cole no WhatsApp.");
   };
@@ -635,6 +638,22 @@ const AdminDashboard = () => {
                 {/* Expandable payment links section */}
                 {expandedProposalId === p.id && (
                   <div className="border-t border-border/50 bg-muted/20 p-4 space-y-3">
+                    {/* Valor Inteiro */}
+                    <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-semibold text-foreground">💳 Valor Inteiro (100%)</span>
+                        <span className="text-sm font-bold text-primary">{formatCurrency(p.amount_cents)}</span>
+                      </div>
+                      <div className="flex gap-1">
+                        <Button size="sm" variant="outline" onClick={() => copyStepLink(p, "full")} className="gap-1 text-xs">
+                          <Copy className="w-3 h-3" /> Copiar Link
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => copyStepMessage(p, "full")} className="gap-1 text-xs">
+                          <Send className="w-3 h-3" /> Copiar Msg
+                        </Button>
+                      </div>
+                    </div>
+
                     {/* Inicialização */}
                     <div className="rounded-lg border border-border/50 p-3">
                       <div className="flex items-center justify-between mb-2">
