@@ -1,5 +1,6 @@
-import { Check, Star, Info, Sparkles } from "lucide-react";
-import { motion } from "framer-motion";
+import { Check, Star, Info, Sparkles, ChevronDown, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
 
 const plans = [
   {
@@ -21,6 +22,114 @@ const plans = [
 
 const container = { hidden: {}, show: { transition: { staggerChildren: 0.12 } } };
 const item = { hidden: { opacity: 0, y: 40 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } };
+
+const nuvemshopPlans = [
+  {
+    name: "Essencial", price: "R$ 69/mês", desc: "Para quem está começando a vender online",
+    included: [
+      "Atendimento por e-mail e messenger",
+      "+30 meios de envio integrados",
+      "+20 meios de pagamento integrados",
+      "Apontamento de domínio próprio",
+      "Acompanhamento via gráficos de desempenho da loja",
+    ],
+    notIncluded: [
+      "Atendimento via WhatsApp",
+      "Acesso ao código fonte (HTML/CSS)",
+    ],
+  },
+  {
+    name: "Impulso", price: "R$ 164/mês", desc: "Mais recursos e edição avançada do site",
+    included: [
+      "Todos os recursos do plano anterior",
+      "Atendimento via WhatsApp",
+      "Acesso ao código fonte (HTML/CSS)",
+    ],
+    notIncluded: [
+      "Relatórios ilimitados",
+      "Gestão e controle de usuários",
+      "Edição de vendas",
+      "Filtro de produtos na lista de vendas",
+      "Campos personalizados de gestão",
+      "Custos e comissões diferenciados",
+    ],
+  },
+  {
+    name: "Escala", price: "R$ 449/mês", desc: "Máxima personalização e ferramentas de gestão",
+    included: [
+      "Todos os recursos do plano anterior",
+      "Relatórios ilimitados",
+      "Edição de vendas",
+      "Filtro de produtos na lista de vendas",
+      "Campos personalizados de gestão",
+      "Custos e comissões diferenciados",
+    ],
+    notIncluded: [],
+  },
+];
+
+function NuvemshopPlans() {
+  const [openPlan, setOpenPlan] = useState<string | null>(null);
+
+  return (
+    <div>
+      <p className="text-xs uppercase tracking-wider text-white/40 font-medium mb-4">Planos Nuvemshop (mensais)</p>
+      <div className="space-y-3">
+        {nuvemshopPlans.map((p) => (
+          <div key={p.name} className="rounded-xl bg-white/[0.05] border border-white/10 overflow-hidden">
+            <button
+              onClick={() => setOpenPlan(openPlan === p.name ? null : p.name)}
+              className="w-full flex items-center justify-between p-3 text-left hover:bg-white/[0.03] gentle-animation"
+            >
+              <div>
+                <span className="text-sm font-bold text-white">{p.name}</span>
+                <p className="text-xs text-white/40 mt-0.5">{p.desc}</p>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0 ml-4">
+                <span className="text-sm font-bold text-emerald-400">{p.price}</span>
+                <ChevronDown
+                  size={16}
+                  className={`text-white/40 gentle-animation ${openPlan === p.name ? "rotate-180" : ""}`}
+                />
+              </div>
+            </button>
+            <AnimatePresence>
+              {openPlan === p.name && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  <div className="px-3 pb-3 pt-1 border-t border-white/10">
+                    <ul className="space-y-2 mt-2">
+                      {p.included.map((f) => (
+                        <li key={f} className="flex items-start gap-2">
+                          <Check className="mt-0.5 flex-shrink-0 text-emerald-400" size={14} strokeWidth={2.5} />
+                          <span className="text-xs text-white/70">{f}</span>
+                        </li>
+                      ))}
+                      {p.notIncluded.map((f) => (
+                        <li key={f} className="flex items-start gap-2">
+                          <X className="mt-0.5 flex-shrink-0 text-white/25" size={14} strokeWidth={2.5} />
+                          <span className="text-xs text-white/35">{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        ))}
+      </div>
+      <p className="text-xs text-white/30 mt-4 leading-relaxed">
+        O plano Nuvemshop é contratado na conta do próprio cliente (e-mail do cliente). Toda a configuração é feita por nós, mas a titularidade e renovação ficam sob responsabilidade do cliente.
+      </p>
+    </div>
+  );
+}
 
 export default function Pricing() {
   return (
@@ -207,27 +316,7 @@ export default function Pricing() {
               </ul>
             </div>
 
-            <div>
-              <p className="text-xs uppercase tracking-wider text-white/40 font-medium mb-4">Planos Nuvemshop (mensais)</p>
-              <div className="space-y-3">
-                {[
-                  { name: "Essencial", price: "R$ 69/mês", desc: "Para quem está começando a vender online" },
-                  { name: "Impulso", price: "R$ 164/mês", desc: "Mais recursos e edição avançada do site" },
-                  { name: "Escala", price: "R$ 449/mês", desc: "Máxima personalização e ferramentas de gestão" },
-                ].map((p) => (
-                  <div key={p.name} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.05] border border-white/10">
-                    <div>
-                      <span className="text-sm font-bold text-white">{p.name}</span>
-                      <p className="text-xs text-white/40 mt-0.5">{p.desc}</p>
-                    </div>
-                    <span className="text-sm font-bold text-emerald-400 flex-shrink-0 ml-4">{p.price}</span>
-                  </div>
-                ))}
-              </div>
-              <p className="text-xs text-white/30 mt-4 leading-relaxed">
-                O plano Nuvemshop é contratado na conta do próprio cliente (e-mail do cliente). Toda a configuração é feita por nós, mas a titularidade e renovação ficam sob responsabilidade do cliente.
-              </p>
-            </div>
+            <NuvemshopPlans />
           </div>
 
           <div className="px-7 md:px-10 pb-7 md:pb-10">
