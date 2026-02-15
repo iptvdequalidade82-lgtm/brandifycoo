@@ -12,7 +12,7 @@ const CAKTO_API_BASE = "https://api.cakto.com.br";
 
 const PaymentSchema = z.object({
   proposal_id: z.string().uuid("Invalid proposal ID"),
-  amount_reais: z.number().positive().max(1000000, "Amount too large"),
+  amount_reais: z.number().positive().min(5, "O preço mínimo é R$ 5,00").max(1000000, "Amount too large"),
   client_name: z.string().trim().min(1).max(200, "Name too long"),
   client_email: z.string().email("Invalid email").max(255).optional().default(""),
   description: z.string().max(1000).optional().default(""),
@@ -82,7 +82,7 @@ async function createCaktoOffer(
   if (!response.ok) {
     const text = await response.text();
     console.error("Cakto create offer error:", text);
-    throw new Error("Failed to create Cakto offer");
+    throw new Error(`Cakto: ${text}`);
   }
 
   const offer = await response.json();
@@ -218,7 +218,7 @@ serve(async (req) => {
   } catch (error: any) {
     console.error("Error creating Cakto payment:", error);
     return new Response(
-      JSON.stringify({ error: "Erro interno ao criar pagamento" }),
+      JSON.stringify({ error: error.message || "Erro interno ao criar pagamento" }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500,
