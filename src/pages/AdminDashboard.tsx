@@ -349,20 +349,14 @@ const AdminDashboard = () => {
   const copyLink = (url: string) => { navigator.clipboard.writeText(url); toast.success("Link copiado!"); };
   const copyPixLink = (id: string) => { navigator.clipboard.writeText(`https://brandifycoo.lovable.app/pix/${id}`); toast.success("Link PIX copiado!"); };
 
-  const shareViaWhatsApp = (p: Proposal) => {
+  const copyPaymentMessage = (p: Proposal) => {
     const isCakto = !!p.cakto_checkout_url;
     const link = isCakto ? p.cakto_checkout_url! : `https://brandifycoo.lovable.app/pix/${p.id}`;
-    const method = isCakto ? "cartão" : "PIX";
-    const msg = `Olá ${p.client_name}! 😊\n\nSegue o link de pagamento via *${method}*:\n\n${link}\n\n💰 Valor: ${formatCurrency(p.amount_cents)}\n📋 Serviço: ${p.title}\n\nQualquer dúvida, estou à disposição!`;
-    
-    if (p.client_phone) {
-      const cleaned = p.client_phone.replace(/\D/g, "");
-      const num = cleaned.startsWith("55") ? cleaned : `55${cleaned}`;
-      window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`, "_blank");
-    } else {
-      navigator.clipboard.writeText(msg);
-      toast.success("Mensagem copiada! Cole no WhatsApp.");
-    }
+    const msg = isCakto
+      ? `Olá, ${p.client_name}! 😊\n\nSeu link de pagamento via *cartão* ou outras opções já está disponível:\n\n${link}\n\n💰 Valor: ${formatCurrency(p.amount_cents)}\n📋 Serviço: ${p.title}\n\nQualquer dúvida, estou à disposição!`
+      : `Olá, ${p.client_name}! 😊\n\nSeu link de pagamento via *PIX* já está disponível:\n\n${link}\n\n💰 Valor: ${formatCurrency(p.amount_cents)}\n📋 Serviço: ${p.title}\n\nQualquer dúvida, estou à disposição!`;
+    navigator.clipboard.writeText(msg);
+    toast.success("Mensagem copiada! Cole no WhatsApp.");
   };
 
   const copyPaymentLink = (p: Proposal) => {
@@ -464,14 +458,14 @@ const AdminDashboard = () => {
                       <p className="text-lg font-bold text-foreground">{formatCurrency(p.amount_cents)}</p>
                     </div>
                     <div className="flex gap-1 flex-wrap">
-                      {/* Main action: Send payment link via WhatsApp */}
+                      {/* Main action: Copy payment message */}
                       {p.cakto_checkout_url ? (
-                        <Button size="sm" onClick={() => shareViaWhatsApp(p)} title="Enviar link Cakto via WhatsApp" className="gap-1.5">
-                          <Send className="w-4 h-4" /> Enviar Cakto
+                        <Button size="sm" onClick={() => copyPaymentMessage(p)} title="Copiar mensagem Cakto" className="gap-1.5">
+                          <Copy className="w-4 h-4" /> Copiar Msg Cakto
                         </Button>
                       ) : (
-                        <Button size="sm" onClick={() => shareViaWhatsApp(p)} title="Enviar link PIX via WhatsApp" className="gap-1.5">
-                          <Send className="w-4 h-4" /> Enviar PIX
+                        <Button size="sm" onClick={() => copyPaymentMessage(p)} title="Copiar mensagem PIX" className="gap-1.5">
+                          <Copy className="w-4 h-4" /> Copiar Msg PIX
                         </Button>
                       )}
 
