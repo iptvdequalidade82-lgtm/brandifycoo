@@ -18,6 +18,7 @@ interface Props {
     created_at: string;
   }>;
   projects: ProjectData[];
+  extraRevenue?: number;
 }
 
 const MONTHS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
@@ -45,7 +46,7 @@ const formatCurrency = (cents: number) =>
 
 type ViewMode = "chart" | "plano" | "projetos";
 
-export default function RevenueChart({ proposals, projects }: Props) {
+export default function RevenueChart({ proposals, projects, extraRevenue = 0 }: Props) {
   const [viewMode, setViewMode] = useState<ViewMode>("chart");
 
   const chartData = useMemo(() => {

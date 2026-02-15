@@ -78,6 +78,7 @@ const AdminDashboard = () => {
   const { user } = useAuth();
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [projects, setProjects] = useState<Array<{ title: string; client_name: string; plan: string; total_amount_cents: number; amount_received_cents: number; payment_status: string; created_at: string }>>([]);
+  const [extraRevenue, setExtraRevenue] = useState(0);
   const [showForm, setShowForm] = useState(false);
   const [loadingProposals, setLoadingProposals] = useState(true);
   const [generatingLink, setGeneratingLink] = useState<string | null>(null);
@@ -114,7 +115,7 @@ const AdminDashboard = () => {
   const [paymentMethod, setPaymentMethod] = useState<"pix" | "cakto">("pix");
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => { fetchProposals(); fetchProjects(); }, []);
+  useEffect(() => { fetchProposals(); fetchProjects(); fetchExtraRevenue(); }, []);
 
   const fetchProposals = async () => {
     setLoadingProposals(true);
@@ -131,6 +132,11 @@ const AdminDashboard = () => {
       .from("projects")
       .select("title, client_name, plan, total_amount_cents, amount_received_cents, payment_status, created_at");
     if (data) setProjects(data as any);
+  };
+
+  const fetchExtraRevenue = async () => {
+    const { data } = await supabase.from("extra_revenue" as any).select("amount_cents");
+    if (data) setExtraRevenue((data as any[]).reduce((s: number, r: any) => s + r.amount_cents, 0));
   };
 
   const filteredProposals = proposals
@@ -514,7 +520,7 @@ const AdminDashboard = () => {
   return (
     <AdminLayout>
       {/* Revenue Chart */}
-      <RevenueChart proposals={proposals} projects={projects} />
+      <RevenueChart proposals={proposals} projects={projects} extraRevenue={extraRevenue} />
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
@@ -522,7 +528,7 @@ const AdminDashboard = () => {
           { label: "Total", value: proposals.length, icon: FileText },
           { label: "Enviados", value: proposals.filter(p => p.status === "sent").length, icon: Send },
           { label: "Pagos", value: proposals.filter(p => p.status === "paid").length, icon: CheckCircle },
-          { label: "Recebido", value: formatCurrency(projects.reduce((s, p) => s + p.amount_received_cents, 0)), icon: DollarSign },
+          { label: "Recebido", value: formatCurrency(projects.reduce((s, p) => s + p.amount_received_cents, 0) + extraRevenue), icon: DollarSign },
           { label: "Em Aberto", value: formatCurrency(projects.filter(p => p.payment_status === "partial").reduce((s, p) => s + (p.total_amount_cents - p.amount_received_cents), 0)), icon: DollarSign },
         ].map((stat, i) => (
           <div key={i} className="glass rounded-xl p-4 glow-border">
