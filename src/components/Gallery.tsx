@@ -2,26 +2,14 @@ import post1 from "@/assets/post-1.jpg";
 import post2 from "@/assets/post-2.jpg";
 import post3 from "@/assets/post-3.jpg";
 import post4 from "@/assets/post-4.jpg";
-import post5 from "@/assets/post-5.jpg";
-import post6 from "@/assets/post-6.jpg";
-import post7 from "@/assets/post-7.jpg";
-import post8 from "@/assets/post-8.jpg";
-import post9 from "@/assets/post-9.jpg";
-import post10 from "@/assets/post-10.jpg";
 import { Instagram } from "lucide-react";
 import { motion } from "framer-motion";
 
 const posts = [
-  { src: post1, alt: "Vale a pena investir em um site institucional?" },
-  { src: post2, alt: "Atrair clientes sem site profissional" },
-  { src: post3, alt: "Seu negócio precisa de um site" },
-  { src: post4, alt: "Toda grande empresa possui um site" },
-  { src: post5, alt: "Marketing digital é estratégia" },
-  { src: post6, alt: "Como atrair clientes corretamente" },
-  { src: post7, alt: "Se o Instagram cair hoje, sua loja sobrevive?" },
-  { src: post8, alt: "Atrair clientes sem ter um site profissional" },
-  { src: post9, alt: "O que fazemos? Brandify.co" },
-  { src: post10, alt: "Sua loja vendendo 24h por dia" },
+  { src: post1, alt: "Sua loja vendendo mesmo quando você está dormindo" },
+  { src: post2, alt: "Atrair clientes sem ter um site profissional é sabor faturamento" },
+  { src: post3, alt: "Se o Instagram cair hoje, sua loja sobrevive?" },
+  { src: post4, alt: "Site online - Criamos sites do futuro" },
 ];
 
 const container = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } };
@@ -60,7 +48,7 @@ export default function Gallery() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-80px" }}
-          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4"
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto"
         >
           {posts.map((post, i) => (
             <motion.a
