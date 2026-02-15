@@ -9,6 +9,7 @@ const corsHeaders = {
 };
 
 const DEFAULT_CHECKLIST = [
+  "✅ 50% entrada pago",
   "Conteúdo recebido",
   "Domínio registrado",
   "Hospedagem configurada",
@@ -16,6 +17,7 @@ const DEFAULT_CHECKLIST = [
   "Desenvolvimento concluído",
   "Revisão do cliente",
   "Site publicado",
+  "💰 50% final pago",
 ];
 
 serve(async (req) => {
@@ -116,7 +118,8 @@ serve(async (req) => {
             project_id: project.id,
             label,
             sort_order: i,
-            checked: false,
+            checked: i === 0, // First item (50% entrada) auto-checked
+            checked_at: i === 0 ? new Date().toISOString() : null,
           }));
           await supabaseAdmin.from("project_checklist").insert(checklistItems);
 

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { logActivity } from "@/lib/admin-helpers";
-import { CheckSquare, Square } from "lucide-react";
+import { CheckSquare, Square, DollarSign } from "lucide-react";
 
 interface ChecklistItem {
   id: string;
@@ -78,27 +78,46 @@ export default function ProjectChecklist({ projectId, projectTitle }: Props) {
         />
       </div>
       <div className="space-y-1">
-        {items.map(item => (
-          <button
-            key={item.id}
-            onClick={() => toggleItem(item)}
-            className="flex items-center gap-2 w-full text-left py-1 px-1 rounded hover:bg-muted/50 transition-colors"
-          >
-            {item.checked ? (
-              <CheckSquare className="w-3.5 h-3.5 text-green-400 shrink-0" />
-            ) : (
-              <Square className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-            )}
-            <span className={`text-xs ${item.checked ? "line-through text-muted-foreground" : "text-foreground"}`}>
-              {item.label}
-            </span>
-            {item.checked && item.checked_at && (
-              <span className="text-[9px] text-muted-foreground ml-auto">
-                {new Date(item.checked_at).toLocaleDateString("pt-BR")}
+        {items.map(item => {
+          const isPaymentItem = item.label.includes("50%");
+          return (
+            <button
+              key={item.id}
+              onClick={() => toggleItem(item)}
+              className={`flex items-center gap-2 w-full text-left py-1.5 px-2 rounded transition-colors ${
+                isPaymentItem
+                  ? "bg-primary/10 hover:bg-primary/20 border border-primary/20"
+                  : "hover:bg-muted/50"
+              }`}
+            >
+              {item.checked ? (
+                <CheckSquare className={`w-3.5 h-3.5 shrink-0 ${isPaymentItem ? "text-primary" : "text-green-400"}`} />
+              ) : (
+                isPaymentItem ? (
+                  <DollarSign className="w-3.5 h-3.5 text-primary shrink-0" />
+                ) : (
+                  <Square className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                )
+              )}
+              <span className={`text-xs ${
+                item.checked
+                  ? isPaymentItem
+                    ? "text-primary font-medium"
+                    : "line-through text-muted-foreground"
+                  : isPaymentItem
+                    ? "text-primary font-semibold"
+                    : "text-foreground"
+              }`}>
+                {item.label}
               </span>
-            )}
-          </button>
-        ))}
+              {item.checked && item.checked_at && (
+                <span className="text-[9px] text-muted-foreground ml-auto">
+                  {new Date(item.checked_at).toLocaleDateString("pt-BR")}
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
