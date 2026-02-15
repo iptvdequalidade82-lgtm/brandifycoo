@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
 import TrabalheConosco from "./pages/TrabalheConosco";
+import QuemSomos from "./pages/QuemSomos";
 import Privacidade from "./pages/Privacidade";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/projetos" element={<Projetos />} />
             
             <Route path="/trabalhe-conosco" element={<TrabalheConosco />} />
+            <Route path="/quem-somos" element={<QuemSomos />} />
             <Route path="/privacidade" element={<Privacidade />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminDashboard />} />

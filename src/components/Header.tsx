@@ -8,9 +8,8 @@ const navLinks = [
   { label: "Início", href: "#inicio" },
   { label: "Projetos", href: "/projetos" },
   { label: "Investimento", href: "#investimento" },
-  { label: "Curso", href: "/curso" },
   { label: "Trabalhe Conosco", href: "/trabalhe-conosco" },
-  { label: "Contato", href: "#contato" },
+  { label: "Quem Somos", href: "/quem-somos" },
 ];
 
 export default function Header() {
