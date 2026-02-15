@@ -31,7 +31,7 @@ const courses = [
     cover: novaProfissaoCover,
     logo: novaProfissaoLogo,
     features: [
-      "Criação de sites profissionais",
+      "Freelancer digital de sucesso",
       "Marketing digital na prática",
       "Gestão de clientes",
       "Certificado de conclusão",
