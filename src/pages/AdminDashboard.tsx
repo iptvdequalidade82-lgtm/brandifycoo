@@ -60,7 +60,8 @@ interface Proposal {
 const statusConfig: Record<string, { label: string; icon: any; color: string }> = {
   draft: { label: "Rascunho", icon: FileText, color: "text-muted-foreground" },
   sent: { label: "Enviado", icon: Send, color: "text-accent" },
-  paid: { label: "Pago", icon: CheckCircle, color: "text-green-400" },
+  partial: { label: "50% Pago", icon: DollarSign, color: "text-amber-400" },
+  paid: { label: "Quitado", icon: CheckCircle, color: "text-green-400" },
   cancelled: { label: "Cancelado", icon: XCircle, color: "text-destructive" },
 };
 
@@ -68,7 +69,8 @@ const filterTabs = [
   { key: "all", label: "Todos" },
   { key: "draft", label: "Rascunhos" },
   { key: "sent", label: "Enviados" },
-  { key: "paid", label: "Pagos" },
+  { key: "partial", label: "50% Pago" },
+  { key: "paid", label: "Quitados" },
   { key: "cancelled", label: "Cancelados" },
 ];
 
