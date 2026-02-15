@@ -184,6 +184,8 @@ export type Database = {
       proposals: {
         Row: {
           amount_cents: number
+          cakto_checkout_url: string | null
+          cakto_offer_id: string | null
           client_email: string | null
           client_name: string
           client_phone: string | null
@@ -200,6 +202,8 @@ export type Database = {
         }
         Insert: {
           amount_cents: number
+          cakto_checkout_url?: string | null
+          cakto_offer_id?: string | null
           client_email?: string | null
           client_name: string
           client_phone?: string | null
@@ -216,6 +220,8 @@ export type Database = {
         }
         Update: {
           amount_cents?: number
+          cakto_checkout_url?: string | null
+          cakto_offer_id?: string | null
           client_email?: string | null
           client_name?: string
           client_phone?: string | null

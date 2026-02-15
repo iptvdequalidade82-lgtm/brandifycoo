@@ -48,6 +48,8 @@ interface Proposal {
   installments: number;
   status: string;
   stripe_checkout_url: string | null;
+  cakto_offer_id: string | null;
+  cakto_checkout_url: string | null;
   created_at: string;
 }
 
@@ -100,7 +102,7 @@ const AdminDashboard = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [amountReais, setAmountReais] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<"pix" | "stripe">("pix");
+  const [paymentMethod, setPaymentMethod] = useState<"pix" | "stripe" | "cakto">("pix");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => { fetchProposals(); }, []);
@@ -204,6 +206,28 @@ const AdminDashboard = () => {
       const msg = `Olá ${clientName.trim()}! Segue o link para pagamento via PIX:\n\n${link}\n\nValor: R$ ${parseFloat(amountReais.replace(",", ".")).toFixed(2).replace(".", ",")}\nServiço: ${title.trim()}`;
       navigator.clipboard.writeText(msg);
       toast.success("Mensagem com link PIX copiada!");
+    } else if (paymentMethod === "cakto") {
+      try {
+        const proposal = inserted as any;
+        const amountNum = parseFloat(amountReais.replace(",", "."));
+        const { data, error: fnError } = await supabase.functions.invoke("create-cakto-payment", {
+          body: {
+            proposal_id: proposal.id,
+            amount_reais: amountNum,
+            client_name: clientName.trim(),
+            client_email: clientEmail.trim() || "",
+            description: `${title.trim()}${description.trim() ? " - " + description.trim() : ""}`,
+          },
+        });
+        if (!fnError && data?.url) {
+          await navigator.clipboard.writeText(data.url);
+          toast.success("Proposta criada! Link Cakto copiado.");
+        } else {
+          toast.success("Proposta criada! Gere o link na lista.");
+        }
+      } catch {
+        toast.success("Proposta criada! Gere o link na lista.");
+      }
     } else {
       try {
         const proposal = inserted as any;
@@ -466,13 +490,13 @@ const AdminDashboard = () => {
                           <MessageCircle className="w-4 h-4 text-green-400" />
                         </Button>
                       )}
-                      {p.stripe_checkout_url ? (
+                      {(p.stripe_checkout_url || p.cakto_checkout_url) ? (
                         <>
-                          <Button variant="outline" size="icon" onClick={() => copyLink(p.stripe_checkout_url!)}>
+                          <Button variant="outline" size="icon" onClick={() => copyLink((p.cakto_checkout_url || p.stripe_checkout_url)!)} title={p.cakto_checkout_url ? "Copiar link Cakto" : "Copiar link Stripe"}>
                             <Copy className="w-4 h-4" />
                           </Button>
                           <Button variant="outline" size="icon" asChild>
-                            <a href={p.stripe_checkout_url} target="_blank" rel="noopener noreferrer">
+                            <a href={(p.cakto_checkout_url || p.stripe_checkout_url)!} target="_blank" rel="noopener noreferrer">
                               <ExternalLink className="w-4 h-4" />
                             </a>
                           </Button>
@@ -559,21 +583,26 @@ const AdminDashboard = () => {
             </div>
             <div className="space-y-1.5">
               <Label>Método de Pagamento</Label>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 <button type="button" onClick={() => setPaymentMethod("pix")}
                   className={`flex items-center gap-2 rounded-lg border p-3 text-sm transition-all ${paymentMethod === "pix" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/50"}`}>
                   <Smartphone className="w-4 h-4" />
                   <div className="text-left"><p className="font-medium">PIX</p><p className="text-xs opacity-70">QR Code direto</p></div>
                 </button>
+                <button type="button" onClick={() => setPaymentMethod("cakto")}
+                  className={`flex items-center gap-2 rounded-lg border p-3 text-sm transition-all ${paymentMethod === "cakto" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/50"}`}>
+                  <ExternalLink className="w-4 h-4" />
+                  <div className="text-left"><p className="font-medium">Cakto</p><p className="text-xs opacity-70">Checkout completo</p></div>
+                </button>
                 <button type="button" onClick={() => setPaymentMethod("stripe")}
                   className={`flex items-center gap-2 rounded-lg border p-3 text-sm transition-all ${paymentMethod === "stripe" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/50"}`}>
                   <CreditCard className="w-4 h-4" />
-                  <div className="text-left"><p className="font-medium">Cartão/Boleto</p><p className="text-xs opacity-70">Via checkout</p></div>
+                  <div className="text-left"><p className="font-medium">Stripe</p><p className="text-xs opacity-70">Cartão/Boleto</p></div>
                 </button>
               </div>
             </div>
             <Button type="submit" className="w-full" disabled={submitting}>
-              {submitting ? "Criando..." : paymentMethod === "pix" ? "Criar Proposta PIX" : "Criar Proposta"}
+              {submitting ? "Criando..." : paymentMethod === "pix" ? "Criar Proposta PIX" : paymentMethod === "cakto" ? "Criar Proposta Cakto" : "Criar Proposta"}
             </Button>
           </form>
         </DialogContent>
