@@ -145,16 +145,6 @@ export default function Pricing() {
 
       <div className="container mx-auto max-w-6xl relative">
         <div className="text-center mb-16">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/15 bg-white/[0.06] text-white/70 text-xs font-medium tracking-widest uppercase mb-6"
-          >
-            <Sparkles size={14} />
-            Investimento
-          </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
