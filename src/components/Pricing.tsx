@@ -136,6 +136,31 @@ export default function Pricing() {
           ))}
         </motion.div>
 
+        {/* Hosting note - above Nuvemshop, below cards */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 p-5 rounded-xl bg-white/[0.05] border border-white/10 backdrop-blur-sm"
+        >
+          <div className="flex items-start gap-3">
+            <Info className="text-white/50 mt-0.5 flex-shrink-0" size={18} />
+            <div>
+              <p className="text-sm font-bold text-white">Hospedagem e domínio são cobrados à parte</p>
+              <p className="text-xs text-white/40 mt-1 leading-relaxed">
+                Hospedagem no 1º ano: <span className="text-white/70 font-medium">R$ 240,00</span> (inclui R$ 120 de instalação) &nbsp;·&nbsp; A partir do 2º ano: <span className="text-white/70 font-medium">R$ 120,00/ano</span>
+              </p>
+              <p className="text-xs text-white/40 mt-1 leading-relaxed">
+                Domínio: <span className="text-white/70 font-medium">a partir de R$ 40,00/ano</span> (valor pode variar conforme o domínio escolhido)
+              </p>
+              <p className="text-xs text-white/40 mt-1.5 leading-relaxed">
+                Tudo é configurado na conta do próprio cliente. Na primeira vez, cuidamos de toda a instalação. Nas renovações seguintes, o cliente assume o pagamento diretamente.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Nuvemshop Section */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -216,31 +241,6 @@ export default function Pricing() {
             >
               Solicitar Orçamento
             </motion.a>
-          </div>
-        </motion.div>
-
-        {/* Hosting note */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 p-5 rounded-xl bg-white/[0.05] border border-white/10 backdrop-blur-sm"
-        >
-          <div className="flex items-start gap-3">
-            <Info className="text-white/50 mt-0.5 flex-shrink-0" size={18} />
-            <div>
-              <p className="text-sm font-bold text-white">Hospedagem e domínio (planos Essencial, Profissional e Premium)</p>
-              <p className="text-xs text-white/40 mt-1 leading-relaxed">
-                Hospedagem no 1º ano: <span className="text-white/70 font-medium">R$ 240,00</span> (inclui R$ 120 de instalação) &nbsp;·&nbsp; A partir do 2º ano: <span className="text-white/70 font-medium">R$ 120,00/ano</span>
-              </p>
-              <p className="text-xs text-white/40 mt-1 leading-relaxed">
-                Domínio: <span className="text-white/70 font-medium">a partir de R$ 40,00/ano</span> (valor pode variar conforme o domínio escolhido)
-              </p>
-              <p className="text-xs text-white/40 mt-1.5 leading-relaxed">
-                Tudo é configurado na conta do próprio cliente. Na primeira vez, cuidamos de toda a instalação. Nas renovações seguintes, o cliente assume o pagamento diretamente.
-              </p>
-            </div>
           </div>
         </motion.div>
       </div>
