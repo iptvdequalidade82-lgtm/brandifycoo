@@ -229,6 +229,7 @@ export type Database = {
           final_cakto_offer_id: string | null
           final_method: string
           id: string
+          init_amount_cents: number | null
           init_method: string
           installments: number
           status: string
@@ -251,6 +252,7 @@ export type Database = {
           final_cakto_offer_id?: string | null
           final_method?: string
           id?: string
+          init_amount_cents?: number | null
           init_method?: string
           installments?: number
           status?: string
@@ -273,6 +275,7 @@ export type Database = {
           final_cakto_offer_id?: string | null
           final_method?: string
           id?: string
+          init_amount_cents?: number | null
           init_method?: string
           installments?: number
           status?: string

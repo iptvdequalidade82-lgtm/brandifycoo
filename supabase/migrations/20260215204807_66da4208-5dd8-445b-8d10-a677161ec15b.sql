@@ -1,0 +1,1 @@
+ALTER TABLE public.proposals ADD COLUMN init_amount_cents integer DEFAULT NULL;
