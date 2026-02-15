@@ -170,7 +170,7 @@ export default function Pricing() {
                   "Configuração de layout completa",
                   "Categorias organizadas",
                   "Banners inseridos (enviados pelo cliente)",
-                  "Cadastro de produtos incluso",
+                  "20 produtos cadastrados inclusos",
                   "A cada 20 produtos adicionais: + R$ 200",
                   "Integração de estoque (se aplicável)",
                 ].map((f) => (
@@ -200,7 +200,7 @@ export default function Pricing() {
                 ))}
               </div>
               <p className="text-xs text-white/30 mt-4 leading-relaxed">
-                O cliente contrata o plano Nuvemshop diretamente. Tudo é configurado na conta do próprio cliente.
+                O plano Nuvemshop é contratado na conta do próprio cliente (e-mail do cliente). Toda a configuração é feita por nós, mas a titularidade e renovação ficam sob responsabilidade do cliente.
               </p>
             </div>
           </div>
@@ -230,7 +230,7 @@ export default function Pricing() {
           <div className="flex items-start gap-3">
             <Info className="text-white/50 mt-0.5 flex-shrink-0" size={18} />
             <div>
-              <p className="text-sm font-bold text-white">Hospedagem e domínio são cobrados à parte</p>
+              <p className="text-sm font-bold text-white">Hospedagem e domínio (planos Essencial, Profissional e Premium)</p>
               <p className="text-xs text-white/40 mt-1 leading-relaxed">
                 Hospedagem no 1º ano: <span className="text-white/70 font-medium">R$ 240,00</span> (inclui R$ 120 de instalação) &nbsp;·&nbsp; A partir do 2º ano: <span className="text-white/70 font-medium">R$ 120,00/ano</span>
               </p>
