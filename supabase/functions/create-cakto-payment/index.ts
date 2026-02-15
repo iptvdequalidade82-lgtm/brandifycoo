@@ -18,6 +18,11 @@ const PaymentSchema = z.object({
   description: z.string().max(1000).optional().default(""),
 });
 
+// Also support a "list_products" action for debugging
+const ListSchema = z.object({
+  action: z.literal("list_products"),
+});
+
 async function getCaktoToken(): Promise<string> {
   const clientId = Deno.env.get("CAKTO_CLIENT_ID");
   const clientSecret = Deno.env.get("CAKTO_CLIENT_SECRET");
@@ -113,16 +118,13 @@ serve(async (req) => {
       { global: { headers: { Authorization: authHeader } } }
     );
 
-    const token = authHeader.replace("Bearer ", "");
-    const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+    if (userError || !user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-
-    const userId = claimsData.claims.sub;
 
     // Check admin role
     const supabaseAdmin = createClient(
@@ -134,7 +136,7 @@ serve(async (req) => {
     const { data: roleData } = await supabaseAdmin
       .from("user_roles")
       .select("role")
-      .eq("user_id", userId)
+      .eq("user_id", user.id)
       .eq("role", "admin")
       .maybeSingle();
 
@@ -145,8 +147,20 @@ serve(async (req) => {
       });
     }
 
-    // Validate input
     const rawBody = await req.json();
+
+    // Handle list_products action
+    const listResult = ListSchema.safeParse(rawBody);
+    if (listResult.success) {
+      const caktoToken = await getCaktoToken();
+      const products = await getCaktoProducts(caktoToken);
+      return new Response(
+        JSON.stringify({ products: products.map((p: any) => ({ id: p.id, name: p.name, status: p.status })) }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
+      );
+    }
+
+    // Validate payment input
     const parseResult = PaymentSchema.safeParse(rawBody);
     if (!parseResult.success) {
       return new Response(
@@ -174,20 +188,26 @@ serve(async (req) => {
     // Authenticate with Cakto
     const caktoToken = await getCaktoToken();
 
-    // Get first active product (the "Link de pagamento" product)
-    const products = await getCaktoProducts(caktoToken);
-    if (products.length === 0) {
-      return new Response(
-        JSON.stringify({ error: "Nenhum produto ativo encontrado na Cakto. Crie um produto primeiro." }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    // Use fixed product ID from secret, or fall back to first active product
+    const fixedProductId = Deno.env.get("CAKTO_PRODUCT_ID");
+    let productId: string;
 
-    const product = products[0];
+    if (fixedProductId) {
+      productId = fixedProductId;
+    } else {
+      const products = await getCaktoProducts(caktoToken);
+      if (products.length === 0) {
+        return new Response(
+          JSON.stringify({ error: "Nenhum produto ativo encontrado na Cakto. Crie um produto primeiro." }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      productId = products[0].id;
+    }
 
     // Create offer with custom price
     const safeName = `${client_name.replace(/[<>"']/g, "").substring(0, 100)} - ${(description || "Serviço Brandify").replace(/[<>"']/g, "").substring(0, 100)}`;
-    const offer = await createCaktoOffer(caktoToken, product.id, safeName, amount_reais);
+    const offer = await createCaktoOffer(caktoToken, productId, safeName, amount_reais);
 
     // Build checkout URL with pre-filled customer data
     let checkoutUrl = offer.checkoutUrl;
