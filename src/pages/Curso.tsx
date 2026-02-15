@@ -21,7 +21,7 @@ const courses = [
       "Estratégias de tráfego pago",
       "Suporte exclusivo",
     ],
-    link: "https://pay.cakto.com.br/j3nfmrj_323782?affiliate=QfzSc7Xx",
+    link: "https://pay.kirvano.com/80931f40-cdd6-42b7-91d2-a9aeb57aa495?aff=cc8503b8-058d-4285-910b-b0fc9746420d",
     tag: "Mais vendido",
   },
   {
