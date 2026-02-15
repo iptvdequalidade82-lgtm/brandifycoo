@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/select";
 import {
   Plus, Copy, ExternalLink, RefreshCw, Search, Pencil,
-  FileText, DollarSign, Send, QrCode, Smartphone, Trash2, CheckCircle, XCircle, MessageCircle, ArrowRight,
+  FileText, DollarSign, Send, Smartphone, Trash2, CheckCircle, XCircle, ArrowRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -349,17 +349,27 @@ const AdminDashboard = () => {
   const copyLink = (url: string) => { navigator.clipboard.writeText(url); toast.success("Link copiado!"); };
   const copyPixLink = (id: string) => { navigator.clipboard.writeText(`https://brandifycoo.lovable.app/pix/${id}`); toast.success("Link PIX copiado!"); };
 
-  const sharePixWhatsApp = (p: Proposal) => {
-    const link = `https://brandifycoo.lovable.app/pix/${p.id}`;
-    const msg = `Olá ${p.client_name}! Segue o link para pagamento via PIX:\n\n${link}\n\nValor: ${formatCurrency(p.amount_cents)}\nServiço: ${p.title}`;
-    navigator.clipboard.writeText(msg);
-    toast.success("Mensagem copiada!");
+  const shareViaWhatsApp = (p: Proposal) => {
+    const isCakto = !!p.cakto_checkout_url;
+    const link = isCakto ? p.cakto_checkout_url! : `https://brandifycoo.lovable.app/pix/${p.id}`;
+    const method = isCakto ? "cartão" : "PIX";
+    const msg = `Olá ${p.client_name}! 😊\n\nSegue o link de pagamento via *${method}*:\n\n${link}\n\n💰 Valor: ${formatCurrency(p.amount_cents)}\n📋 Serviço: ${p.title}\n\nQualquer dúvida, estou à disposição!`;
+    
+    if (p.client_phone) {
+      const cleaned = p.client_phone.replace(/\D/g, "");
+      const num = cleaned.startsWith("55") ? cleaned : `55${cleaned}`;
+      window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`, "_blank");
+    } else {
+      navigator.clipboard.writeText(msg);
+      toast.success("Mensagem copiada! Cole no WhatsApp.");
+    }
   };
 
-  const openWhatsApp = (phone: string, name: string) => {
-    const cleaned = phone.replace(/\D/g, "");
-    const num = cleaned.startsWith("55") ? cleaned : `55${cleaned}`;
-    window.open(`https://wa.me/${num}?text=${encodeURIComponent(`Olá ${name}! Aqui é da Brandify.`)}`, "_blank");
+  const copyPaymentLink = (p: Proposal) => {
+    const isCakto = !!p.cakto_checkout_url;
+    const link = isCakto ? p.cakto_checkout_url! : `https://brandifycoo.lovable.app/pix/${p.id}`;
+    navigator.clipboard.writeText(link);
+    toast.success(`Link ${isCakto ? "Cakto" : "PIX"} copiado!`);
   };
 
   const formatCurrency = (cents: number) =>
@@ -442,6 +452,8 @@ const AdminDashboard = () => {
                     <div className="flex items-center gap-2 mb-1">
                       <StatusIcon className={`w-4 h-4 ${config.color}`} />
                       <span className={`text-xs font-medium ${config.color}`}>{config.label}</span>
+                      {p.cakto_checkout_url && <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full font-medium">Cakto</span>}
+                      {!p.cakto_checkout_url && <span className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded-full font-medium">PIX</span>}
                     </div>
                     <h3 className="font-semibold text-foreground truncate">{p.title}</h3>
                     <p className="text-sm text-muted-foreground">{p.client_name}{p.client_email ? ` · ${p.client_email}` : ""}</p>
@@ -452,33 +464,30 @@ const AdminDashboard = () => {
                       <p className="text-lg font-bold text-foreground">{formatCurrency(p.amount_cents)}</p>
                     </div>
                     <div className="flex gap-1 flex-wrap">
-                      <Button variant="outline" size="icon" onClick={() => copyPixLink(p.id)} title="Copiar link PIX">
-                        <QrCode className="w-4 h-4" />
-                      </Button>
-                      <Button variant="outline" size="icon" onClick={() => sharePixWhatsApp(p)} title="Enviar PIX via WhatsApp">
-                        <Send className="w-4 h-4" />
-                      </Button>
-                      {p.client_phone && (
-                        <Button variant="outline" size="icon" onClick={() => openWhatsApp(p.client_phone!, p.client_name)} title="WhatsApp direto">
-                          <MessageCircle className="w-4 h-4 text-green-400" />
-                        </Button>
-                      )}
+                      {/* Main action: Send payment link via WhatsApp */}
                       {p.cakto_checkout_url ? (
-                        <>
-                          <Button variant="outline" size="icon" onClick={() => copyLink(p.cakto_checkout_url!)} title="Copiar link Cakto">
-                            <Copy className="w-4 h-4" />
-                          </Button>
-                          <Button variant="outline" size="icon" asChild>
-                            <a href={p.cakto_checkout_url!} target="_blank" rel="noopener noreferrer">
-                              <ExternalLink className="w-4 h-4" />
-                            </a>
-                          </Button>
-                        </>
+                        <Button size="sm" onClick={() => shareViaWhatsApp(p)} title="Enviar link Cakto via WhatsApp" className="gap-1.5">
+                          <Send className="w-4 h-4" /> Enviar Cakto
+                        </Button>
                       ) : (
-                        <Button size="sm" onClick={() => generateCaktoLink(p)} disabled={generatingLink === p.id}>
-                          {generatingLink === p.id ? <RefreshCw className="w-4 h-4 animate-spin" /> : <><DollarSign className="w-4 h-4 mr-1" /> Gerar Cakto</>}
+                        <Button size="sm" onClick={() => shareViaWhatsApp(p)} title="Enviar link PIX via WhatsApp" className="gap-1.5">
+                          <Send className="w-4 h-4" /> Enviar PIX
                         </Button>
                       )}
+
+                      {/* Copy link */}
+                      <Button variant="outline" size="icon" onClick={() => copyPaymentLink(p)} title={p.cakto_checkout_url ? "Copiar link Cakto" : "Copiar link PIX"}>
+                        <Copy className="w-4 h-4" />
+                      </Button>
+
+                      {/* Generate Cakto link if not yet generated and no cakto url */}
+                      {!p.cakto_checkout_url && (
+                        <Button variant="outline" size="sm" onClick={() => generateCaktoLink(p)} disabled={generatingLink === p.id} title="Gerar link Cakto">
+                          {generatingLink === p.id ? <RefreshCw className="w-4 h-4 animate-spin" /> : <><ExternalLink className="w-4 h-4 mr-1" /> Gerar Cakto</>}
+                        </Button>
+                      )}
+
+                      {/* Status actions */}
                       {p.status !== "paid" && (
                         <Button variant="outline" size="icon" onClick={() => updateStatus(p.id, "paid")} title="Marcar como pago" className="text-green-400 hover:text-green-300 hover:border-green-400/50">
                           <CheckCircle className="w-4 h-4" />
