@@ -135,6 +135,7 @@ export type Database = {
       }
       projects: {
         Row: {
+          amount_received_cents: number | null
           client_email: string | null
           client_name: string
           client_phone: string | null
@@ -143,13 +144,16 @@ export type Database = {
           due_date: string | null
           id: string
           notes: string | null
+          payment_status: string | null
           plan: Database["public"]["Enums"]["project_plan"]
           start_date: string | null
           status: Database["public"]["Enums"]["project_status"]
           title: string
+          total_amount_cents: number | null
           updated_at: string
         }
         Insert: {
+          amount_received_cents?: number | null
           client_email?: string | null
           client_name: string
           client_phone?: string | null
@@ -158,13 +162,16 @@ export type Database = {
           due_date?: string | null
           id?: string
           notes?: string | null
+          payment_status?: string | null
           plan?: Database["public"]["Enums"]["project_plan"]
           start_date?: string | null
           status?: Database["public"]["Enums"]["project_status"]
           title: string
+          total_amount_cents?: number | null
           updated_at?: string
         }
         Update: {
+          amount_received_cents?: number | null
           client_email?: string | null
           client_name?: string
           client_phone?: string | null
@@ -173,10 +180,12 @@ export type Database = {
           due_date?: string | null
           id?: string
           notes?: string | null
+          payment_status?: string | null
           plan?: Database["public"]["Enums"]["project_plan"]
           start_date?: string | null
           status?: Database["public"]["Enums"]["project_status"]
           title?: string
+          total_amount_cents?: number | null
           updated_at?: string
         }
         Relationships: []

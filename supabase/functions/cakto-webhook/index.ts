@@ -124,7 +124,9 @@ serve(async (req) => {
       .update({ status: "paid" })
       .eq("id", proposal.id);
 
-    // 2. Auto-create project
+    const halfAmount = Math.round(proposal.amount_cents / 2);
+
+    // 2. Auto-create project with partial payment
     const { data: project, error: projectError } = await supabaseAdmin
       .from("projects")
       .insert({
@@ -136,6 +138,9 @@ serve(async (req) => {
         notes: proposal.description || null,
         start_date: new Date().toISOString().split("T")[0],
         created_by: proposal.created_by,
+        total_amount_cents: proposal.amount_cents,
+        amount_received_cents: halfAmount,
+        payment_status: "partial",
       })
       .select()
       .single();

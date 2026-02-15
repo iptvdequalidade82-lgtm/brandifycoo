@@ -17,6 +17,7 @@ export async function logActivity(
 }
 
 const DEFAULT_CHECKLIST = [
+  "✅ 50% entrada pago",
   "Conteúdo recebido",
   "Domínio registrado",
   "Hospedagem configurada",
@@ -24,6 +25,7 @@ const DEFAULT_CHECKLIST = [
   "Desenvolvimento concluído",
   "Revisão do cliente",
   "Site publicado",
+  "💰 50% final pago",
 ];
 
 export async function createDefaultChecklist(projectId: string) {
@@ -31,7 +33,8 @@ export async function createDefaultChecklist(projectId: string) {
     project_id: projectId,
     label,
     sort_order: i,
-    checked: false,
+    checked: i === 0,
+    checked_at: i === 0 ? new Date().toISOString() : null,
   }));
   await supabase.from("project_checklist").insert(items as any);
 }

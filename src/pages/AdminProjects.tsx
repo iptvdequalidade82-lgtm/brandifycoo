@@ -19,7 +19,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Plus, RefreshCw, MessageCircle, Trash2, Crown, Award, Star, ChevronDown, ChevronUp, Search, Pencil,
+  Plus, RefreshCw, MessageCircle, Trash2, Crown, Award, Star, ChevronDown, ChevronUp, Search, Pencil, DollarSign, CheckCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -35,6 +35,9 @@ interface Project {
   start_date: string | null;
   due_date: string | null;
   created_at: string;
+  total_amount_cents: number;
+  amount_received_cents: number;
+  payment_status: string;
 }
 
 const planConfig = {
@@ -203,6 +206,26 @@ export default function AdminProjects() {
     window.open(`https://wa.me/${num}?text=${encodeURIComponent(`Olá ${name}! Aqui é da Brandify, tudo bem?`)}`, "_blank");
   };
 
+  const formatCurrency = (cents: number) =>
+    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(cents / 100);
+
+  const markFinalPayment = async (project: Project) => {
+    const { error } = await supabase.from("projects").update({
+      amount_received_cents: project.total_amount_cents,
+      payment_status: "full",
+    } as any).eq("id", project.id);
+    if (error) { toast.error("Erro ao marcar pagamento"); return; }
+    toast.success("Pagamento final registrado!");
+    setProjects(prev => prev.map(p => p.id === project.id ? { ...p, amount_received_cents: project.total_amount_cents, payment_status: "full" } : p));
+    if (user) {
+      logActivity("project", project.id, "payment_completed", user.id, {
+        title: project.title,
+        client_name: project.client_name,
+        total: formatCurrency(project.total_amount_cents),
+      });
+    }
+  };
+
   return (
     <AdminLayout>
       {/* Stats */}
@@ -285,8 +308,36 @@ export default function AdminProjects() {
                         Prazo: {new Date(p.due_date).toLocaleDateString("pt-BR")}
                       </p>
                     )}
+                    {/* Payment info */}
+                    {p.total_amount_cents > 0 && (
+                      <div className="flex items-center gap-3 mt-2">
+                        <span className="text-sm font-bold text-foreground">{formatCurrency(p.total_amount_cents)}</span>
+                        {p.payment_status === "partial" ? (
+                          <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-amber-400/10 text-amber-400 border border-amber-400/20">
+                            <DollarSign className="w-3 h-3" />
+                            {formatCurrency(p.total_amount_cents - p.amount_received_cents)} em aberto
+                          </span>
+                        ) : p.payment_status === "full" ? (
+                          <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-green-400/10 text-green-400 border border-green-400/20">
+                            <CheckCircle className="w-3 h-3" /> Pago integralmente
+                          </span>
+                        ) : null}
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-center gap-1 flex-wrap">
+                    {/* Mark final payment */}
+                    {p.payment_status === "partial" && p.total_amount_cents > 0 && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => markFinalPayment(p)}
+                        className="text-amber-400 hover:text-amber-300 hover:border-amber-400/50 gap-1"
+                        title="Marcar pagamento final recebido"
+                      >
+                        <DollarSign className="w-4 h-4" /> Receber 50% final
+                      </Button>
+                    )}
                     {/* Status progression */}
                     <Select value={p.status} onValueChange={(v) => updateStatus(p.id, v)}>
                       <SelectTrigger className="w-[140px] h-8 text-xs">

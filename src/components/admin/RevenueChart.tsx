@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 interface Props {
   proposals: Array<{
@@ -7,32 +7,44 @@ interface Props {
     amount_cents: number;
     created_at: string;
   }>;
+  projects: Array<{
+    total_amount_cents: number;
+    amount_received_cents: number;
+    payment_status: string;
+    created_at: string;
+  }>;
 }
 
 const MONTHS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
-export default function RevenueChart({ proposals }: Props) {
+export default function RevenueChart({ proposals, projects }: Props) {
   const data = useMemo(() => {
-    const paid = proposals.filter(p => p.status === "paid");
     const now = new Date();
-    const months: { name: string; value: number }[] = [];
+    const months: { name: string; recebido: number; aberto: number }[] = [];
 
     for (let i = 5; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const month = d.getMonth();
       const year = d.getFullYear();
-      const total = paid
-        .filter(p => {
-          const pd = new Date(p.created_at);
-          return pd.getMonth() === month && pd.getFullYear() === year;
-        })
-        .reduce((s, p) => s + p.amount_cents, 0);
-      months.push({ name: `${MONTHS[month]}/${String(year).slice(2)}`, value: total / 100 });
+
+      const monthProjects = projects.filter(p => {
+        const pd = new Date(p.created_at);
+        return pd.getMonth() === month && pd.getFullYear() === year;
+      });
+
+      const recebido = monthProjects.reduce((s, p) => s + p.amount_received_cents, 0);
+      const aberto = monthProjects.reduce((s, p) => s + (p.total_amount_cents - p.amount_received_cents), 0);
+
+      months.push({
+        name: `${MONTHS[month]}/${String(year).slice(2)}`,
+        recebido: recebido / 100,
+        aberto: aberto / 100,
+      });
     }
     return months;
-  }, [proposals]);
+  }, [projects]);
 
-  const hasData = data.some(d => d.value > 0);
+  const hasData = data.some(d => d.recebido > 0 || d.aberto > 0);
 
   if (!hasData) {
     return (
@@ -61,12 +73,17 @@ export default function RevenueChart({ proposals }: Props) {
               borderRadius: "8px",
               fontSize: "12px",
             }}
-            formatter={(value: number) => [
+            formatter={(value: number, name: string) => [
               new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value),
-              "Faturado",
+              name === "recebido" ? "Recebido" : "Em Aberto",
             ]}
           />
-          <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+          <Legend
+            formatter={(value: string) => value === "recebido" ? "Recebido" : "Em Aberto"}
+            wrapperStyle={{ fontSize: "11px" }}
+          />
+          <Bar dataKey="recebido" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} stackId="a" />
+          <Bar dataKey="aberto" fill="hsl(45 100% 60%)" radius={[4, 4, 0, 0]} stackId="a" />
         </BarChart>
       </ResponsiveContainer>
     </div>
