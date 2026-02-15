@@ -6,7 +6,7 @@ export default function Hero() {
   return (
     <section
       id="inicio"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background pt-20 md:pt-0"
     >
       {/* Subtle dot pattern */}
       <div className="absolute inset-0 opacity-[0.4] pointer-events-none">
