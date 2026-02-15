@@ -86,6 +86,7 @@ const AdminDashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<Proposal | null>(null);
   const [expandedProposalId, setExpandedProposalId] = useState<string | null>(null);
+  const [convertPaymentStatus, setConvertPaymentStatus] = useState<"pending" | "partial" | "full">("pending");
 
   // Convert to project state
   const [convertTarget, setConvertTarget] = useState<Proposal | null>(null);
@@ -309,17 +310,6 @@ const AdminDashboard = () => {
   };
 
   const updateStatus = async (id: string, newStatus: string) => {
-    if (newStatus === "paid") {
-      const proposal = proposals.find(p => p.id === id);
-      if (proposal) {
-        setConvertTarget(proposal);
-        setConvertPlan("essencial");
-        setConvertStartDate(new Date().toISOString().split("T")[0]);
-        setConvertDueDate("");
-        setConvertNotes("");
-        return;
-      }
-    }
     const oldProposal = proposals.find(p => p.id === id);
     const { error } = await supabase.from("proposals").update({ status: newStatus } as any).eq("id", id);
     if (error) toast.error("Erro ao atualizar");
@@ -335,6 +325,15 @@ const AdminDashboard = () => {
     }
   };
 
+  const openConvertDialog = (proposal: Proposal) => {
+    setConvertTarget(proposal);
+    setConvertPlan("essencial");
+    setConvertStartDate(new Date().toISOString().split("T")[0]);
+    setConvertDueDate("");
+    setConvertNotes("");
+    setConvertPaymentStatus("pending");
+  };
+
   const handleConvertToProject = async () => {
     if (!convertTarget || !user) return;
     setConverting(true);
@@ -345,11 +344,16 @@ const AdminDashboard = () => {
       title: convertTarget.title,
       client_name: convertTarget.client_name,
       from: statusConfig[convertTarget.status]?.label || convertTarget.status,
-      to: "Pago",
+      to: "Convertido em Projeto",
     });
 
-    // 2. Create project from proposal data with partial payment
-    const halfAmount = Math.round(convertTarget.amount_cents / 2);
+    // 2. Calculate received based on chosen payment status
+    const received = convertPaymentStatus === "full"
+      ? convertTarget.amount_cents
+      : convertPaymentStatus === "partial"
+        ? Math.round(convertTarget.amount_cents / 2)
+        : 0;
+
     const { data: project, error } = await supabase.from("projects").insert({
       client_name: convertTarget.client_name,
       client_phone: convertTarget.client_phone || null,
@@ -361,8 +365,8 @@ const AdminDashboard = () => {
       due_date: convertDueDate || null,
       created_by: user.id,
       total_amount_cents: convertTarget.amount_cents,
-      amount_received_cents: halfAmount,
-      payment_status: "partial",
+      amount_received_cents: received,
+      payment_status: convertPaymentStatus,
     } as any).select().single();
 
     if (error || !project) {
@@ -378,9 +382,11 @@ const AdminDashboard = () => {
       client_name: convertTarget.client_name,
       plan: convertPlan,
       from_proposal: convertTarget.id,
+      payment_status: convertPaymentStatus,
     });
 
-    toast.success("Proposta paga e projeto criado com sucesso!");
+    const statusLabels: Record<string, string> = { pending: "Em Aberto", partial: "50% Pago", full: "Quitado" };
+    toast.success(`Projeto criado como "${statusLabels[convertPaymentStatus]}"!`);
     setConvertTarget(null);
     fetchProposals();
     fetchProjects();
@@ -500,6 +506,10 @@ const AdminDashboard = () => {
     navigator.clipboard.writeText(link);
     const label = step === "init" ? "inicialização" : step === "final" ? "finalização" : "valor inteiro";
     toast.success(`Link de ${label} copiado!`);
+    // Auto-mark as sent if still draft
+    if (p.status === "draft") {
+      updateStatus(p.id, "sent");
+    }
   };
 
   const copyStepMessage = (p: Proposal, step: "init" | "final" | "full") => {
@@ -529,7 +539,7 @@ const AdminDashboard = () => {
           { label: "Enviados", value: proposals.filter(p => p.status === "sent").length, icon: Send },
           { label: "Pagos", value: proposals.filter(p => p.status === "paid").length, icon: CheckCircle },
           { label: "Recebido", value: formatCurrency(projects.reduce((s, p) => s + p.amount_received_cents, 0) + extraRevenue), icon: DollarSign },
-          { label: "Em Aberto", value: formatCurrency(projects.filter(p => p.payment_status === "partial").reduce((s, p) => s + (p.total_amount_cents - p.amount_received_cents), 0)), icon: DollarSign },
+          { label: "Em Aberto", value: formatCurrency(projects.filter(p => p.payment_status === "pending" || p.payment_status === "partial").reduce((s, p) => s + (p.total_amount_cents - p.amount_received_cents), 0)), icon: DollarSign },
         ].map((stat, i) => (
           <div key={i} className="glass rounded-xl p-4 glow-border">
             <stat.icon className={`w-5 h-5 mb-2 ${i === 4 ? "text-amber-400" : "text-primary"}`} />
@@ -617,6 +627,11 @@ const AdminDashboard = () => {
                           <DollarSign className="w-4 h-4" />
                           Links
                           {expandedProposalId === p.id ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                        </Button>
+
+                        {/* Convert to project */}
+                        <Button variant="outline" size="icon" onClick={() => openConvertDialog(p)} title="Converter em Projeto" className="text-primary hover:text-primary hover:border-primary/50">
+                          <ArrowRight className="w-4 h-4" />
                         </Button>
 
                         {/* Status actions */}
@@ -815,10 +830,10 @@ const AdminDashboard = () => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <ArrowRight className="w-5 h-5 text-primary" />
-              Confirmar Pagamento e Criar Projeto
+              Converter em Projeto
             </DialogTitle>
             <DialogDescription>
-              A proposta será marcada como paga e um novo projeto será criado automaticamente.
+              Transforme esta proposta em um projeto ativo. Escolha o status de pagamento.
             </DialogDescription>
           </DialogHeader>
 
@@ -831,6 +846,30 @@ const AdminDashboard = () => {
                 <p className="text-lg font-bold text-primary">
                   {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(convertTarget.amount_cents / 100)}
                 </p>
+              </div>
+
+              {/* Payment status selection */}
+              <div className="space-y-1.5">
+                <Label>Status do Pagamento</Label>
+                <div className="grid grid-cols-3 gap-2">
+                  {([
+                    { key: "pending" as const, label: "Em Aberto", desc: "R$ 0 recebido", color: "border-amber-500/30 bg-amber-500/10 text-amber-500" },
+                    { key: "partial" as const, label: "50% Pago", desc: formatCurrency(Math.round(convertTarget.amount_cents / 2)), color: "border-amber-400/30 bg-amber-400/10 text-amber-400" },
+                    { key: "full" as const, label: "Quitado", desc: formatCurrency(convertTarget.amount_cents), color: "border-green-400/30 bg-green-400/10 text-green-400" },
+                  ]).map(opt => (
+                    <button
+                      key={opt.key}
+                      type="button"
+                      onClick={() => setConvertPaymentStatus(opt.key)}
+                      className={`rounded-lg border p-3 text-center transition-all ${
+                        convertPaymentStatus === opt.key ? opt.color : "border-border text-muted-foreground hover:border-primary/30"
+                      }`}
+                    >
+                      <p className="text-sm font-medium">{opt.label}</p>
+                      <p className="text-[10px] opacity-70">{opt.desc}</p>
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Project config */}
@@ -866,7 +905,7 @@ const AdminDashboard = () => {
               </div>
 
               <Button onClick={handleConvertToProject} className="w-full" disabled={converting}>
-                {converting ? "Criando projeto..." : "Confirmar Pagamento e Criar Projeto"}
+                {converting ? "Criando projeto..." : "Criar Projeto"}
               </Button>
             </div>
           )}
