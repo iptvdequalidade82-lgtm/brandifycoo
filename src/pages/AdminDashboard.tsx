@@ -71,6 +71,7 @@ const filterTabs = [
 const AdminDashboard = () => {
   const { user } = useAuth();
   const [proposals, setProposals] = useState<Proposal[]>([]);
+  const [projects, setProjects] = useState<Array<{ total_amount_cents: number; amount_received_cents: number; payment_status: string; created_at: string }>>([]);
   const [showForm, setShowForm] = useState(false);
   const [loadingProposals, setLoadingProposals] = useState(true);
   const [generatingLink, setGeneratingLink] = useState<string | null>(null);
@@ -106,7 +107,7 @@ const AdminDashboard = () => {
   const [paymentMethod, setPaymentMethod] = useState<"pix" | "cakto">("pix");
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => { fetchProposals(); }, []);
+  useEffect(() => { fetchProposals(); fetchProjects(); }, []);
 
   const fetchProposals = async () => {
     setLoadingProposals(true);
@@ -116,6 +117,13 @@ const AdminDashboard = () => {
       .order("created_at", { ascending: false });
     if (!error && data) setProposals(data as unknown as Proposal[]);
     setLoadingProposals(false);
+  };
+
+  const fetchProjects = async () => {
+    const { data } = await supabase
+      .from("projects")
+      .select("total_amount_cents, amount_received_cents, payment_status, created_at");
+    if (data) setProjects(data as any);
   };
 
   const filteredProposals = proposals
@@ -327,7 +335,8 @@ const AdminDashboard = () => {
       to: "Pago",
     });
 
-    // 2. Create project from proposal data
+    // 2. Create project from proposal data with partial payment
+    const halfAmount = Math.round(convertTarget.amount_cents / 2);
     const { data: project, error } = await supabase.from("projects").insert({
       client_name: convertTarget.client_name,
       client_phone: convertTarget.client_phone || null,
@@ -338,6 +347,9 @@ const AdminDashboard = () => {
       start_date: convertStartDate || null,
       due_date: convertDueDate || null,
       created_by: user.id,
+      total_amount_cents: convertTarget.amount_cents,
+      amount_received_cents: halfAmount,
+      payment_status: "partial",
     } as any).select().single();
 
     if (error || !project) {
@@ -358,6 +370,7 @@ const AdminDashboard = () => {
     toast.success("Proposta paga e projeto criado com sucesso!");
     setConvertTarget(null);
     fetchProposals();
+    fetchProjects();
     setConverting(false);
   };
 
@@ -412,18 +425,19 @@ const AdminDashboard = () => {
   return (
     <AdminLayout>
       {/* Revenue Chart */}
-      <RevenueChart proposals={proposals} />
+      <RevenueChart proposals={proposals} projects={projects} />
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
         {[
           { label: "Total", value: proposals.length, icon: FileText },
           { label: "Enviados", value: proposals.filter(p => p.status === "sent").length, icon: Send },
           { label: "Pagos", value: proposals.filter(p => p.status === "paid").length, icon: CheckCircle },
-          { label: "Faturado", value: formatCurrency(proposals.filter(p => p.status === "paid").reduce((s, p) => s + p.amount_cents, 0)), icon: DollarSign },
+          { label: "Recebido", value: formatCurrency(projects.reduce((s, p) => s + p.amount_received_cents, 0)), icon: DollarSign },
+          { label: "Em Aberto", value: formatCurrency(projects.filter(p => p.payment_status === "partial").reduce((s, p) => s + (p.total_amount_cents - p.amount_received_cents), 0)), icon: DollarSign },
         ].map((stat, i) => (
           <div key={i} className="glass rounded-xl p-4 glow-border">
-            <stat.icon className="w-5 h-5 text-primary mb-2" />
+            <stat.icon className={`w-5 h-5 mb-2 ${i === 4 ? "text-amber-400" : "text-primary"}`} />
             <p className="text-2xl font-bold text-foreground">{stat.value}</p>
             <p className="text-xs text-muted-foreground">{stat.label}</p>
           </div>
