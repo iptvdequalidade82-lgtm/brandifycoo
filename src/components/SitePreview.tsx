@@ -55,7 +55,7 @@ export default function SitePreview() {
               {/* Browser bar */}
               <div className="flex items-center gap-2 px-4 py-3 bg-secondary border-b border-border">
                 <div className="flex gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[hsl(0_70%_55%)]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-destructive/70" />
                   <span className="w-2.5 h-2.5 rounded-full bg-[hsl(45_70%_55%)]" />
                   <span className="w-2.5 h-2.5 rounded-full bg-[hsl(120_50%_45%)]" />
                 </div>
@@ -73,6 +73,8 @@ export default function SitePreview() {
                   alt={`Preview - ${site.title}`}
                   className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
                   loading="lazy"
+                  width={800}
+                  height={500}
                 />
               </div>
 
@@ -96,10 +98,10 @@ export default function SitePreview() {
           <motion.a
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            href="https://wa.me/5543991065129?text=Ol%C3%A1!%20Fiquei%20interessado%20nos%20servi%C3%A7os%20da%20Brandify%20e%20gostaria%20de%20solicitar%20um%20or%C3%A7amento%20para%20cria%C3%A7%C3%A3o%20de%20site."
+            href="https://wa.me/5543991065129?text=Ol%C3%A1!%20Vi%20os%20projetos%20no%20site%20da%20Brandify%20e%20gostaria%20de%20um%20or%C3%A7amento."
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block px-8 py-3.5 rounded-xl bg-[hsl(205,12%,22%)] text-white font-bold gentle-animation"
+            className="inline-block px-8 py-3.5 rounded-xl bg-brand text-white font-bold gentle-animation"
           >
             Quero um site assim
           </motion.a>

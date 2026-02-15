@@ -4,12 +4,12 @@ import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-white/10 bg-[hsl(200,18%,8%)] text-white pt-14 pb-8 px-6">
+    <footer className="border-t border-white/10 bg-brand-deep text-white pt-14 pb-8 px-6">
       <div className="container mx-auto max-w-6xl">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <img src={logo} alt="Brandify" className="h-10 w-10 rounded-full ring-1 ring-white/15" />
+              <img src={logo} alt="Brandify" className="h-10 w-10 rounded-full ring-1 ring-white/15" width={40} height={40} />
               <span className="font-display text-lg font-black">Brandify</span>
             </div>
             <p className="text-sm text-white/40 leading-relaxed">
@@ -32,6 +32,7 @@ export default function Footer() {
             <ul className="space-y-2.5">
               <li><Link to="/curso" className="text-sm text-white/40 hover:text-white gentle-animation">Cursos</Link></li>
               <li><Link to="/trabalhe-conosco" className="text-sm text-white/40 hover:text-white gentle-animation">Trabalhe Conosco</Link></li>
+              <li><Link to="/privacidade" className="text-sm text-white/40 hover:text-white gentle-animation">Política de Privacidade</Link></li>
             </ul>
           </div>
 

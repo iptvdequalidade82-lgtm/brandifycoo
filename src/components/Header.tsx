@@ -1,20 +1,23 @@
 import logo from "@/assets/logo.jpg";
 import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const navLinks = [
   { label: "Início", href: "#inicio" },
   { label: "Serviços", href: "#servicos" },
+  { label: "Investimento", href: "#investimento" },
   { label: "Curso", href: "/curso" },
   { label: "Trabalhe Conosco", href: "/trabalhe-conosco" },
+  { label: "Contato", href: "#contato" },
 ];
 
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -26,8 +29,13 @@ export default function Header() {
     setOpen(false);
     if (href.startsWith("/")) {
       navigate(href);
-    } else {
-      document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+    } else if (href.startsWith("#")) {
+      // If not on homepage, navigate there first
+      if (location.pathname !== "/") {
+        navigate("/" + href);
+      } else {
+        document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+      }
     }
   };
 
@@ -41,17 +49,19 @@ export default function Header() {
       }`}
     >
       <div className="container mx-auto flex items-center justify-center h-16 px-6 lg:px-12 relative">
-        <a href="#inicio" className="absolute left-6 lg:left-12 flex items-center gap-3">
+        <a href="#inicio" onClick={(e) => { e.preventDefault(); handleNav("#inicio"); }} className="absolute left-6 lg:left-12 flex items-center gap-3">
           <motion.img
             whileHover={{ scale: 1.05 }}
             src={logo}
-            alt="Logo"
+            alt="Brandify - Criação de Sites Profissionais"
             className="h-10 w-10 rounded-full ring-1 ring-border"
+            width={40}
+            height={40}
           />
         </a>
 
         {/* Desktop */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-6">
           {navLinks.map((l) => (
             <button
               key={l.href}
@@ -75,7 +85,7 @@ export default function Header() {
 
         {/* Mobile toggle */}
         <button
-          className="md:hidden text-foreground p-2"
+          className="md:hidden absolute right-6 text-foreground p-2"
           onClick={() => setOpen(!open)}
           aria-label="Menu"
         >

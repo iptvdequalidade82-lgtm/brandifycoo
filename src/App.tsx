@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Curso from "./pages/Curso";
 import TrabalheConosco from "./pages/TrabalheConosco";
+import Privacidade from "./pages/Privacidade";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminProjects from "./pages/AdminProjects";
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/curso" element={<Curso />} />
             <Route path="/trabalhe-conosco" element={<TrabalheConosco />} />
+            <Route path="/privacidade" element={<Privacidade />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/projetos" element={<AdminProjects />} />

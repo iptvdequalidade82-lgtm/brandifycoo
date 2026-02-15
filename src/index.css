@@ -36,6 +36,17 @@
 
     --radius: 0.75rem;
 
+    /* Brand tokens – Azul Petróleo */
+    --brand: 205 12% 22%;
+    --brand-light: 205 8% 93%;
+    --brand-muted: 205 10% 45%;
+    --brand-deep: 200 18% 12%;
+    --brand-gradient-from: 195 28% 30%;
+    --brand-gradient-to: 205 25% 22%;
+    --brand-accent: 190 35% 60%;
+    --brand-accent-deep: 210 30% 55%;
+    --whatsapp: 142 70% 45%;
+
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 0 0% 15%;
     --sidebar-primary: 0 0% 8%;
