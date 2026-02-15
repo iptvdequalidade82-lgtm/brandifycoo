@@ -54,8 +54,12 @@ interface Proposal {
   final_method: string;
   final_cakto_checkout_url: string | null;
   final_cakto_offer_id: string | null;
+  init_amount_cents: number | null;
   created_at: string;
 }
+
+const getInitAmount = (p: Proposal) => p.init_amount_cents ?? Math.round(p.amount_cents / 2);
+const getFinalAmount = (p: Proposal) => p.amount_cents - getInitAmount(p);
 
 const statusConfig: Record<string, { label: string; icon: any; color: string }> = {
   draft: { label: "Rascunho", icon: FileText, color: "text-muted-foreground" },
@@ -350,8 +354,8 @@ const AdminDashboard = () => {
     // 2. Calculate received based on chosen payment status
     const received = convertPaymentStatus === "full"
       ? convertTarget.amount_cents
-      : convertPaymentStatus === "partial"
-        ? Math.round(convertTarget.amount_cents / 2)
+       : convertPaymentStatus === "partial"
+         ? getInitAmount(convertTarget)
         : 0;
 
     const { data: project, error } = await supabase.from("projects").insert({
@@ -396,7 +400,7 @@ const AdminDashboard = () => {
   const generateCaktoLink = async (proposal: Proposal) => {
     setGeneratingLink(proposal.id);
     try {
-      const halfAmount = proposal.amount_cents / 200; // half in reais
+      const halfAmount = getInitAmount(proposal) / 100;
       const { data, error } = await supabase.functions.invoke("create-cakto-payment", {
         body: {
           proposal_id: proposal.id,
@@ -463,7 +467,7 @@ const AdminDashboard = () => {
   const generateFinalCaktoLink = async (proposal: Proposal) => {
     setGeneratingLink(proposal.id);
     try {
-      const halfAmount = proposal.amount_cents / 200; // half in reais
+      const halfAmount = getFinalAmount(proposal) / 100;
       const { data, error } = await supabase.functions.invoke("create-cakto-payment", {
         body: {
           proposal_id: proposal.id,
@@ -515,7 +519,7 @@ const AdminDashboard = () => {
   const copyStepMessage = (p: Proposal, step: "init" | "final" | "full") => {
     const link = getStepLink(p, step);
     if (!link) { toast.error("Link ainda não gerado"); return; }
-    const amount = step === "full" ? p.amount_cents : Math.round(p.amount_cents / 2);
+    const amount = step === "full" ? p.amount_cents : step === "init" ? getInitAmount(p) : getFinalAmount(p);
     const label = step === "init" ? "inicialização" : step === "final" ? "finalização" : "pagamento integral";
     const method = step === "full" ? "pix" : (step === "init" ? p.init_method : p.final_method);
     const methodLabel = method === "cakto" ? "cartão" : "PIX";
@@ -614,7 +618,7 @@ const AdminDashboard = () => {
                     <div className="flex items-center gap-4">
                       <div className="text-right">
                         <p className="text-lg font-bold text-foreground">{formatCurrency(p.amount_cents)}</p>
-                        <p className="text-[10px] text-muted-foreground">50% = {formatCurrency(Math.round(p.amount_cents / 2))}</p>
+                        <p className="text-[10px] text-muted-foreground">Init: {formatCurrency(getInitAmount(p))} · Final: {formatCurrency(getFinalAmount(p))}</p>
                       </div>
                       <div className="flex gap-1 flex-wrap">
                         {/* Expand payment links */}
@@ -690,7 +694,7 @@ const AdminDashboard = () => {
                             </span>
                           )}
                         </div>
-                        <span className="text-sm font-bold text-foreground">{formatCurrency(Math.round(p.amount_cents / 2))}</span>
+                        <span className="text-sm font-bold text-foreground">{formatCurrency(getInitAmount(p))}</span>
                       </div>
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xs text-muted-foreground">Método:</span>
@@ -736,7 +740,7 @@ const AdminDashboard = () => {
                             </span>
                           )}
                         </div>
-                        <span className="text-sm font-bold text-foreground">{formatCurrency(Math.round(p.amount_cents / 2))}</span>
+                        <span className="text-sm font-bold text-foreground">{formatCurrency(getFinalAmount(p))}</span>
                       </div>
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xs text-muted-foreground">Método:</span>
@@ -876,7 +880,7 @@ const AdminDashboard = () => {
                 <div className="grid grid-cols-3 gap-2">
                   {([
                     { key: "pending" as const, label: "Em Aberto", desc: "R$ 0 recebido", color: "border-amber-500/30 bg-amber-500/10 text-amber-500" },
-                    { key: "partial" as const, label: "50% Pago", desc: formatCurrency(Math.round(convertTarget.amount_cents / 2)), color: "border-amber-400/30 bg-amber-400/10 text-amber-400" },
+                    { key: "partial" as const, label: "50% Pago", desc: formatCurrency(getInitAmount(convertTarget)), color: "border-amber-400/30 bg-amber-400/10 text-amber-400" },
                     { key: "full" as const, label: "Quitado", desc: formatCurrency(convertTarget.amount_cents), color: "border-green-400/30 bg-green-400/10 text-green-400" },
                   ]).map(opt => (
                     <button
