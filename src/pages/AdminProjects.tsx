@@ -94,6 +94,7 @@ export default function AdminProjects() {
   const [notes, setNotes] = useState("");
   const [startDate, setStartDate] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [amountReais, setAmountReais] = useState("");
 
   const fetchProjects = async () => {
     setLoading(true);
@@ -117,7 +118,7 @@ export default function AdminProjects() {
 
   const resetForm = () => {
     setClientName(""); setClientPhone(""); setClientEmail("");
-    setTitle(""); setPlan("essencial"); setNotes(""); setStartDate(""); setDueDate("");
+    setTitle(""); setPlan("essencial"); setNotes(""); setStartDate(""); setDueDate(""); setAmountReais("");
   };
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -127,6 +128,12 @@ export default function AdminProjects() {
       return;
     }
     setSubmitting(true);
+    const cents = amountReais.trim() ? Math.round(parseFloat(amountReais.replace(",", ".")) * 100) : 0;
+    if (amountReais.trim() && (isNaN(cents) || cents < 0)) {
+      toast.error("Valor inválido");
+      setSubmitting(false);
+      return;
+    }
     const { data: inserted, error } = await supabase.from("projects").insert({
       client_name: clientName.trim(),
       client_phone: clientPhone.trim() || null,
@@ -137,6 +144,9 @@ export default function AdminProjects() {
       start_date: startDate || null,
       due_date: dueDate || null,
       created_by: user!.id,
+      total_amount_cents: cents,
+      amount_received_cents: 0,
+      payment_status: cents > 0 ? "pending" : "pending",
     } as any).select().single();
     if (error || !inserted) {
       toast.error("Erro ao criar projeto");
@@ -221,7 +231,7 @@ export default function AdminProjects() {
       payment_status: newStatus,
     } as any).eq("id", project.id);
     if (error) { toast.error("Erro ao atualizar pagamento"); return; }
-    const labels: Record<string, string> = { pending: "Pendente", partial: "50% Pago", full: "Quitado" };
+    const labels: Record<string, string> = { pending: "Em Aberto", partial: "50% Pago", full: "Quitado" };
     toast.success(`Pagamento: ${labels[newStatus]}`);
     setProjects(prev => prev.map(p => p.id === project.id ? { ...p, amount_received_cents: received, payment_status: newStatus } : p));
     if (user) {
@@ -323,7 +333,7 @@ export default function AdminProjects() {
                         <div className="flex gap-1">
                           {(["pending", "partial", "full"] as const).map(status => {
                             const labels: Record<string, { label: string; activeClass: string }> = {
-                              pending: { label: "Pendente", activeClass: "bg-muted text-foreground border-border" },
+                              pending: { label: "Em Aberto", activeClass: "bg-amber-500/15 text-amber-500 border-amber-500/30" },
                               partial: { label: "50% Pago", activeClass: "bg-amber-400/15 text-amber-400 border-amber-400/30" },
                               full: { label: "Quitado", activeClass: "bg-green-400/15 text-green-400 border-green-400/30" },
                             };
@@ -455,9 +465,15 @@ export default function AdminProjects() {
                 <Input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
               </div>
             </div>
-            <div className="space-y-1.5">
-              <Label>Prazo de Entrega</Label>
-              <Input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Valor Total (R$)</Label>
+                <Input value={amountReais} onChange={e => setAmountReais(e.target.value)} placeholder="Ex: 550,00" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Prazo de Entrega</Label>
+                <Input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} />
+              </div>
             </div>
             <div className="space-y-1.5">
               <Label>Observações</Label>

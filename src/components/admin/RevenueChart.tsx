@@ -36,7 +36,7 @@ const PLAN_LABELS: Record<string, string> = {
 };
 
 const PAYMENT_STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  pending: { label: "Pendente", color: "text-muted-foreground" },
+  pending: { label: "Em Aberto", color: "text-amber-500" },
   partial: { label: "Parcial (50%)", color: "text-amber-400" },
   full: { label: "Quitado", color: "text-green-400" },
 };
@@ -153,7 +153,7 @@ export default function RevenueChart({ proposals, projects, extraRevenue = 0 }: 
               wrapperStyle={{ fontSize: "11px" }}
             />
             <Bar dataKey="recebido" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} stackId="a" />
-            <Bar dataKey="aberto" fill="hsl(45 100% 60%)" radius={[4, 4, 0, 0]} stackId="a" />
+            <Bar dataKey="aberto" fill="hsl(35 100% 55%)" radius={[4, 4, 0, 0]} stackId="a" />
           </BarChart>
         </ResponsiveContainer>
       )}
