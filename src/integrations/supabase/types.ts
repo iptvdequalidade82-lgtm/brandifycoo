@@ -201,7 +201,11 @@ export type Database = {
           created_at: string
           created_by: string
           description: string | null
+          final_cakto_checkout_url: string | null
+          final_cakto_offer_id: string | null
+          final_method: string
           id: string
+          init_method: string
           installments: number
           status: string
           stripe_checkout_url: string | null
@@ -219,7 +223,11 @@ export type Database = {
           created_at?: string
           created_by: string
           description?: string | null
+          final_cakto_checkout_url?: string | null
+          final_cakto_offer_id?: string | null
+          final_method?: string
           id?: string
+          init_method?: string
           installments?: number
           status?: string
           stripe_checkout_url?: string | null
@@ -237,7 +245,11 @@ export type Database = {
           created_at?: string
           created_by?: string
           description?: string | null
+          final_cakto_checkout_url?: string | null
+          final_cakto_offer_id?: string | null
+          final_method?: string
           id?: string
+          init_method?: string
           installments?: number
           status?: string
           stripe_checkout_url?: string | null
