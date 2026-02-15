@@ -19,7 +19,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Plus, Copy, ExternalLink, RefreshCw,
+  Plus, Copy, ExternalLink, RefreshCw, Search, Pencil,
   FileText, DollarSign, Send, QrCode, CreditCard, Smartphone, Trash2, CheckCircle, XCircle, MessageCircle, ArrowRight,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -73,6 +73,7 @@ const AdminDashboard = () => {
   const [loadingProposals, setLoadingProposals] = useState(true);
   const [generatingLink, setGeneratingLink] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<Proposal | null>(null);
 
   // Convert to project state
@@ -82,6 +83,16 @@ const AdminDashboard = () => {
   const [convertDueDate, setConvertDueDate] = useState("");
   const [convertNotes, setConvertNotes] = useState("");
   const [converting, setConverting] = useState(false);
+
+  // Edit proposal state
+  const [editTarget, setEditTarget] = useState<Proposal | null>(null);
+  const [editClientName, setEditClientName] = useState("");
+  const [editClientEmail, setEditClientEmail] = useState("");
+  const [editClientPhone, setEditClientPhone] = useState("");
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [editAmountReais, setEditAmountReais] = useState("");
+  const [editSaving, setEditSaving] = useState(false);
 
   const [clientName, setClientName] = useState("");
   const [clientEmail, setClientEmail] = useState("");
@@ -104,9 +115,43 @@ const AdminDashboard = () => {
     setLoadingProposals(false);
   };
 
-  const filteredProposals = activeFilter === "all"
-    ? proposals
-    : proposals.filter(p => p.status === activeFilter);
+  const filteredProposals = proposals
+    .filter(p => activeFilter === "all" || p.status === activeFilter)
+    .filter(p => {
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase();
+      return p.client_name.toLowerCase().includes(q) || p.title.toLowerCase().includes(q) || (p.client_email?.toLowerCase().includes(q));
+    });
+
+  const openEdit = (p: Proposal) => {
+    setEditTarget(p);
+    setEditClientName(p.client_name);
+    setEditClientEmail(p.client_email || "");
+    setEditClientPhone(p.client_phone || "");
+    setEditTitle(p.title);
+    setEditDescription(p.description || "");
+    setEditAmountReais((p.amount_cents / 100).toFixed(2).replace(".", ","));
+  };
+
+  const handleEditSave = async () => {
+    if (!editTarget) return;
+    setEditSaving(true);
+    const cents = Math.round(parseFloat(editAmountReais.replace(",", ".")) * 100);
+    if (isNaN(cents) || cents <= 0) { toast.error("Valor inválido"); setEditSaving(false); return; }
+
+    const { error } = await supabase.from("proposals").update({
+      client_name: editClientName.trim(),
+      client_email: editClientEmail.trim() || null,
+      client_phone: editClientPhone.trim() || null,
+      title: editTitle.trim(),
+      description: editDescription.trim() || null,
+      amount_cents: cents,
+    } as any).eq("id", editTarget.id);
+
+    if (error) toast.error("Erro ao salvar");
+    else { toast.success("Proposta atualizada"); setEditTarget(null); fetchProposals(); }
+    setEditSaving(false);
+  };
 
   const resetForm = () => {
     setClientName(""); setClientEmail(""); setClientPhone("");
@@ -348,6 +393,15 @@ const AdminDashboard = () => {
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-foreground">Propostas</h2>
         <div className="flex gap-2">
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Buscar cliente..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="pl-8 h-8 w-[160px] text-sm"
+            />
+          </div>
           <Button variant="outline" size="sm" onClick={fetchProposals}><RefreshCw className="w-4 h-4" /></Button>
           <Button size="sm" onClick={() => setShowForm(true)}><Plus className="w-4 h-4 mr-1" /> Nova Proposta</Button>
         </div>
@@ -438,6 +492,9 @@ const AdminDashboard = () => {
                           <Send className="w-4 h-4" />
                         </Button>
                       )}
+                      <Button variant="outline" size="icon" onClick={() => openEdit(p)} title="Editar">
+                        <Pencil className="w-4 h-4" />
+                      </Button>
                       <Button variant="outline" size="icon" onClick={() => setDeleteTarget(p)} className="text-destructive hover:text-destructive">
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -583,6 +640,47 @@ const AdminDashboard = () => {
               </Button>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Proposal Dialog */}
+      <Dialog open={!!editTarget} onOpenChange={(open) => !open && setEditTarget(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Editar Proposta</DialogTitle>
+            <DialogDescription>Atualize os dados da proposta</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Nome do Cliente</Label>
+                <Input value={editClientName} onChange={e => setEditClientName(e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Email</Label>
+                <Input type="email" value={editClientEmail} onChange={e => setEditClientEmail(e.target.value)} />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>WhatsApp</Label>
+              <Input value={editClientPhone} onChange={e => setEditClientPhone(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Título</Label>
+              <Input value={editTitle} onChange={e => setEditTitle(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Descrição</Label>
+              <Textarea value={editDescription} onChange={e => setEditDescription(e.target.value)} rows={2} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Valor (R$)</Label>
+              <Input value={editAmountReais} onChange={e => setEditAmountReais(e.target.value)} />
+            </div>
+            <Button onClick={handleEditSave} className="w-full" disabled={editSaving}>
+              {editSaving ? "Salvando..." : "Salvar Alterações"}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </AdminLayout>

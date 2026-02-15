@@ -19,7 +19,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Plus, RefreshCw, MessageCircle, Trash2, Crown, Award, Star, ChevronDown, ChevronUp,
+  Plus, RefreshCw, MessageCircle, Trash2, Crown, Award, Star, ChevronDown, ChevronUp, Search, Pencil,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -66,9 +66,21 @@ export default function AdminProjects() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [activeFilter, setActiveFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<Project | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  // Edit state
+  const [editTarget, setEditTarget] = useState<Project | null>(null);
+  const [editClientName, setEditClientName] = useState("");
+  const [editClientPhone, setEditClientPhone] = useState("");
+  const [editClientEmail, setEditClientEmail] = useState("");
+  const [editTitle, setEditTitle] = useState("");
+  const [editPlan, setEditPlan] = useState<"essencial" | "profissional" | "premium">("essencial");
+  const [editNotes, setEditNotes] = useState("");
+  const [editDueDate, setEditDueDate] = useState("");
+  const [editSaving, setEditSaving] = useState(false);
 
   // Form
   const [clientName, setClientName] = useState("");
@@ -92,9 +104,13 @@ export default function AdminProjects() {
 
   useEffect(() => { fetchProjects(); }, []);
 
-  const filtered = activeFilter === "all"
-    ? projects
-    : projects.filter(p => p.status === activeFilter);
+  const filtered = projects
+    .filter(p => activeFilter === "all" || p.status === activeFilter)
+    .filter(p => {
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase();
+      return p.client_name.toLowerCase().includes(q) || p.title.toLowerCase().includes(q);
+    });
 
   const resetForm = () => {
     setClientName(""); setClientPhone(""); setClientEmail("");
@@ -164,6 +180,23 @@ export default function AdminProjects() {
     setDeleteTarget(null);
   };
 
+  const handleEditProject = async () => {
+    if (!editTarget) return;
+    setEditSaving(true);
+    const { error } = await supabase.from("projects").update({
+      client_name: editClientName.trim(),
+      client_phone: editClientPhone.trim() || null,
+      client_email: editClientEmail.trim() || null,
+      title: editTitle.trim(),
+      plan: editPlan,
+      notes: editNotes.trim() || null,
+      due_date: editDueDate || null,
+    } as any).eq("id", editTarget.id);
+    if (error) toast.error("Erro ao salvar");
+    else { toast.success("Projeto atualizado"); setEditTarget(null); fetchProjects(); }
+    setEditSaving(false);
+  };
+
   const openWhatsApp = (phone: string, name: string) => {
     const cleaned = phone.replace(/\D/g, "");
     const num = cleaned.startsWith("55") ? cleaned : `55${cleaned}`;
@@ -189,6 +222,15 @@ export default function AdminProjects() {
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-foreground">Projetos</h2>
         <div className="flex gap-2">
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Buscar cliente..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="pl-8 h-8 w-[160px] text-sm"
+            />
+          </div>
           <Button variant="outline" size="sm" onClick={fetchProjects}><RefreshCw className="w-4 h-4" /></Button>
           <Button size="sm" onClick={() => setShowForm(true)}><Plus className="w-4 h-4 mr-1" /> Novo Projeto</Button>
         </div>
@@ -268,6 +310,18 @@ export default function AdminProjects() {
                       title="Checklist"
                     >
                       {expandedId === p.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </Button>
+                    <Button variant="outline" size="icon" onClick={() => {
+                      setEditTarget(p);
+                      setEditClientName(p.client_name);
+                      setEditClientPhone(p.client_phone || "");
+                      setEditClientEmail(p.client_email || "");
+                      setEditTitle(p.title);
+                      setEditPlan(p.plan);
+                      setEditNotes(p.notes || "");
+                      setEditDueDate(p.due_date || "");
+                    }} title="Editar">
+                      <Pencil className="w-4 h-4" />
                     </Button>
                     <Button variant="outline" size="icon" onClick={() => setDeleteTarget(p)} className="text-destructive hover:text-destructive">
                       <Trash2 className="w-4 h-4" />
@@ -354,6 +408,60 @@ export default function AdminProjects() {
               {submitting ? "Criando..." : "Criar Projeto"}
             </Button>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Project Dialog */}
+      <Dialog open={!!editTarget} onOpenChange={(open) => !open && setEditTarget(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Editar Projeto</DialogTitle>
+            <DialogDescription>Atualize os dados do projeto</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Nome do Cliente</Label>
+                <Input value={editClientName} onChange={e => setEditClientName(e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>WhatsApp</Label>
+                <Input value={editClientPhone} onChange={e => setEditClientPhone(e.target.value)} />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Email</Label>
+              <Input type="email" value={editClientEmail} onChange={e => setEditClientEmail(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Título</Label>
+              <Input value={editTitle} onChange={e => setEditTitle(e.target.value)} />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Plano</Label>
+                <Select value={editPlan} onValueChange={(v: any) => setEditPlan(v)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="essencial">⭐ Essencial</SelectItem>
+                    <SelectItem value="profissional">🏆 Profissional</SelectItem>
+                    <SelectItem value="premium">👑 Premium</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Prazo</Label>
+                <Input type="date" value={editDueDate} onChange={e => setEditDueDate(e.target.value)} />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Observações</Label>
+              <Textarea value={editNotes} onChange={e => setEditNotes(e.target.value)} rows={2} />
+            </div>
+            <Button onClick={handleEditProject} className="w-full" disabled={editSaving}>
+              {editSaving ? "Salvando..." : "Salvar Alterações"}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </AdminLayout>
