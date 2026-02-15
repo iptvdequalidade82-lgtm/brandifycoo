@@ -8,6 +8,16 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const DEFAULT_CHECKLIST = [
+  "Conteúdo recebido",
+  "Domínio registrado",
+  "Hospedagem configurada",
+  "Design aprovado",
+  "Desenvolvimento concluído",
+  "Revisão do cliente",
+  "Site publicado",
+];
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -21,7 +31,6 @@ serve(async (req) => {
     const body = await req.text();
     const signature = req.headers.get("stripe-signature");
 
-    // Verify webhook signature if secret is configured
     const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
     let event: Stripe.Event;
 
@@ -61,16 +70,86 @@ serve(async (req) => {
       const proposalId = session.metadata?.proposal_id;
 
       if (proposalId) {
-        const { error } = await supabaseAdmin
+        // 1. Get proposal data
+        const { data: proposal } = await supabaseAdmin
           .from("proposals")
-          .update({ status: "paid" } as any)
+          .select("*")
           .eq("id", proposalId)
-          .eq("stripe_session_id", session.id);
+          .eq("stripe_session_id", session.id)
+          .single();
 
-        if (error) {
-          console.error("Failed to update proposal status:", error);
+        if (!proposal) {
+          console.error("Proposal not found:", proposalId);
+          return new Response(JSON.stringify({ received: true }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 200,
+          });
+        }
+
+        // 2. Mark proposal as paid
+        await supabaseAdmin
+          .from("proposals")
+          .update({ status: "paid" })
+          .eq("id", proposalId);
+
+        // 3. Auto-create project from proposal
+        const { data: project, error: projectError } = await supabaseAdmin
+          .from("projects")
+          .insert({
+            client_name: proposal.client_name,
+            client_phone: proposal.client_phone || null,
+            client_email: proposal.client_email || null,
+            title: proposal.title,
+            plan: "essencial",
+            notes: proposal.description || null,
+            start_date: new Date().toISOString().split("T")[0],
+            created_by: proposal.created_by,
+          })
+          .select()
+          .single();
+
+        if (projectError || !project) {
+          console.error("Failed to create project:", projectError);
         } else {
-          console.log(`Proposal ${proposalId} marked as paid`);
+          // 4. Create default checklist
+          const checklistItems = DEFAULT_CHECKLIST.map((label, i) => ({
+            project_id: project.id,
+            label,
+            sort_order: i,
+            checked: false,
+          }));
+          await supabaseAdmin.from("project_checklist").insert(checklistItems);
+
+          // 5. Log activity
+          await supabaseAdmin.from("activity_logs").insert({
+            entity_type: "project",
+            entity_id: project.id,
+            action: "created",
+            created_by: proposal.created_by,
+            details: {
+              title: proposal.title,
+              client_name: proposal.client_name,
+              plan: "essencial",
+              from_proposal: proposalId,
+              auto_created: true,
+            },
+          });
+
+          await supabaseAdmin.from("activity_logs").insert({
+            entity_type: "proposal",
+            entity_id: proposalId,
+            action: "status_changed",
+            created_by: proposal.created_by,
+            details: {
+              title: proposal.title,
+              client_name: proposal.client_name,
+              from: "Enviado",
+              to: "Pago",
+              auto_converted: true,
+            },
+          });
+
+          console.log(`Proposal ${proposalId} paid → Project ${project.id} auto-created`);
         }
       }
     }
