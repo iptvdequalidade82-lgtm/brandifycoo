@@ -514,12 +514,6 @@ const AdminDashboard = () => {
                         <Copy className="w-4 h-4" />
                       </Button>
 
-                      {/* Generate Cakto link if not yet generated and no cakto url */}
-                      {!p.cakto_checkout_url && (
-                        <Button variant="outline" size="sm" onClick={() => generateCaktoLink(p)} disabled={generatingLink === p.id} title="Gerar link Cakto">
-                          {generatingLink === p.id ? <RefreshCw className="w-4 h-4 animate-spin" /> : <><ExternalLink className="w-4 h-4 mr-1" /> Gerar Cakto</>}
-                        </Button>
-                      )}
 
                       {/* Status actions */}
                       {p.status !== "paid" && (
