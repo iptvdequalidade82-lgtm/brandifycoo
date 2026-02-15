@@ -21,7 +21,7 @@ const courses = [
       "Estratégias de tráfego pago",
       "Suporte exclusivo",
     ],
-    link: "https://wa.me/5543991065129?text=Ol%C3%A1!%20Tenho%20interesse%20no%20curso%20Drop%20Million%C3%A1rio",
+    link: "https://pay.cakto.com.br/j3nfmrj_323782?affiliate=QfzSc7Xx",
     tag: "Mais vendido",
   },
   {
