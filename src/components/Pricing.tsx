@@ -24,11 +24,11 @@ const item = { hidden: { opacity: 0, y: 40 }, show: { opacity: 1, y: 0, transiti
 
 export default function Pricing() {
   return (
-    <section id="investimento" className="relative py-28 md:py-36 px-6 overflow-hidden bg-[hsl(200,18%,12%)] text-white">
+    <section id="investimento" className="relative py-28 md:py-36 px-6 overflow-hidden bg-brand-deep text-white">
       {/* Ambient blobs */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full bg-[hsl(195,30%,35%/0.1)] blur-[150px] pointer-events-none animate-[pulse_6s_ease-in-out_infinite]" />
-      <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full bg-[hsl(205,25%,30%/0.07)] blur-[120px] pointer-events-none animate-[pulse_8s_ease-in-out_infinite]" />
-      
+      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full bg-brand-accent/10 blur-[150px] pointer-events-none animate-[pulse_6s_ease-in-out_infinite]" />
+      <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full bg-brand-accent-deep/7 blur-[120px] pointer-events-none animate-[pulse_8s_ease-in-out_infinite]" />
+
       {/* Dot pattern */}
       <div className="absolute inset-0 opacity-[0.04] pointer-events-none">
         <div className="absolute inset-0" style={{ backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)`, backgroundSize: '50px 50px' }} />
@@ -54,7 +54,7 @@ export default function Pricing() {
             className="font-display text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-4"
           >
             Escolha o plano{" "}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-[hsl(190,35%,60%)] to-[hsl(210,30%,55%)]">ideal</span>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">ideal</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -81,12 +81,12 @@ export default function Pricing() {
               whileHover={{ y: -8, transition: { duration: 0.3 } }}
               className={`relative rounded-2xl overflow-hidden gentle-animation flex flex-col ${
                 plan.featured
-                  ? "bg-gradient-to-b from-[hsl(195,28%,30%)] to-[hsl(205,25%,22%)] shadow-[0_20px_60px_-15px_hsl(200,30%,25%/0.4)] md:scale-[1.06] z-10"
+                  ? "bg-gradient-to-b from-[hsl(var(--brand-gradient-from))] to-[hsl(var(--brand-gradient-to))] shadow-[0_20px_60px_-15px_hsl(var(--brand-gradient-from)/0.4)] md:scale-[1.06] z-10"
                   : "bg-white/[0.06] border border-white/10 backdrop-blur-sm hover:bg-white/[0.1]"
               }`}
             >
               {plan.featured && (
-                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[hsl(190,35%,60%)] to-transparent" />
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-brand-accent to-transparent" />
               )}
 
               <div className={`p-7 text-center border-b ${plan.featured ? "border-white/20" : "border-white/10"}`}>
@@ -109,7 +109,7 @@ export default function Pricing() {
                 <ul className="space-y-3">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-3">
-                      <Check className={`mt-0.5 flex-shrink-0 ${plan.featured ? "text-[hsl(190,40%,65%)]" : "text-white/40"}`} size={16} strokeWidth={2.5} />
+                      <Check className={`mt-0.5 flex-shrink-0 ${plan.featured ? "text-brand-accent" : "text-white/40"}`} size={16} strokeWidth={2.5} />
                       <span className={`text-sm ${plan.featured ? "text-white/90" : "text-white/70"}`}>{f}</span>
                     </li>
                   ))}
@@ -120,12 +120,12 @@ export default function Pricing() {
                 <motion.a
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
-                  href="https://wa.me/5543991065129?text=Ol%C3%A1!%20Fiquei%20interessado%20nos%20servi%C3%A7os%20da%20Brandify%20e%20gostaria%20de%20solicitar%20um%20or%C3%A7amento%20para%20cria%C3%A7%C3%A3o%20de%20site."
+                  href={`https://wa.me/5543991065129?text=${encodeURIComponent(`Olá! Tenho interesse no plano ${plan.name} para criação de site.`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`block w-full text-center px-6 py-3.5 rounded-xl font-bold gentle-animation ${
                     plan.featured
-                      ? "bg-white text-[hsl(200,20%,18%)] shadow-lg"
+                      ? "bg-white text-brand shadow-lg"
                       : "border border-white/20 text-white hover:bg-white/10"
                   }`}
                 >

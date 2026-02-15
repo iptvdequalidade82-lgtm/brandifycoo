@@ -25,10 +25,11 @@ export default function FloatingWhatsApp() {
           exit={{ scale: 0, opacity: 0 }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[hsl(142_70%_45%)] text-white flex items-center justify-center shadow-[0_4px_20px_hsl(142_70%_45%/0.4)] hover:shadow-[0_4px_30px_hsl(142_70%_45%/0.6)] transition-shadow duration-300"
+          className="fixed bottom-6 right-6 z-50 flex items-center gap-2 pl-4 pr-5 py-3 rounded-full bg-whatsapp text-white shadow-[0_4px_20px_hsl(var(--whatsapp)/0.4)] hover:shadow-[0_4px_30px_hsl(var(--whatsapp)/0.6)] transition-shadow duration-300 font-semibold text-sm"
           aria-label="Fale conosco no WhatsApp"
         >
-          <MessageCircle size={26} />
+          <MessageCircle size={22} />
+          <span className="hidden sm:inline">Fale conosco</span>
         </motion.a>
       )}
     </AnimatePresence>
