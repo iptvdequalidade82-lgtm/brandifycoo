@@ -95,6 +95,7 @@ const AdminDashboard = () => {
   const [editDescription, setEditDescription] = useState("");
   const [editAmountReais, setEditAmountReais] = useState("");
   const [editSaving, setEditSaving] = useState(false);
+  const [editPaymentMethod, setEditPaymentMethod] = useState<"pix" | "cakto">("pix");
 
   const [clientName, setClientName] = useState("");
   const [clientEmail, setClientEmail] = useState("");
@@ -133,6 +134,7 @@ const AdminDashboard = () => {
     setEditTitle(p.title);
     setEditDescription(p.description || "");
     setEditAmountReais((p.amount_cents / 100).toFixed(2).replace(".", ","));
+    setEditPaymentMethod(p.cakto_checkout_url ? "cakto" : "pix");
   };
 
   const handleEditSave = async () => {
@@ -141,17 +143,55 @@ const AdminDashboard = () => {
     const cents = Math.round(parseFloat(editAmountReais.replace(",", ".")) * 100);
     if (isNaN(cents) || cents <= 0) { toast.error("Valor inválido"); setEditSaving(false); return; }
 
-    const { error } = await supabase.from("proposals").update({
+    const wasCakto = !!editTarget.cakto_checkout_url;
+    const nowCakto = editPaymentMethod === "cakto";
+
+    // Base update
+    const updateData: any = {
       client_name: editClientName.trim(),
       client_email: editClientEmail.trim() || null,
       client_phone: editClientPhone.trim() || null,
       title: editTitle.trim(),
       description: editDescription.trim() || null,
       amount_cents: cents,
-    } as any).eq("id", editTarget.id);
+    };
 
-    if (error) toast.error("Erro ao salvar");
-    else { toast.success("Proposta atualizada"); setEditTarget(null); fetchProposals(); }
+    // Switching from Cakto to PIX: clear Cakto data
+    if (wasCakto && !nowCakto) {
+      updateData.cakto_checkout_url = null;
+      updateData.cakto_offer_id = null;
+    }
+
+    const { error } = await supabase.from("proposals").update(updateData).eq("id", editTarget.id);
+    if (error) { toast.error("Erro ao salvar"); setEditSaving(false); return; }
+
+    // Switching from PIX to Cakto: generate Cakto link
+    if (!wasCakto && nowCakto) {
+      try {
+        const amountReais = cents / 100;
+        const { data, error: fnError } = await supabase.functions.invoke("create-cakto-payment", {
+          body: {
+            proposal_id: editTarget.id,
+            amount_reais: amountReais,
+            client_name: editClientName.trim(),
+            client_email: editClientEmail.trim() || "",
+            description: `${editTitle.trim()}${editDescription.trim() ? " - " + editDescription.trim() : ""}`,
+          },
+        });
+        if (fnError || !data?.url) {
+          toast.success("Proposta salva! Gere o link Cakto na lista.");
+        } else {
+          toast.success("Proposta salva com link Cakto!");
+        }
+      } catch {
+        toast.success("Proposta salva! Gere o link Cakto na lista.");
+      }
+    } else {
+      toast.success("Proposta atualizada!");
+    }
+
+    setEditTarget(null);
+    fetchProposals();
     setEditSaving(false);
   };
 
@@ -676,6 +716,21 @@ const AdminDashboard = () => {
             <div className="space-y-1.5">
               <Label>Valor (R$)</Label>
               <Input value={editAmountReais} onChange={e => setEditAmountReais(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Método de Pagamento</Label>
+              <div className="grid grid-cols-2 gap-2">
+                <button type="button" onClick={() => setEditPaymentMethod("pix")}
+                  className={`flex items-center gap-2 rounded-lg border p-3 text-sm transition-all ${editPaymentMethod === "pix" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/50"}`}>
+                  <Smartphone className="w-4 h-4" />
+                  <div className="text-left"><p className="font-medium">PIX</p><p className="text-xs opacity-70">QR Code direto</p></div>
+                </button>
+                <button type="button" onClick={() => setEditPaymentMethod("cakto")}
+                  className={`flex items-center gap-2 rounded-lg border p-3 text-sm transition-all ${editPaymentMethod === "cakto" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/50"}`}>
+                  <ExternalLink className="w-4 h-4" />
+                  <div className="text-left"><p className="font-medium">Cakto</p><p className="text-xs opacity-70">Checkout completo</p></div>
+                </button>
+              </div>
             </div>
             <Button onClick={handleEditSave} className="w-full" disabled={editSaving}>
               {editSaving ? "Salvando..." : "Salvar Alterações"}
