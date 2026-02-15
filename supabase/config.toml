@@ -8,3 +8,9 @@ verify_jwt = false
 
 [functions.generate-pix]
 verify_jwt = false
+
+[functions.create-cakto-payment]
+verify_jwt = false
+
+[functions.cakto-webhook]
+verify_jwt = false
