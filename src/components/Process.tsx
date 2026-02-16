@@ -38,7 +38,7 @@ export default function Process() {
             className="font-display text-4xl md:text-6xl lg:text-7xl font-black tracking-tight text-white"
           >
             Do conceito à{" "}
-            <span className="text-white/40">realidade</span>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">realidade</span>
           </motion.h2>
         </div>
 
