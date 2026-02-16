@@ -18,6 +18,10 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const isHome = location.pathname === "/";
+
+  // On non-home pages, always use scrolled (solid) style
+  const useTransparent = isHome && !scrolled;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -45,9 +49,9 @@ export default function Header() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.3 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? "glass-navbar-scrolled"
-          : "bg-transparent backdrop-blur-none border-none shadow-none"
+        useTransparent
+          ? "bg-transparent backdrop-blur-none border-none shadow-none"
+          : "glass-navbar-scrolled"
       }`}
     >
       <div className="container mx-auto flex items-center justify-center h-16 px-6 lg:px-12 relative">
@@ -56,7 +60,7 @@ export default function Header() {
             whileHover={{ scale: 1.05 }}
             src={logo}
             alt="Brandify - Criação de Sites Profissionais"
-            className={`h-10 w-10 rounded-full ring-1 ${scrolled ? 'ring-border' : 'ring-white/30'}`}
+            className={`h-10 w-10 rounded-full ring-1 ${useTransparent ? 'ring-white/30' : 'ring-border'}`}
             width={40}
             height={40}
           />
@@ -69,7 +73,7 @@ export default function Header() {
               key={l.href}
               onClick={() => handleNav(l.href)}
               className={`text-sm bg-transparent border-none cursor-pointer gentle-animation hover:scale-105 font-medium ${
-                scrolled ? 'text-muted-foreground hover:text-foreground' : 'text-white/80 hover:text-white'
+                useTransparent ? 'text-white/80 hover:text-white' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {l.label}
@@ -82,7 +86,7 @@ export default function Header() {
             target="_blank"
             rel="noopener noreferrer"
             className={`text-sm font-semibold px-5 py-2.5 rounded-lg gentle-animation ${
-              scrolled ? 'bg-foreground text-background hover:opacity-90' : 'bg-white/20 text-white backdrop-blur-sm hover:bg-white/30'
+              useTransparent ? 'bg-white/20 text-white backdrop-blur-sm hover:bg-white/30' : 'bg-foreground text-background hover:opacity-90'
             }`}
           >
             Contratar
@@ -91,7 +95,7 @@ export default function Header() {
 
         {/* Mobile toggle */}
         <button
-          className={`md:hidden absolute right-6 p-2 ${scrolled ? 'text-foreground' : 'text-white'}`}
+          className={`md:hidden absolute right-6 p-2 ${useTransparent ? 'text-white' : 'text-foreground'}`}
           onClick={() => setOpen(!open)}
           aria-label="Menu"
         >
