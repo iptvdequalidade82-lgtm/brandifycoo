@@ -31,7 +31,7 @@ export default function FAQ() {
         >
            <h2 className="font-display text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-4 text-white">
             Perguntas{" "}
-            <span className="text-white/40">frequentes</span>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">frequentes</span>
           </h2>
         </motion.div>
 

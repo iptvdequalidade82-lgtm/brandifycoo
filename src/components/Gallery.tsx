@@ -17,7 +17,7 @@ const item = { hidden: { opacity: 0, scale: 0.95 }, show: { opacity: 1, scale: 1
 
 export default function Gallery() {
   return (
-    <section id="galeria" className="section-padding relative overflow-hidden">
+    <section id="galeria" className="section-padding relative overflow-hidden bg-black text-white">
       <div className="absolute bottom-0 left-0 w-[350px] h-[350px] rounded-full bg-primary/5 blur-[130px] pointer-events-none" />
 
       <div className="container mx-auto max-w-6xl relative">
@@ -27,17 +27,17 @@ export default function Gallery() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6 }}
-            className="font-display text-3xl md:text-5xl font-black tracking-tight mb-4"
+            className="font-display text-3xl md:text-5xl font-black tracking-tight mb-4 text-white"
           >
             Nosso{" "}
-            <span className="text-gradient">conteúdo</span>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">conteúdo</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-muted-foreground max-w-xl mx-auto"
+            className="text-white/50 max-w-xl mx-auto"
           >
             Acompanhe nossas dicas e insights sobre presença digital no Instagram.
           </motion.p>
