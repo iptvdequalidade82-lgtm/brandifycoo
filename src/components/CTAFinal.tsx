@@ -25,11 +25,11 @@ export default function CTAFinal() {
     <section ref={sectionRef} className="relative py-28 md:py-36 px-6 overflow-visible bg-black">
       {/* Galaxy background with gradient fade */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.20] pointer-events-none"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.28] md:opacity-[0.20] pointer-events-none"
         style={{
           backgroundImage: `url(${skyscrapersUpBg})`,
-          maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
+          maskImage: 'linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)',
         }}
       />
       {/* Organic shapes */}
