@@ -48,11 +48,6 @@ const Curso = () => {
 
       {/* Hero */}
       <section className="relative pt-24 pb-16 overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-10"
-          style={{ backgroundImage: `url(${cursoBanner})` }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black via-black/80 to-black" />
         <div className="container mx-auto px-6 relative z-10 text-center max-w-3xl">
           <motion.img
             initial={{ opacity: 0, scale: 0.8 }}
