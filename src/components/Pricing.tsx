@@ -272,10 +272,6 @@ export default function Pricing() {
           <div className="p-7 md:p-10 border-b border-white/10">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
               <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-accent/15 text-brand-accent text-xs font-medium mb-3">
-                  <Sparkles size={12} />
-                  E-commerce
-                </div>
                 <h3 className="font-display text-2xl md:text-3xl font-black">Loja Virtual — Nuvemshop</h3>
                 <p className="text-white/50 mt-2 max-w-lg">Loja online completa, configurada e pronta para vender. Ideal para quem quer entrar no e-commerce com estrutura profissional.</p>
               </div>
