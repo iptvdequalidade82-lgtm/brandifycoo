@@ -2,6 +2,7 @@ import { MessageCircle, Code2, Palette, Megaphone, PenTool, Rocket, Users, Clock
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import teamBg from "@/assets/team-bg.jpg";
 
 const roles = [
   { icon: Code2, title: "Desenvolvedor Web", desc: "HTML, CSS, React, e ferramentas no-code/low-code." },
@@ -30,7 +31,11 @@ export default function TrabalheConosco() {
   const stepsReveal = useScrollReveal();
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white relative">
+      <div
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-[0.12] pointer-events-none blur-sm"
+        style={{ backgroundImage: `url(${teamBg})` }}
+      />
       <Header />
 
       {/* Hero */}

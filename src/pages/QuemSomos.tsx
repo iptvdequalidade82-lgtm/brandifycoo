@@ -3,10 +3,15 @@ import Footer from "@/components/Footer";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 import { motion } from "framer-motion";
 import { Users, Target, Lightbulb } from "lucide-react";
+import aboutBg from "@/assets/about-bg.jpg";
 
 export default function QuemSomos() {
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white relative">
+      <div
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-[0.12] pointer-events-none blur-sm"
+        style={{ backgroundImage: `url(${aboutBg})` }}
+      />
       <Header />
 
       <section className="pt-32 pb-20 px-6">
