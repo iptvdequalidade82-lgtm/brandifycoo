@@ -52,11 +52,11 @@ export default function CTAFinal() {
             <span className="underline decoration-brand-accent/40 underline-offset-8">impressiona</span>?
           </h2>
 
-          <ScrollRevealText
-            text="Seu próximo projeto começa aqui. Fale conosco e transforme sua presença digital."
-            className="text-white/70 text-lg md:text-xl mb-10 max-w-xl mx-auto leading-relaxed"
-            highlightWords={["transforme"]}
-          />
+          <p className="text-white/70 text-lg md:text-xl mb-10 max-w-xl mx-auto leading-relaxed">
+            Seu próximo projeto começa aqui. Fale conosco e{" "}
+            <span className="italic font-semibold bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">transforme</span>{" "}
+            sua presença digital.
+          </p>
 
           <motion.a
             whileHover={{ scale: 1.05 }}
