@@ -67,6 +67,19 @@
     >
       <source src="/hero-bg-video.mp4" type="video/mp4" />
     </video>
+    <style>
+      /* Hide iOS Safari default video controls */
+      #hero-video::-webkit-media-controls,
+      #hero-video::-webkit-media-controls-panel,
+      #hero-video::-webkit-media-controls-play-button,
+      #hero-video::-webkit-media-controls-start-playback-button,
+      #hero-video::-webkit-media-controls-overlay-play-button {
+        display: none !important;
+        -webkit-appearance: none !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+    </style>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
