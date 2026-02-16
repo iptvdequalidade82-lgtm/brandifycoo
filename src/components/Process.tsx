@@ -53,8 +53,9 @@ export default function Process() {
               <motion.div
                 key={step.title}
                 variants={item}
-                whileHover={{ y: -4, transition: { duration: 0.3 } }}
+                whileHover={{ y: -4, rotateX: 2, rotateY: -1.5, transition: { duration: 0.3 } }}
                 className="relative p-6 rounded-2xl bg-background border border-border text-center gentle-animation hover:shadow-lg"
+                style={{ transformPerspective: 800 }}
               >
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-brand text-white text-xs font-bold flex items-center justify-center shadow-md">
                   {i + 1}

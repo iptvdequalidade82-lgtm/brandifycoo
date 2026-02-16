@@ -46,13 +46,14 @@ export default function Services() {
               <motion.div
                 key={s.title}
                 variants={item}
-                whileHover={{ y: -6, transition: { duration: 0.3 } }}
+                whileHover={{ y: -6, rotateX: 2, rotateY: -2, transition: { duration: 0.3 } }}
                 className="group relative p-6 rounded-2xl bg-background border border-border gentle-animation hover:shadow-lg"
+                style={{ transformPerspective: 800 }}
               >
                 <div className="w-11 h-11 rounded-xl bg-brand-light flex items-center justify-center mb-5 group-hover:bg-brand gentle-animation">
                   <Icon className="text-brand-muted group-hover:text-white gentle-animation" size={20} strokeWidth={1.8} />
                 </div>
-                <h3 className="font-display text-base font-bold text-foreground mb-2">{s.title}</h3>
+                <h3 className="font-display text-base font-bold text-foreground mb-2 tracking-tight">{s.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
               </motion.div>
             );
