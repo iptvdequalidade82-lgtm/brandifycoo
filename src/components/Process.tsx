@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import TiltCard from "@/components/TiltCard";
+import lunarMountainBg from "@/assets/lunar-mountain-bg.jpg";
 
 const steps = [
   { num: "01", title: "Briefing", desc: "Entendemos sua marca, objetivos e público para criar a estratégia ideal." },
@@ -22,6 +23,17 @@ export default function Process() {
 
   return (
     <section ref={sectionRef} id="processo" className="relative overflow-visible py-28 md:py-36 bg-black">
+      {/* Lunar mountain background */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.12] pointer-events-none"
+        style={{
+          backgroundImage: `url(${lunarMountainBg})`,
+          maskImage: 'radial-gradient(ellipse 50% 70% at center, transparent 0%, black 100%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
+          WebkitMaskImage: 'radial-gradient(ellipse 50% 70% at center, transparent 0%, black 100%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
+          maskComposite: 'intersect',
+          WebkitMaskComposite: 'source-in',
+        }}
+      />
       {/* Parallax grid pattern */}
       <motion.div
         style={{ y: bgY }}
