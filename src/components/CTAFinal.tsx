@@ -2,7 +2,7 @@ import { ArrowRight } from "lucide-react";
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import ScrollRevealText from "@/components/ScrollRevealText";
-import constellationBg from "@/assets/constellation-bg.jpg";
+import skyscrapersUpBg from "@/assets/skyscrapers-up-bg.jpg";
 
 const whatsappBase = "https://wa.me/5543991065129?text=";
 
@@ -27,7 +27,7 @@ export default function CTAFinal() {
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.20] pointer-events-none"
         style={{
-          backgroundImage: `url(${constellationBg})`,
+          backgroundImage: `url(${skyscrapersUpBg})`,
           maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
           WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
         }}
