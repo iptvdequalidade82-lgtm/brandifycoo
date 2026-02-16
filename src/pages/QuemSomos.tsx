@@ -18,7 +18,7 @@ export default function QuemSomos() {
             className="text-center mb-16"
           >
             <h1 className="font-display text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-6 text-white">
-              Quem <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">Somos</span>
+              Quem <span className="italic bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">Somos</span>
             </h1>
             <p className="text-white/50 text-lg max-w-2xl mx-auto leading-relaxed">
               A Brandify é uma agência digital especializada em criação de sites profissionais, 

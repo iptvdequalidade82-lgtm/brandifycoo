@@ -22,7 +22,7 @@ export default function SitePreview() {
             className="font-display text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-4 text-white"
           >
             Projetos{" "}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">em destaque</span>
+            <span className="italic bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">em destaque</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}

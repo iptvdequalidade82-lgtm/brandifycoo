@@ -55,7 +55,7 @@ const Curso = () => {
             transition={{ duration: 0.6 }}
             className="font-display text-3xl md:text-5xl font-black mb-4 text-white"
           >
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">Cursos</span>
+            <span className="italic bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">Cursos</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
