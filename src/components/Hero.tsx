@@ -11,27 +11,51 @@ export default function Hero() {
     const video = videoRef.current;
     if (!video) return;
 
-    const attemptPlay = async () => {
-      try {
-        await video.play();
-      } catch {
-        video.muted = true;
-        try { await video.play(); } catch { /* fallback: stays paused */ }
+    // Force muted via property (not just attribute) - critical for iOS
+    video.muted = true;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+    video.setAttribute('x5-playsinline', '');
+    video.setAttribute('x5-video-player-type', 'h5');
+    video.setAttribute('x5-video-player-fullscreen', 'true');
+
+    const attemptPlay = () => {
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // Silently fail, interval will retry
+        });
       }
     };
 
+    // Try immediately
     attemptPlay();
 
-    // Also try on first user interaction (iOS sometimes needs this)
+    // Keep retrying every 500ms until playing
+    const interval = setInterval(() => {
+      if (video.paused) {
+        attemptPlay();
+      } else {
+        clearInterval(interval);
+      }
+    }, 500);
+
+    // Also try on any user interaction
+    const events = ['touchstart', 'touchend', 'click', 'scroll'];
     const handleInteraction = () => {
       if (video.paused) {
-        video.play().catch(() => {});
+        attemptPlay();
       }
-      document.removeEventListener('touchstart', handleInteraction);
+      if (!video.paused) {
+        events.forEach(e => document.removeEventListener(e, handleInteraction));
+      }
     };
-    document.addEventListener('touchstart', handleInteraction, { once: true });
+    events.forEach(e => document.addEventListener(e, handleInteraction, { once: true, passive: true }));
 
-    return () => document.removeEventListener('touchstart', handleInteraction);
+    return () => {
+      clearInterval(interval);
+      events.forEach(e => document.removeEventListener(e, handleInteraction));
+    };
   }, []);
 
   return (
@@ -52,12 +76,13 @@ export default function Hero() {
           loop
           muted
           playsInline
+          // @ts-ignore - webkit attribute for iOS
+          webkit-playsinline="true"
           preload="auto"
           onLoadedData={() => setVideoLoaded(true)}
           className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src="/hero-bg-video.mp4" type="video/mp4" />
-        </video>
+          src="/hero-bg-video.mp4"
+        />
       </motion.div>
 
       {/* Dark overlay for text legibility */}
