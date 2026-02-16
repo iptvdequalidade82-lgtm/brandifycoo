@@ -2,7 +2,7 @@ import post1 from "@/assets/post-1.jpg";
 import post2 from "@/assets/post-2.jpg";
 import post3 from "@/assets/post-3.jpg";
 import post4 from "@/assets/post-4.jpg";
-import moonBg from "@/assets/moon-bg.jpg";
+import auroraBg from "@/assets/aurora-bg.jpg";
 import { Instagram } from "lucide-react";
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
@@ -25,11 +25,13 @@ export default function Gallery() {
   return (
     <section ref={sectionRef} id="galeria" className="section-padding relative overflow-hidden bg-black text-white">
       <div
-        className="absolute inset-0 bg-cover bg-top bg-no-repeat opacity-[0.10] pointer-events-none"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.14] pointer-events-none"
         style={{
-          backgroundImage: `url(${moonBg})`,
-          maskImage: 'linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%)',
+          backgroundImage: `url(${auroraBg})`,
+          maskImage: 'radial-gradient(ellipse 50% 70% at center, transparent 0%, black 100%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
+          WebkitMaskImage: 'radial-gradient(ellipse 50% 70% at center, transparent 0%, black 100%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
+          maskComposite: 'intersect',
+          WebkitMaskComposite: 'source-in',
         }}
       />
       <motion.div style={{ y: blobY }} className="absolute bottom-0 left-0 w-[350px] h-[350px] rounded-full bg-primary/5 blur-[130px] pointer-events-none" />

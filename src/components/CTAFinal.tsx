@@ -2,7 +2,7 @@ import { ArrowRight } from "lucide-react";
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import ScrollRevealText from "@/components/ScrollRevealText";
-import moonBg from "@/assets/moon-bg.jpg";
+import galaxyBg from "@/assets/galaxy-bg.jpg";
 
 const whatsappBase = "https://wa.me/5543991065129?text=";
 
@@ -23,13 +23,15 @@ export default function CTAFinal() {
 
   return (
     <section ref={sectionRef} className="relative py-28 md:py-36 px-6 overflow-visible bg-black">
-      {/* Moon background with gradient fade */}
+      {/* Galaxy background with gradient fade */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.14] pointer-events-none"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.16] pointer-events-none"
         style={{
-          backgroundImage: `url(${moonBg})`,
-          maskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%)',
+          backgroundImage: `url(${galaxyBg})`,
+          maskImage: 'radial-gradient(ellipse 45% 65% at center, transparent 0%, black 100%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
+          WebkitMaskImage: 'radial-gradient(ellipse 45% 65% at center, transparent 0%, black 100%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
+          maskComposite: 'intersect',
+          WebkitMaskComposite: 'source-in',
         }}
       />
       {/* Organic shapes */}

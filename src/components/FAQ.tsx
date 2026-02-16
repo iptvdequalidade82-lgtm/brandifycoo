@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import moonBg from "@/assets/moon-bg.jpg";
+import nebulaBg from "@/assets/space-nebula-bg.jpg";
 import {
   Accordion,
   AccordionContent,
@@ -23,11 +23,13 @@ export default function FAQ() {
   return (
     <section id="faq" className="section-padding relative overflow-visible bg-black text-white">
       <div
-        className="absolute inset-0 bg-cover bg-bottom bg-no-repeat opacity-[0.12] pointer-events-none"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.15] pointer-events-none"
         style={{
-          backgroundImage: `url(${moonBg})`,
-          maskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%)',
+          backgroundImage: `url(${nebulaBg})`,
+          maskImage: 'radial-gradient(ellipse 50% 70% at center, transparent 0%, black 100%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
+          WebkitMaskImage: 'radial-gradient(ellipse 50% 70% at center, transparent 0%, black 100%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
+          maskComposite: 'intersect',
+          WebkitMaskComposite: 'source-in',
         }}
       />
       <div className="container mx-auto max-w-3xl relative">
