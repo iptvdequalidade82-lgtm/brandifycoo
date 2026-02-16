@@ -51,7 +51,7 @@ export default function Header() {
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         useTransparent
           ? "bg-transparent backdrop-blur-none border-none shadow-none"
-          : "glass-navbar-scrolled"
+          : "bg-black/90 backdrop-blur-xl border-b border-white/10"
       }`}
     >
       <div className="container mx-auto flex items-center justify-center h-16 px-6 lg:px-12 relative">
@@ -60,7 +60,7 @@ export default function Header() {
             whileHover={{ scale: 1.05 }}
             src={logo}
             alt="Brandify - Criação de Sites Profissionais"
-            className={`h-10 w-10 rounded-full ring-1 ${useTransparent ? 'ring-white/30' : 'ring-border'}`}
+            className={`h-10 w-10 rounded-full ring-1 ${useTransparent ? 'ring-white/30' : 'ring-white/20'}`}
             width={40}
             height={40}
           />
@@ -73,7 +73,7 @@ export default function Header() {
               key={l.href}
               onClick={() => handleNav(l.href)}
               className={`text-sm bg-transparent border-none cursor-pointer gentle-animation hover:scale-105 font-medium ${
-                useTransparent ? 'text-white/80 hover:text-white' : 'text-muted-foreground hover:text-foreground'
+                useTransparent ? 'text-white/80 hover:text-white' : 'text-white/70 hover:text-white'
               }`}
             >
               {l.label}
@@ -86,7 +86,7 @@ export default function Header() {
             target="_blank"
             rel="noopener noreferrer"
             className={`text-sm font-semibold px-5 py-2.5 rounded-lg gentle-animation ${
-              useTransparent ? 'bg-white/20 text-white backdrop-blur-sm hover:bg-white/30' : 'bg-foreground text-background hover:opacity-90'
+              useTransparent ? 'bg-white/20 text-white backdrop-blur-sm hover:bg-white/30' : 'bg-white text-black hover:bg-white/90'
             }`}
           >
             Contratar
@@ -95,7 +95,7 @@ export default function Header() {
 
         {/* Mobile toggle */}
         <button
-          className={`md:hidden absolute right-6 p-2 ${useTransparent ? 'text-white' : 'text-foreground'}`}
+          className={`md:hidden absolute right-6 p-2 ${useTransparent ? 'text-white' : 'text-white'}`}
           onClick={() => setOpen(!open)}
           aria-label="Menu"
         >
@@ -105,12 +105,12 @@ export default function Header() {
 
       {/* Mobile menu */}
       {open && (
-        <nav className="md:hidden glass-strong px-6 pb-6 pt-4 flex flex-col gap-4 animate-fade-in">
+        <nav className="md:hidden bg-black/95 backdrop-blur-xl border-b border-white/10 px-6 pb-6 pt-4 flex flex-col gap-4 animate-fade-in">
           {navLinks.map((l) => (
             <button
               key={l.href}
               onClick={() => handleNav(l.href)}
-              className="text-muted-foreground hover:text-foreground gentle-animation bg-transparent border-none cursor-pointer text-left font-medium text-lg px-4 py-3 hover:bg-accent rounded-lg"
+              className="text-white/70 hover:text-white gentle-animation bg-transparent border-none cursor-pointer text-left font-medium text-lg px-4 py-3 hover:bg-white/10 rounded-lg"
             >
               {l.label}
             </button>
@@ -120,7 +120,7 @@ export default function Header() {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => setOpen(false)}
-            className="font-semibold px-5 py-3 rounded-lg bg-foreground text-background text-center gentle-animation mt-4"
+            className="font-semibold px-5 py-3 rounded-lg bg-white text-black text-center gentle-animation mt-4"
           >
             Contratar
           </a>
