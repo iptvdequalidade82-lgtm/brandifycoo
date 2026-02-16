@@ -59,18 +59,19 @@ export default function Gallery() {
             <motion.a
               key={i}
               variants={item}
+              whileTap={{ scale: 0.95 }}
               href="https://www.instagram.com/brandifycoo"
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative aspect-[4/5] rounded-xl overflow-hidden bg-white/[0.04] border border-white/10 hover:border-white/20 transition-all duration-500"
+              className="group relative aspect-[4/5] rounded-xl overflow-hidden bg-white/[0.04] border border-white/10 hover:border-white/20 active:border-brand-accent/30 transition-all duration-500"
             >
               <img
                 src={post.src}
                 alt={post.alt}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-active:scale-105"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-end pb-4">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-end pb-4">
                 <Instagram className="text-white mb-2" size={24} />
                 <span className="text-xs text-white/80 font-medium">Ver no Instagram</span>
               </div>

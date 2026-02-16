@@ -67,12 +67,16 @@ export default function CTAFinal() {
               {quickMessages.map((qm, i) => (
                 <motion.a
                   key={i}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.3 + i * 0.08 }}
                   whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileTap={{ scale: 0.9, backgroundColor: "rgba(255,255,255,0.15)" }}
                   href={`${whatsappBase}${encodeURIComponent(qm.message)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-2.5 rounded-xl bg-white/[0.06] border border-white/10 hover:border-white/25 hover:bg-white/[0.1] text-white/70 hover:text-white text-xs font-medium gentle-animation"
+                  className="px-4 py-2.5 rounded-xl bg-white/[0.06] border border-white/10 hover:border-white/25 hover:bg-white/[0.1] active:border-brand-accent/40 text-white/70 hover:text-white active:text-white text-xs font-medium gentle-animation"
                 >
                   {qm.label}
                 </motion.a>

@@ -46,10 +46,10 @@ export default function FAQ() {
         >
           <Accordion type="single" collapsible className="space-y-3">
             {faqs.map((faq, i) => (
-              <motion.div key={i} variants={item}>
+              <motion.div key={i} variants={item} whileTap={{ scale: 0.98 }}>
                 <AccordionItem
                   value={`faq-${i}`}
-                  className="rounded-2xl border border-white/10 bg-white/[0.04] px-6"
+                  className="rounded-2xl border border-white/10 bg-white/[0.04] px-6 active:border-white/20 transition-colors"
                 >
                   <AccordionTrigger className="text-sm font-bold text-white hover:no-underline py-5">
                     {faq.q}
