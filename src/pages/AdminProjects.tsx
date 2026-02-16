@@ -307,7 +307,7 @@ export default function AdminProjects() {
             const sCfg = statusConfig[p.status];
             const PlanIcon = pCfg.icon;
             return (
-              <div key={p.id} className="glass rounded-xl p-5 glow-border">
+              <div key={p.id} className="rounded-2xl p-5 border border-white/[0.06] bg-white/[0.02]">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">

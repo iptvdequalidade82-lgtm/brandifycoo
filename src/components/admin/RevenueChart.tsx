@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell } from "recharts";
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 interface ProjectData {
   title: string;
@@ -23,12 +23,6 @@ interface Props {
 
 const MONTHS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
-const PLAN_COLORS: Record<string, string> = {
-  essencial: "hsl(var(--primary))",
-  profissional: "hsl(200 80% 55%)",
-  premium: "hsl(45 100% 60%)",
-};
-
 const PLAN_LABELS: Record<string, string> = {
   essencial: "Essencial",
   profissional: "Profissional",
@@ -36,9 +30,9 @@ const PLAN_LABELS: Record<string, string> = {
 };
 
 const PAYMENT_STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  pending: { label: "Em Aberto", color: "text-amber-500" },
+  pending: { label: "Em Aberto", color: "text-amber-400" },
   partial: { label: "Parcial (50%)", color: "text-amber-400" },
-  full: { label: "Quitado", color: "text-green-400" },
+  full: { label: "Quitado", color: "text-emerald-400" },
 };
 
 const formatCurrency = (cents: number) =>
@@ -63,7 +57,7 @@ export default function RevenueChart({ proposals, projects, extraRevenue = 0 }: 
       const recebido = monthProjects.reduce((s, p) => s + p.amount_received_cents, 0);
       const aberto = monthProjects.reduce((s, p) => s + (p.total_amount_cents - p.amount_received_cents), 0);
       months.push({
-        name: `${MONTHS[month]}/${String(year).slice(2)}`,
+        name: `${MONTHS[month]}`,
         recebido: recebido / 100,
         aberto: aberto / 100,
       });
@@ -93,32 +87,32 @@ export default function RevenueChart({ proposals, projects, extraRevenue = 0 }: 
 
   if (!hasData) {
     return (
-      <div className="glass rounded-xl p-5 glow-border mb-8">
-        <h3 className="text-sm font-semibold text-foreground mb-3">📊 Faturamento</h3>
-        <p className="text-xs text-muted-foreground text-center py-6">Nenhum faturamento registrado ainda</p>
+      <div className="rounded-2xl p-6 border border-white/[0.06] bg-white/[0.02] mb-8">
+        <h3 className="text-sm font-semibold text-white mb-3">Faturamento</h3>
+        <p className="text-xs text-white/30 text-center py-6">Nenhum faturamento registrado ainda</p>
       </div>
     );
   }
 
   const tabs: { key: ViewMode; label: string }[] = [
-    { key: "chart", label: "📈 Mensal" },
-    { key: "plano", label: "📦 Por Plano" },
-    { key: "projetos", label: "📋 Por Projeto" },
+    { key: "chart", label: "Mensal" },
+    { key: "plano", label: "Por Plano" },
+    { key: "projetos", label: "Por Projeto" },
   ];
 
   return (
-    <div className="glass rounded-xl p-5 glow-border mb-8">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-foreground">📊 Faturamento</h3>
-        <div className="flex gap-1">
+    <div className="rounded-2xl p-6 border border-white/[0.06] bg-white/[0.02] mb-8">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-sm font-semibold text-white">Faturamento</h3>
+        <div className="flex gap-1 p-0.5 rounded-lg bg-white/[0.04]">
           {tabs.map(tab => (
             <button
               key={tab.key}
               onClick={() => setViewMode(tab.key)}
-              className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all ${
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${
                 viewMode === tab.key
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-muted"
+                  ? "bg-brand-accent text-white shadow-sm"
+                  : "text-white/40 hover:text-white/60"
               }`}
             >
               {tab.label}
@@ -128,20 +122,38 @@ export default function RevenueChart({ proposals, projects, extraRevenue = 0 }: 
       </div>
 
       {viewMode === "chart" && (
-        <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={chartData}>
-            <XAxis dataKey="name" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
+        <ResponsiveContainer width="100%" height={220}>
+          <AreaChart data={chartData}>
+            <defs>
+              <linearGradient id="gradientRecebido" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="hsl(224, 76%, 33%)" stopOpacity={0.4} />
+                <stop offset="100%" stopColor="hsl(224, 76%, 33%)" stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="gradientAberto" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="hsl(45, 100%, 60%)" stopOpacity={0.3} />
+                <stop offset="100%" stopColor="hsl(45, 100%, 60%)" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <XAxis
+              dataKey="name"
+              tick={{ fontSize: 11, fill: "rgba(255,255,255,0.3)" }}
+              axisLine={false}
+              tickLine={false}
+            />
             <YAxis
-              tick={{ fontSize: 11 }}
-              stroke="hsl(var(--muted-foreground))"
+              tick={{ fontSize: 11, fill: "rgba(255,255,255,0.3)" }}
+              axisLine={false}
+              tickLine={false}
               tickFormatter={(v) => `R$${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "hsl(var(--card))",
-                border: "1px solid hsl(var(--border))",
-                borderRadius: "8px",
+                backgroundColor: "rgba(15,15,15,0.95)",
+                border: "1px solid rgba(255,255,255,0.1)",
+                borderRadius: "12px",
                 fontSize: "12px",
+                color: "#fff",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
               }}
               formatter={(value: number, name: string) => [
                 new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value),
@@ -149,34 +161,45 @@ export default function RevenueChart({ proposals, projects, extraRevenue = 0 }: 
               ]}
             />
             <Legend
-              formatter={(value: string) => value === "recebido" ? "Recebido" : "Em Aberto"}
-              wrapperStyle={{ fontSize: "11px" }}
+              formatter={(value: string) => <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 11 }}>{value === "recebido" ? "Recebido" : "Em Aberto"}</span>}
             />
-            <Bar dataKey="recebido" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} stackId="a" />
-            <Bar dataKey="aberto" fill="hsl(35 100% 55%)" radius={[4, 4, 0, 0]} stackId="a" />
-          </BarChart>
+            <Area
+              type="monotone"
+              dataKey="recebido"
+              stroke="hsl(224, 76%, 33%)"
+              strokeWidth={2}
+              fill="url(#gradientRecebido)"
+            />
+            <Area
+              type="monotone"
+              dataKey="aberto"
+              stroke="hsl(45, 100%, 60%)"
+              strokeWidth={2}
+              fill="url(#gradientAberto)"
+            />
+          </AreaChart>
         </ResponsiveContainer>
       )}
 
       {viewMode === "plano" && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {planData.length === 0 ? (
-            <p className="text-xs text-muted-foreground col-span-3 text-center py-6">Nenhum projeto ainda</p>
+            <p className="text-xs text-white/30 col-span-3 text-center py-6">Nenhum projeto ainda</p>
           ) : (
             planData.map(p => (
-              <div key={p.plan} className="rounded-lg border border-border/50 p-4 space-y-3">
+              <div key={p.plan} className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold text-foreground">{p.name}</span>
-                  <span className="text-xs text-muted-foreground">{p.count} projeto{p.count !== 1 ? "s" : ""}</span>
+                  <span className="text-sm font-semibold text-white">{p.name}</span>
+                  <span className="text-xs text-white/30">{p.count} projeto{p.count !== 1 ? "s" : ""}</span>
                 </div>
                 <div className="space-y-1.5">
                   <div className="flex justify-between text-xs">
-                    <span className="text-muted-foreground">Total</span>
-                    <span className="text-foreground font-medium">{formatCurrency(p.total)}</span>
+                    <span className="text-white/40">Total</span>
+                    <span className="text-white font-medium">{formatCurrency(p.total)}</span>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="text-green-400">Recebido</span>
-                    <span className="text-green-400 font-medium">{formatCurrency(p.recebido)}</span>
+                    <span className="text-emerald-400">Recebido</span>
+                    <span className="text-emerald-400 font-medium">{formatCurrency(p.recebido)}</span>
                   </div>
                   <div className="flex justify-between text-xs">
                     <span className="text-amber-400">Em Aberto</span>
@@ -184,9 +207,9 @@ export default function RevenueChart({ proposals, projects, extraRevenue = 0 }: 
                   </div>
                 </div>
                 {/* Progress bar */}
-                <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-primary rounded-full transition-all"
+                    className="h-full rounded-full transition-all bg-gradient-to-r from-brand-accent to-brand-accent-deep"
                     style={{ width: p.total > 0 ? `${(p.recebido / p.total) * 100}%` : "0%" }}
                   />
                 </div>
@@ -200,41 +223,38 @@ export default function RevenueChart({ proposals, projects, extraRevenue = 0 }: 
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
-              <tr className="border-b border-border/50">
-                <th className="text-left py-2 px-2 text-muted-foreground font-medium">Projeto</th>
-                <th className="text-left py-2 px-2 text-muted-foreground font-medium">Cliente</th>
-                <th className="text-left py-2 px-2 text-muted-foreground font-medium">Plano</th>
-                <th className="text-right py-2 px-2 text-muted-foreground font-medium">Total</th>
-                <th className="text-right py-2 px-2 text-muted-foreground font-medium">Recebido</th>
-                <th className="text-right py-2 px-2 text-muted-foreground font-medium">Pendente</th>
-                <th className="text-center py-2 px-2 text-muted-foreground font-medium">Status</th>
+              <tr className="border-b border-white/[0.06]">
+                <th className="text-left py-2.5 px-2 text-white/30 font-medium">Projeto</th>
+                <th className="text-left py-2.5 px-2 text-white/30 font-medium">Cliente</th>
+                <th className="text-left py-2.5 px-2 text-white/30 font-medium">Plano</th>
+                <th className="text-right py-2.5 px-2 text-white/30 font-medium">Total</th>
+                <th className="text-right py-2.5 px-2 text-white/30 font-medium">Recebido</th>
+                <th className="text-right py-2.5 px-2 text-white/30 font-medium">Pendente</th>
+                <th className="text-center py-2.5 px-2 text-white/30 font-medium">Status</th>
               </tr>
             </thead>
             <tbody>
               {projects.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-6 text-muted-foreground">Nenhum projeto</td>
+                  <td colSpan={7} className="text-center py-6 text-white/30">Nenhum projeto</td>
                 </tr>
               ) : (
                 projects.map((p, i) => {
                   const pending = p.total_amount_cents - p.amount_received_cents;
                   const statusInfo = PAYMENT_STATUS_LABELS[p.payment_status] || PAYMENT_STATUS_LABELS.pending;
                   return (
-                    <tr key={i} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
-                      <td className="py-2.5 px-2 text-foreground font-medium max-w-[140px] truncate">{p.title}</td>
-                      <td className="py-2.5 px-2 text-muted-foreground max-w-[120px] truncate">{p.client_name}</td>
-                      <td className="py-2.5 px-2">
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-medium" style={{
-                          backgroundColor: `${PLAN_COLORS[p.plan]}20`,
-                          color: PLAN_COLORS[p.plan],
-                        }}>
+                    <tr key={i} className="border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors">
+                      <td className="py-3 px-2 text-white font-medium max-w-[140px] truncate">{p.title}</td>
+                      <td className="py-3 px-2 text-white/50 max-w-[120px] truncate">{p.client_name}</td>
+                      <td className="py-3 px-2">
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-white/[0.06] text-white/60">
                           {PLAN_LABELS[p.plan] || p.plan}
                         </span>
                       </td>
-                      <td className="py-2.5 px-2 text-right text-foreground">{formatCurrency(p.total_amount_cents)}</td>
-                      <td className="py-2.5 px-2 text-right text-green-400">{formatCurrency(p.amount_received_cents)}</td>
-                      <td className="py-2.5 px-2 text-right text-amber-400">{pending > 0 ? formatCurrency(pending) : "—"}</td>
-                      <td className="py-2.5 px-2 text-center">
+                      <td className="py-3 px-2 text-right text-white">{formatCurrency(p.total_amount_cents)}</td>
+                      <td className="py-3 px-2 text-right text-emerald-400">{formatCurrency(p.amount_received_cents)}</td>
+                      <td className="py-3 px-2 text-right text-amber-400">{pending > 0 ? formatCurrency(pending) : "—"}</td>
+                      <td className="py-3 px-2 text-center">
                         <span className={`text-[10px] font-medium ${statusInfo.color}`}>{statusInfo.label}</span>
                       </td>
                     </tr>
