@@ -123,13 +123,20 @@ export default function Hero() {
             { value: 50, suffix: "+", label: "Projetos entregues" },
             { value: 98, suffix: "%", label: "Clientes satisfeitos" },
             { value: 24, suffix: "h", label: "Tempo de resposta" },
-          ].map((stat) => (
-            <div key={stat.label} className="text-center">
+          ].map((stat, i) => (
+            <motion.div
+              key={stat.label}
+              whileTap={{ scale: 1.1 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 1.6 + i * 0.15 }}
+              className="text-center cursor-default select-none"
+            >
               <p className="font-display text-3xl md:text-4xl font-extrabold text-white tracking-tight">
                 <AnimatedCounter end={stat.value} suffix={stat.suffix} />
               </p>
               <p className="text-xs md:text-sm text-white/60 mt-1.5 tracking-wide font-medium">{stat.label}</p>
-            </div>
+            </motion.div>
           ))}
         </motion.div>
       </div>

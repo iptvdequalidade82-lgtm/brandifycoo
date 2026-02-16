@@ -63,19 +63,29 @@ export default function Process() {
           viewport={{ once: true, margin: "-80px" }}
           className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
         >
-          {steps.map((step) => (
+          {steps.map((step, i) => (
             <motion.div key={step.title} variants={item}>
               <TiltCard className="h-full" tiltAmount={12}>
-                <div className="relative p-8 rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-sm h-full flex flex-col transition-all duration-500 hover:border-white/[0.15] hover:bg-white/[0.06]">
-                  <span className="font-display text-6xl font-black text-white/[0.07] group-hover:text-white/[0.12] transition-colors duration-500 leading-none mb-6">
+                <motion.div
+                  whileInView={{ opacity: 1, x: 0 }}
+                  initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                  className="relative p-8 rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-sm h-full flex flex-col transition-all duration-500 hover:border-white/[0.15] hover:bg-white/[0.06] active:bg-white/[0.08] active:border-brand-accent/30"
+                >
+                  <span className="font-display text-6xl font-black text-white/[0.07] leading-none mb-6">
                     {step.num}
                   </span>
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-2 h-2 rounded-full bg-brand-accent shadow-[0_0_12px_hsl(var(--brand-accent))] transition-shadow duration-500" />
+                    <motion.div
+                      animate={{ scale: [1, 1.3, 1] }}
+                      transition={{ repeat: Infinity, duration: 2, delay: i * 0.5 }}
+                      className="w-2 h-2 rounded-full bg-brand-accent shadow-[0_0_12px_hsl(var(--brand-accent))]"
+                    />
                     <h3 className="font-display text-xl font-bold text-white tracking-tight">{step.title}</h3>
                   </div>
                   <p className="text-sm text-white/40 leading-relaxed">{step.desc}</p>
-                </div>
+                </motion.div>
               </TiltCard>
             </motion.div>
           ))}
