@@ -1,5 +1,7 @@
 import { ArrowRight } from "lucide-react";
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import ScrollRevealText from "@/components/ScrollRevealText";
 
 const whatsappBase = "https://wa.me/5543991065129?text=";
 
@@ -11,14 +13,25 @@ const quickMessages = [
 ];
 
 export default function CTAFinal() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+  const scale = useTransform(scrollYProgress, [0, 0.5], [0.92, 1]);
+  const opacity = useTransform(scrollYProgress, [0, 0.3], [0, 1]);
+
   return (
-    <section className="relative py-28 md:py-36 px-6 overflow-visible bg-black">
+    <section ref={sectionRef} className="relative py-28 md:py-36 px-6 overflow-visible bg-black">
       {/* Organic shapes */}
       <div className="absolute top-10 left-10 w-24 h-24 rounded-full border border-white/10 animate-[pulse_4s_ease-in-out_infinite]" />
       <div className="absolute bottom-20 right-20 w-16 h-16 rounded-full bg-white/10 blur-sm animate-[pulse_5s_ease-in-out_infinite]" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-brand-accent/5 blur-[100px] pointer-events-none" />
 
-      <div className="relative container mx-auto max-w-3xl text-center text-white">
+      <motion.div
+        style={{ scale, opacity }}
+        className="relative container mx-auto max-w-3xl text-center text-white"
+      >
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -30,9 +43,11 @@ export default function CTAFinal() {
             <span className="underline decoration-brand-accent/40 underline-offset-8">impressiona</span>?
           </h2>
 
-          <p className="text-white/70 text-lg md:text-xl mb-10 max-w-xl mx-auto leading-relaxed">
-            Seu próximo projeto começa aqui. Fale conosco e transforme sua presença digital.
-          </p>
+          <ScrollRevealText
+            text="Seu próximo projeto começa aqui. Fale conosco e transforme sua presença digital."
+            className="text-white/70 text-lg md:text-xl mb-10 max-w-xl mx-auto leading-relaxed"
+            highlightWords={["transforme"]}
+          />
 
           <motion.a
             whileHover={{ scale: 1.05 }}
@@ -66,7 +81,7 @@ export default function CTAFinal() {
             </div>
           </div>
         </motion.div>
-      </div>
+      </motion.div>
     </section>
   );
 }

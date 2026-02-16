@@ -1,4 +1,6 @@
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import TiltCard from "@/components/TiltCard";
 
 const steps = [
   { num: "01", title: "Briefing", desc: "Entendemos sua marca, objetivos e público para criar a estratégia ideal." },
@@ -11,13 +13,25 @@ const container = { hidden: {}, show: { transition: { staggerChildren: 0.15 } } 
 const item = { hidden: { opacity: 0, y: 40 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } } };
 
 export default function Process() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+
   return (
-    <section id="processo" className="relative overflow-visible py-28 md:py-36 bg-black">
-      {/* Subtle grid pattern */}
-      <div className="absolute inset-0 opacity-[0.04]" style={{
-        backgroundImage: 'linear-gradient(rgba(255,255,255,.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.15) 1px, transparent 1px)',
-        backgroundSize: '60px 60px'
-      }} />
+    <section ref={sectionRef} id="processo" className="relative overflow-visible py-28 md:py-36 bg-black">
+      {/* Parallax grid pattern */}
+      <motion.div
+        style={{ y: bgY }}
+        className="absolute inset-0 opacity-[0.04]"
+      >
+        <div className="absolute inset-0" style={{
+          backgroundImage: 'linear-gradient(rgba(255,255,255,.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.15) 1px, transparent 1px)',
+          backgroundSize: '60px 60px'
+        }} />
+      </motion.div>
 
       <div className="container mx-auto max-w-6xl px-6 relative">
         <div className="text-center mb-20">
@@ -50,25 +64,19 @@ export default function Process() {
           className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
         >
           {steps.map((step) => (
-            <motion.div
-              key={step.title}
-              variants={item}
-              className="group relative"
-            >
-              <div className="relative p-8 rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-sm h-full flex flex-col transition-all duration-500 hover:border-white/[0.15] hover:bg-white/[0.06]">
-                {/* Large number */}
-                <span className="font-display text-6xl font-black text-white/[0.07] group-hover:text-white/[0.12] transition-colors duration-500 leading-none mb-6">
-                  {step.num}
-                </span>
-
-                {/* Glowing dot + title */}
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-2 h-2 rounded-full bg-brand-accent shadow-[0_0_12px_hsl(var(--brand-accent))] group-hover:shadow-[0_0_20px_hsl(var(--brand-accent))] transition-shadow duration-500" />
-                  <h3 className="font-display text-xl font-bold text-white tracking-tight">{step.title}</h3>
+            <motion.div key={step.title} variants={item}>
+              <TiltCard className="h-full" tiltAmount={12}>
+                <div className="relative p-8 rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-sm h-full flex flex-col transition-all duration-500 hover:border-white/[0.15] hover:bg-white/[0.06]">
+                  <span className="font-display text-6xl font-black text-white/[0.07] group-hover:text-white/[0.12] transition-colors duration-500 leading-none mb-6">
+                    {step.num}
+                  </span>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-2 h-2 rounded-full bg-brand-accent shadow-[0_0_12px_hsl(var(--brand-accent))] transition-shadow duration-500" />
+                    <h3 className="font-display text-xl font-bold text-white tracking-tight">{step.title}</h3>
+                  </div>
+                  <p className="text-sm text-white/40 leading-relaxed">{step.desc}</p>
                 </div>
-
-                <p className="text-sm text-white/40 leading-relaxed group-hover:text-white/60 transition-colors duration-500">{step.desc}</p>
-              </div>
+              </TiltCard>
             </motion.div>
           ))}
         </motion.div>
