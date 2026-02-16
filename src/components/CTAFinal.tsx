@@ -1,6 +1,15 @@
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
+const whatsappBase = "https://wa.me/5543991065129?text=";
+
+const quickMessages = [
+  { label: "Quero fazer um orçamento", message: "Olá! Gostaria de fazer um orçamento para criação de site." },
+  { label: "Como funciona?", message: "Olá! Gostaria de saber como funciona o processo de criação de site com vocês." },
+  { label: "O que preciso enviar?", message: "Olá! Gostaria de saber o que preciso enviar para vocês começarem a fazer meu site." },
+  { label: "Como é o contrato?", message: "Olá! Gostaria de entender como funciona o contrato de vocês." },
+];
+
 export default function CTAFinal() {
   return (
     <section className="relative py-28 md:py-36 px-6 overflow-visible bg-black">
@@ -36,6 +45,26 @@ export default function CTAFinal() {
             Solicitar Orçamento
             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
           </motion.a>
+
+          {/* Quick messages */}
+          <div className="mt-10">
+            <p className="text-xs text-white/40 mb-3">Ou envie uma mensagem rápida:</p>
+            <div className="flex flex-wrap justify-center gap-3">
+              {quickMessages.map((qm, i) => (
+                <motion.a
+                  key={i}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  href={`${whatsappBase}${encodeURIComponent(qm.message)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2.5 rounded-xl bg-white/[0.06] border border-white/10 hover:border-white/25 hover:bg-white/[0.1] text-white/70 hover:text-white text-xs font-medium gentle-animation"
+                >
+                  {qm.label}
+                </motion.a>
+              ))}
+            </div>
+          </div>
         </motion.div>
       </div>
     </section>
