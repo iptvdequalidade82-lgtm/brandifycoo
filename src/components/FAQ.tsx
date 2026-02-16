@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import nebulaBg from "@/assets/space-nebula-bg.jpg";
+import darkForestBg from "@/assets/dark-forest-bg.jpg";
 import {
   Accordion,
   AccordionContent,
@@ -25,7 +25,7 @@ export default function FAQ() {
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.15] pointer-events-none"
         style={{
-          backgroundImage: `url(${nebulaBg})`,
+          backgroundImage: `url(${darkForestBg})`,
           maskImage: 'radial-gradient(ellipse 50% 70% at center, transparent 0%, black 100%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
           WebkitMaskImage: 'radial-gradient(ellipse 50% 70% at center, transparent 0%, black 100%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
           maskComposite: 'intersect',
