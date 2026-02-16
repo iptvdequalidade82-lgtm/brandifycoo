@@ -545,25 +545,25 @@ const AdminDashboard = () => {
           { label: "Recebido", value: formatCurrency(projects.reduce((s, p) => s + p.amount_received_cents, 0) + extraRevenue), icon: DollarSign },
           { label: "Em Aberto", value: formatCurrency(projects.filter(p => p.payment_status === "pending" || p.payment_status === "partial").reduce((s, p) => s + (p.total_amount_cents - p.amount_received_cents), 0)), icon: DollarSign },
         ].map((stat, i) => (
-          <div key={i} className="glass rounded-xl p-4 glow-border">
-            <stat.icon className={`w-5 h-5 mb-2 ${i === 4 ? "text-amber-400" : "text-primary"}`} />
-            <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-            <p className="text-xs text-muted-foreground">{stat.label}</p>
+          <div key={i} className="rounded-2xl p-4 border border-white/[0.06] bg-white/[0.02]">
+            <stat.icon className={`w-5 h-5 mb-2 ${i === 4 ? "text-amber-400" : "text-brand-accent"}`} />
+            <p className="text-2xl font-bold text-white">{stat.value}</p>
+            <p className="text-xs text-white/40">{stat.label}</p>
           </div>
         ))}
       </div>
 
       {/* Actions */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-foreground">Propostas</h2>
+        <h2 className="text-lg font-semibold text-white">Propostas</h2>
         <div className="flex gap-2">
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Search className="w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-white/30" />
             <Input
               placeholder="Buscar cliente..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="pl-8 h-8 w-[160px] text-sm"
+              className="pl-8 h-8 w-[160px] text-sm bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/30"
             />
           </div>
           <Button variant="outline" size="sm" onClick={fetchProposals}><RefreshCw className="w-4 h-4" /></Button>
@@ -580,7 +580,7 @@ const AdminDashboard = () => {
               key={tab.key}
               onClick={() => setActiveFilter(tab.key)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-                activeFilter === tab.key ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
+                activeFilter === tab.key ? "bg-brand-accent text-white" : "text-white/40 hover:bg-white/[0.04] hover:text-white/60"
               }`}
             >
               {tab.label} ({count})
@@ -592,9 +592,9 @@ const AdminDashboard = () => {
       {/* Proposals list */}
       <div className="space-y-3">
         {loadingProposals ? (
-          <div className="text-center py-12 text-muted-foreground">Carregando...</div>
+          <div className="text-center py-12 text-white/30">Carregando...</div>
         ) : filteredProposals.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
+          <div className="text-center py-12 text-white/30">
             <FileText className="w-10 h-10 mx-auto mb-3 opacity-40" />
             <p>{activeFilter === "all" ? "Nenhuma proposta ainda" : "Nenhuma proposta nesta categoria"}</p>
           </div>
@@ -603,7 +603,7 @@ const AdminDashboard = () => {
             const config = statusConfig[p.status] || statusConfig.draft;
             const StatusIcon = config.icon;
             return (
-              <div key={p.id} className="glass rounded-xl glow-border overflow-hidden">
+              <div key={p.id} className="rounded-2xl border border-white/[0.06] bg-white/[0.02] overflow-hidden">
                 <div className="p-5">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                     <div className="flex-1 min-w-0">
@@ -611,14 +611,14 @@ const AdminDashboard = () => {
                         <StatusIcon className={`w-4 h-4 ${config.color}`} />
                         <span className={`text-xs font-medium ${config.color}`}>{config.label}</span>
                       </div>
-                      <h3 className="font-semibold text-foreground truncate">{p.title}</h3>
-                      <p className="text-sm text-muted-foreground">{p.client_name}{p.client_email ? ` · ${p.client_email}` : ""}</p>
-                      {p.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{p.description}</p>}
+                      <h3 className="font-semibold text-white truncate">{p.title}</h3>
+                      <p className="text-sm text-white/50">{p.client_name}{p.client_email ? ` · ${p.client_email}` : ""}</p>
+                      {p.description && <p className="text-xs text-white/30 mt-1 line-clamp-1">{p.description}</p>}
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="text-right">
-                        <p className="text-lg font-bold text-foreground">{formatCurrency(p.amount_cents)}</p>
-                        <p className="text-[10px] text-muted-foreground">Init: {formatCurrency(getInitAmount(p))} · Final: {formatCurrency(getFinalAmount(p))}</p>
+                       <p className="text-lg font-bold text-white">{formatCurrency(p.amount_cents)}</p>
+                        <p className="text-[10px] text-white/30">Init: {formatCurrency(getInitAmount(p))} · Final: {formatCurrency(getFinalAmount(p))}</p>
                       </div>
                       <div className="flex gap-1 flex-wrap">
                         {/* Expand payment links */}
@@ -662,7 +662,7 @@ const AdminDashboard = () => {
 
                 {/* Expandable payment links section */}
                 {expandedProposalId === p.id && (
-                  <div className="border-t border-border/50 bg-muted/20 p-4 space-y-3">
+                  <div className="border-t border-white/[0.06] bg-white/[0.02] p-4 space-y-3">
                     {/* Valor Inteiro */}
                     <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
                       <div className="flex items-center justify-between mb-2">

@@ -112,27 +112,27 @@ export default function AdminAgenda() {
         <>
           {/* Summary cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-            <div className="glass rounded-xl p-4 glow-border">
-              <p className="text-2xl font-bold text-foreground">{activeProjects.length}</p>
-              <p className="text-xs text-muted-foreground">Em andamento</p>
+            <div className="rounded-2xl p-4 border border-white/[0.06] bg-white/[0.02]">
+              <p className="text-2xl font-bold text-white">{activeProjects.length}</p>
+              <p className="text-xs text-white/40">Em andamento</p>
             </div>
-            <div className="glass rounded-xl p-4 glow-border">
-              <p className="text-2xl font-bold text-destructive">{overdue.length}</p>
-              <p className="text-xs text-muted-foreground">Atrasados</p>
+            <div className="rounded-2xl p-4 border border-white/[0.06] bg-white/[0.02]">
+              <p className="text-2xl font-bold text-red-400">{overdue.length}</p>
+              <p className="text-xs text-white/40">Atrasados</p>
             </div>
-            <div className="glass rounded-xl p-4 glow-border">
-              <p className="text-2xl font-bold text-foreground">{projects.filter(p => p.status === "entregue").length}</p>
-              <p className="text-xs text-muted-foreground">Entregues</p>
+            <div className="rounded-2xl p-4 border border-white/[0.06] bg-white/[0.02]">
+              <p className="text-2xl font-bold text-white">{projects.filter(p => p.status === "entregue").length}</p>
+              <p className="text-xs text-white/40">Entregues</p>
             </div>
-            <div className="glass rounded-xl p-4 glow-border">
-              <p className="text-2xl font-bold text-foreground">{projects.length}</p>
-              <p className="text-xs text-muted-foreground">Total</p>
+            <div className="rounded-2xl p-4 border border-white/[0.06] bg-white/[0.02]">
+              <p className="text-2xl font-bold text-white">{projects.length}</p>
+              <p className="text-xs text-white/40">Total</p>
             </div>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
             {/* Calendar */}
-            <div className="md:col-span-2 glass rounded-xl p-5 glow-border">
+            <div className="md:col-span-2 rounded-2xl p-5 border border-white/[0.06] bg-white/[0.02]">
               <div className="flex items-center justify-between mb-4">
                 <Button variant="ghost" size="icon" onClick={prevMonth}>
                   <ChevronLeft className="w-4 h-4" />
@@ -206,7 +206,7 @@ export default function AdminAgenda() {
             </div>
 
             {/* Day detail panel */}
-            <div className="glass rounded-xl p-5 glow-border">
+            <div className="rounded-2xl p-5 border border-white/[0.06] bg-white/[0.02]">
               {selectedDay ? (
                 <>
                   <h3 className="font-semibold text-foreground mb-1">
@@ -291,7 +291,7 @@ export default function AdminAgenda() {
                     return (
                       <div key={p.id} className="relative">
                         <div className={`absolute -left-[31px] top-1.5 w-3 h-3 rounded-full border-2 border-background ${cfg.dot}`} />
-                        <div className="glass rounded-xl p-4 glow-border">
+                        <div className="rounded-xl p-4 border border-white/[0.06] bg-white/[0.02]">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                               <Icon className={`w-4 h-4 ${cfg.color}`} />

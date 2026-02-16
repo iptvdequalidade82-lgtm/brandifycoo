@@ -34,9 +34,9 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <div className="glass rounded-2xl p-8 glow-border">
+        <div className="rounded-2xl p-8 border border-white/[0.06] bg-white/[0.02]">
           <div className="text-center mb-8">
             <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <Lock className="w-7 h-7 text-primary" />

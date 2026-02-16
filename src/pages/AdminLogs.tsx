@@ -106,10 +106,10 @@ export default function AdminLogs() {
                   const details = log.details || {};
                   return (
                     <div key={log.id} className="relative">
-                      <div className="absolute -left-[25px] top-2 w-2.5 h-2.5 rounded-full bg-primary border-2 border-background" />
-                      <div className="glass rounded-lg p-3 glow-border">
+                      <div className="absolute -left-[25px] top-2 w-2.5 h-2.5 rounded-full bg-brand-accent border-2 border-[#0a0a0a]" />
+                      <div className="rounded-xl p-3 border border-white/[0.06] bg-white/[0.02]">
                         <div className="flex items-center gap-2 mb-1">
-                          <Icon className="w-3.5 h-3.5 text-muted-foreground" />
+                          <Icon className="w-3.5 h-3.5 text-white/40" />
                           <span className="text-xs font-medium text-foreground">
                             {actionLabels[log.action] || log.action}
                           </span>
