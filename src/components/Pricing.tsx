@@ -86,7 +86,7 @@ function NuvemshopPlans() {
                 <p className="text-xs text-white/40 mt-0.5">{p.desc}</p>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0 ml-4">
-                <span className="text-sm font-bold text-emerald-400">{p.price}</span>
+                <span className="text-sm font-bold text-brand-accent">{p.price}</span>
                 <ChevronDown
                   size={16}
                   className={`text-white/40 gentle-animation ${openPlan === p.name ? "rotate-180" : ""}`}
@@ -106,7 +106,7 @@ function NuvemshopPlans() {
                     <ul className="space-y-2 mt-2">
                       {p.included.map((f) => (
                         <li key={f} className="flex items-start gap-2">
-                          <Check className="mt-0.5 flex-shrink-0 text-emerald-400" size={14} strokeWidth={2.5} />
+                          <Check className="mt-0.5 flex-shrink-0 text-brand-accent" size={14} strokeWidth={2.5} />
                           <span className="text-xs text-white/70">{f}</span>
                         </li>
                       ))}
@@ -267,12 +267,12 @@ export default function Pricing() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="mt-16 rounded-2xl overflow-hidden border border-white/10 bg-white/[0.06] backdrop-blur-sm"
+          className="mt-16 rounded-2xl overflow-hidden border border-brand-accent/20 bg-gradient-to-b from-brand-accent/[0.08] to-white/[0.04] backdrop-blur-sm"
         >
           <div className="p-7 md:p-10 border-b border-white/10">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
               <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 text-xs font-medium mb-3">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-accent/15 text-brand-accent text-xs font-medium mb-3">
                   <Sparkles size={12} />
                   E-commerce
                 </div>
@@ -300,7 +300,7 @@ export default function Pricing() {
                   "Integração de estoque (se aplicável)",
                 ].map((f) => (
                   <li key={f} className="flex items-start gap-3">
-                    <Check className="mt-0.5 flex-shrink-0 text-emerald-400" size={16} strokeWidth={2.5} />
+                    <Check className="mt-0.5 flex-shrink-0 text-brand-accent" size={16} strokeWidth={2.5} />
                     <span className="text-sm text-white/80">{f}</span>
                   </li>
                 ))}
@@ -317,7 +317,7 @@ export default function Pricing() {
               href={`https://wa.me/5543991065129?text=${encodeURIComponent('Olá! Tenho interesse na Loja Virtual Nuvemshop.')}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block px-8 py-3.5 rounded-xl font-bold bg-emerald-500 text-white hover:bg-emerald-600 gentle-animation"
+              className="inline-block px-8 py-3.5 rounded-xl font-bold bg-gradient-to-r from-[hsl(224,76%,33%)] to-[hsl(217,91%,53%)] text-white hover:opacity-90 gentle-animation shadow-lg shadow-brand-accent/20"
             >
               Solicitar Orçamento
             </motion.a>
