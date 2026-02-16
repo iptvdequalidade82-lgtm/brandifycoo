@@ -44,8 +44,10 @@ export default function Header() {
       initial={{ opacity: 0, y: -30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.3 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "glass-navbar-scrolled" : "glass-navbar"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        scrolled
+          ? "glass-navbar-scrolled"
+          : "bg-transparent backdrop-blur-none border-none shadow-none"
       }`}
     >
       <div className="container mx-auto flex items-center justify-center h-16 px-6 lg:px-12 relative">
@@ -54,7 +56,7 @@ export default function Header() {
             whileHover={{ scale: 1.05 }}
             src={logo}
             alt="Brandify - Criação de Sites Profissionais"
-            className="h-10 w-10 rounded-full ring-1 ring-border"
+            className={`h-10 w-10 rounded-full ring-1 ${scrolled ? 'ring-border' : 'ring-white/30'}`}
             width={40}
             height={40}
           />
@@ -66,7 +68,9 @@ export default function Header() {
             <button
               key={l.href}
               onClick={() => handleNav(l.href)}
-              className="text-sm text-muted-foreground bg-transparent border-none cursor-pointer gentle-animation hover:text-foreground hover:scale-105 font-medium"
+              className={`text-sm bg-transparent border-none cursor-pointer gentle-animation hover:scale-105 font-medium ${
+                scrolled ? 'text-muted-foreground hover:text-foreground' : 'text-white/80 hover:text-white'
+              }`}
             >
               {l.label}
             </button>
@@ -77,7 +81,9 @@ export default function Header() {
             href="https://wa.me/5543991065129?text=Ol%C3%A1!%20Fiquei%20interessado%20nos%20servi%C3%A7os%20da%20Brandify%20e%20gostaria%20de%20solicitar%20um%20or%C3%A7amento%20para%20cria%C3%A7%C3%A3o%20de%20site."
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm font-semibold px-5 py-2.5 rounded-lg bg-foreground text-background hover:opacity-90 gentle-animation"
+            className={`text-sm font-semibold px-5 py-2.5 rounded-lg gentle-animation ${
+              scrolled ? 'bg-foreground text-background hover:opacity-90' : 'bg-white/20 text-white backdrop-blur-sm hover:bg-white/30'
+            }`}
           >
             Contratar
           </motion.a>
@@ -85,7 +91,7 @@ export default function Header() {
 
         {/* Mobile toggle */}
         <button
-          className="md:hidden absolute right-6 text-foreground p-2"
+          className={`md:hidden absolute right-6 p-2 ${scrolled ? 'text-foreground' : 'text-white'}`}
           onClick={() => setOpen(!open)}
           aria-label="Menu"
         >
