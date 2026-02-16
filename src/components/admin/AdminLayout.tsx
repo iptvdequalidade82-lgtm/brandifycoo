@@ -35,7 +35,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (!user || !isAdmin) return null;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-[#0a0a0a] text-white" style={{
+      // Override CSS variables for dark admin context
+      '--background': '0 0% 4%',
+      '--foreground': '0 0% 100%',
+      '--card': '0 0% 7%',
+      '--card-foreground': '0 0% 100%',
+      '--popover': '0 0% 8%',
+      '--popover-foreground': '0 0% 100%',
+      '--primary': '224 76% 48%',
+      '--primary-foreground': '0 0% 100%',
+      '--secondary': '0 0% 12%',
+      '--secondary-foreground': '0 0% 90%',
+      '--muted': '0 0% 12%',
+      '--muted-foreground': '0 0% 55%',
+      '--accent': '0 0% 14%',
+      '--accent-foreground': '0 0% 100%',
+      '--border': '0 0% 18%',
+      '--input': '0 0% 18%',
+      '--ring': '224 76% 48%',
+    } as React.CSSProperties}>
       {/* Top header */}
       <header className="border-b border-white/[0.06] px-6 py-3 flex items-center justify-between bg-[#0a0a0a]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="flex items-center gap-6">
