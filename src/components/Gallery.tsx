@@ -24,16 +24,7 @@ export default function Gallery() {
 
   return (
     <section ref={sectionRef} id="galeria" className="section-padding relative overflow-hidden bg-black text-white">
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.14] pointer-events-none"
-        style={{
-          backgroundImage: `url(${lightningBg})`,
-          maskImage: 'radial-gradient(ellipse 50% 70% at center, transparent 0%, black 100%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
-          WebkitMaskImage: 'radial-gradient(ellipse 50% 70% at center, transparent 0%, black 100%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
-          maskComposite: 'intersect',
-          WebkitMaskComposite: 'source-in',
-        }}
-      />
+      {/* Background image temporarily disabled for testing */}
       <motion.div style={{ y: blobY }} className="absolute bottom-0 left-0 w-[350px] h-[350px] rounded-full bg-primary/5 blur-[130px] pointer-events-none" />
 
       <div className="container mx-auto max-w-6xl relative">
