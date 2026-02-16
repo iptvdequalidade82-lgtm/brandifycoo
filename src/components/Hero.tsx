@@ -11,49 +11,50 @@ export default function Hero() {
     const video = videoRef.current;
     if (!video) return;
 
-    // Force muted via property (not just attribute) - critical for iOS
+    // Force muted via property (critical for iOS autoplay)
     video.muted = true;
+    video.defaultMuted = true;
     video.setAttribute('playsinline', '');
     video.setAttribute('webkit-playsinline', '');
-    video.setAttribute('x5-playsinline', '');
-    video.setAttribute('x5-video-player-type', 'h5');
-    video.setAttribute('x5-video-player-fullscreen', 'true');
+
+    // Load then play
+    video.load();
 
     const attemptPlay = () => {
-      const playPromise = video.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(() => {
-          // Silently fail, interval will retry
-        });
-      }
+      video.play().catch(() => {});
     };
 
-    // Try immediately
+    // Try on canplay event
+    video.addEventListener('canplay', attemptPlay, { once: true });
+
+    // Also try immediately
     attemptPlay();
 
-    // Keep retrying every 500ms until playing
+    // Retry every 300ms until playing
     const interval = setInterval(() => {
       if (video.paused) {
         attemptPlay();
       } else {
         clearInterval(interval);
       }
-    }, 500);
+    }, 300);
 
-    // Also try on any user interaction
-    const events = ['touchstart', 'touchend', 'click', 'scroll'];
+    // Try on any user interaction
     const handleInteraction = () => {
-      if (video.paused) {
-        attemptPlay();
-      }
-      if (!video.paused) {
-        events.forEach(e => document.removeEventListener(e, handleInteraction));
-      }
+      if (video.paused) attemptPlay();
     };
-    events.forEach(e => document.addEventListener(e, handleInteraction, { once: true, passive: true }));
+    const events = ['touchstart', 'touchend', 'click', 'scroll'];
+    events.forEach(e => document.addEventListener(e, handleInteraction, { passive: true }));
+
+    // Cleanup after 10s (should be playing by then)
+    const timeout = setTimeout(() => {
+      clearInterval(interval);
+      events.forEach(e => document.removeEventListener(e, handleInteraction));
+    }, 10000);
 
     return () => {
       clearInterval(interval);
+      clearTimeout(timeout);
       events.forEach(e => document.removeEventListener(e, handleInteraction));
     };
   }, []);
@@ -63,27 +64,28 @@ export default function Hero() {
       id="inicio"
       className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background pt-28 md:pt-0"
     >
-      {/* Background Video */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: videoLoaded ? 1 : 0 }}
-        transition={{ duration: 1.5, ease: "easeOut" }}
-        className="absolute inset-0 z-0"
-      >
+      {/* Background Video - always visible (no opacity:0 wrapper, iOS blocks autoplay on hidden videos) */}
+      <div className="absolute inset-0 z-0">
         <video
           ref={videoRef}
           autoPlay
           loop
           muted
           playsInline
-          // @ts-ignore - webkit attribute for iOS
-          webkit-playsinline="true"
           preload="auto"
           onLoadedData={() => setVideoLoaded(true)}
           className="absolute inset-0 w-full h-full object-cover"
           src="/hero-bg-video.mp4"
         />
-      </motion.div>
+      </div>
+
+      {/* Fade-in cover: starts opaque black, fades out when video loads */}
+      <motion.div
+        initial={{ opacity: 1 }}
+        animate={{ opacity: videoLoaded ? 0 : 1 }}
+        transition={{ duration: 1.5, ease: "easeOut" }}
+        className="absolute inset-0 z-0 bg-background pointer-events-none"
+      />
 
       {/* Dark overlay for text legibility */}
       <div className="absolute inset-0 z-[1] bg-black/50 backdrop-blur-[2px] pointer-events-none" />
