@@ -5,20 +5,18 @@ import AnimatedCounter from "@/components/AnimatedCounter";
 
 export default function Hero() {
   useEffect(() => {
-    // Grab the video from index.html (already in DOM before React)
     const video = document.getElementById('hero-video') as HTMLVideoElement | null;
     if (!video) return;
 
-    // Move it into the hero container and make it visible
     const container = document.getElementById('hero-video-container');
     if (container && !container.contains(video)) {
       video.style.position = 'absolute';
       video.style.opacity = '1';
       video.style.zIndex = '0';
+      video.style.pointerEvents = 'none';
       container.appendChild(video);
     }
 
-    // Ensure it's playing
     const attemptPlay = () => {
       if (!video.paused) return;
       video.play().catch(() => {});
@@ -26,14 +24,12 @@ export default function Hero() {
 
     attemptPlay();
 
-    // Gentle retry
     const interval = setInterval(() => {
       if (!video.paused) { clearInterval(interval); return; }
       attemptPlay();
     }, 300);
     const timeout = setTimeout(() => clearInterval(interval), 10000);
 
-    // User interaction fallback
     const handleInteraction = () => {
       attemptPlay();
       if (!video.paused) {
@@ -47,6 +43,14 @@ export default function Hero() {
       clearInterval(interval);
       clearTimeout(timeout);
       events.forEach(e => document.removeEventListener(e, handleInteraction));
+
+      // Return video to body so it survives React unmount
+      if (video && video.parentElement !== document.body) {
+        video.style.opacity = '0';
+        video.style.position = 'fixed';
+        video.style.zIndex = '-1';
+        document.body.prepend(video);
+      }
     };
   }, []);
 
