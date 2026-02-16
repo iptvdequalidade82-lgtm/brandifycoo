@@ -13,7 +13,7 @@ import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background animated-bg relative">
+    <div className="min-h-screen bg-brand-deep animated-bg relative overflow-hidden">
       <Header />
       <Hero />
       
