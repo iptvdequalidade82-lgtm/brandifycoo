@@ -11,52 +11,73 @@ export default function Hero() {
     const video = videoRef.current;
     if (!video) return;
 
+    // Ensure muted state via both property and attribute (iOS checks attribute)
     video.muted = true;
     video.defaultMuted = true;
     video.volume = 0;
+    video.setAttribute('muted', '');
     video.setAttribute('playsinline', '');
     video.setAttribute('webkit-playsinline', '');
+    video.setAttribute('autoplay', '');
+
+    let loaded = false;
 
     const attemptPlay = () => {
       if (!video.paused) return;
-      if (video.readyState === 0) video.load();
+      // On iOS, calling play() returns a promise. Don't call load() again
+      // as it cancels any pending play on iOS Safari.
       video.play().catch(() => {});
     };
 
-    video.addEventListener('loadedmetadata', attemptPlay);
-    video.addEventListener('loadeddata', attemptPlay);
-    video.addEventListener('canplay', attemptPlay);
-    video.addEventListener('canplaythrough', attemptPlay);
+    const onLoaded = () => {
+      loaded = true;
+      attemptPlay();
+    };
 
-    video.load();
-    attemptPlay();
+    video.addEventListener('loadeddata', onLoaded);
+    video.addEventListener('canplay', onLoaded);
 
-    const interval = setInterval(attemptPlay, 100);
-    const timeout = setTimeout(() => clearInterval(interval), 20000);
+    // Only call load() once at startup
+    if (video.readyState >= 2) {
+      // Already loaded (cached)
+      attemptPlay();
+    } else {
+      video.load();
+    }
 
+    // Gentle retry — only try play(), never load() again
+    const interval = setInterval(() => {
+      if (!video.paused) {
+        clearInterval(interval);
+        return;
+      }
+      attemptPlay();
+    }, 250);
+    const timeout = setTimeout(() => clearInterval(interval), 15000);
+
+    // Visibility change (tab switch)
     const handleVisibility = () => {
       if (!document.hidden) attemptPlay();
     };
     document.addEventListener('visibilitychange', handleVisibility);
 
+    // User interaction fallback (last resort for very restrictive iOS)
     const handleInteraction = () => {
       attemptPlay();
       if (!video.paused) {
-        events.forEach(e => document.removeEventListener(e, handleInteraction));
+        interactionEvents.forEach(e => document.removeEventListener(e, handleInteraction));
       }
     };
-    const events = ['touchstart', 'touchend', 'click', 'scroll', 'mousemove'];
-    events.forEach(e => document.addEventListener(e, handleInteraction, { passive: true }));
+    const interactionEvents = ['touchstart', 'touchend', 'click', 'scroll'];
+    interactionEvents.forEach(e => document.addEventListener(e, handleInteraction, { passive: true }));
 
     return () => {
       clearInterval(interval);
       clearTimeout(timeout);
-      video.removeEventListener('loadedmetadata', attemptPlay);
-      video.removeEventListener('loadeddata', attemptPlay);
-      video.removeEventListener('canplay', attemptPlay);
-      video.removeEventListener('canplaythrough', attemptPlay);
+      video.removeEventListener('loadeddata', onLoaded);
+      video.removeEventListener('canplay', onLoaded);
       document.removeEventListener('visibilitychange', handleVisibility);
-      events.forEach(e => document.removeEventListener(e, handleInteraction));
+      interactionEvents.forEach(e => document.removeEventListener(e, handleInteraction));
     };
   }, []);
 
