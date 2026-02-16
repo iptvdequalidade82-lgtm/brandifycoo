@@ -20,9 +20,9 @@ export default function Footer() {
           <div>
             <h4 className="font-display text-sm font-bold mb-4">Navegação</h4>
             <ul className="space-y-2.5">
-              <li><a href="#servicos" className="text-sm text-white/40 hover:text-white gentle-animation">Serviços</a></li>
-              <li><a href="#portfolio" className="text-sm text-white/40 hover:text-white gentle-animation">Segmentos</a></li>
+              <li><a href="#processo" className="text-sm text-white/40 hover:text-white gentle-animation">Como Trabalhamos</a></li>
               <li><a href="#investimento" className="text-sm text-white/40 hover:text-white gentle-animation">Investimento</a></li>
+              <li><a href="#galeria" className="text-sm text-white/40 hover:text-white gentle-animation">Conteúdo</a></li>
               <li><a href="#faq" className="text-sm text-white/40 hover:text-white gentle-animation">FAQ</a></li>
             </ul>
           </div>

@@ -57,7 +57,7 @@ export default function Gallery() {
               href="https://www.instagram.com/brandifycoo"
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative aspect-[4/5] rounded-xl overflow-hidden bg-card/40 border border-border/40 hover:border-primary/40 transition-all duration-500"
+              className="group relative aspect-[4/5] rounded-xl overflow-hidden bg-white/[0.04] border border-white/10 hover:border-white/20 transition-all duration-500"
             >
               <img
                 src={post.src}
@@ -65,9 +65,9 @@ export default function Gallery() {
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-end pb-4">
-                <Instagram className="text-accent mb-2" size={24} />
-                <span className="text-xs text-foreground/80 font-medium">Ver no Instagram</span>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-end pb-4">
+                <Instagram className="text-white mb-2" size={24} />
+                <span className="text-xs text-white/80 font-medium">Ver no Instagram</span>
               </div>
             </motion.a>
           ))}
