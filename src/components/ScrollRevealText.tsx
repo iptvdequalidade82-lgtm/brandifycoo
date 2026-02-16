@@ -57,7 +57,7 @@ function Word({
   isHighlight: boolean;
   highlightClassName: string;
 }) {
-  const opacity = useTransform(progress, range, [0.15, 1]);
+  const opacity = useTransform(progress, range, [0.4, 1]);
   const y = useTransform(progress, range, [8, 0]);
 
   return (
