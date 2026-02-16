@@ -17,7 +17,7 @@ const item = { hidden: { opacity: 0, y: 25 }, show: { opacity: 1, y: 0, transiti
 
 export default function Portfolio() {
   return (
-    <section id="portfolio" className="section-padding relative overflow-hidden bg-black text-white">
+    <section id="portfolio" className="section-padding relative overflow-hidden text-white">
       <div className="container mx-auto max-w-5xl relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
