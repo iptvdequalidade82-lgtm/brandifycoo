@@ -202,7 +202,7 @@ export default function Pricing() {
                 <div className="flex items-baseline justify-center gap-1">
                   <span className="font-display text-4xl font-black">{plan.price}</span>
                 </div>
-                <p className={`text-xs mt-1 ${plan.featured ? "text-white/50" : "text-white/30"}`}>Pagamento facilitado · Consulte parcelamento</p>
+                <p className={`text-xs mt-1 ${plan.featured ? "text-white/50" : "text-white/30"}`}>Pagamento único · Consulte parcelamento</p>
               </div>
 
               <div className="p-7 flex-1">
