@@ -11,50 +11,45 @@ export default function Hero() {
     const video = videoRef.current;
     if (!video) return;
 
-    // Force muted via property (critical for iOS autoplay)
+    // Critical for iOS autoplay
     video.muted = true;
     video.defaultMuted = true;
     video.setAttribute('playsinline', '');
     video.setAttribute('webkit-playsinline', '');
 
-    // Load then play
-    video.load();
-
     const attemptPlay = () => {
+      if (!video.paused) return;
       video.play().catch(() => {});
     };
 
-    // Try on canplay event
-    video.addEventListener('canplay', attemptPlay, { once: true });
+    // Try playing at every possible stage of loading
+    video.addEventListener('loadedmetadata', attemptPlay);
+    video.addEventListener('canplay', attemptPlay);
+    video.addEventListener('canplaythrough', attemptPlay);
 
-    // Also try immediately
+    // Try immediately (works if cached/reload)
     attemptPlay();
 
-    // Retry every 300ms until playing
-    const interval = setInterval(() => {
-      if (video.paused) {
-        attemptPlay();
-      } else {
-        clearInterval(interval);
-      }
-    }, 300);
+    // Retry every 200ms for first 15 seconds
+    const interval = setInterval(attemptPlay, 200);
+    const timeout = setTimeout(() => clearInterval(interval), 15000);
 
-    // Try on any user interaction
+    // Try on any user interaction as last resort
     const handleInteraction = () => {
-      if (video.paused) attemptPlay();
+      attemptPlay();
+      if (!video.paused) {
+        events.forEach(e => document.removeEventListener(e, handleInteraction));
+      }
     };
     const events = ['touchstart', 'touchend', 'click', 'scroll'];
     events.forEach(e => document.addEventListener(e, handleInteraction, { passive: true }));
 
-    // Cleanup after 10s (should be playing by then)
-    const timeout = setTimeout(() => {
-      clearInterval(interval);
-      events.forEach(e => document.removeEventListener(e, handleInteraction));
-    }, 10000);
-
     return () => {
       clearInterval(interval);
       clearTimeout(timeout);
+      video.removeEventListener('loadedmetadata', attemptPlay);
+      video.removeEventListener('canplay', attemptPlay);
+      video.removeEventListener('canplaythrough', attemptPlay);
       events.forEach(e => document.removeEventListener(e, handleInteraction));
     };
   }, []);
