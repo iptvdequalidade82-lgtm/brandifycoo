@@ -3,11 +3,7 @@ import { motion } from "framer-motion";
 
 export default function CTAFinal() {
   return (
-    <section className="relative py-28 md:py-36 px-6 overflow-hidden bg-black">
-      {/* Organic shapes */}
-      <div className="absolute top-10 left-10 w-24 h-24 rounded-full border border-white/10 animate-[pulse_4s_ease-in-out_infinite]" />
-      <div className="absolute bottom-20 right-20 w-16 h-16 rounded-full bg-white/10 blur-sm animate-[pulse_5s_ease-in-out_infinite]" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-brand-accent/5 blur-[100px] pointer-events-none" />
+    <section className="relative py-28 md:py-36 px-6 bg-black">
 
       <div className="relative container mx-auto max-w-3xl text-center text-white">
         <motion.div
