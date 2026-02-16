@@ -1,83 +1,52 @@
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
-import { useRef, useEffect } from "react";
+import { useEffect } from "react";
 import AnimatedCounter from "@/components/AnimatedCounter";
-import heroBg from "@/assets/hero-bg.jpg";
 
 export default function Hero() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
   useEffect(() => {
-    const video = videoRef.current;
+    // Grab the video from index.html (already in DOM before React)
+    const video = document.getElementById('hero-video') as HTMLVideoElement | null;
     if (!video) return;
 
-    // Ensure muted state via both property and attribute (iOS checks attribute)
-    video.muted = true;
-    video.defaultMuted = true;
-    video.volume = 0;
-    video.setAttribute('muted', '');
-    video.setAttribute('playsinline', '');
-    video.setAttribute('webkit-playsinline', '');
-    video.setAttribute('autoplay', '');
+    // Move it into the hero container and make it visible
+    const container = document.getElementById('hero-video-container');
+    if (container && !container.contains(video)) {
+      video.style.position = 'absolute';
+      video.style.opacity = '1';
+      video.style.zIndex = '0';
+      container.appendChild(video);
+    }
 
-    let loaded = false;
-
+    // Ensure it's playing
     const attemptPlay = () => {
       if (!video.paused) return;
-      // On iOS, calling play() returns a promise. Don't call load() again
-      // as it cancels any pending play on iOS Safari.
       video.play().catch(() => {});
     };
 
-    const onLoaded = () => {
-      loaded = true;
-      attemptPlay();
-    };
+    attemptPlay();
 
-    video.addEventListener('loadeddata', onLoaded);
-    video.addEventListener('canplay', onLoaded);
-
-    // Only call load() once at startup
-    if (video.readyState >= 2) {
-      // Already loaded (cached)
-      attemptPlay();
-    } else {
-      video.load();
-    }
-
-    // Gentle retry — only try play(), never load() again
+    // Gentle retry
     const interval = setInterval(() => {
-      if (!video.paused) {
-        clearInterval(interval);
-        return;
-      }
+      if (!video.paused) { clearInterval(interval); return; }
       attemptPlay();
-    }, 250);
-    const timeout = setTimeout(() => clearInterval(interval), 15000);
+    }, 300);
+    const timeout = setTimeout(() => clearInterval(interval), 10000);
 
-    // Visibility change (tab switch)
-    const handleVisibility = () => {
-      if (!document.hidden) attemptPlay();
-    };
-    document.addEventListener('visibilitychange', handleVisibility);
-
-    // User interaction fallback (last resort for very restrictive iOS)
+    // User interaction fallback
     const handleInteraction = () => {
       attemptPlay();
       if (!video.paused) {
-        interactionEvents.forEach(e => document.removeEventListener(e, handleInteraction));
+        events.forEach(e => document.removeEventListener(e, handleInteraction));
       }
     };
-    const interactionEvents = ['touchstart', 'touchend', 'click', 'scroll'];
-    interactionEvents.forEach(e => document.addEventListener(e, handleInteraction, { passive: true }));
+    const events = ['touchstart', 'touchend', 'click', 'scroll'];
+    events.forEach(e => document.addEventListener(e, handleInteraction, { passive: true }));
 
     return () => {
       clearInterval(interval);
       clearTimeout(timeout);
-      video.removeEventListener('loadeddata', onLoaded);
-      video.removeEventListener('canplay', onLoaded);
-      document.removeEventListener('visibilitychange', handleVisibility);
-      interactionEvents.forEach(e => document.removeEventListener(e, handleInteraction));
+      events.forEach(e => document.removeEventListener(e, handleInteraction));
     };
   }, []);
 
@@ -86,21 +55,8 @@ export default function Hero() {
       id="inicio"
       className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background pt-28 md:pt-0"
     >
-      {/* Background Video - no cover div so iOS doesn't consider it hidden */}
-      <div className="absolute inset-0 z-0">
-        <video
-          ref={videoRef}
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="auto"
-          poster={heroBg}
-          className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src="/hero-bg-video.mp4" type="video/mp4" />
-        </video>
-      </div>
+      {/* Container for the video element moved from index.html */}
+      <div id="hero-video-container" className="absolute inset-0 z-0" />
 
       {/* Dark overlay for text legibility */}
       <div className="absolute inset-0 z-[1] bg-black/50 backdrop-blur-[2px] pointer-events-none" />
