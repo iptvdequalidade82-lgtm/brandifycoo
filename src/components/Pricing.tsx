@@ -306,7 +306,7 @@ export default function Pricing() {
             <NuvemshopPlans />
           </div>
 
-          <div className="px-7 md:px-10 pb-7 md:pb-10">
+          <div className="px-7 md:px-10 pb-7 md:pb-10 space-y-4">
             <motion.a
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -317,6 +317,9 @@ export default function Pricing() {
             >
               Solicitar Orçamento
             </motion.a>
+            <p className="text-xs text-white/30 leading-relaxed">
+              <span className="text-white/50 font-medium">Domínio é cobrado à parte:</span> a partir de R$ 40,00/ano. O registro fica na conta do próprio cliente.
+            </p>
           </div>
         </motion.div>
       </div>

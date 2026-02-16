@@ -105,7 +105,7 @@ export default function Hero() {
           </motion.a>
           <motion.a
             whileHover={{ scale: 1.03 }}
-            href="#servicos"
+            href="#investimento"
             className="px-8 py-4 rounded-xl border border-white/20 text-white font-semibold hover:bg-white/10 gentle-animation text-center"
           >
             Nossos Serviços
