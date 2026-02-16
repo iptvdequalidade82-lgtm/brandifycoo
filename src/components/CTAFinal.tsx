@@ -40,7 +40,7 @@ export default function CTAFinal() {
             href="https://wa.me/5543991065129?text=Ol%C3%A1!%20Quero%20come%C3%A7ar%20meu%20projeto%20de%20site%20com%20a%20Brandify!"
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center justify-center gap-2 px-10 py-5 rounded-xl bg-white text-brand font-black text-lg gentle-animation shadow-[0_15px_40px_-10px_rgba(0,0,0,0.3)]"
+            className="group inline-flex items-center justify-center gap-2 px-10 py-5 rounded-xl bg-gradient-to-r from-[hsl(var(--brand-gradient-from))] to-[hsl(var(--brand-gradient-to))] text-white font-black text-lg gentle-animation shadow-lg shadow-brand-accent/20"
           >
             Solicitar Orçamento
             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
