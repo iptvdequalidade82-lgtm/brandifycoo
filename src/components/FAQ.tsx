@@ -31,7 +31,7 @@ export default function FAQ() {
         >
            <h2 className="font-display text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-4 text-white">
             Perguntas{" "}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">frequentes</span>
+            <span className="italic bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">frequentes</span>
           </h2>
           <p className="text-white/50 max-w-xl mx-auto">
             Tire suas dúvidas sobre nossos serviços, prazos e formas de pagamento.
