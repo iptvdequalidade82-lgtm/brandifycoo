@@ -25,7 +25,7 @@ export default function Process() {
     <section ref={sectionRef} id="processo" className="relative overflow-visible py-28 md:py-36 bg-black">
       {/* Lunar mountain background */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.20] md:opacity-[0.15] pointer-events-none"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.35] md:opacity-[0.15] pointer-events-none blur-[1px] md:blur-0"
         style={{
           backgroundImage: `url(${lunarMountainBg})`,
           maskImage: 'linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)',
