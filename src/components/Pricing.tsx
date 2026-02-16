@@ -202,7 +202,7 @@ export default function Pricing() {
                 <div className="flex items-baseline justify-center gap-1">
                   <span className="font-display text-4xl font-black">{plan.price}</span>
                 </div>
-                <p className={`text-xs mt-1 ${plan.featured ? "text-white/50" : "text-white/30"}`}>valor único · pagamento via PIX</p>
+                <p className={`text-xs mt-1 ${plan.featured ? "text-white/50" : "text-white/30"}`}>Pagamento facilitado · Consulte parcelamento</p>
               </div>
 
               <div className="p-7 flex-1">
@@ -282,7 +282,7 @@ export default function Pricing() {
               <div className="text-left md:text-right flex-shrink-0">
                 <p className="text-[10px] uppercase tracking-wider text-white/30 mb-1">a partir de</p>
                 <span className="font-display text-4xl font-black">R$ 2.500</span>
-                <p className="text-xs text-white/30 mt-1">valor único · pagamento via PIX</p>
+                <p className="text-xs text-white/30 mt-1">Pagamento facilitado · Consulte parcelamento</p>
               </div>
             </div>
           </div>
