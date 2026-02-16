@@ -21,8 +21,8 @@ const contacts = [
 
 export default function Contact() {
   return (
-    <section id="contato" className="relative py-28 md:py-36 px-6 overflow-hidden">
-      <div className="absolute bottom-0 left-1/3 w-[500px] h-[500px] rounded-full bg-primary/3 blur-[140px] pointer-events-none" />
+    <section id="contato" className="relative py-28 md:py-36 px-6 overflow-hidden bg-brand-deep text-white">
+      <div className="absolute bottom-0 left-1/3 w-[500px] h-[500px] rounded-full bg-brand-accent/8 blur-[140px] pointer-events-none" />
 
       <div className="container mx-auto max-w-4xl relative">
         <motion.div
@@ -30,15 +30,15 @@ export default function Contact() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
-          className="rounded-2xl overflow-hidden border border-border bg-card shadow-2xl"
+          className="rounded-2xl overflow-hidden border border-white/10 bg-white/[0.04] backdrop-blur-sm shadow-2xl"
         >
           <div className="grid md:grid-cols-5">
-            <div className="md:col-span-2 p-8 md:p-10 bg-gradient-to-br from-[hsl(185_45%_20%)] to-[hsl(200_40%_12%)] border-b md:border-b-0 md:border-r border-border flex flex-col justify-center">
-              <MessageCircle className="text-primary/70 mb-4" size={32} />
-              <h2 className="font-display text-2xl md:text-3xl font-extrabold mb-3 text-foreground">
+            <div className="md:col-span-2 p-8 md:p-10 bg-gradient-to-br from-[hsl(var(--brand-gradient-from))] to-[hsl(var(--brand-gradient-to))] border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-center">
+              <MessageCircle className="text-white/70 mb-4" size={32} />
+              <h2 className="font-display text-2xl md:text-3xl font-black mb-3">
                 Vamos criar o seu site?
               </h2>
-              <p className="text-muted-foreground text-sm leading-relaxed mb-6">
+              <p className="text-white/60 text-sm leading-relaxed mb-6">
                 Entre em contato e receba um orçamento sem compromisso. Respondemos em até 24h.
               </p>
               <motion.a
@@ -47,7 +47,7 @@ export default function Contact() {
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-primary text-primary-foreground font-bold gentle-animation text-sm btn-glow shadow-[0_0_20px_hsl(var(--primary)/0.25)]"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white text-brand font-bold gentle-animation text-sm shadow-lg"
               >
                 <Phone size={16} />
                 Falar no WhatsApp
@@ -72,16 +72,16 @@ export default function Contact() {
                   >
                     <Wrapper
                       {...linkProps}
-                      className={`flex items-center gap-4 p-4 rounded-xl bg-accent hover:bg-accent/80 border border-border hover:border-primary/20 gentle-animation ${
+                      className={`flex items-center gap-4 p-4 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-white/20 gentle-animation ${
                         c.href ? "cursor-pointer" : ""
                       }`}
                     >
-                      <div className="w-10 h-10 rounded-lg bg-brand-light flex items-center justify-center shrink-0">
-                        <Icon className="text-muted-foreground" size={18} />
+                      <div className="w-10 h-10 rounded-lg bg-white/[0.08] flex items-center justify-center shrink-0">
+                        <Icon className="text-white/60" size={18} />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-foreground">{c.title}</p>
-                        <p className="text-xs text-muted-foreground">{c.value}</p>
+                        <p className="text-sm font-bold text-white">{c.title}</p>
+                        <p className="text-xs text-white/40">{c.value}</p>
                       </div>
                     </Wrapper>
                   </motion.div>
@@ -99,7 +99,7 @@ export default function Contact() {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="mt-8"
         >
-          <p className="text-xs text-muted-foreground mb-3 text-center">Ou envie uma mensagem rápida:</p>
+          <p className="text-xs text-white/40 mb-3 text-center">Ou envie uma mensagem rápida:</p>
           <div className="flex flex-wrap justify-center gap-3">
             {quickMessages.map((qm, i) => (
               <motion.a
@@ -109,7 +109,7 @@ export default function Contact() {
                 href={`${whatsappBase}${encodeURIComponent(qm.message)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-4 py-2.5 rounded-xl bg-card border border-border hover:border-primary/25 hover:bg-accent text-muted-foreground hover:text-foreground text-xs font-medium gentle-animation"
+                className="px-4 py-2.5 rounded-xl bg-white/[0.06] border border-white/10 hover:border-white/25 hover:bg-white/[0.1] text-white/70 hover:text-white text-xs font-medium gentle-animation"
               >
                 {qm.label}
               </motion.a>

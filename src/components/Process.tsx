@@ -13,10 +13,7 @@ const item = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0, transiti
 
 export default function Process() {
   return (
-    <section id="processo" className="section-padding relative overflow-hidden">
-      {/* Subtle glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/3 blur-[150px] pointer-events-none" />
-
+    <section id="processo" className="section-padding relative overflow-hidden bg-secondary">
       <div className="container mx-auto max-w-5xl relative">
         <div className="text-center mb-16">
           <motion.h2
@@ -24,7 +21,7 @@ export default function Process() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6 }}
-            className="font-display text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 text-foreground"
+            className="font-display text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-4 text-foreground"
           >
             Do conceito à{" "}
             <span className="text-gradient">realidade</span>
@@ -48,7 +45,7 @@ export default function Process() {
           className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-5"
         >
           {/* Connector line */}
-          <div className="hidden lg:block absolute top-[56px] left-[12%] right-[12%] h-px bg-gradient-to-r from-border via-primary/20 to-border" />
+          <div className="hidden lg:block absolute top-[56px] left-[12%] right-[12%] h-px bg-gradient-to-r from-border via-muted-foreground/30 to-border" />
 
           {steps.map((step, i) => {
             const Icon = step.icon;
@@ -57,9 +54,9 @@ export default function Process() {
                 key={step.title}
                 variants={item}
                 whileHover={{ y: -4, transition: { duration: 0.3 } }}
-                className="relative p-6 rounded-2xl bg-card border border-border text-center gentle-animation hover:border-primary/20 hover:shadow-[0_8px_30px_rgba(100,220,220,0.06)]"
+                className="relative p-6 rounded-2xl bg-background border border-border text-center gentle-animation hover:shadow-lg"
               >
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center shadow-[0_0_15px_hsl(var(--primary)/0.3)]">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-brand text-white text-xs font-bold flex items-center justify-center shadow-md">
                   {i + 1}
                 </div>
                 <div className="w-12 h-12 mx-auto rounded-xl bg-brand-light flex items-center justify-center mb-4 mt-2">

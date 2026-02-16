@@ -18,7 +18,7 @@ const item = { hidden: { opacity: 0, scale: 0.95 }, show: { opacity: 1, scale: 1
 export default function Gallery() {
   return (
     <section id="galeria" className="section-padding relative overflow-hidden">
-      <div className="absolute bottom-0 left-0 w-[350px] h-[350px] rounded-full bg-primary/3 blur-[130px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[350px] h-[350px] rounded-full bg-primary/5 blur-[130px] pointer-events-none" />
 
       <div className="container mx-auto max-w-6xl relative">
         <div className="text-center mb-16">
@@ -27,7 +27,7 @@ export default function Gallery() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6 }}
-            className="font-display text-3xl md:text-5xl font-extrabold tracking-tight mb-4"
+            className="font-display text-3xl md:text-5xl font-black tracking-tight mb-4"
           >
             Nosso{" "}
             <span className="text-gradient">conteúdo</span>
@@ -57,7 +57,7 @@ export default function Gallery() {
               href="https://www.instagram.com/brandifycoo"
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative aspect-[4/5] rounded-xl overflow-hidden bg-card border border-border hover:border-primary/30 transition-all duration-500"
+              className="group relative aspect-[4/5] rounded-xl overflow-hidden bg-card/40 border border-border/40 hover:border-primary/40 transition-all duration-500"
             >
               <img
                 src={post.src}
@@ -66,7 +66,7 @@ export default function Gallery() {
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-end pb-4">
-                <Instagram className="text-primary mb-2" size={24} />
+                <Instagram className="text-accent mb-2" size={24} />
                 <span className="text-xs text-foreground/80 font-medium">Ver no Instagram</span>
               </div>
             </motion.a>
@@ -84,7 +84,7 @@ export default function Gallery() {
             href="https://www.instagram.com/brandifycoo"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-border text-foreground font-semibold hover:border-primary/30 hover:scale-[1.03] transition-all duration-300"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-border/50 text-foreground font-semibold hover:bg-secondary/60 hover:border-primary/30 hover:scale-[1.03] transition-all duration-300 gradient-border"
           >
             <Instagram size={20} />
             Siga no Instagram

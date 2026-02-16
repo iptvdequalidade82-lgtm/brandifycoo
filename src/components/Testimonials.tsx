@@ -12,7 +12,7 @@ const item = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0, transiti
 
 export default function Testimonials() {
   return (
-    <section className="section-padding relative overflow-hidden">
+    <section className="section-padding relative overflow-hidden bg-secondary">
       <div className="container mx-auto max-w-5xl relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -21,9 +21,9 @@ export default function Testimonials() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="font-display text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 text-foreground">
+          <h2 className="font-display text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-4 text-foreground">
             Resultados{" "}
-            <span className="text-gradient">reais</span>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--brand-gradient-from))] to-[hsl(var(--brand-muted))]">reais</span>
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
             O que nossos clientes dizem sobre o trabalho da Brandify.
@@ -42,7 +42,7 @@ export default function Testimonials() {
               key={t.name}
               variants={item}
               whileHover={{ y: -6, transition: { duration: 0.3 } }}
-              className="relative p-6 rounded-2xl bg-card border border-border gentle-animation hover:border-primary/20 hover:shadow-[0_8px_30px_rgba(100,220,220,0.06)]"
+              className="relative p-6 rounded-2xl bg-background border border-border gentle-animation hover:shadow-xl hover:shadow-brand/5"
             >
               <Quote className="text-border absolute top-4 right-4" size={36} />
               <div className="flex gap-1 mb-4">
