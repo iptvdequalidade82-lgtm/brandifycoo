@@ -12,12 +12,7 @@ const item = { hidden: { opacity: 0, y: 40 }, show: { opacity: 1, y: 0, transiti
 
 export default function Process() {
   return (
-    <section id="processo" className="relative overflow-hidden py-28 md:py-36 bg-black">
-      {/* Subtle grid pattern */}
-      <div className="absolute inset-0 opacity-[0.04]" style={{
-        backgroundImage: 'linear-gradient(rgba(255,255,255,.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.15) 1px, transparent 1px)',
-        backgroundSize: '60px 60px'
-      }} />
+    <section id="processo" className="relative py-28 md:py-36 bg-black">
 
       <div className="container mx-auto max-w-6xl px-6 relative">
         <div className="text-center mb-20">
