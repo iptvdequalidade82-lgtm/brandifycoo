@@ -1,58 +1,54 @@
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { useState } from "react";
 import AnimatedCounter from "@/components/AnimatedCounter";
 
 export default function Hero() {
+  const [videoLoaded, setVideoLoaded] = useState(false);
+
   return (
     <section
       id="inicio"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background pt-28 md:pt-0 animated-bg"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background pt-28 md:pt-0"
     >
-      {/* Subtle dot pattern */}
-      <div className="absolute inset-0 opacity-[0.4] pointer-events-none">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `radial-gradient(circle, hsl(0 0% 80%) 1px, transparent 1px)`,
-            backgroundSize: '40px 40px',
-          }}
-        />
-      </div>
-
-      {/* Soft ambient shapes with subtle drift */}
+      {/* Background Video */}
       <motion.div
-        animate={{
-          x: [0, 20, -10, 0],
-          y: [0, -15, 10, 0],
-        }}
-        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-1/4 left-1/3 w-[500px] h-[500px] rounded-full bg-black/[0.02] blur-[120px] pointer-events-none"
-      />
-      <motion.div
-        animate={{
-          x: [0, -15, 20, 0],
-          y: [0, 10, -20, 0],
-        }}
-        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-black/[0.015] blur-[100px] pointer-events-none"
-      />
+        initial={{ opacity: 0 }}
+        animate={{ opacity: videoLoaded ? 1 : 0 }}
+        transition={{ duration: 1.5, ease: "easeOut" }}
+        className="absolute inset-0 z-0"
+      >
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          onLoadedData={() => setVideoLoaded(true)}
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source src="/hero-bg-video.mp4" type="video/mp4" />
+        </video>
+      </motion.div>
 
-      <div className="relative z-10 container mx-auto text-center max-w-5xl px-6">
+      {/* Dark overlay for text legibility */}
+      <div className="absolute inset-0 z-[1] bg-black/50 backdrop-blur-[2px] pointer-events-none" />
+
+      <div className="relative z-10 container mx-auto text-center max-w-5xl px-6 text-white">
         <motion.h1
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.5 }}
-          className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-extrabold leading-[0.95] mb-8 tracking-[-0.04em] text-foreground"
+          className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-extrabold leading-[0.95] mb-8 tracking-[-0.04em] text-white"
         >
           Criamos sites do{" "}
-          <span className="text-gradient">futuro</span>
+          <span className="text-white/70">futuro</span>
         </motion.h1>
 
         <motion.p
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.8 }}
-          className="text-muted-foreground text-lg md:text-xl mb-14 max-w-2xl mx-auto leading-relaxed font-light"
+          className="text-white/70 text-lg md:text-xl mb-14 max-w-2xl mx-auto leading-relaxed font-light"
         >
           Modernos, rápidos e com design que impressiona. Tecnologia de ponta
           aplicada ao seu negócio digital.
@@ -78,7 +74,7 @@ export default function Hero() {
           <motion.a
             whileHover={{ scale: 1.03 }}
             href="#servicos"
-            className="px-8 py-4 rounded-xl border border-border text-foreground font-semibold hover:bg-accent gentle-animation text-center"
+            className="px-8 py-4 rounded-xl border border-white/20 text-white font-semibold hover:bg-white/10 gentle-animation text-center"
           >
             Nossos Serviços
           </motion.a>
@@ -97,10 +93,10 @@ export default function Hero() {
             { value: 24, suffix: "h", label: "Tempo de resposta" },
           ].map((stat) => (
             <div key={stat.label} className="text-center">
-              <p className="font-display text-3xl md:text-4xl font-extrabold text-brand tracking-tight">
+              <p className="font-display text-3xl md:text-4xl font-extrabold text-white tracking-tight">
                 <AnimatedCounter end={stat.value} suffix={stat.suffix} />
               </p>
-              <p className="text-xs md:text-sm text-muted-foreground mt-1.5 tracking-wide font-medium">{stat.label}</p>
+              <p className="text-xs md:text-sm text-white/60 mt-1.5 tracking-wide font-medium">{stat.label}</p>
             </div>
           ))}
         </motion.div>
