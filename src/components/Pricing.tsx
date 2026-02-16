@@ -2,7 +2,7 @@ import { Check, Star, Info, Sparkles, ChevronDown, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRef, useState } from "react";
 import TiltCard from "@/components/TiltCard";
-import moonBg from "@/assets/moon-bg.jpg";
+import earthMoonBg from "@/assets/earth-moon-bg.jpg";
 
 const plans = [
   {
@@ -140,7 +140,7 @@ export default function Pricing() {
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.18] pointer-events-none"
         style={{
-          backgroundImage: `url(${moonBg})`,
+          backgroundImage: `url(${earthMoonBg})`,
           maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
           WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
         }}
