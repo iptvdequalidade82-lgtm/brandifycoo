@@ -25,13 +25,11 @@ export default function Process() {
     <section ref={sectionRef} id="processo" className="relative overflow-visible py-28 md:py-36 bg-black">
       {/* Lunar mountain background */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.12] pointer-events-none"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.20] md:opacity-[0.15] pointer-events-none"
         style={{
           backgroundImage: `url(${lunarMountainBg})`,
-          maskImage: 'radial-gradient(ellipse 50% 70% at center, transparent 0%, black 100%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
-          WebkitMaskImage: 'radial-gradient(ellipse 50% 70% at center, transparent 0%, black 100%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
-          maskComposite: 'intersect',
-          WebkitMaskComposite: 'source-in',
+          maskImage: 'linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)',
         }}
       />
       {/* Parallax grid pattern */}

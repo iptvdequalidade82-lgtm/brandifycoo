@@ -23,13 +23,11 @@ export default function FAQ() {
   return (
     <section id="faq" className="section-padding relative overflow-visible bg-black text-white">
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.15] pointer-events-none"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.22] md:opacity-[0.15] pointer-events-none"
         style={{
           backgroundImage: `url(${skylineBg})`,
-          maskImage: 'radial-gradient(ellipse 50% 70% at center, transparent 0%, black 100%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
-          WebkitMaskImage: 'radial-gradient(ellipse 50% 70% at center, transparent 0%, black 100%), linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
-          maskComposite: 'intersect',
-          WebkitMaskComposite: 'source-in',
+          maskImage: 'linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)',
         }}
       />
       <div className="container mx-auto max-w-3xl relative">
