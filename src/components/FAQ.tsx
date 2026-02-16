@@ -23,7 +23,7 @@ export default function FAQ() {
   return (
     <section id="faq" className="section-padding relative overflow-visible bg-black text-white">
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.22] md:opacity-[0.15] pointer-events-none"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.35] md:opacity-[0.15] pointer-events-none blur-[1px] md:blur-0"
         style={{
           backgroundImage: `url(${skylineBg})`,
           maskImage: 'linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)',
