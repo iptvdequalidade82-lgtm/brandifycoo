@@ -133,7 +133,7 @@ function NuvemshopPlans() {
 
 export default function Pricing() {
   return (
-    <section id="investimento" className="relative py-28 md:py-36 px-6 overflow-hidden bg-black text-white">
+    <section id="investimento" className="relative py-28 md:py-36 px-6 overflow-visible bg-black text-white">
       {/* Ambient blobs */}
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full bg-brand-accent/10 blur-[150px] pointer-events-none animate-[pulse_6s_ease-in-out_infinite]" />
       <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full bg-brand-accent-deep/7 blur-[120px] pointer-events-none animate-[pulse_8s_ease-in-out_infinite]" />
