@@ -33,7 +33,7 @@ export default function Contact() {
           className="rounded-2xl overflow-hidden border border-white/10 bg-white/[0.04] backdrop-blur-sm shadow-2xl"
         >
           <div className="grid md:grid-cols-5">
-            <div className="md:col-span-2 p-8 md:p-10 bg-gradient-to-br from-[hsl(var(--brand-gradient-from))] to-[hsl(var(--brand-gradient-to))] border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-center">
+            <div className="md:col-span-2 p-8 md:p-10 bg-white/[0.04] border-b md:border-b-0 md:border-r border-white/10 flex flex-col justify-center">
               <MessageCircle className="text-white/70 mb-4" size={32} />
               <h2 className="font-display text-2xl md:text-3xl font-black mb-3">
                 Vamos criar o seu site?

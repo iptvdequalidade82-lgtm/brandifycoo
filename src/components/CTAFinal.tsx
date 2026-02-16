@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 export default function CTAFinal() {
   return (
-    <section className="relative py-28 md:py-36 px-6 overflow-hidden bg-gradient-to-br from-[hsl(var(--brand-gradient-from))] via-[hsl(var(--brand-gradient-to))] to-brand-deep">
+    <section className="relative py-28 md:py-36 px-6 overflow-hidden bg-black">
       {/* Organic shapes */}
       <div className="absolute top-10 left-10 w-24 h-24 rounded-full border border-white/10 animate-[pulse_4s_ease-in-out_infinite]" />
       <div className="absolute bottom-20 right-20 w-16 h-16 rounded-full bg-white/10 blur-sm animate-[pulse_5s_ease-in-out_infinite]" />
