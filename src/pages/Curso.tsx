@@ -49,30 +49,21 @@ const Curso = () => {
       {/* Hero */}
       <section className="relative pt-24 pb-16 overflow-hidden">
         <div className="container mx-auto px-6 relative z-10 text-center max-w-3xl">
-          <motion.img
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
-            src={cursoLogo}
-            alt="Brandify Cursos"
-            className="h-16 w-16 rounded-full mx-auto mb-6 ring-2 ring-white/20"
-          />
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
+            transition={{ duration: 0.6 }}
             className="font-display text-3xl md:text-5xl font-black mb-4 text-white"
           >
-            Nossos <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">Cursos</span>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">Cursos</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
             className="text-white/50 text-lg"
           >
-            Aprenda com quem faz. Cursos práticos para transformar sua carreira
-            digital.
+            Cursos que recomendamos para você se desenvolver no mercado digital.
           </motion.p>
 
           <motion.div
