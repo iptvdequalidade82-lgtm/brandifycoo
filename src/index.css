@@ -219,3 +219,28 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--brand-deep));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(0 0% 15%);
+  border-radius: 5px;
+  border: 2px solid hsl(var(--brand-deep));
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(0 0% 25%);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(0 0% 15%) hsl(var(--brand-deep));
+}
