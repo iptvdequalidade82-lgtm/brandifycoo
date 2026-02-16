@@ -136,13 +136,15 @@ function NuvemshopPlans() {
 export default function Pricing() {
   return (
     <section id="investimento" className="relative py-28 md:py-36 px-6 overflow-visible bg-black text-white">
-      {/* Moon background with gradient fade */}
+      {/* Moon background - larger and more visible */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.35] md:opacity-[0.18] pointer-events-none blur-[1px] md:blur-0"
+        className="absolute -inset-x-20 -inset-y-10 bg-cover bg-center bg-no-repeat opacity-[0.40] md:opacity-[0.22] pointer-events-none"
         style={{
           backgroundImage: `url(${earthMoonBg})`,
-          maskImage: 'linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center 40%',
+          maskImage: 'linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)',
         }}
       />
       {/* Ambient blobs */}
