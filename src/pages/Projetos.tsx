@@ -6,7 +6,7 @@ import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 
 const Projetos = () => {
   return (
-    <div className="min-h-screen bg-background pt-20">
+    <div className="min-h-screen bg-black text-white pt-20">
       <Header />
       <Portfolio />
       <SitePreview />

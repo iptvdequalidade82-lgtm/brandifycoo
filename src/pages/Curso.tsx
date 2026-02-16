@@ -43,16 +43,16 @@ const courses = [
 
 const Curso = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-black text-white">
       <Header />
 
       {/* Hero */}
       <section className="relative pt-24 pb-16 overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-20"
+          className="absolute inset-0 bg-cover bg-center opacity-10"
           style={{ backgroundImage: `url(${cursoBanner})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/80 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-black/80 to-black" />
         <div className="container mx-auto px-6 relative z-10 text-center max-w-3xl">
           <motion.img
             initial={{ opacity: 0, scale: 0.8 }}
@@ -60,21 +60,21 @@ const Curso = () => {
             transition={{ duration: 0.6 }}
             src={cursoLogo}
             alt="Brandify Cursos"
-            className="h-16 w-16 rounded-full mx-auto mb-6 ring-2 ring-border"
+            className="h-16 w-16 rounded-full mx-auto mb-6 ring-2 ring-white/20"
           />
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-display text-3xl md:text-5xl font-black mb-4"
+            className="font-display text-3xl md:text-5xl font-black mb-4 text-white"
           >
-            Nossos Cursos
+            Nossos <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">Cursos</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-muted-foreground text-lg"
+            className="text-white/50 text-lg"
           >
             Aprenda com quem faz. Cursos práticos para transformar sua carreira
             digital.
@@ -84,7 +84,7 @@ const Curso = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex items-center justify-center gap-6 mt-8 text-sm text-muted-foreground"
+            className="flex items-center justify-center gap-6 mt-8 text-sm text-white/40"
           >
             <span className="flex items-center gap-2">
               <Users size={16} /> +500 alunos
@@ -109,7 +109,7 @@ const Curso = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.15 }}
-              className="group rounded-2xl border border-border bg-card overflow-hidden hover:border-foreground/20 gentle-animation"
+              className="group rounded-2xl border border-white/10 bg-white/[0.05] overflow-hidden hover:border-white/20 gentle-animation"
             >
               <div className="relative aspect-video overflow-hidden">
                 <img
@@ -117,24 +117,24 @@ const Curso = () => {
                   alt={course.title}
                   className="w-full h-full object-cover group-hover:scale-105 gentle-animation"
                 />
-                <span className="absolute top-4 left-4 text-xs font-bold px-3 py-1 rounded-full bg-foreground text-background">
+                <span className="absolute top-4 left-4 text-xs font-bold px-3 py-1 rounded-full bg-brand-accent text-white">
                   {course.tag}
                 </span>
               </div>
               <div className="p-6">
-                <h3 className="font-display text-xl font-bold mb-2">
+                <h3 className="font-display text-xl font-bold mb-2 text-white">
                   {course.title}
                 </h3>
-                <p className="text-sm text-muted-foreground mb-4">
+                <p className="text-sm text-white/50 mb-4">
                   {course.description}
                 </p>
                 <ul className="space-y-2 mb-6">
                   {course.features.map((f) => (
                     <li
                       key={f}
-                      className="flex items-center gap-2 text-sm text-muted-foreground"
+                      className="flex items-center gap-2 text-sm text-white/60"
                     >
-                      <CheckCircle size={14} className="text-foreground" />
+                      <CheckCircle size={14} className="text-brand-accent" />
                       {f}
                     </li>
                   ))}
@@ -143,7 +143,7 @@ const Curso = () => {
                   href={course.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 font-semibold text-sm px-5 py-2.5 rounded-lg bg-foreground text-background hover:opacity-90 gentle-animation"
+                  className="inline-flex items-center gap-2 font-semibold text-sm px-5 py-2.5 rounded-lg bg-gradient-to-r from-[hsl(224,76%,33%)] to-[hsl(217,91%,53%)] text-white hover:opacity-90 gentle-animation"
                 >
                   Saiba mais <ExternalLink size={14} />
                 </a>
