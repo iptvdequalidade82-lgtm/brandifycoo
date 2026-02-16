@@ -2,6 +2,7 @@ import { Check, Star, Info, Sparkles, ChevronDown, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRef, useState } from "react";
 import TiltCard from "@/components/TiltCard";
+import pricingBg from "@/assets/pricing-bg.jpg";
 
 const plans = [
   {
@@ -134,7 +135,13 @@ function NuvemshopPlans() {
 
 export default function Pricing() {
   return (
-    <section id="investimento" className="relative py-28 md:py-36 px-6 overflow-visible bg-black text-white">
+    <section id="investimento" className="relative py-28 md:py-36 px-6 overflow-visible text-white">
+      {/* Storm background image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-[0.15] pointer-events-none"
+        style={{ backgroundImage: `url(${pricingBg})` }}
+      />
+      <div className="absolute inset-0 bg-black/70 pointer-events-none" />
       {/* Ambient blobs */}
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full bg-brand-accent/10 blur-[150px] pointer-events-none animate-[pulse_6s_ease-in-out_infinite]" />
       <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full bg-brand-accent-deep/7 blur-[120px] pointer-events-none animate-[pulse_8s_ease-in-out_infinite]" />
