@@ -153,7 +153,7 @@ export default function Pricing() {
             className="font-display text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-4"
           >
             Invista no seu{" "}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">negócio</span>
+            <span className="italic bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">negócio</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}

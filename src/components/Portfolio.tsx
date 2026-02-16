@@ -28,7 +28,7 @@ export default function Portfolio() {
         >
           <h2 className="font-display text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-4 text-white">
             Diversos{" "}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">segmentos</span>
+            <span className="italic bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">segmentos</span>
           </h2>
           <p className="text-white/50 max-w-xl mx-auto">
             Experiência comprovada nos mais variados nichos de mercado.

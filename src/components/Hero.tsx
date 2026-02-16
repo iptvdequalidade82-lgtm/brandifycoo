@@ -73,7 +73,7 @@ export default function Hero() {
           className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-extrabold leading-[0.95] mb-8 tracking-[-0.04em] text-white"
         >
           Criamos sites do{" "}
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">futuro</span>
+          <span className="italic bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">futuro</span>
         </motion.h1>
 
         <motion.p
