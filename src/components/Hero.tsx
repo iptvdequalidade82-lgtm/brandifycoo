@@ -1,58 +1,44 @@
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import AnimatedCounter from "@/components/AnimatedCounter";
+import heroBg from "@/assets/hero-bg.jpg";
 
 export default function Hero() {
-  const [videoLoaded, setVideoLoaded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    // Critical for iOS autoplay
     video.muted = true;
     video.defaultMuted = true;
     video.volume = 0;
     video.setAttribute('playsinline', '');
     video.setAttribute('webkit-playsinline', '');
-    video.setAttribute('x5-playsinline', '');
-    video.setAttribute('x5-video-player-type', 'h5');
 
     const attemptPlay = () => {
       if (!video.paused) return;
-      // Force load before play on mobile
-      if (video.readyState === 0) {
-        video.load();
-      }
-      const p = video.play();
-      if (p !== undefined) {
-        p.catch(() => {});
-      }
+      if (video.readyState === 0) video.load();
+      video.play().catch(() => {});
     };
 
-    // Try playing at every possible stage of loading
     video.addEventListener('loadedmetadata', attemptPlay);
     video.addEventListener('loadeddata', attemptPlay);
     video.addEventListener('canplay', attemptPlay);
     video.addEventListener('canplaythrough', attemptPlay);
 
-    // Force load + play immediately
     video.load();
     attemptPlay();
 
-    // Retry every 100ms for first 20 seconds (more aggressive)
     const interval = setInterval(attemptPlay, 100);
     const timeout = setTimeout(() => clearInterval(interval), 20000);
 
-    // Also try on visibility change (user switches tabs back)
     const handleVisibility = () => {
       if (!document.hidden) attemptPlay();
     };
     document.addEventListener('visibilitychange', handleVisibility);
 
-    // Try on any user interaction as last resort
     const handleInteraction = () => {
       attemptPlay();
       if (!video.paused) {
@@ -79,7 +65,7 @@ export default function Hero() {
       id="inicio"
       className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background pt-28 md:pt-0"
     >
-      {/* Background Video - always visible (no opacity:0 wrapper, iOS blocks autoplay on hidden videos) */}
+      {/* Background Video - no cover div so iOS doesn't consider it hidden */}
       <div className="absolute inset-0 z-0">
         <video
           ref={videoRef}
@@ -88,19 +74,12 @@ export default function Hero() {
           muted
           playsInline
           preload="auto"
-          onLoadedData={() => setVideoLoaded(true)}
+          poster={heroBg}
           className="absolute inset-0 w-full h-full object-cover"
-          src="/hero-bg-video.mp4"
-        />
+        >
+          <source src="/hero-bg-video.mp4" type="video/mp4" />
+        </video>
       </div>
-
-      {/* Fade-in cover: starts opaque black, fades out when video loads */}
-      <motion.div
-        initial={{ opacity: 1 }}
-        animate={{ opacity: videoLoaded ? 0 : 1 }}
-        transition={{ duration: 1.5, ease: "easeOut" }}
-        className="absolute inset-0 z-0 bg-background pointer-events-none"
-      />
 
       {/* Dark overlay for text legibility */}
       <div className="absolute inset-0 z-[1] bg-black/50 backdrop-blur-[2px] pointer-events-none" />
