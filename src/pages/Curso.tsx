@@ -6,6 +6,7 @@ import cursoLogo from "@/assets/curso-logo.png";
 import dropMilionarioCover from "@/assets/drop-milionario-cover.webp";
 import novaProfissaoCover from "@/assets/nova-profissao-cover.webp";
 import novaProfissaoLogo from "@/assets/nova-profissao-logo.webp";
+import coursesBg from "@/assets/courses-bg.jpg";
 import { motion } from "framer-motion";
 import { ExternalLink, Star, Users, Clock, CheckCircle } from "lucide-react";
 
@@ -43,7 +44,12 @@ const courses = [
 
 const Curso = () => {
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white relative">
+      {/* Background image */}
+      <div
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-[0.12] pointer-events-none blur-sm"
+        style={{ backgroundImage: `url(${coursesBg})` }}
+      />
       <Header />
 
       {/* Hero */}
