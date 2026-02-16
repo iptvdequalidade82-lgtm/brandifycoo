@@ -84,7 +84,8 @@ export default function Gallery() {
             href="https://www.instagram.com/brandifycoo"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-border/50 text-foreground font-semibold hover:bg-secondary/60 hover:border-primary/30 hover:scale-[1.03] transition-all duration-300 gradient-border"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white hover:opacity-90 hover:scale-[1.03] transition-all duration-300"
+            style={{ background: "linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)" }}
           >
             <Instagram size={20} />
             Siga no Instagram
