@@ -222,25 +222,24 @@
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(var(--brand-deep));
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(0 0% 15%);
-  border-radius: 5px;
-  border: 2px solid hsl(var(--brand-deep));
+  background: white;
+  border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(0 0% 25%);
+  background: hsl(0 0% 85%);
 }
 
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: hsl(0 0% 15%) hsl(var(--brand-deep));
+  scrollbar-color: white transparent;
 }
