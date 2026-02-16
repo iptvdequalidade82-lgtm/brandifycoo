@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import moonBg from "@/assets/moon-bg.jpg";
 import {
   Accordion,
   AccordionContent,
@@ -21,6 +22,14 @@ const item = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transiti
 export default function FAQ() {
   return (
     <section id="faq" className="section-padding relative overflow-visible bg-black text-white">
+      <div
+        className="absolute inset-0 bg-cover bg-bottom bg-no-repeat opacity-[0.12] pointer-events-none"
+        style={{
+          backgroundImage: `url(${moonBg})`,
+          maskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%)',
+        }}
+      />
       <div className="container mx-auto max-w-3xl relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
