@@ -21,7 +21,8 @@ const contacts = [
 
 export default function Contact() {
   return (
-    <section id="contato" className="relative py-28 md:py-36 px-6 bg-black text-white">
+    <section id="contato" className="relative py-28 md:py-36 px-6 overflow-hidden bg-black text-white">
+      <div className="absolute bottom-0 left-1/3 w-[500px] h-[500px] rounded-full bg-brand-accent/8 blur-[140px] pointer-events-none" />
 
       <div className="container mx-auto max-w-4xl relative">
         <motion.div
