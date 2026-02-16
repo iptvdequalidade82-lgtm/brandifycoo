@@ -15,7 +15,7 @@ const item = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0, transiti
 
 export default function Services() {
   return (
-    <section id="servicos" className="section-padding relative overflow-hidden bg-secondary">
+    <section id="servicos" className="section-padding relative overflow-hidden">
       <div className="container mx-auto max-w-5xl relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -24,7 +24,7 @@ export default function Services() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="font-display text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-4 text-foreground">
+          <h2 className="font-display text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 text-foreground">
             Tecnologia que{" "}
             <span className="text-gradient">transforma</span>
           </h2>
@@ -47,10 +47,10 @@ export default function Services() {
                 key={s.title}
                 variants={item}
                 whileHover={{ y: -6, transition: { duration: 0.3 } }}
-                className="group relative p-6 rounded-2xl bg-background border border-border gentle-animation hover:shadow-lg"
+                className="group relative p-6 rounded-2xl bg-card border border-border gentle-animation hover:border-primary/20 hover:shadow-[0_8px_30px_rgba(100,220,220,0.06)]"
               >
-                <div className="w-11 h-11 rounded-xl bg-brand-light flex items-center justify-center mb-5 group-hover:bg-brand gentle-animation">
-                  <Icon className="text-brand-muted group-hover:text-white gentle-animation" size={20} strokeWidth={1.8} />
+                <div className="w-11 h-11 rounded-xl bg-brand-light flex items-center justify-center mb-5 group-hover:bg-primary/20 gentle-animation">
+                  <Icon className="text-brand-muted group-hover:text-primary gentle-animation" size={20} strokeWidth={1.8} />
                 </div>
                 <h3 className="font-display text-base font-bold text-foreground mb-2">{s.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>

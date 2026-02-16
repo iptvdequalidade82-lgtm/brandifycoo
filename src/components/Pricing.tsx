@@ -26,44 +26,17 @@ const item = { hidden: { opacity: 0, y: 40 }, show: { opacity: 1, y: 0, transiti
 const nuvemshopPlans = [
   {
     name: "Essencial", price: "R$ 69/mês", desc: "Para quem está começando a vender online",
-    included: [
-      "Atendimento por e-mail e messenger",
-      "+30 meios de envio integrados",
-      "+20 meios de pagamento integrados",
-      "Apontamento de domínio próprio",
-      "Acompanhamento via gráficos de desempenho da loja",
-    ],
-    notIncluded: [
-      "Atendimento via WhatsApp",
-      "Acesso ao código fonte (HTML/CSS)",
-    ],
+    included: ["Atendimento por e-mail e messenger", "+30 meios de envio integrados", "+20 meios de pagamento integrados", "Apontamento de domínio próprio", "Acompanhamento via gráficos de desempenho da loja"],
+    notIncluded: ["Atendimento via WhatsApp", "Acesso ao código fonte (HTML/CSS)"],
   },
   {
     name: "Impulso", price: "R$ 164/mês", desc: "Mais recursos e edição avançada do site",
-    included: [
-      "Todos os recursos do plano anterior",
-      "Atendimento via WhatsApp",
-      "Acesso ao código fonte (HTML/CSS)",
-    ],
-    notIncluded: [
-      "Relatórios ilimitados",
-      "Gestão e controle de usuários",
-      "Edição de vendas",
-      "Filtro de produtos na lista de vendas",
-      "Campos personalizados de gestão",
-      "Custos e comissões diferenciados",
-    ],
+    included: ["Todos os recursos do plano anterior", "Atendimento via WhatsApp", "Acesso ao código fonte (HTML/CSS)"],
+    notIncluded: ["Relatórios ilimitados", "Gestão e controle de usuários", "Edição de vendas", "Filtro de produtos na lista de vendas", "Campos personalizados de gestão", "Custos e comissões diferenciados"],
   },
   {
     name: "Escala", price: "R$ 449/mês", desc: "Máxima personalização e ferramentas de gestão",
-    included: [
-      "Todos os recursos do plano anterior",
-      "Relatórios ilimitados",
-      "Edição de vendas",
-      "Filtro de produtos na lista de vendas",
-      "Campos personalizados de gestão",
-      "Custos e comissões diferenciados",
-    ],
+    included: ["Todos os recursos do plano anterior", "Relatórios ilimitados", "Edição de vendas", "Filtro de produtos na lista de vendas", "Campos personalizados de gestão", "Custos e comissões diferenciados"],
     notIncluded: [],
   },
 ];
@@ -73,23 +46,23 @@ function NuvemshopPlans() {
 
   return (
     <div>
-      <p className="text-xs uppercase tracking-wider text-white/40 font-medium mb-4">Planos Nuvemshop (mensais)</p>
+      <p className="text-xs uppercase tracking-wider text-foreground/40 font-medium mb-4">Planos Nuvemshop (mensais)</p>
       <div className="space-y-3">
         {nuvemshopPlans.map((p) => (
-          <div key={p.name} className="rounded-xl bg-white/[0.05] border border-white/10 overflow-hidden">
+          <div key={p.name} className="rounded-xl bg-card border border-border overflow-hidden">
             <button
               onClick={() => setOpenPlan(openPlan === p.name ? null : p.name)}
-              className="w-full flex items-center justify-between p-3 text-left hover:bg-white/[0.03] gentle-animation"
+              className="w-full flex items-center justify-between p-3 text-left hover:bg-accent gentle-animation"
             >
               <div>
-                <span className="text-sm font-bold text-white">{p.name}</span>
-                <p className="text-xs text-white/40 mt-0.5">{p.desc}</p>
+                <span className="text-sm font-bold text-foreground">{p.name}</span>
+                <p className="text-xs text-muted-foreground mt-0.5">{p.desc}</p>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0 ml-4">
-                <span className="text-sm font-bold text-emerald-400">{p.price}</span>
+                <span className="text-sm font-bold text-primary">{p.price}</span>
                 <ChevronDown
                   size={16}
-                  className={`text-white/40 gentle-animation ${openPlan === p.name ? "rotate-180" : ""}`}
+                  className={`text-muted-foreground gentle-animation ${openPlan === p.name ? "rotate-180" : ""}`}
                 />
               </div>
             </button>
@@ -102,18 +75,18 @@ function NuvemshopPlans() {
                   transition={{ duration: 0.3 }}
                   className="overflow-hidden"
                 >
-                  <div className="px-3 pb-3 pt-1 border-t border-white/10">
+                  <div className="px-3 pb-3 pt-1 border-t border-border">
                     <ul className="space-y-2 mt-2">
                       {p.included.map((f) => (
                         <li key={f} className="flex items-start gap-2">
-                          <Check className="mt-0.5 flex-shrink-0 text-emerald-400" size={14} strokeWidth={2.5} />
-                          <span className="text-xs text-white/70">{f}</span>
+                          <Check className="mt-0.5 flex-shrink-0 text-primary" size={14} strokeWidth={2.5} />
+                          <span className="text-xs text-foreground/70">{f}</span>
                         </li>
                       ))}
                       {p.notIncluded.map((f) => (
                         <li key={f} className="flex items-start gap-2">
-                          <X className="mt-0.5 flex-shrink-0 text-white/25" size={14} strokeWidth={2.5} />
-                          <span className="text-xs text-white/35">{f}</span>
+                          <X className="mt-0.5 flex-shrink-0 text-muted-foreground/40" size={14} strokeWidth={2.5} />
+                          <span className="text-xs text-muted-foreground/50">{f}</span>
                         </li>
                       ))}
                     </ul>
@@ -124,7 +97,7 @@ function NuvemshopPlans() {
           </div>
         ))}
       </div>
-      <p className="text-xs text-white/30 mt-4 leading-relaxed">
+      <p className="text-xs text-muted-foreground/50 mt-4 leading-relaxed">
         O plano Nuvemshop é contratado na conta do próprio cliente (e-mail do cliente). Toda a configuração é feita por nós, mas a titularidade e renovação ficam sob responsabilidade do cliente.
       </p>
     </div>
@@ -133,15 +106,10 @@ function NuvemshopPlans() {
 
 export default function Pricing() {
   return (
-    <section id="investimento" className="relative py-28 md:py-36 px-6 overflow-hidden bg-brand-deep text-white">
+    <section id="investimento" className="relative py-28 md:py-36 px-6 overflow-hidden">
       {/* Ambient blobs */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full bg-brand-accent/10 blur-[150px] pointer-events-none animate-[pulse_6s_ease-in-out_infinite]" />
-      <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full bg-brand-accent-deep/7 blur-[120px] pointer-events-none animate-[pulse_8s_ease-in-out_infinite]" />
-
-      {/* Dot pattern */}
-      <div className="absolute inset-0 opacity-[0.04] pointer-events-none">
-        <div className="absolute inset-0" style={{ backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)`, backgroundSize: '50px 50px' }} />
-      </div>
+      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full bg-primary/5 blur-[150px] pointer-events-none animate-[pulse_6s_ease-in-out_infinite]" />
+      <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full bg-brand-accent/3 blur-[120px] pointer-events-none animate-[pulse_8s_ease-in-out_infinite]" />
 
       <div className="container mx-auto max-w-6xl relative">
         <div className="text-center mb-16">
@@ -150,17 +118,17 @@ export default function Pricing() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6 }}
-            className="font-display text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-4"
+            className="font-display text-3xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 text-foreground"
           >
             Escolha o plano{" "}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">ideal</span>
+            <span className="text-gradient">ideal</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-white/50 max-w-xl mx-auto"
+            className="text-muted-foreground max-w-xl mx-auto"
           >
             Sem surpresas. Preços transparentes para o seu negócio crescer.
           </motion.p>
@@ -180,36 +148,36 @@ export default function Pricing() {
               whileHover={{ y: -8, transition: { duration: 0.3 } }}
               className={`relative rounded-2xl overflow-hidden gentle-animation flex flex-col ${
                 plan.featured
-                  ? "bg-gradient-to-b from-[hsl(var(--brand-gradient-from))] to-[hsl(var(--brand-gradient-to))] shadow-[0_20px_60px_-15px_hsl(var(--brand-gradient-from)/0.4)] md:scale-[1.06] z-10"
-                  : "bg-white/[0.06] border border-white/10 backdrop-blur-sm hover:bg-white/[0.1]"
+                  ? "bg-gradient-to-b from-[hsl(185_45%_20%)] to-[hsl(200_40%_12%)] shadow-[0_20px_60px_-15px_hsl(var(--primary)/0.25)] md:scale-[1.06] z-10 border border-primary/20"
+                  : "bg-card border border-border hover:border-primary/15"
               }`}
             >
               {plan.featured && (
-                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-brand-accent to-transparent" />
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent" />
               )}
 
-              <div className={`p-7 text-center border-b ${plan.featured ? "border-white/20" : "border-white/10"}`}>
+              <div className={`p-7 text-center border-b ${plan.featured ? "border-primary/20" : "border-border"}`}>
                 {plan.featured && (
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-medium mb-3">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/20 text-primary text-xs font-medium mb-3">
                     <Star size={12} className="fill-current" />
                     Mais popular
                   </div>
                 )}
-                <h3 className="font-display text-lg font-black">{plan.name}</h3>
-                <p className={`text-xs mt-1 mb-4 ${plan.featured ? "text-white/70" : "text-white/40"}`}>{plan.desc}</p>
-                <p className={`text-[10px] uppercase tracking-wider mb-2 ${plan.featured ? "text-white/50" : "text-white/30"}`}>{plan.pricePrefix}</p>
+                <h3 className="font-display text-lg font-extrabold text-foreground">{plan.name}</h3>
+                <p className={`text-xs mt-1 mb-4 text-muted-foreground`}>{plan.desc}</p>
+                <p className="text-[10px] uppercase tracking-wider mb-2 text-muted-foreground/60">{plan.pricePrefix}</p>
                 <div className="flex items-baseline justify-center gap-1">
-                  <span className="font-display text-4xl font-black">{plan.price}</span>
+                  <span className="font-display text-4xl font-extrabold text-foreground">{plan.price}</span>
                 </div>
-                <p className={`text-xs mt-1 ${plan.featured ? "text-white/50" : "text-white/30"}`}>valor único · pagamento via PIX</p>
+                <p className="text-xs mt-1 text-muted-foreground/50">valor único · pagamento via PIX</p>
               </div>
 
               <div className="p-7 flex-1">
                 <ul className="space-y-3">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-3">
-                      <Check className={`mt-0.5 flex-shrink-0 ${plan.featured ? "text-brand-accent" : "text-white/40"}`} size={16} strokeWidth={2.5} />
-                      <span className={`text-sm ${plan.featured ? "text-white/90" : "text-white/70"}`}>{f}</span>
+                      <Check className={`mt-0.5 flex-shrink-0 ${plan.featured ? "text-primary" : "text-muted-foreground"}`} size={16} strokeWidth={2.5} />
+                      <span className="text-sm text-foreground/80">{f}</span>
                     </li>
                   ))}
                 </ul>
@@ -224,8 +192,8 @@ export default function Pricing() {
                   rel="noopener noreferrer"
                   className={`block w-full text-center px-6 py-3.5 rounded-xl font-bold gentle-animation ${
                     plan.featured
-                      ? "bg-white text-brand shadow-lg"
-                      : "border border-white/20 text-white hover:bg-white/10"
+                      ? "bg-primary text-primary-foreground btn-glow shadow-[0_0_20px_hsl(var(--primary)/0.3)]"
+                      : "border border-border text-foreground hover:bg-accent hover:border-primary/20"
                   }`}
                 >
                   Solicitar Orçamento
@@ -235,25 +203,25 @@ export default function Pricing() {
           ))}
         </motion.div>
 
-        {/* Hosting note - above Nuvemshop, below cards */}
+        {/* Hosting note */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 p-5 rounded-xl bg-white/[0.05] border border-white/10 backdrop-blur-sm"
+          className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 p-5 rounded-xl bg-card border border-border"
         >
           <div className="flex items-start gap-3">
-            <Info className="text-white/50 mt-0.5 flex-shrink-0" size={18} />
+            <Info className="text-muted-foreground mt-0.5 flex-shrink-0" size={18} />
             <div>
-              <p className="text-sm font-bold text-white">Hospedagem e domínio são cobrados à parte</p>
-              <p className="text-xs text-white/40 mt-1 leading-relaxed">
-                Hospedagem no 1º ano: <span className="text-white/70 font-medium">R$ 240,00</span> (inclui R$ 120 de instalação) &nbsp;·&nbsp; A partir do 2º ano: <span className="text-white/70 font-medium">R$ 120,00/ano</span>
+              <p className="text-sm font-bold text-foreground">Hospedagem e domínio são cobrados à parte</p>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                Hospedagem no 1º ano: <span className="text-foreground/70 font-medium">R$ 240,00</span> (inclui R$ 120 de instalação) &nbsp;·&nbsp; A partir do 2º ano: <span className="text-foreground/70 font-medium">R$ 120,00/ano</span>
               </p>
-              <p className="text-xs text-white/40 mt-1 leading-relaxed">
-                Domínio: <span className="text-white/70 font-medium">a partir de R$ 40,00/ano</span> (valor pode variar conforme o domínio escolhido)
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                Domínio: <span className="text-foreground/70 font-medium">a partir de R$ 40,00/ano</span> (valor pode variar conforme o domínio escolhido)
               </p>
-              <p className="text-xs text-white/40 mt-1.5 leading-relaxed">
+              <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
                 Tudo é configurado na conta do próprio cliente. Na primeira vez, cuidamos de toda a instalação. Nas renovações seguintes, o cliente assume o pagamento diretamente.
               </p>
             </div>
@@ -266,29 +234,29 @@ export default function Pricing() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="mt-16 rounded-2xl overflow-hidden border border-white/10 bg-white/[0.06] backdrop-blur-sm"
+          className="mt-16 rounded-2xl overflow-hidden border border-border bg-card"
         >
-          <div className="p-7 md:p-10 border-b border-white/10">
+          <div className="p-7 md:p-10 border-b border-border">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
               <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 text-xs font-medium mb-3">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/15 text-primary text-xs font-medium mb-3">
                   <Sparkles size={12} />
                   E-commerce
                 </div>
-                <h3 className="font-display text-2xl md:text-3xl font-black">Loja Virtual — Nuvemshop</h3>
-                <p className="text-white/50 mt-2 max-w-lg">Loja online completa, configurada e pronta para vender. Ideal para quem quer entrar no e-commerce com estrutura profissional.</p>
+                <h3 className="font-display text-2xl md:text-3xl font-extrabold text-foreground">Loja Virtual — Nuvemshop</h3>
+                <p className="text-muted-foreground mt-2 max-w-lg">Loja online completa, configurada e pronta para vender. Ideal para quem quer entrar no e-commerce com estrutura profissional.</p>
               </div>
               <div className="text-left md:text-right flex-shrink-0">
-                <p className="text-[10px] uppercase tracking-wider text-white/30 mb-1">a partir de</p>
-                <span className="font-display text-4xl font-black">R$ 2.500</span>
-                <p className="text-xs text-white/30 mt-1">valor único · pagamento via PIX</p>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground/50 mb-1">a partir de</p>
+                <span className="font-display text-4xl font-extrabold text-foreground">R$ 2.500</span>
+                <p className="text-xs text-muted-foreground/50 mt-1">valor único · pagamento via PIX</p>
               </div>
             </div>
           </div>
 
           <div className="p-7 md:p-10 grid md:grid-cols-2 gap-8">
             <div>
-              <p className="text-xs uppercase tracking-wider text-white/40 font-medium mb-4">O que está incluso</p>
+              <p className="text-xs uppercase tracking-wider text-foreground/40 font-medium mb-4">O que está incluso</p>
               <ul className="space-y-3">
                 {[
                   "Configuração de layout completa",
@@ -299,8 +267,8 @@ export default function Pricing() {
                   "Integração de estoque (se aplicável)",
                 ].map((f) => (
                   <li key={f} className="flex items-start gap-3">
-                    <Check className="mt-0.5 flex-shrink-0 text-emerald-400" size={16} strokeWidth={2.5} />
-                    <span className="text-sm text-white/80">{f}</span>
+                    <Check className="mt-0.5 flex-shrink-0 text-primary" size={16} strokeWidth={2.5} />
+                    <span className="text-sm text-foreground/80">{f}</span>
                   </li>
                 ))}
               </ul>
@@ -316,7 +284,7 @@ export default function Pricing() {
               href={`https://wa.me/5543991065129?text=${encodeURIComponent('Olá! Tenho interesse na Loja Virtual Nuvemshop.')}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block px-8 py-3.5 rounded-xl font-bold bg-emerald-500 text-white hover:bg-emerald-600 gentle-animation"
+              className="inline-block px-8 py-3.5 rounded-xl font-bold bg-primary text-primary-foreground btn-glow gentle-animation shadow-[0_0_20px_hsl(var(--primary)/0.25)]"
             >
               Solicitar Orçamento
             </motion.a>
