@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Sora:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -72,7 +72,9 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Sora', sans-serif;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
   }
 
   /* Clean scrollbar */
@@ -189,6 +191,24 @@
   .text-shadow-medium {
     text-shadow: none;
   }
+}
+
+/* Subtle animated background mesh */
+@keyframes mesh-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.02); }
+  66% { transform: translate(-20px, 15px) scale(0.98); }
+}
+
+.animated-bg::before {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  background: radial-gradient(ellipse 600px 400px at 30% 40%, hsl(var(--brand) / 0.03), transparent),
+              radial-gradient(ellipse 500px 350px at 70% 60%, hsl(var(--brand-muted) / 0.025), transparent);
+  animation: mesh-drift 20s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* Performance optimizations */

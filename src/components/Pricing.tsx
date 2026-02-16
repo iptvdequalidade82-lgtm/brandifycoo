@@ -177,7 +177,8 @@ export default function Pricing() {
             <motion.div
               key={plan.name}
               variants={item}
-              whileHover={{ y: -8, transition: { duration: 0.3 } }}
+              whileHover={{ y: -8, rotateX: 1.5, rotateY: -1.5, transition: { duration: 0.3 } }}
+              style={{ transformPerspective: 800 }}
               className={`relative rounded-2xl overflow-hidden gentle-animation flex flex-col ${
                 plan.featured
                   ? "bg-gradient-to-b from-[hsl(var(--brand-gradient-from))] to-[hsl(var(--brand-gradient-to))] shadow-[0_20px_60px_-15px_hsl(var(--brand-gradient-from)/0.4)] md:scale-[1.06] z-10"

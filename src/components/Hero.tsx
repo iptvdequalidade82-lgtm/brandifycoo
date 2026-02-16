@@ -6,7 +6,7 @@ export default function Hero() {
   return (
     <section
       id="inicio"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background pt-28 md:pt-0"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background pt-28 md:pt-0 animated-bg"
     >
       {/* Subtle dot pattern */}
       <div className="absolute inset-0 opacity-[0.4] pointer-events-none">
@@ -19,16 +19,30 @@ export default function Hero() {
         />
       </div>
 
-      {/* Soft ambient shapes */}
-      <div className="absolute top-1/4 left-1/3 w-[500px] h-[500px] rounded-full bg-black/[0.02] blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-black/[0.015] blur-[100px] pointer-events-none" />
+      {/* Soft ambient shapes with subtle drift */}
+      <motion.div
+        animate={{
+          x: [0, 20, -10, 0],
+          y: [0, -15, 10, 0],
+        }}
+        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-1/4 left-1/3 w-[500px] h-[500px] rounded-full bg-black/[0.02] blur-[120px] pointer-events-none"
+      />
+      <motion.div
+        animate={{
+          x: [0, -15, 20, 0],
+          y: [0, 10, -20, 0],
+        }}
+        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-black/[0.015] blur-[100px] pointer-events-none"
+      />
 
       <div className="relative z-10 container mx-auto text-center max-w-5xl px-6">
         <motion.h1
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.5 }}
-          className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-[0.95] mb-8 tracking-[-0.04em] text-foreground"
+          className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-extrabold leading-[0.95] mb-8 tracking-[-0.04em] text-foreground"
         >
           Criamos sites do{" "}
           <span className="text-gradient">futuro</span>
@@ -38,7 +52,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.8 }}
-          className="text-muted-foreground text-lg md:text-xl mb-14 max-w-2xl mx-auto leading-relaxed"
+          className="text-muted-foreground text-lg md:text-xl mb-14 max-w-2xl mx-auto leading-relaxed font-light"
         >
           Modernos, rápidos e com design que impressiona. Tecnologia de ponta
           aplicada ao seu negócio digital.
@@ -83,10 +97,10 @@ export default function Hero() {
             { value: 24, suffix: "h", label: "Tempo de resposta" },
           ].map((stat) => (
             <div key={stat.label} className="text-center">
-              <p className="font-display text-3xl md:text-4xl font-black text-brand tracking-tight">
+              <p className="font-display text-3xl md:text-4xl font-extrabold text-brand tracking-tight">
                 <AnimatedCounter end={stat.value} suffix={stat.suffix} />
               </p>
-              <p className="text-xs md:text-sm text-muted-foreground mt-1.5 tracking-wide">{stat.label}</p>
+              <p className="text-xs md:text-sm text-muted-foreground mt-1.5 tracking-wide font-medium">{stat.label}</p>
             </div>
           ))}
         </motion.div>

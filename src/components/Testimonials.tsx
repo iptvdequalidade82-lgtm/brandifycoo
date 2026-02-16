@@ -41,8 +41,9 @@ export default function Testimonials() {
             <motion.div
               key={t.name}
               variants={item}
-              whileHover={{ y: -6, transition: { duration: 0.3 } }}
+              whileHover={{ y: -6, rotateX: 2, rotateY: -2, transition: { duration: 0.3 } }}
               className="relative p-6 rounded-2xl bg-background border border-border gentle-animation hover:shadow-xl hover:shadow-brand/5"
+              style={{ transformPerspective: 800 }}
             >
               <Quote className="text-border absolute top-4 right-4" size={36} />
               <div className="flex gap-1 mb-4">
