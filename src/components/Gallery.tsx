@@ -3,7 +3,8 @@ import post2 from "@/assets/post-2.jpg";
 import post3 from "@/assets/post-3.jpg";
 import post4 from "@/assets/post-4.jpg";
 import { Instagram } from "lucide-react";
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 const posts = [
   { src: post1, alt: "Sua loja vendendo mesmo quando você está dormindo" },
@@ -16,9 +17,13 @@ const container = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } 
 const item = { hidden: { opacity: 0, scale: 0.95 }, show: { opacity: 1, scale: 1, transition: { duration: 0.4 } } };
 
 export default function Gallery() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
+  const blobY = useTransform(scrollYProgress, [0, 1], ["-20%", "40%"]);
+
   return (
-    <section id="galeria" className="section-padding relative overflow-hidden bg-black text-white">
-      <div className="absolute bottom-0 left-0 w-[350px] h-[350px] rounded-full bg-primary/5 blur-[130px] pointer-events-none" />
+    <section ref={sectionRef} id="galeria" className="section-padding relative overflow-hidden bg-black text-white">
+      <motion.div style={{ y: blobY }} className="absolute bottom-0 left-0 w-[350px] h-[350px] rounded-full bg-primary/5 blur-[130px] pointer-events-none" />
 
       <div className="container mx-auto max-w-6xl relative">
         <div className="text-center mb-16">

@@ -1,6 +1,7 @@
 import { Check, Star, Info, Sparkles, ChevronDown, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import TiltCard from "@/components/TiltCard";
 
 const plans = [
   {
@@ -177,14 +178,15 @@ export default function Pricing() {
             <motion.div
               key={plan.name}
               variants={item}
-              whileHover={{ y: -8, rotateX: 1.5, rotateY: -1.5, transition: { duration: 0.3 } }}
-              style={{ transformPerspective: 800 }}
-              className={`relative rounded-2xl overflow-hidden gentle-animation flex flex-col ${
-                plan.featured
-                  ? "bg-gradient-to-b from-[hsl(var(--brand-gradient-from))] to-[hsl(var(--brand-gradient-to))] shadow-[0_20px_60px_-15px_hsl(var(--brand-gradient-from)/0.4)] md:scale-[1.06] z-10"
-                  : "bg-white/[0.06] border border-white/10 backdrop-blur-sm hover:bg-white/[0.1]"
-              }`}
             >
+              <TiltCard
+                tiltAmount={plan.featured ? 8 : 12}
+                className={`relative rounded-2xl overflow-hidden gentle-animation flex flex-col h-full ${
+                  plan.featured
+                    ? "bg-gradient-to-b from-[hsl(var(--brand-gradient-from))] to-[hsl(var(--brand-gradient-to))] shadow-[0_20px_60px_-15px_hsl(var(--brand-gradient-from)/0.4)] md:scale-[1.06] z-10"
+                    : "bg-white/[0.06] border border-white/10 backdrop-blur-sm hover:bg-white/[0.1]"
+                }`}
+              >
               {plan.featured && (
                 <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-brand-accent to-transparent" />
               )}
@@ -232,6 +234,7 @@ export default function Pricing() {
                   Solicitar Orçamento
                 </motion.a>
               </div>
+              </TiltCard>
             </motion.div>
           ))}
         </motion.div>
