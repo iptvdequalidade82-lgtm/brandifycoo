@@ -14,25 +14,43 @@ export default function Hero() {
     // Critical for iOS autoplay
     video.muted = true;
     video.defaultMuted = true;
+    video.volume = 0;
     video.setAttribute('playsinline', '');
     video.setAttribute('webkit-playsinline', '');
+    video.setAttribute('x5-playsinline', '');
+    video.setAttribute('x5-video-player-type', 'h5');
 
     const attemptPlay = () => {
       if (!video.paused) return;
-      video.play().catch(() => {});
+      // Force load before play on mobile
+      if (video.readyState === 0) {
+        video.load();
+      }
+      const p = video.play();
+      if (p !== undefined) {
+        p.catch(() => {});
+      }
     };
 
     // Try playing at every possible stage of loading
     video.addEventListener('loadedmetadata', attemptPlay);
+    video.addEventListener('loadeddata', attemptPlay);
     video.addEventListener('canplay', attemptPlay);
     video.addEventListener('canplaythrough', attemptPlay);
 
-    // Try immediately (works if cached/reload)
+    // Force load + play immediately
+    video.load();
     attemptPlay();
 
-    // Retry every 200ms for first 15 seconds
-    const interval = setInterval(attemptPlay, 200);
-    const timeout = setTimeout(() => clearInterval(interval), 15000);
+    // Retry every 100ms for first 20 seconds (more aggressive)
+    const interval = setInterval(attemptPlay, 100);
+    const timeout = setTimeout(() => clearInterval(interval), 20000);
+
+    // Also try on visibility change (user switches tabs back)
+    const handleVisibility = () => {
+      if (!document.hidden) attemptPlay();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
 
     // Try on any user interaction as last resort
     const handleInteraction = () => {
@@ -41,15 +59,17 @@ export default function Hero() {
         events.forEach(e => document.removeEventListener(e, handleInteraction));
       }
     };
-    const events = ['touchstart', 'touchend', 'click', 'scroll'];
+    const events = ['touchstart', 'touchend', 'click', 'scroll', 'mousemove'];
     events.forEach(e => document.addEventListener(e, handleInteraction, { passive: true }));
 
     return () => {
       clearInterval(interval);
       clearTimeout(timeout);
       video.removeEventListener('loadedmetadata', attemptPlay);
+      video.removeEventListener('loadeddata', attemptPlay);
       video.removeEventListener('canplay', attemptPlay);
       video.removeEventListener('canplaythrough', attemptPlay);
+      document.removeEventListener('visibilitychange', handleVisibility);
       events.forEach(e => document.removeEventListener(e, handleInteraction));
     };
   }, []);
