@@ -30,7 +30,6 @@ export default function Header() {
     if (href.startsWith("/")) {
       navigate(href);
     } else if (href.startsWith("#")) {
-      // If not on homepage, navigate there first
       if (location.pathname !== "/") {
         navigate("/" + href);
       } else {
@@ -77,7 +76,7 @@ export default function Header() {
             href="https://wa.me/5543991065129?text=Ol%C3%A1!%20Fiquei%20interessado%20nos%20servi%C3%A7os%20da%20Brandify%20e%20gostaria%20de%20solicitar%20um%20or%C3%A7amento%20para%20cria%C3%A7%C3%A3o%20de%20site."
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm font-semibold px-5 py-2.5 rounded-lg bg-foreground text-background hover:opacity-90 gentle-animation"
+            className="text-sm font-semibold px-5 py-2.5 rounded-lg bg-primary text-primary-foreground hover:opacity-90 gentle-animation btn-glow"
           >
             Contratar
           </motion.a>
@@ -110,7 +109,7 @@ export default function Header() {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => setOpen(false)}
-            className="font-semibold px-5 py-3 rounded-lg bg-foreground text-background text-center gentle-animation mt-4"
+            className="font-semibold px-5 py-3 rounded-lg bg-primary text-primary-foreground text-center gentle-animation mt-4"
           >
             Contratar
           </a>
