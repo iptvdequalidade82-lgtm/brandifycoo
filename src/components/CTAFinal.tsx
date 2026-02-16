@@ -18,8 +18,7 @@ export default function CTAFinal() {
     target: sectionRef,
     offset: ["start end", "end start"],
   });
-  const scale = useTransform(scrollYProgress, [0, 0.4], [0.95, 1]);
-  const sectionOpacity = useTransform(scrollYProgress, [0, 0.2], [0.3, 1]);
+  const scale = useTransform(scrollYProgress, [0, 0.4], [0.97, 1]);
 
   return (
     <section ref={sectionRef} className="relative py-28 md:py-36 px-6 overflow-visible bg-black">
@@ -29,7 +28,7 @@ export default function CTAFinal() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-brand-accent/5 blur-[100px] pointer-events-none" />
 
       <motion.div
-        style={{ scale, opacity: sectionOpacity }}
+        style={{ scale }}
         className="relative container mx-auto max-w-3xl text-center text-white"
       >
         <motion.div
