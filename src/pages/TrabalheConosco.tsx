@@ -44,7 +44,7 @@ export default function TrabalheConosco() {
           </div>
 
           <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.1] mb-6 animate-fade-up text-white" style={{ animationDelay: "0.1s" }}>
-            Trabalhe <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">conosco</span>
+            Trabalhe <span className="italic bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">conosco</span>
           </h1>
 
           <p className="text-white/50 text-lg leading-relaxed mb-10 animate-fade-up" style={{ animationDelay: "0.2s" }}>
