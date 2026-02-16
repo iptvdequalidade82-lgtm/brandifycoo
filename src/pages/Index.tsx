@@ -7,7 +7,6 @@ import Pricing from "@/components/Pricing";
 import Gallery from "@/components/Gallery";
 import FAQ from "@/components/FAQ";
 import CTAFinal from "@/components/CTAFinal";
-import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 
@@ -23,7 +22,6 @@ const Index = () => {
       
       <Gallery />
       <CTAFinal />
-      <Contact />
       <Footer />
       <FloatingWhatsApp />
     </div>
