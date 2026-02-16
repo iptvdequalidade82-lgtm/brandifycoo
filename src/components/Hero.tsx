@@ -1,10 +1,38 @@
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import AnimatedCounter from "@/components/AnimatedCounter";
 
 export default function Hero() {
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const attemptPlay = async () => {
+      try {
+        await video.play();
+      } catch {
+        video.muted = true;
+        try { await video.play(); } catch { /* fallback: stays paused */ }
+      }
+    };
+
+    attemptPlay();
+
+    // Also try on first user interaction (iOS sometimes needs this)
+    const handleInteraction = () => {
+      if (video.paused) {
+        video.play().catch(() => {});
+      }
+      document.removeEventListener('touchstart', handleInteraction);
+    };
+    document.addEventListener('touchstart', handleInteraction, { once: true });
+
+    return () => document.removeEventListener('touchstart', handleInteraction);
+  }, []);
 
   return (
     <section
@@ -19,10 +47,12 @@ export default function Hero() {
         className="absolute inset-0 z-0"
       >
         <video
+          ref={videoRef}
           autoPlay
           loop
           muted
           playsInline
+          preload="auto"
           onLoadedData={() => setVideoLoaded(true)}
           className="absolute inset-0 w-full h-full object-cover"
         >
