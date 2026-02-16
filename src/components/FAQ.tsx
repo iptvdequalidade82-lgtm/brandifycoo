@@ -33,6 +33,9 @@ export default function FAQ() {
             Perguntas{" "}
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">frequentes</span>
           </h2>
+          <p className="text-white/50 max-w-xl mx-auto">
+            Tire suas dúvidas sobre nossos serviços, prazos e formas de pagamento.
+          </p>
         </motion.div>
 
         <motion.div

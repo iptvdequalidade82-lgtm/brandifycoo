@@ -3,39 +3,21 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import RevenueChart from "@/components/admin/RevenueChart";
-import { logActivity, createDefaultChecklist } from "@/lib/admin-helpers";
+import ProposalForm from "@/components/admin/ProposalForm";
+import ProposalEditDialog from "@/components/admin/ProposalEditDialog";
+import ConvertProjectDialog from "@/components/admin/ConvertProjectDialog";
+import { logActivity } from "@/lib/admin-helpers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
-} from "@/components/ui/dialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
-import {
-  Plus, Copy, ExternalLink, RefreshCw, Search, Pencil,
-  FileText, DollarSign, Send, Smartphone, Trash2, CheckCircle, XCircle, ArrowRight, ChevronDown, ChevronUp,
+  Plus, Copy, RefreshCw, Search, Pencil,
+  FileText, DollarSign, Send, Trash2, CheckCircle, XCircle, ArrowRight, ChevronDown, ChevronUp,
 } from "lucide-react";
 import { toast } from "sonner";
-import { z } from "zod";
-
-const proposalSchema = z.object({
-  clientName: z.string().trim().min(1, "Nome é obrigatório").max(200, "Nome muito longo"),
-  clientEmail: z.string().trim().email("Email inválido").max(255, "Email muito longo").optional().or(z.literal("")),
-  clientPhone: z.string().trim().max(20, "Telefone muito longo").optional().or(z.literal("")),
-  title: z.string().trim().min(1, "Título é obrigatório").max(200, "Título muito longo"),
-  description: z.string().trim().max(1000, "Descrição muito longa").optional().or(z.literal("")),
-  amountReais: z.string().refine((val) => {
-    const num = parseFloat(val.replace(",", "."));
-    return !isNaN(num) && num > 0 && num <= 1000000;
-  }, "Valor deve ser entre R$ 0,01 e R$ 1.000.000,00"),
-});
 
 interface Proposal {
   id: string;
@@ -78,6 +60,9 @@ const filterTabs = [
   { key: "cancelled", label: "Cancelados" },
 ];
 
+const formatCurrency = (cents: number) =>
+  new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(cents / 100);
+
 const AdminDashboard = () => {
   const { user } = useAuth();
   const [proposals, setProposals] = useState<Proposal[]>([]);
@@ -90,52 +75,20 @@ const AdminDashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<Proposal | null>(null);
   const [expandedProposalId, setExpandedProposalId] = useState<string | null>(null);
-  const [convertPaymentStatus, setConvertPaymentStatus] = useState<"pending" | "partial" | "full">("pending");
-
-  // Convert to project state
-  const [convertTarget, setConvertTarget] = useState<Proposal | null>(null);
-  const [convertPlan, setConvertPlan] = useState<"essencial" | "profissional" | "premium">("essencial");
-  const [convertStartDate, setConvertStartDate] = useState("");
-  const [convertDueDate, setConvertDueDate] = useState("");
-  const [convertNotes, setConvertNotes] = useState("");
-  const [converting, setConverting] = useState(false);
-
-  // Edit proposal state
   const [editTarget, setEditTarget] = useState<Proposal | null>(null);
-  const [editClientName, setEditClientName] = useState("");
-  const [editClientEmail, setEditClientEmail] = useState("");
-  const [editClientPhone, setEditClientPhone] = useState("");
-  const [editTitle, setEditTitle] = useState("");
-  const [editDescription, setEditDescription] = useState("");
-  const [editAmountReais, setEditAmountReais] = useState("");
-  const [editSaving, setEditSaving] = useState(false);
-  const [editPaymentMethod, setEditPaymentMethod] = useState<"pix" | "cakto">("pix");
-
-  const [clientName, setClientName] = useState("");
-  const [clientEmail, setClientEmail] = useState("");
-  const [clientPhone, setClientPhone] = useState("");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [amountReais, setAmountReais] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<"pix" | "cakto">("pix");
-  const [submitting, setSubmitting] = useState(false);
+  const [convertTarget, setConvertTarget] = useState<Proposal | null>(null);
 
   useEffect(() => { fetchProposals(); fetchProjects(); fetchExtraRevenue(); }, []);
 
   const fetchProposals = async () => {
     setLoadingProposals(true);
-    const { data, error } = await supabase
-      .from("proposals")
-      .select("*")
-      .order("created_at", { ascending: false });
+    const { data, error } = await supabase.from("proposals").select("*").order("created_at", { ascending: false });
     if (!error && data) setProposals(data as unknown as Proposal[]);
     setLoadingProposals(false);
   };
 
   const fetchProjects = async () => {
-    const { data } = await supabase
-      .from("projects")
-      .select("title, client_name, plan, total_amount_cents, amount_received_cents, payment_status, created_at");
+    const { data } = await supabase.from("projects").select("title, client_name, plan, total_amount_cents, amount_received_cents, payment_status, created_at");
     if (data) setProjects(data as any);
   };
 
@@ -151,167 +104,6 @@ const AdminDashboard = () => {
       const q = searchQuery.toLowerCase();
       return p.client_name.toLowerCase().includes(q) || p.title.toLowerCase().includes(q) || (p.client_email?.toLowerCase().includes(q));
     });
-
-  const openEdit = (p: Proposal) => {
-    setEditTarget(p);
-    setEditClientName(p.client_name);
-    setEditClientEmail(p.client_email || "");
-    setEditClientPhone(p.client_phone || "");
-    setEditTitle(p.title);
-    setEditDescription(p.description || "");
-    setEditAmountReais((p.amount_cents / 100).toFixed(2).replace(".", ","));
-    setEditPaymentMethod(p.cakto_checkout_url ? "cakto" : "pix");
-  };
-
-  const handleEditSave = async () => {
-    if (!editTarget) return;
-    setEditSaving(true);
-    const cents = Math.round(parseFloat(editAmountReais.replace(",", ".")) * 100);
-    if (isNaN(cents) || cents <= 0) { toast.error("Valor inválido"); setEditSaving(false); return; }
-
-    const wasCakto = !!editTarget.cakto_checkout_url;
-    const nowCakto = editPaymentMethod === "cakto";
-
-    // Base update
-    const updateData: any = {
-      client_name: editClientName.trim(),
-      client_email: editClientEmail.trim() || null,
-      client_phone: editClientPhone.trim() || null,
-      title: editTitle.trim(),
-      description: editDescription.trim() || null,
-      amount_cents: cents,
-    };
-
-    // Switching from Cakto to PIX: clear Cakto data
-    if (wasCakto && !nowCakto) {
-      updateData.cakto_checkout_url = null;
-      updateData.cakto_offer_id = null;
-    }
-
-    const { error } = await supabase.from("proposals").update(updateData).eq("id", editTarget.id);
-    if (error) { toast.error("Erro ao salvar"); setEditSaving(false); return; }
-
-    // Switching from PIX to Cakto: generate Cakto link
-    if (!wasCakto && nowCakto) {
-      try {
-        const amountReais = cents / 100;
-        const { data, error: fnError } = await supabase.functions.invoke("create-cakto-payment", {
-          body: {
-            proposal_id: editTarget.id,
-            amount_reais: amountReais,
-            client_name: editClientName.trim(),
-            client_email: editClientEmail.trim() || "",
-            description: `${editTitle.trim()}${editDescription.trim() ? " - " + editDescription.trim() : ""}`,
-          },
-        });
-        if (fnError || !data?.url) {
-          toast.success("Proposta salva! Gere o link Cakto na lista.");
-        } else {
-          toast.success("Proposta salva com link Cakto!");
-        }
-      } catch {
-        toast.success("Proposta salva! Gere o link Cakto na lista.");
-      }
-    } else {
-      toast.success("Proposta atualizada!");
-    }
-
-    setEditTarget(null);
-    fetchProposals();
-    setEditSaving(false);
-  };
-
-  const resetForm = () => {
-    setClientName(""); setClientEmail(""); setClientPhone("");
-    setTitle(""); setDescription(""); setAmountReais(""); setPaymentMethod("pix");
-  };
-
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-
-    const validation = proposalSchema.safeParse({
-      clientName, clientEmail, clientPhone, title, description, amountReais,
-    });
-    if (!validation.success) {
-      toast.error(validation.error.errors[0]?.message || "Dados inválidos");
-      setSubmitting(false);
-      return;
-    }
-
-    const cents = Math.round(parseFloat(amountReais.replace(",", ".")) * 100);
-
-    const { data: inserted, error } = await supabase.from("proposals").insert({
-      client_name: clientName.trim(),
-      client_email: clientEmail.trim() || null,
-      client_phone: clientPhone.trim() || null,
-      title: title.trim(),
-      description: description.trim() || null,
-      amount_cents: cents,
-      installments: 1,
-      created_by: user!.id,
-    } as any).select().single();
-
-    if (error || !inserted) {
-      toast.error("Erro ao criar proposta");
-      setSubmitting(false);
-      return;
-    }
-
-    const inserted2 = inserted as any;
-
-    // Log creation
-    logActivity("proposal", inserted2.id, "created", user!.id, {
-      title: title.trim(),
-      client_name: clientName.trim(),
-      amount: formatCurrency(cents),
-    });
-
-    if (paymentMethod === "pix") {
-      const link = `https://brandifycoo.lovable.app/pix/${(inserted as any).id}`;
-      const msg = `Olá ${clientName.trim()}! Segue o link para pagamento via PIX:\n\n${link}\n\nValor: R$ ${parseFloat(amountReais.replace(",", ".")).toFixed(2).replace(".", ",")}\nServiço: ${title.trim()}`;
-      navigator.clipboard.writeText(msg);
-      toast.success("Mensagem com link PIX copiada!");
-    } else if (paymentMethod === "cakto") {
-      try {
-        const proposal = inserted as any;
-        const amountNum = parseFloat(amountReais.replace(",", "."));
-        const { data, error: fnError } = await supabase.functions.invoke("create-cakto-payment", {
-          body: {
-            proposal_id: proposal.id,
-            amount_reais: amountNum,
-            client_name: clientName.trim(),
-            client_email: clientEmail.trim() || "",
-            description: `${title.trim()}${description.trim() ? " - " + description.trim() : ""}`,
-          },
-        });
-        if (!fnError && data?.url) {
-          await navigator.clipboard.writeText(data.url);
-          toast.success("Proposta criada! Link Cakto copiado.");
-        } else {
-          toast.success("Proposta criada! Gere o link na lista.");
-        }
-      } catch {
-        toast.success("Proposta criada! Gere o link na lista.");
-      }
-    }
-
-    setShowForm(false);
-    resetForm();
-    fetchProposals();
-    setSubmitting(false);
-  };
-
-  const handleDelete = async () => {
-    if (!deleteTarget) return;
-    const { error } = await supabase.from("proposals").delete().eq("id", deleteTarget.id);
-    if (error) toast.error("Erro ao excluir");
-    else {
-      toast.success("Proposta excluída");
-      setProposals(prev => prev.filter(p => p.id !== deleteTarget.id));
-    }
-    setDeleteTarget(null);
-  };
 
   const updateStatus = async (id: string, newStatus: string) => {
     const oldProposal = proposals.find(p => p.id === id);
@@ -329,72 +121,15 @@ const AdminDashboard = () => {
     }
   };
 
-  const openConvertDialog = (proposal: Proposal) => {
-    setConvertTarget(proposal);
-    setConvertPlan("essencial");
-    setConvertStartDate(new Date().toISOString().split("T")[0]);
-    setConvertDueDate("");
-    setConvertNotes("");
-    setConvertPaymentStatus("pending");
-  };
-
-  const handleConvertToProject = async () => {
-    if (!convertTarget || !user) return;
-    setConverting(true);
-
-    // 1. Mark proposal as paid
-    await supabase.from("proposals").update({ status: "paid" } as any).eq("id", convertTarget.id);
-    logActivity("proposal", convertTarget.id, "status_changed", user.id, {
-      title: convertTarget.title,
-      client_name: convertTarget.client_name,
-      from: statusConfig[convertTarget.status]?.label || convertTarget.status,
-      to: "Convertido em Projeto",
-    });
-
-    // 2. Calculate received based on chosen payment status
-    const received = convertPaymentStatus === "full"
-      ? convertTarget.amount_cents
-       : convertPaymentStatus === "partial"
-         ? getInitAmount(convertTarget)
-        : 0;
-
-    const { data: project, error } = await supabase.from("projects").insert({
-      client_name: convertTarget.client_name,
-      client_phone: convertTarget.client_phone || null,
-      client_email: convertTarget.client_email || null,
-      title: convertTarget.title,
-      plan: convertPlan,
-      notes: convertNotes.trim() || convertTarget.description || null,
-      start_date: convertStartDate || null,
-      due_date: convertDueDate || null,
-      created_by: user.id,
-      total_amount_cents: convertTarget.amount_cents,
-      amount_received_cents: received,
-      payment_status: convertPaymentStatus,
-    } as any).select().single();
-
-    if (error || !project) {
-      toast.error("Erro ao criar projeto");
-      setConverting(false);
-      return;
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    const { error } = await supabase.from("proposals").delete().eq("id", deleteTarget.id);
+    if (error) toast.error("Erro ao excluir");
+    else {
+      toast.success("Proposta excluída");
+      setProposals(prev => prev.filter(p => p.id !== deleteTarget.id));
     }
-
-    const proj = project as any;
-    await createDefaultChecklist(proj.id);
-    logActivity("project", proj.id, "created", user.id, {
-      title: convertTarget.title,
-      client_name: convertTarget.client_name,
-      plan: convertPlan,
-      from_proposal: convertTarget.id,
-      payment_status: convertPaymentStatus,
-    });
-
-    const statusLabels: Record<string, string> = { pending: "Em Aberto", partial: "50% Pago", full: "Quitado" };
-    toast.success(`Projeto criado como "${statusLabels[convertPaymentStatus]}"!`);
-    setConvertTarget(null);
-    fetchProposals();
-    fetchProjects();
-    setConverting(false);
+    setDeleteTarget(null);
   };
 
   const generateCaktoLink = async (proposal: Proposal) => {
@@ -420,48 +155,6 @@ const AdminDashboard = () => {
       toast.error("Erro: " + (err.message || "tente novamente"));
     }
     setGeneratingLink(null);
-  };
-
-  const copyLink = (url: string) => { navigator.clipboard.writeText(url); toast.success("Link copiado!"); };
-  const copyPixLink = (id: string) => { navigator.clipboard.writeText(`https://brandifycoo.lovable.app/pix/${id}`); toast.success("Link PIX copiado!"); };
-
-  const copyPaymentMessage = (p: Proposal) => {
-    const isCakto = !!p.cakto_checkout_url;
-    const link = isCakto ? p.cakto_checkout_url! : `https://brandifycoo.lovable.app/pix/${p.id}`;
-    const msg = isCakto
-      ? `Olá, ${p.client_name}! 😊\n\nSeu link de pagamento via *cartão* ou outras opções já está disponível:\n\n${link}\n\n💰 Valor: ${formatCurrency(p.amount_cents)}\n📋 Serviço: ${p.title}\n\nQualquer dúvida, estou à disposição!`
-      : `Olá, ${p.client_name}! 😊\n\nSeu link de pagamento via *PIX* já está disponível:\n\n${link}\n\n💰 Valor: ${formatCurrency(p.amount_cents)}\n📋 Serviço: ${p.title}\n\nQualquer dúvida, estou à disposição!`;
-    navigator.clipboard.writeText(msg);
-    toast.success("Mensagem copiada! Cole no WhatsApp.");
-  };
-
-  const copyPaymentLink = (p: Proposal) => {
-    const isCakto = !!p.cakto_checkout_url;
-    const link = isCakto ? p.cakto_checkout_url! : `https://brandifycoo.lovable.app/pix/${p.id}`;
-    navigator.clipboard.writeText(link);
-    toast.success(`Link ${isCakto ? "Cakto" : "PIX"} copiado!`);
-  };
-
-  const updateStepMethod = async (proposalId: string, step: "init" | "final", method: "pix" | "cakto") => {
-    const field = step === "init" ? "init_method" : "final_method";
-    const { error } = await supabase.from("proposals").update({ [field]: method } as any).eq("id", proposalId);
-    if (error) { toast.error("Erro ao atualizar método"); return; }
-    toast.success(`Método ${step === "init" ? "inicialização" : "finalização"} atualizado`);
-    setProposals(prev => prev.map(p => p.id === proposalId ? { ...p, [field]: method } : p));
-
-    // If switching to cakto for finalization, generate the link
-    if (step === "final" && method === "cakto") {
-      const proposal = proposals.find(p => p.id === proposalId);
-      if (proposal && !proposal.final_cakto_checkout_url) {
-        generateFinalCaktoLink(proposal);
-      }
-    }
-    if (step === "init" && method === "cakto") {
-      const proposal = proposals.find(p => p.id === proposalId);
-      if (proposal && !proposal.cakto_checkout_url) {
-        generateCaktoLink(proposal);
-      }
-    }
   };
 
   const generateFinalCaktoLink = async (proposal: Proposal) => {
@@ -490,30 +183,37 @@ const AdminDashboard = () => {
     setGeneratingLink(null);
   };
 
+  const updateStepMethod = async (proposalId: string, step: "init" | "final", method: "pix" | "cakto") => {
+    const field = step === "init" ? "init_method" : "final_method";
+    const { error } = await supabase.from("proposals").update({ [field]: method } as any).eq("id", proposalId);
+    if (error) { toast.error("Erro ao atualizar método"); return; }
+    toast.success(`Método ${step === "init" ? "inicialização" : "finalização"} atualizado`);
+    setProposals(prev => prev.map(p => p.id === proposalId ? { ...p, [field]: method } : p));
+
+    if (step === "final" && method === "cakto") {
+      const proposal = proposals.find(p => p.id === proposalId);
+      if (proposal && !proposal.final_cakto_checkout_url) generateFinalCaktoLink(proposal);
+    }
+    if (step === "init" && method === "cakto") {
+      const proposal = proposals.find(p => p.id === proposalId);
+      if (proposal && !proposal.cakto_checkout_url) generateCaktoLink(proposal);
+    }
+  };
+
   const getStepLink = (p: Proposal, step: "init" | "final" | "full") => {
-    if (step === "full") {
-      return `https://brandifycoo.lovable.app/pix/${p.id}`;
-    }
+    if (step === "full") return `https://brandifycoo.lovable.app/pix/${p.id}`;
     const method = step === "init" ? p.init_method : p.final_method;
-    if (method === "cakto") {
-      return step === "init" ? p.cakto_checkout_url : p.final_cakto_checkout_url;
-    }
+    if (method === "cakto") return step === "init" ? p.cakto_checkout_url : p.final_cakto_checkout_url;
     return `https://brandifycoo.lovable.app/pix/${p.id}?step=${step}`;
   };
 
   const copyStepLink = (p: Proposal, step: "init" | "final" | "full") => {
     const link = getStepLink(p, step);
-    if (!link) {
-      toast.error("Link ainda não gerado");
-      return;
-    }
+    if (!link) { toast.error("Link ainda não gerado"); return; }
     navigator.clipboard.writeText(link);
     const label = step === "init" ? "inicialização" : step === "final" ? "finalização" : "valor inteiro";
     toast.success(`Link de ${label} copiado!`);
-    // Auto-mark as sent if still draft
-    if (p.status === "draft") {
-      updateStatus(p.id, "sent");
-    }
+    if (p.status === "draft") updateStatus(p.id, "sent");
   };
 
   const copyStepMessage = (p: Proposal, step: "init" | "final" | "full") => {
@@ -528,12 +228,8 @@ const AdminDashboard = () => {
     toast.success("Mensagem copiada! Cole no WhatsApp.");
   };
 
-  const formatCurrency = (cents: number) =>
-    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(cents / 100);
-
   return (
     <AdminLayout>
-      {/* Revenue Chart */}
       <RevenueChart proposals={proposals} projects={projects} extraRevenue={extraRevenue} />
 
       {/* Stats */}
@@ -571,7 +267,7 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Filter Tabs */}
+      {/* Filter Tabs with counts */}
       <div className="flex gap-1 mb-6 overflow-x-auto pb-1">
         {filterTabs.map(tab => {
           const count = tab.key === "all" ? proposals.length : proposals.filter(p => p.status === tab.key).length;
@@ -617,28 +313,17 @@ const AdminDashboard = () => {
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="text-right">
-                       <p className="text-lg font-bold text-white">{formatCurrency(p.amount_cents)}</p>
+                        <p className="text-lg font-bold text-white">{formatCurrency(p.amount_cents)}</p>
                         <p className="text-[10px] text-white/30">Init: {formatCurrency(getInitAmount(p))} · Final: {formatCurrency(getFinalAmount(p))}</p>
                       </div>
                       <div className="flex gap-1 flex-wrap">
-                        {/* Expand payment links */}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setExpandedProposalId(expandedProposalId === p.id ? null : p.id)}
-                          className="gap-1"
-                        >
-                          <DollarSign className="w-4 h-4" />
-                          Links
+                        <Button variant="outline" size="sm" onClick={() => setExpandedProposalId(expandedProposalId === p.id ? null : p.id)} className="gap-1">
+                          <DollarSign className="w-4 h-4" /> Links
                           {expandedProposalId === p.id ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                         </Button>
-
-                        {/* Convert to project */}
-                        <Button variant="outline" size="icon" onClick={() => openConvertDialog(p)} title="Converter em Projeto" className="text-primary hover:text-primary hover:border-primary/50">
+                        <Button variant="outline" size="icon" onClick={() => setConvertTarget(p)} title="Converter em Projeto" className="text-primary hover:text-primary hover:border-primary/50">
                           <ArrowRight className="w-4 h-4" />
                         </Button>
-
-                        {/* Status actions */}
                         {p.status !== "paid" && (
                           <Button variant="outline" size="icon" onClick={() => updateStatus(p.id, "paid")} title="Marcar como pago" className="text-green-400 hover:text-green-300 hover:border-green-400/50">
                             <CheckCircle className="w-4 h-4" />
@@ -649,7 +334,7 @@ const AdminDashboard = () => {
                             <Send className="w-4 h-4" />
                           </Button>
                         )}
-                        <Button variant="outline" size="icon" onClick={() => openEdit(p)} title="Editar">
+                        <Button variant="outline" size="icon" onClick={() => setEditTarget(p)} title="Editar">
                           <Pencil className="w-4 h-4" />
                         </Button>
                         <Button variant="outline" size="icon" onClick={() => setDeleteTarget(p)} className="text-destructive hover:text-destructive">
@@ -660,10 +345,10 @@ const AdminDashboard = () => {
                   </div>
                 </div>
 
-                {/* Expandable payment links section */}
+                {/* Expandable payment links */}
                 {expandedProposalId === p.id && (
                   <div className="border-t border-white/[0.06] bg-white/[0.02] p-4 space-y-3">
-                    {/* Valor Inteiro */}
+                    {/* Full amount */}
                     <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-semibold text-foreground">💳 Valor Inteiro (100%)</span>
@@ -679,11 +364,9 @@ const AdminDashboard = () => {
                       </div>
                     </div>
 
-                    {/* Inicialização */}
+                    {/* Init step */}
                     <div className={`rounded-lg border p-3 ${
-                      p.status === "partial" || p.status === "paid"
-                        ? "border-green-500/30 bg-green-500/5"
-                        : "border-border/50"
+                      p.status === "partial" || p.status === "paid" ? "border-green-500/30 bg-green-500/5" : "border-border/50"
                     }`}>
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
@@ -698,22 +381,14 @@ const AdminDashboard = () => {
                       </div>
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xs text-muted-foreground">Método:</span>
-                        <button
-                          onClick={() => updateStepMethod(p.id, "init", "pix")}
+                        <button onClick={() => updateStepMethod(p.id, "init", "pix")}
                           className={`px-2 py-0.5 rounded-full text-[11px] font-medium border transition-all ${
                             p.init_method === "pix" ? "bg-primary/10 text-primary border-primary/30" : "border-transparent text-muted-foreground/50 hover:text-muted-foreground"
-                          }`}
-                        >
-                          PIX
-                        </button>
-                        <button
-                          onClick={() => updateStepMethod(p.id, "init", "cakto")}
+                          }`}>PIX</button>
+                        <button onClick={() => updateStepMethod(p.id, "init", "cakto")}
                           className={`px-2 py-0.5 rounded-full text-[11px] font-medium border transition-all ${
                             p.init_method === "cakto" ? "bg-primary/10 text-primary border-primary/30" : "border-transparent text-muted-foreground/50 hover:text-muted-foreground"
-                          }`}
-                        >
-                          Cakto
-                        </button>
+                          }`}>Cakto</button>
                       </div>
                       <div className="flex gap-1">
                         <Button size="sm" variant="outline" onClick={() => copyStepLink(p, "init")} className="gap-1 text-xs">
@@ -725,11 +400,9 @@ const AdminDashboard = () => {
                       </div>
                     </div>
 
-                    {/* Finalização */}
+                    {/* Final step */}
                     <div className={`rounded-lg border p-3 ${
-                      p.status === "paid"
-                        ? "border-green-500/30 bg-green-500/5"
-                        : "border-border/50"
+                      p.status === "paid" ? "border-green-500/30 bg-green-500/5" : "border-border/50"
                     }`}>
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
@@ -744,22 +417,14 @@ const AdminDashboard = () => {
                       </div>
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xs text-muted-foreground">Método:</span>
-                        <button
-                          onClick={() => updateStepMethod(p.id, "final", "pix")}
+                        <button onClick={() => updateStepMethod(p.id, "final", "pix")}
                           className={`px-2 py-0.5 rounded-full text-[11px] font-medium border transition-all ${
                             p.final_method === "pix" ? "bg-primary/10 text-primary border-primary/30" : "border-transparent text-muted-foreground/50 hover:text-muted-foreground"
-                          }`}
-                        >
-                          PIX
-                        </button>
-                        <button
-                          onClick={() => updateStepMethod(p.id, "final", "cakto")}
+                          }`}>PIX</button>
+                        <button onClick={() => updateStepMethod(p.id, "final", "cakto")}
                           className={`px-2 py-0.5 rounded-full text-[11px] font-medium border transition-all ${
                             p.final_method === "cakto" ? "bg-primary/10 text-primary border-primary/30" : "border-transparent text-muted-foreground/50 hover:text-muted-foreground"
-                          }`}
-                        >
-                          Cakto
-                        </button>
+                          }`}>Cakto</button>
                       </div>
                       <div className="flex gap-1">
                         <Button size="sm" variant="outline" onClick={() => copyStepLink(p, "final")} className="gap-1 text-xs">
@@ -794,205 +459,10 @@ const AdminDashboard = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* New Proposal Dialog */}
-      <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Nova Proposta</DialogTitle>
-            <DialogDescription>Crie um orçamento personalizado para o cliente</DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleCreate} className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="cname">Nome do Cliente</Label>
-                <Input id="cname" value={clientName} onChange={e => setClientName(e.target.value)} required />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="cemail">Email (opcional)</Label>
-                <Input id="cemail" type="email" value={clientEmail} onChange={e => setClientEmail(e.target.value)} />
-              </div>
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="cphone">WhatsApp (opcional)</Label>
-              <Input id="cphone" value={clientPhone} onChange={e => setClientPhone(e.target.value)} />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="ptitle">Título do Serviço</Label>
-              <Input id="ptitle" value={title} onChange={e => setTitle(e.target.value)} placeholder="Ex: Site Institucional Premium" required />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="pdesc">Descrição (opcional)</Label>
-              <Textarea id="pdesc" value={description} onChange={e => setDescription(e.target.value)} rows={2} />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="pamount">Valor (R$)</Label>
-              <Input id="pamount" value={amountReais} onChange={e => setAmountReais(e.target.value)} placeholder="1500,00" required />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Método de Pagamento</Label>
-              <div className="grid grid-cols-2 gap-2">
-                <button type="button" onClick={() => setPaymentMethod("pix")}
-                  className={`flex items-center gap-2 rounded-lg border p-3 text-sm transition-all ${paymentMethod === "pix" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/50"}`}>
-                  <Smartphone className="w-4 h-4" />
-                  <div className="text-left"><p className="font-medium">PIX</p><p className="text-xs opacity-70">QR Code direto</p></div>
-                </button>
-                <button type="button" onClick={() => setPaymentMethod("cakto")}
-                  className={`flex items-center gap-2 rounded-lg border p-3 text-sm transition-all ${paymentMethod === "cakto" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/50"}`}>
-                  <ExternalLink className="w-4 h-4" />
-                  <div className="text-left"><p className="font-medium">Cakto</p><p className="text-xs opacity-70">Checkout completo</p></div>
-                </button>
-              </div>
-            </div>
-            <Button type="submit" className="w-full" disabled={submitting}>
-              {submitting ? "Criando..." : paymentMethod === "pix" ? "Criar Proposta PIX" : "Criar Proposta Cakto"}
-            </Button>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Convert to Project Dialog */}
-      <Dialog open={!!convertTarget} onOpenChange={(open) => !open && setConvertTarget(null)}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <ArrowRight className="w-5 h-5 text-primary" />
-              Converter em Projeto
-            </DialogTitle>
-            <DialogDescription>
-              Transforme esta proposta em um projeto ativo. Escolha o status de pagamento.
-            </DialogDescription>
-          </DialogHeader>
-
-          {convertTarget && (
-            <div className="space-y-4">
-              {/* Proposal summary */}
-              <div className="rounded-lg border border-border bg-muted/50 p-4 space-y-1">
-                <p className="text-sm font-medium text-foreground">{convertTarget.title}</p>
-                <p className="text-sm text-muted-foreground">{convertTarget.client_name}</p>
-                <p className="text-lg font-bold text-primary">
-                  {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(convertTarget.amount_cents / 100)}
-                </p>
-              </div>
-
-              {/* Payment status selection */}
-              <div className="space-y-1.5">
-                <Label>Status do Pagamento</Label>
-                <div className="grid grid-cols-3 gap-2">
-                  {([
-                    { key: "pending" as const, label: "Em Aberto", desc: "R$ 0 recebido", color: "border-amber-500/30 bg-amber-500/10 text-amber-500" },
-                    { key: "partial" as const, label: "50% Pago", desc: formatCurrency(getInitAmount(convertTarget)), color: "border-amber-400/30 bg-amber-400/10 text-amber-400" },
-                    { key: "full" as const, label: "Quitado", desc: formatCurrency(convertTarget.amount_cents), color: "border-green-400/30 bg-green-400/10 text-green-400" },
-                  ]).map(opt => (
-                    <button
-                      key={opt.key}
-                      type="button"
-                      onClick={() => setConvertPaymentStatus(opt.key)}
-                      className={`rounded-lg border p-3 text-center transition-all ${
-                        convertPaymentStatus === opt.key ? opt.color : "border-border text-muted-foreground hover:border-primary/30"
-                      }`}
-                    >
-                      <p className="text-sm font-medium">{opt.label}</p>
-                      <p className="text-[10px] opacity-70">{opt.desc}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Project config */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label>Plano</Label>
-                  <Select value={convertPlan} onValueChange={(v: any) => setConvertPlan(v)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="essencial">⭐ Essencial</SelectItem>
-                      <SelectItem value="profissional">🏆 Profissional</SelectItem>
-                      <SelectItem value="premium">👑 Premium</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Data de Início</Label>
-                  <Input type="date" value={convertStartDate} onChange={e => setConvertStartDate(e.target.value)} />
-                </div>
-              </div>
-              <div className="space-y-1.5">
-                <Label>Prazo de Entrega</Label>
-                <Input type="date" value={convertDueDate} onChange={e => setConvertDueDate(e.target.value)} />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Observações do Projeto</Label>
-                <Textarea
-                  value={convertNotes}
-                  onChange={e => setConvertNotes(e.target.value)}
-                  rows={2}
-                  placeholder="Detalhes, pendências, briefing..."
-                />
-              </div>
-
-              <Button onClick={handleConvertToProject} className="w-full" disabled={converting}>
-                {converting ? "Criando projeto..." : "Criar Projeto"}
-              </Button>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Proposal Dialog */}
-      <Dialog open={!!editTarget} onOpenChange={(open) => !open && setEditTarget(null)}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Editar Proposta</DialogTitle>
-            <DialogDescription>Atualize os dados da proposta</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label>Nome do Cliente</Label>
-                <Input value={editClientName} onChange={e => setEditClientName(e.target.value)} />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Email</Label>
-                <Input type="email" value={editClientEmail} onChange={e => setEditClientEmail(e.target.value)} />
-              </div>
-            </div>
-            <div className="space-y-1.5">
-              <Label>WhatsApp</Label>
-              <Input value={editClientPhone} onChange={e => setEditClientPhone(e.target.value)} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Título</Label>
-              <Input value={editTitle} onChange={e => setEditTitle(e.target.value)} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Descrição</Label>
-              <Textarea value={editDescription} onChange={e => setEditDescription(e.target.value)} rows={2} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Valor (R$)</Label>
-              <Input value={editAmountReais} onChange={e => setEditAmountReais(e.target.value)} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Método de Pagamento</Label>
-              <div className="grid grid-cols-2 gap-2">
-                <button type="button" onClick={() => setEditPaymentMethod("pix")}
-                  className={`flex items-center gap-2 rounded-lg border p-3 text-sm transition-all ${editPaymentMethod === "pix" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/50"}`}>
-                  <Smartphone className="w-4 h-4" />
-                  <div className="text-left"><p className="font-medium">PIX</p><p className="text-xs opacity-70">QR Code direto</p></div>
-                </button>
-                <button type="button" onClick={() => setEditPaymentMethod("cakto")}
-                  className={`flex items-center gap-2 rounded-lg border p-3 text-sm transition-all ${editPaymentMethod === "cakto" ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/50"}`}>
-                  <ExternalLink className="w-4 h-4" />
-                  <div className="text-left"><p className="font-medium">Cakto</p><p className="text-xs opacity-70">Checkout completo</p></div>
-                </button>
-              </div>
-            </div>
-            <Button onClick={handleEditSave} className="w-full" disabled={editSaving}>
-              {editSaving ? "Salvando..." : "Salvar Alterações"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Extracted Dialogs */}
+      <ProposalForm open={showForm} onOpenChange={setShowForm} userId={user!.id} onCreated={() => { fetchProposals(); fetchProjects(); }} />
+      <ProposalEditDialog proposal={editTarget} onClose={() => setEditTarget(null)} onSaved={fetchProposals} />
+      <ConvertProjectDialog proposal={convertTarget} onClose={() => setConvertTarget(null)} onConverted={() => { fetchProposals(); fetchProjects(); }} userId={user!.id} />
     </AdminLayout>
   );
 };
