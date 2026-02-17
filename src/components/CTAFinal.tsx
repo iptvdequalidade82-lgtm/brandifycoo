@@ -1,7 +1,8 @@
 import { ArrowRight } from "lucide-react";
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import ScrollRevealText from "@/components/ScrollRevealText";
+import MagneticButton from "@/components/MagneticButton";
+import StaggeredReveal from "@/components/StaggeredReveal";
 import skyscrapersUpBg from "@/assets/skyscrapers-up-bg.jpg";
 
 const whatsappBase = "https://wa.me/5543991065129?text=";
@@ -23,7 +24,7 @@ export default function CTAFinal() {
 
   return (
     <section ref={sectionRef} className="relative py-28 md:py-36 px-6 overflow-visible bg-black">
-      {/* Skyscrapers background - extended beyond section for bigger coverage */}
+      {/* Skyscrapers background */}
       <div
         className="absolute -inset-x-20 -inset-y-10 bg-cover bg-center bg-no-repeat opacity-[0.40] md:opacity-[0.22] pointer-events-none"
         style={{
@@ -48,8 +49,11 @@ export default function CTAFinal() {
           transition={{ duration: 0.7 }}
         >
           <h2 className="font-display text-4xl md:text-6xl lg:text-7xl font-black tracking-[-0.03em] mb-6">
-            Pronto para ter um site que{" "}
-            <span className="underline decoration-brand-accent/40 underline-offset-8">impressiona</span>?
+            <StaggeredReveal
+              text="Pronto para ter um site que impressiona?"
+              highlightWords={["impressiona"]}
+              highlightClassName="underline decoration-brand-accent/40 underline-offset-8"
+            />
           </h2>
 
           <p className="text-white/70 text-lg md:text-xl mb-10 max-w-xl mx-auto leading-relaxed">
@@ -58,9 +62,8 @@ export default function CTAFinal() {
             sua presença digital.
           </p>
 
-          <motion.a
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+          <MagneticButton
+            as="a"
             href="https://wa.me/5543991065129?text=Ol%C3%A1!%20Quero%20come%C3%A7ar%20meu%20projeto%20de%20site%20com%20a%20Brandify!"
             target="_blank"
             rel="noopener noreferrer"
@@ -68,7 +71,7 @@ export default function CTAFinal() {
           >
             Solicitar Orçamento
             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-          </motion.a>
+          </MagneticButton>
 
           {/* Quick messages */}
           <div className="mt-10">
