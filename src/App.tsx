@@ -20,6 +20,7 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import PixPayment from "./pages/PixPayment";
 import Projetos from "./pages/Projetos";
 import Curso from "./pages/Curso";
+import Planos from "./pages/Planos";
 import AdminContabilidade from "./pages/AdminContabilidade";
 import AdminPreviews from "./pages/AdminPreviews";
 import PreviewSite from "./pages/PreviewSite";
@@ -42,6 +43,7 @@ const App = () => (
             <Route path="/preview-loja" element={<PreviewLoja />} />
             
             <Route path="/curso" element={<Curso />} />
+            <Route path="/planos" element={<Planos />} />
             
             <Route path="/trabalhe-conosco" element={<TrabalheConosco />} />
             <Route path="/quem-somos" element={<QuemSomos />} />

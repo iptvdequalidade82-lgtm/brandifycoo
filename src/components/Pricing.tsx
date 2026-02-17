@@ -264,15 +264,21 @@ export default function Pricing() {
                 
                 <Link
                   to={`/preview-site?plano=${plan.name.toLowerCase()}`}
-                  className={`mt-6 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest transition-all p-4 rounded-xl border-2 group relative overflow-hidden shadow-sm ${
-                    plan.featured 
-                      ? "border-white/40 text-white bg-white/5 hover:bg-white/15 hover:shadow-lg hover:shadow-white/5" 
-                      : "border-brand-accent/50 text-brand-accent bg-brand-accent/5 hover:bg-brand-accent/10 hover:shadow-xl hover:shadow-brand-accent/10"
-                  }`}
+                  className="group relative mt-5 block w-full overflow-hidden rounded-xl"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none" />
-                  <Sparkles size={14} className={`animate-pulse ${plan.featured ? "text-white/60" : "text-brand-accent/70"}`} />
-                  <span>faça sua prévia grátis</span>
+                  <motion.div
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    className={`relative flex items-center justify-center gap-2.5 py-4 px-6 rounded-xl font-black text-sm uppercase tracking-wider transition-all duration-300 ${
+                      plan.featured
+                        ? "bg-gradient-to-r from-yellow-400 via-amber-400 to-orange-400 text-black shadow-lg shadow-yellow-500/30 hover:shadow-xl hover:shadow-yellow-500/40"
+                        : "bg-gradient-to-r from-brand-accent to-brand-accent-deep text-white shadow-lg shadow-brand-accent/25 hover:shadow-xl hover:shadow-brand-accent/40"
+                    }`}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none" />
+                    <Sparkles size={16} className="animate-pulse" />
+                    <span>🎨 Prévia Grátis — Teste Agora!</span>
+                  </motion.div>
                 </Link>
               </div>
               </TiltCard>
@@ -364,13 +370,16 @@ export default function Pricing() {
               </motion.a>
             </div>
             
-            <Link
-              to="/preview-loja"
-              className="flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest transition-all p-4 rounded-xl border-2 border-brand-accent/50 text-brand-accent bg-brand-accent/5 hover:bg-brand-accent/10 hover:shadow-xl hover:shadow-brand-accent/10 group relative overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none" />
-              <Eye size={14} className="text-brand-accent/70" />
-              <span>prévia grátis da loja</span>
+            <Link to="/preview-loja" className="group block w-full overflow-hidden rounded-xl">
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="relative flex items-center justify-center gap-2.5 py-4 px-6 rounded-xl font-black text-sm uppercase tracking-wider bg-gradient-to-r from-brand-accent to-brand-accent-deep text-white shadow-lg shadow-brand-accent/25 hover:shadow-xl hover:shadow-brand-accent/40 transition-all duration-300"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none" />
+                <Sparkles size={16} className="animate-pulse" />
+                <span>🎨 Prévia Grátis da Loja — Teste Agora!</span>
+              </motion.div>
             </Link>
 
             <p className="text-xs text-white/30 leading-relaxed">
