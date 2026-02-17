@@ -1,13 +1,23 @@
 import { useState, useRef, useCallback } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Sparkles, Loader2, Monitor, Smartphone, Download, RotateCcw } from "lucide-react";
+import { ArrowLeft, Sparkles, Loader2, Monitor, Smartphone, Download, RotateCcw, Check } from "lucide-react";
 
 const planLabels: Record<string, string> = {
   essencial: "Essencial — até 6 páginas",
   profissional: "Profissional — até 10 páginas",
   premium: "Premium — páginas ilimitadas",
 };
+
+const colorPalettes = [
+  { id: "midnight", label: "Midnight", colors: ["#0a0a0f", "#2563eb", "#3b82f6", "#f8fafc"] },
+  { id: "ocean", label: "Ocean", colors: ["#0a1628", "#0ea5e9", "#38bdf8", "#f0f9ff"] },
+  { id: "emerald", label: "Emerald", colors: ["#0a0f0a", "#10b981", "#34d399", "#f0fdf4"] },
+  { id: "sunset", label: "Sunset", colors: ["#0f0a0a", "#f97316", "#fb923c", "#fff7ed"] },
+  { id: "royal", label: "Royal", colors: ["#0f0a1a", "#8b5cf6", "#a78bfa", "#f5f3ff"] },
+  { id: "rose", label: "Rosé", colors: ["#0f0a0c", "#e11d48", "#fb7185", "#fff1f2"] },
+  { id: "neutral", label: "Clean", colors: ["#fafafa", "#18181b", "#3f3f46", "#18181b"] },
+];
 
 export default function PreviewSite() {
   const [params] = useSearchParams();
@@ -17,6 +27,7 @@ export default function PreviewSite() {
   const [phone, setPhone] = useState("");
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [selectedPalette, setSelectedPalette] = useState("midnight");
 
   const [generating, setGenerating] = useState(false);
   const [htmlContent, setHtmlContent] = useState("");
@@ -54,6 +65,7 @@ export default function PreviewSite() {
             businessName: businessName.trim(),
             phone: phone.trim(),
             logoUrl: logoPreview || null,
+            colorPalette: selectedPalette,
           }),
         }
       );
@@ -86,7 +98,6 @@ export default function PreviewSite() {
             const content = parsed.choices?.[0]?.delta?.content;
             if (content) {
               fullHtml += content;
-              // Clean markdown fences if AI wraps output
               let cleaned = fullHtml;
               if (cleaned.startsWith("```html")) cleaned = cleaned.slice(7);
               if (cleaned.startsWith("```")) cleaned = cleaned.slice(3);
@@ -108,7 +119,7 @@ export default function PreviewSite() {
     } finally {
       setGenerating(false);
     }
-  }, [businessName, phone, logoPreview, plan]);
+  }, [businessName, phone, logoPreview, plan, selectedPalette]);
 
   const downloadHtml = () => {
     const blob = new Blob([htmlContent], { type: "text/html" });
@@ -183,6 +194,49 @@ export default function PreviewSite() {
                     className="w-full px-4 py-3 rounded-xl bg-white/[0.06] border border-white/10 text-white placeholder:text-white/25 focus:outline-none focus:border-brand-accent/50 transition-colors"
                     maxLength={20}
                   />
+                </div>
+
+                {/* Color Palette Picker */}
+                <div>
+                  <label className="block text-sm font-medium text-white/70 mb-3">Tonalidade do site</label>
+                  <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
+                    {colorPalettes.map((palette) => (
+                      <button
+                        key={palette.id}
+                        type="button"
+                        onClick={() => setSelectedPalette(palette.id)}
+                        className={`group relative flex flex-col items-center gap-1.5 p-2 rounded-xl border transition-all ${
+                          selectedPalette === palette.id
+                            ? "border-brand-accent bg-brand-accent/10 ring-1 ring-brand-accent/30"
+                            : "border-white/10 bg-white/[0.03] hover:bg-white/[0.06] hover:border-white/20"
+                        }`}
+                      >
+                        {/* Color swatch stack */}
+                        <div className="flex gap-0.5">
+                          {palette.colors.map((color, i) => (
+                            <div
+                              key={i}
+                              className="w-4 h-4 rounded-full border border-white/10"
+                              style={{ backgroundColor: color }}
+                            />
+                          ))}
+                        </div>
+                        <span className={`text-[10px] font-medium leading-none ${
+                          selectedPalette === palette.id ? "text-brand-accent" : "text-white/40"
+                        }`}>
+                          {palette.label}
+                        </span>
+                        {selectedPalette === palette.id && (
+                          <motion.div
+                            layoutId="palette-check"
+                            className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-brand-accent flex items-center justify-center"
+                          >
+                            <Check size={10} className="text-white" strokeWidth={3} />
+                          </motion.div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <div>
