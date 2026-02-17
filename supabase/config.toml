@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.generate-site-preview]
 verify_jwt = false
+
+[functions.generate-store-preview]
+verify_jwt = false

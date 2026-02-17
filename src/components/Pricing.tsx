@@ -351,16 +351,28 @@ export default function Pricing() {
           </div>
 
           <div className="px-7 md:px-10 pb-7 md:pb-10 space-y-4">
-            <motion.a
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              href={`https://wa.me/5543991065129?text=${encodeURIComponent('Olá! Tenho interesse na Loja Virtual Nuvemshop.')}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block px-8 py-3.5 rounded-xl font-bold bg-gradient-to-r from-[hsl(224,76%,33%)] to-[hsl(217,91%,53%)] text-white hover:opacity-90 gentle-animation shadow-lg shadow-brand-accent/20"
-            >
-              Solicitar Orçamento
-            </motion.a>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <motion.a
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                href="/preview-loja"
+                className="relative inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold border-2 border-brand-accent/40 bg-brand-accent/10 text-white hover:bg-brand-accent/20 hover:border-brand-accent/60 gentle-animation overflow-hidden group"
+              >
+                <Sparkles size={18} className="animate-pulse" />
+                Prévia Grátis da Loja
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+              </motion.a>
+              <motion.a
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                href={`https://wa.me/5543991065129?text=${encodeURIComponent('Olá! Tenho interesse na Loja Virtual Nuvemshop.')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center px-8 py-3.5 rounded-xl font-bold bg-gradient-to-r from-[hsl(224,76%,33%)] to-[hsl(217,91%,53%)] text-white hover:opacity-90 gentle-animation shadow-lg shadow-brand-accent/20"
+              >
+                Solicitar Orçamento
+              </motion.a>
+            </div>
             <p className="text-xs text-white/30 leading-relaxed">
               <span className="text-white/50 font-medium">Domínio é cobrado à parte:</span> a partir de R$ 40,00/ano. O registro fica na conta do próprio cliente.
             </p>
