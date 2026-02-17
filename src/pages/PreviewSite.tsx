@@ -10,13 +10,15 @@ const planLabels: Record<string, string> = {
 };
 
 const colorPalettes = [
-  { id: "midnight", label: "Midnight", colors: ["#0a0a0f", "#2563eb", "#3b82f6", "#f8fafc"] },
-  { id: "ocean", label: "Ocean", colors: ["#0a1628", "#0ea5e9", "#38bdf8", "#f0f9ff"] },
-  { id: "emerald", label: "Emerald", colors: ["#0a0f0a", "#10b981", "#34d399", "#f0fdf4"] },
-  { id: "sunset", label: "Sunset", colors: ["#0f0a0a", "#f97316", "#fb923c", "#fff7ed"] },
-  { id: "royal", label: "Royal", colors: ["#0f0a1a", "#8b5cf6", "#a78bfa", "#f5f3ff"] },
-  { id: "rose", label: "Rosé", colors: ["#0f0a0c", "#e11d48", "#fb7185", "#fff1f2"] },
-  { id: "neutral", label: "Clean", colors: ["#fafafa", "#18181b", "#3f3f46", "#18181b"] },
+  { id: "midnight", label: "Midnight", gradient: "linear-gradient(135deg, #0a0a1a 0%, #1e3a8a 50%, #2563eb 100%)" },
+  { id: "aurora", label: "Aurora", gradient: "linear-gradient(135deg, #6366f1 0%, #06b6d4 50%, #a78bfa 100%)" },
+  { id: "neon", label: "Neon", gradient: "linear-gradient(135deg, #f43f5e 0%, #ec4899 50%, #a855f7 100%)" },
+  { id: "cyber", label: "Cyber", gradient: "linear-gradient(135deg, #00ff88 0%, #0ea5e9 50%, #22d3ee 100%)" },
+  { id: "sunset", label: "Sunset", gradient: "linear-gradient(135deg, #ef4444 0%, #f97316 50%, #eab308 100%)" },
+  { id: "royal", label: "Royal", gradient: "linear-gradient(135deg, #7c3aed 0%, #d946ef 50%, #f0abfc 100%)" },
+  { id: "ocean", label: "Ocean", gradient: "linear-gradient(135deg, #0369a1 0%, #0ea5e9 50%, #2dd4bf 100%)" },
+  { id: "emerald", label: "Emerald", gradient: "linear-gradient(135deg, #059669 0%, #10b981 50%, #a3e635 100%)" },
+  { id: "neutral", label: "Clean", gradient: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%)" },
 ];
 
 export default function PreviewSite() {
@@ -199,39 +201,34 @@ export default function PreviewSite() {
                 {/* Color Palette Picker */}
                 <div>
                   <label className="block text-sm font-medium text-white/70 mb-3">Tonalidade do site</label>
-                  <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
+                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-2.5">
                     {colorPalettes.map((palette) => (
                       <button
                         key={palette.id}
                         type="button"
                         onClick={() => setSelectedPalette(palette.id)}
-                        className={`group relative flex flex-col items-center gap-1.5 p-2 rounded-xl border transition-all ${
+                        className={`group relative flex flex-col items-center gap-2 p-2.5 rounded-xl border transition-all ${
                           selectedPalette === palette.id
-                            ? "border-brand-accent bg-brand-accent/10 ring-1 ring-brand-accent/30"
+                            ? "border-white/30 bg-white/[0.08] ring-1 ring-white/20 scale-[1.04]"
                             : "border-white/10 bg-white/[0.03] hover:bg-white/[0.06] hover:border-white/20"
                         }`}
                       >
-                        {/* Color swatch stack */}
-                        <div className="flex gap-0.5">
-                          {palette.colors.map((color, i) => (
-                            <div
-                              key={i}
-                              className="w-4 h-4 rounded-full border border-white/10"
-                              style={{ backgroundColor: color }}
-                            />
-                          ))}
-                        </div>
-                        <span className={`text-[10px] font-medium leading-none ${
-                          selectedPalette === palette.id ? "text-brand-accent" : "text-white/40"
+                        {/* Gradient swatch */}
+                        <div
+                          className="w-full h-8 rounded-lg border border-white/10"
+                          style={{ background: palette.gradient }}
+                        />
+                        <span className={`text-[10px] font-semibold tracking-wide uppercase leading-none ${
+                          selectedPalette === palette.id ? "text-white" : "text-white/40"
                         }`}>
                           {palette.label}
                         </span>
                         {selectedPalette === palette.id && (
                           <motion.div
                             layoutId="palette-check"
-                            className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-brand-accent flex items-center justify-center"
+                            className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-white flex items-center justify-center shadow-lg"
                           >
-                            <Check size={10} className="text-white" strokeWidth={3} />
+                            <Check size={11} className="text-black" strokeWidth={3} />
                           </motion.div>
                         )}
                       </button>

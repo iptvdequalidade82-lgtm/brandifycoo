@@ -81,15 +81,17 @@ serve(async (req) => {
     const planKey = (plan || "essencial").toLowerCase();
     const planPrompt = planPrompts[planKey] || planPrompts.essencial;
 
-    // Color palette mapping
-    const palettes: Record<string, { bg: string; accent: string; accentLight: string; text: string; muted: string; cardBg: string }> = {
-      midnight: { bg: "#0a0a0f", accent: "#2563eb", accentLight: "#3b82f6", text: "#f8fafc", muted: "#94a3b8", cardBg: "rgba(255,255,255,0.04)" },
-      ocean: { bg: "#0a1628", accent: "#0ea5e9", accentLight: "#38bdf8", text: "#f0f9ff", muted: "#7dd3fc", cardBg: "rgba(14,165,233,0.06)" },
-      emerald: { bg: "#0a0f0a", accent: "#10b981", accentLight: "#34d399", text: "#f0fdf4", muted: "#6ee7b7", cardBg: "rgba(16,185,129,0.06)" },
-      sunset: { bg: "#0f0a0a", accent: "#f97316", accentLight: "#fb923c", text: "#fff7ed", muted: "#fdba74", cardBg: "rgba(249,115,22,0.06)" },
-      royal: { bg: "#0f0a1a", accent: "#8b5cf6", accentLight: "#a78bfa", text: "#f5f3ff", muted: "#c4b5fd", cardBg: "rgba(139,92,246,0.06)" },
-      rose: { bg: "#0f0a0c", accent: "#e11d48", accentLight: "#fb7185", text: "#fff1f2", muted: "#fda4af", cardBg: "rgba(225,29,72,0.06)" },
-      neutral: { bg: "#fafafa", accent: "#18181b", accentLight: "#3f3f46", text: "#18181b", muted: "#71717a", cardBg: "rgba(0,0,0,0.03)" },
+    // Color palette mapping with gradient info
+    const palettes: Record<string, { bg: string; accent: string; accentLight: string; accentGradient: string; text: string; muted: string; cardBg: string }> = {
+      midnight: { bg: "#0a0a1a", accent: "#2563eb", accentLight: "#3b82f6", accentGradient: "linear-gradient(135deg, #1e3a8a, #2563eb)", text: "#f8fafc", muted: "#94a3b8", cardBg: "rgba(255,255,255,0.04)" },
+      aurora: { bg: "#0f0720", accent: "#6366f1", accentLight: "#a78bfa", accentGradient: "linear-gradient(135deg, #6366f1, #06b6d4, #a78bfa)", text: "#f0f0ff", muted: "#a5b4fc", cardBg: "rgba(99,102,241,0.06)" },
+      neon: { bg: "#030712", accent: "#f43f5e", accentLight: "#ec4899", accentGradient: "linear-gradient(135deg, #f43f5e, #ec4899, #a855f7)", text: "#fdf2f8", muted: "#f9a8d4", cardBg: "rgba(244,63,94,0.06)" },
+      cyber: { bg: "#0a0a0f", accent: "#00ff88", accentLight: "#22d3ee", accentGradient: "linear-gradient(135deg, #00ff88, #0ea5e9)", text: "#ecfdf5", muted: "#6ee7b7", cardBg: "rgba(0,255,136,0.05)" },
+      sunset: { bg: "#0f0a0a", accent: "#f97316", accentLight: "#eab308", accentGradient: "linear-gradient(135deg, #ef4444, #f97316, #eab308)", text: "#fff7ed", muted: "#fdba74", cardBg: "rgba(249,115,22,0.06)" },
+      royal: { bg: "#0f0a1a", accent: "#8b5cf6", accentLight: "#d946ef", accentGradient: "linear-gradient(135deg, #7c3aed, #d946ef)", text: "#f5f3ff", muted: "#c4b5fd", cardBg: "rgba(139,92,246,0.06)" },
+      ocean: { bg: "#0a1628", accent: "#0ea5e9", accentLight: "#2dd4bf", accentGradient: "linear-gradient(135deg, #0369a1, #0ea5e9, #2dd4bf)", text: "#f0f9ff", muted: "#7dd3fc", cardBg: "rgba(14,165,233,0.06)" },
+      emerald: { bg: "#0a0f0a", accent: "#10b981", accentLight: "#a3e635", accentGradient: "linear-gradient(135deg, #059669, #10b981, #a3e635)", text: "#f0fdf4", muted: "#6ee7b7", cardBg: "rgba(16,185,129,0.06)" },
+      neutral: { bg: "#fafafa", accent: "#18181b", accentLight: "#6b7280", accentGradient: "linear-gradient(135deg, #18181b, #4b5563)", text: "#18181b", muted: "#71717a", cardBg: "rgba(0,0,0,0.03)" },
     };
 
     const selectedPalette = palettes[colorPalette || "midnight"] || palettes.midnight;
@@ -110,11 +112,14 @@ PALETA DE CORES OBRIGATÓRIA:
 --bg: ${selectedPalette.bg}
 --accent: ${selectedPalette.accent}
 --accent-light: ${selectedPalette.accentLight}
+--accent-gradient: ${selectedPalette.accentGradient}
 --text: ${selectedPalette.text}
 --muted: ${selectedPalette.muted}
 --card-bg: ${selectedPalette.cardBg}
 
-Use estas variáveis CSS em TODO o site. O fundo principal é --bg, textos em --text, textos secundários em --muted, destaques e CTAs em --accent.
+Use estas variáveis CSS em TODO o site. O fundo principal é --bg, textos em --text, textos secundários em --muted.
+Para CTAs, botões principais e destaques de texto, use background: var(--accent-gradient) para um visual moderno com degradê.
+Use var(--accent) para bordas, hovers e detalhes secundários.
 
 ESTILO DE DESIGN:
 - Espaçamento generoso (padding: 6rem 2rem nas seções, gap: 2rem nos grids)
