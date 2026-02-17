@@ -183,20 +183,8 @@ export default function PreviewLoja() {
 
   const canGenerate = mode === "ia" ? !!segment.trim() : !!storeName.trim();
 
-  const fillTestData = () => {
-    setStoreName("Luna Acessórios");
-    setSegment("Joias e acessórios femininos");
-    setPhone("(43) 99106-5129");
-    setSelectedScheme("elegant");
-    if (mode === "manual") {
-      setProducts([
-        { name: "Bracelete Aço Prata", price: "67,90", category: "Braceletes", imageUrl: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400&h=400&fit=crop" },
-        { name: "Colar Coração Dourado", price: "89,90", category: "Colares", imageUrl: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=400&fit=crop" },
-        { name: "Brinco Argola Click", price: "45,90", category: "Brincos", imageUrl: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400&h=400&fit=crop" },
-        { name: "Anel Solitário Rose", price: "54,90", category: "Anéis", imageUrl: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&h=400&fit=crop" },
-      ]);
-    }
-  };
+
+
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -352,11 +340,6 @@ export default function PreviewLoja() {
                     ))}
                   </div>
                 </div>
-
-                {/* ADM Test Button */}
-                <button onClick={fillTestData} className="w-full py-2 text-xs text-white/20 hover:text-white/40 transition-colors border border-dashed border-white/10 hover:border-white/20 rounded-lg">
-                  ⚡ Preencher Teste (ADM)
-                </button>
 
                 <motion.button
                   whileHover={canGenerate ? { scale: 1.02 } : {}}
