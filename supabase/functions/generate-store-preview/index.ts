@@ -5,39 +5,128 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Curated product images by segment (direct Unsplash URLs, always available)
 function getProductImages(segment: string): string[] {
   const s = (segment || "loja").toLowerCase().trim();
-  const segmentMap: Record<string, string> = {
-    "moda": "fashion-clothing",
-    "roupas": "fashion-clothing",
-    "calçados": "shoes-footwear",
-    "sapatos": "shoes-footwear",
-    "joias": "jewelry-gold",
-    "acessórios": "accessories-fashion",
-    "cosméticos": "cosmetics-beauty",
-    "beleza": "beauty-products",
-    "eletrônicos": "electronics-gadgets",
-    "celular": "smartphone-tech",
-    "decoração": "home-decor-interior",
-    "móveis": "furniture-modern",
-    "pet": "pet-supplies",
-    "esportes": "sports-equipment",
-    "brinquedos": "toys-kids",
-    "alimentos": "gourmet-food",
-    "bebidas": "drinks-beverage",
-    "papelaria": "stationery-office",
-    "jardim": "garden-plants",
-    "artesanato": "handcraft-artisan",
+
+  const segmentImages: Record<string, string[]> = {
+    moda: [
+      "https://images.unsplash.com/photo-1434389677669-e08b4cda3a00?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1445205170230-053b83016050?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1492707892479-7bc8d5a4ee93?w=600&h=600&fit=crop",
+    ],
+    joias: [
+      "https://images.unsplash.com/photo-1515562141589-67f0d569b3f4?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1535632787350-4e68ef0ac584?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1598560917505-59a3ad559071?w=600&h=600&fit=crop",
+    ],
+    eletronicos: [
+      "https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1526738549149-8e07eca6c147?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1546868871-af0de0ae72be?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1484788984921-03950022c9ef?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1550009158-9ebf69173e03?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1491933382434-500287f9b54b?w=600&h=600&fit=crop",
+    ],
+    cosmeticos: [
+      "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1570194065650-d99fb4b38b17?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1571875257727-256c39da42af?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1583209814683-c023dd293cc6?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=600&h=600&fit=crop",
+    ],
+    pet: [
+      "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1574158622682-e40e69881006?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1591946614720-90a587da4a36?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1623387641168-d9803ddd3f35?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1615497001839-b0a0eac3274c?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1592754862816-1a21a4ea2281?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1576201836106-db1758fd1c97?w=600&h=600&fit=crop",
+    ],
+    decoracao: [
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1540932239986-30128078f3c5?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1560185009-5bf9f2849488?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1600210491369-e753d80a41f3?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=600&h=600&fit=crop",
+    ],
   };
 
-  let keyword = "products-ecommerce";
-  for (const [key, val] of Object.entries(segmentMap)) {
-    if (s.includes(key)) { keyword = val; break; }
+  // Default product images
+  const defaultImages = [
+    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&h=600&fit=crop",
+    "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=600&fit=crop",
+    "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600&h=600&fit=crop",
+    "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600&h=600&fit=crop",
+    "https://images.unsplash.com/photo-1560343090-f0409e92791a?w=600&h=600&fit=crop",
+    "https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=600&h=600&fit=crop",
+    "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=600&fit=crop",
+    "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=600&h=600&fit=crop",
+    "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&h=600&fit=crop",
+    "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=600&h=600&fit=crop",
+    "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=600&h=600&fit=crop",
+    "https://images.unsplash.com/photo-1547949003-9792a18a2601?w=600&h=600&fit=crop",
+  ];
+
+  // Match by keyword
+  const matchMap: Record<string, string> = {
+    moda: "moda", roupa: "moda", "calçado": "moda", sapato: "moda", "tênis": "moda",
+    joia: "joias", "acessório": "joias", bijuteria: "joias", prata: "joias", ouro: "joias",
+    "eletrônico": "eletronicos", celular: "eletronicos", tech: "eletronicos", "informática": "eletronicos",
+    "cosmético": "cosmeticos", beleza: "cosmeticos", maquiagem: "cosmeticos", skincare: "cosmeticos",
+    pet: "pet", animal: "pet", "veterinár": "pet", "ração": "pet",
+    "decoração": "decoracao", "móve": "decoracao", casa: "decoracao", jardim: "decoracao",
+  };
+
+  for (const [key, ref] of Object.entries(matchMap)) {
+    if (s.includes(key) && segmentImages[ref]) return segmentImages[ref];
   }
-  const ts = Date.now();
-  return Array.from({ length: 12 }, (_, i) =>
-    `https://source.unsplash.com/600x600/?${encodeURIComponent(keyword)}&t=${ts}${i}`
-  );
+
+  return defaultImages;
 }
 
 serve(async (req) => {
