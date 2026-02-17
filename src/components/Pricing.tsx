@@ -264,12 +264,15 @@ export default function Pricing() {
                 
                 <Link
                   to={`/preview-site?plano=${plan.name.toLowerCase()}`}
-                  className={`mt-4 flex items-center justify-center gap-1.5 text-xs font-bold uppercase tracking-wider transition-all hover:opacity-80 ${
-                    plan.featured ? "text-white/60 hover:text-white" : "text-brand-accent hover:text-brand-accent-deep"
+                  className={`mt-6 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest transition-all p-4 rounded-xl border-2 group relative overflow-hidden shadow-sm ${
+                    plan.featured 
+                      ? "border-white/40 text-white bg-white/5 hover:bg-white/15 hover:shadow-lg hover:shadow-white/5" 
+                      : "border-brand-accent/50 text-brand-accent bg-brand-accent/5 hover:bg-brand-accent/10 hover:shadow-xl hover:shadow-brand-accent/10"
                   }`}
                 >
-                  <Eye size={14} />
-                  prévia grátis
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none" />
+                  <Sparkles size={14} className={`animate-pulse ${plan.featured ? "text-white/60" : "text-brand-accent/70"}`} />
+                  <span>faça sua prévia grátis</span>
                 </Link>
               </div>
               </TiltCard>
