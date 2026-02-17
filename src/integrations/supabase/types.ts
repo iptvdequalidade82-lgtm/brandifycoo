@@ -44,6 +44,36 @@ export type Database = {
         }
         Relationships: []
       }
+      expenses: {
+        Row: {
+          amount_cents: number
+          category: string
+          created_at: string
+          created_by: string
+          description: string
+          expense_date: string
+          id: string
+        }
+        Insert: {
+          amount_cents: number
+          category?: string
+          created_at?: string
+          created_by: string
+          description: string
+          expense_date?: string
+          id?: string
+        }
+        Update: {
+          amount_cents?: number
+          category?: string
+          created_at?: string
+          created_by?: string
+          description?: string
+          expense_date?: string
+          id?: string
+        }
+        Relationships: []
+      }
       extra_revenue: {
         Row: {
           amount_cents: number
