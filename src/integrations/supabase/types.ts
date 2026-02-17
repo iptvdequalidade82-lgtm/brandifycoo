@@ -316,6 +316,51 @@ export type Database = {
         }
         Relationships: []
       }
+      site_previews: {
+        Row: {
+          client_email: string | null
+          client_name: string
+          client_phone: string | null
+          color_palette: string | null
+          created_at: string
+          feedback: string | null
+          feedback_at: string | null
+          html_storage_path: string | null
+          id: string
+          plan: string
+          segment: string | null
+          slogan: string | null
+        }
+        Insert: {
+          client_email?: string | null
+          client_name: string
+          client_phone?: string | null
+          color_palette?: string | null
+          created_at?: string
+          feedback?: string | null
+          feedback_at?: string | null
+          html_storage_path?: string | null
+          id?: string
+          plan?: string
+          segment?: string | null
+          slogan?: string | null
+        }
+        Update: {
+          client_email?: string | null
+          client_name?: string
+          client_phone?: string | null
+          color_palette?: string | null
+          created_at?: string
+          feedback?: string | null
+          feedback_at?: string | null
+          html_storage_path?: string | null
+          id?: string
+          plan?: string
+          segment?: string | null
+          slogan?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
