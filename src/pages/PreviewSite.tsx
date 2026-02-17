@@ -11,6 +11,7 @@ const planLabels: Record<string, string> = {
 };
 
 const colorPalettes = [
+  // Originals
   { id: "midnight", label: "Midnight", gradient: "linear-gradient(135deg, #0a0a1a 0%, #1e3a8a 50%, #2563eb 100%)" },
   { id: "aurora", label: "Aurora", gradient: "linear-gradient(135deg, #6366f1 0%, #06b6d4 50%, #a78bfa 100%)" },
   { id: "neon", label: "Neon", gradient: "linear-gradient(135deg, #f43f5e 0%, #ec4899 50%, #a855f7 100%)" },
@@ -26,6 +27,17 @@ const colorPalettes = [
   { id: "lavender", label: "Lavanda", gradient: "linear-gradient(135deg, #4c1d95 0%, #7c3aed 50%, #c4b5fd 100%)" },
   { id: "mint", label: "Mint", gradient: "linear-gradient(135deg, #064e3b 0%, #059669 50%, #6ee7b7 100%)" },
   { id: "coral", label: "Coral", gradient: "linear-gradient(135deg, #c2410c 0%, #f97316 50%, #fdba74 100%)" },
+  // New modern palettes
+  { id: "arctic", label: "Arctic", gradient: "linear-gradient(135deg, #0c4a6e 0%, #38bdf8 50%, #e0f2fe 100%)" },
+  { id: "cherry", label: "Cherry", gradient: "linear-gradient(135deg, #881337 0%, #e11d48 50%, #fda4af 100%)" },
+  { id: "bronze", label: "Bronze", gradient: "linear-gradient(135deg, #451a03 0%, #b45309 50%, #fcd34d 100%)" },
+  { id: "forest", label: "Forest", gradient: "linear-gradient(135deg, #14532d 0%, #16a34a 50%, #bbf7d0 100%)" },
+  { id: "electric", label: "Electric", gradient: "linear-gradient(135deg, #1e1b4b 0%, #4f46e5 50%, #c7d2fe 100%)" },
+  { id: "magma", label: "Magma", gradient: "linear-gradient(135deg, #7c2d12 0%, #ea580c 50%, #fde68a 100%)" },
+  { id: "grape", label: "Grape", gradient: "linear-gradient(135deg, #3b0764 0%, #9333ea 50%, #e9d5ff 100%)" },
+  { id: "steel", label: "Steel", gradient: "linear-gradient(135deg, #1c1917 0%, #57534e 50%, #d6d3d1 100%)" },
+  { id: "tropical", label: "Tropical", gradient: "linear-gradient(135deg, #134e4a 0%, #14b8a6 50%, #fde047 100%)" },
+  { id: "blush", label: "Blush", gradient: "linear-gradient(135deg, #831843 0%, #ec4899 50%, #fce7f3 100%)" },
 ];
 
 const inputClass = "w-full px-4 py-3 rounded-xl bg-white/[0.06] border border-white/10 text-white placeholder:text-white/25 focus:outline-none focus:border-white/30 transition-colors";

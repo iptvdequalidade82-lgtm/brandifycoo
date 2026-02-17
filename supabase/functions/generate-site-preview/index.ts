@@ -274,21 +274,32 @@ serve(async (req) => {
 
     // Color palette mapping
     const palettes: Record<string, { bg: string; accent: string; accentLight: string; accentGradient: string; text: string; muted: string; cardBg: string }> = {
-      midnight: { bg: "#0a0a1a", accent: "#2563eb", accentLight: "#3b82f6", accentGradient: "linear-gradient(135deg, #1e3a8a, #2563eb)", text: "#f8fafc", muted: "#94a3b8", cardBg: "rgba(255,255,255,0.04)" },
+      midnight: { bg: "#0a0a1a", accent: "#1e3a8a", accentLight: "#2563eb", accentGradient: "linear-gradient(135deg, #1e3a8a, #2563eb)", text: "#f8fafc", muted: "#94a3b8", cardBg: "rgba(30,58,138,0.08)" },
       aurora: { bg: "#0f0720", accent: "#6366f1", accentLight: "#a78bfa", accentGradient: "linear-gradient(135deg, #6366f1, #06b6d4, #a78bfa)", text: "#f0f0ff", muted: "#a5b4fc", cardBg: "rgba(99,102,241,0.06)" },
-      neon: { bg: "#030712", accent: "#f43f5e", accentLight: "#ec4899", accentGradient: "linear-gradient(135deg, #f43f5e, #ec4899, #a855f7)", text: "#fdf2f8", muted: "#f9a8d4", cardBg: "rgba(244,63,94,0.06)" },
-      cyber: { bg: "#0a0a0f", accent: "#00ff88", accentLight: "#22d3ee", accentGradient: "linear-gradient(135deg, #00ff88, #0ea5e9)", text: "#ecfdf5", muted: "#6ee7b7", cardBg: "rgba(0,255,136,0.05)" },
-      sunset: { bg: "#0f0a0a", accent: "#f97316", accentLight: "#eab308", accentGradient: "linear-gradient(135deg, #ef4444, #f97316, #eab308)", text: "#fff7ed", muted: "#fdba74", cardBg: "rgba(249,115,22,0.06)" },
-      royal: { bg: "#0f0a1a", accent: "#8b5cf6", accentLight: "#d946ef", accentGradient: "linear-gradient(135deg, #7c3aed, #d946ef)", text: "#f5f3ff", muted: "#c4b5fd", cardBg: "rgba(139,92,246,0.06)" },
-      ocean: { bg: "#0a1628", accent: "#0ea5e9", accentLight: "#2dd4bf", accentGradient: "linear-gradient(135deg, #0369a1, #0ea5e9, #2dd4bf)", text: "#f0f9ff", muted: "#7dd3fc", cardBg: "rgba(14,165,233,0.06)" },
-      emerald: { bg: "#0a0f0a", accent: "#10b981", accentLight: "#a3e635", accentGradient: "linear-gradient(135deg, #059669, #10b981, #a3e635)", text: "#f0fdf4", muted: "#6ee7b7", cardBg: "rgba(16,185,129,0.06)" },
-      neutral: { bg: "#fafafa", accent: "#18181b", accentLight: "#6b7280", accentGradient: "linear-gradient(135deg, #18181b, #4b5563)", text: "#18181b", muted: "#71717a", cardBg: "rgba(0,0,0,0.03)" },
-      rose: { bg: "#0f0a0c", accent: "#e11d48", accentLight: "#fb7185", accentGradient: "linear-gradient(135deg, #9f1239, #e11d48, #fb7185)", text: "#fff1f2", muted: "#fda4af", cardBg: "rgba(225,29,72,0.06)" },
-      gold: { bg: "#0f0c05", accent: "#d97706", accentLight: "#fbbf24", accentGradient: "linear-gradient(135deg, #78350f, #d97706, #fbbf24)", text: "#fffbeb", muted: "#fcd34d", cardBg: "rgba(217,119,6,0.06)" },
-      slate: { bg: "#0f172a", accent: "#475569", accentLight: "#94a3b8", accentGradient: "linear-gradient(135deg, #1e293b, #475569, #64748b)", text: "#f1f5f9", muted: "#94a3b8", cardBg: "rgba(71,85,105,0.06)" },
-      lavender: { bg: "#0f0820", accent: "#7c3aed", accentLight: "#c4b5fd", accentGradient: "linear-gradient(135deg, #4c1d95, #7c3aed, #c4b5fd)", text: "#f5f3ff", muted: "#a78bfa", cardBg: "rgba(124,58,237,0.06)" },
-      mint: { bg: "#0a0f0d", accent: "#059669", accentLight: "#6ee7b7", accentGradient: "linear-gradient(135deg, #064e3b, #059669, #6ee7b7)", text: "#ecfdf5", muted: "#6ee7b7", cardBg: "rgba(5,150,105,0.06)" },
-      coral: { bg: "#0f0a08", accent: "#f97316", accentLight: "#fdba74", accentGradient: "linear-gradient(135deg, #c2410c, #f97316, #fdba74)", text: "#fff7ed", muted: "#fdba74", cardBg: "rgba(249,115,22,0.06)" },
+      neon: { bg: "#030712", accent: "#f43f5e", accentLight: "#a855f7", accentGradient: "linear-gradient(135deg, #f43f5e, #ec4899, #a855f7)", text: "#fdf2f8", muted: "#f9a8d4", cardBg: "rgba(244,63,94,0.06)" },
+      cyber: { bg: "#0a0a0f", accent: "#00ff88", accentLight: "#22d3ee", accentGradient: "linear-gradient(135deg, #00ff88, #0ea5e9, #22d3ee)", text: "#ecfdf5", muted: "#6ee7b7", cardBg: "rgba(0,255,136,0.05)" },
+      sunset: { bg: "#0f0a0a", accent: "#ef4444", accentLight: "#eab308", accentGradient: "linear-gradient(135deg, #ef4444, #f97316, #eab308)", text: "#fff7ed", muted: "#fdba74", cardBg: "rgba(249,115,22,0.06)" },
+      royal: { bg: "#0f0a1a", accent: "#7c3aed", accentLight: "#f0abfc", accentGradient: "linear-gradient(135deg, #7c3aed, #d946ef, #f0abfc)", text: "#f5f3ff", muted: "#c4b5fd", cardBg: "rgba(139,92,246,0.06)" },
+      ocean: { bg: "#0a1628", accent: "#0369a1", accentLight: "#2dd4bf", accentGradient: "linear-gradient(135deg, #0369a1, #0ea5e9, #2dd4bf)", text: "#f0f9ff", muted: "#7dd3fc", cardBg: "rgba(14,165,233,0.06)" },
+      emerald: { bg: "#0a0f0a", accent: "#059669", accentLight: "#a3e635", accentGradient: "linear-gradient(135deg, #059669, #10b981, #a3e635)", text: "#f0fdf4", muted: "#6ee7b7", cardBg: "rgba(16,185,129,0.06)" },
+      neutral: { bg: "#fafafa", accent: "#18181b", accentLight: "#6b7280", accentGradient: "linear-gradient(135deg, #18181b, #4b5563, #6b7280)", text: "#18181b", muted: "#71717a", cardBg: "rgba(0,0,0,0.03)" },
+      rose: { bg: "#0f0a0c", accent: "#9f1239", accentLight: "#fb7185", accentGradient: "linear-gradient(135deg, #9f1239, #e11d48, #fb7185)", text: "#fff1f2", muted: "#fda4af", cardBg: "rgba(225,29,72,0.06)" },
+      gold: { bg: "#0f0c05", accent: "#78350f", accentLight: "#fbbf24", accentGradient: "linear-gradient(135deg, #78350f, #d97706, #fbbf24)", text: "#fffbeb", muted: "#fcd34d", cardBg: "rgba(217,119,6,0.06)" },
+      slate: { bg: "#0f172a", accent: "#1e293b", accentLight: "#64748b", accentGradient: "linear-gradient(135deg, #1e293b, #475569, #64748b)", text: "#f1f5f9", muted: "#94a3b8", cardBg: "rgba(71,85,105,0.06)" },
+      lavender: { bg: "#0f0820", accent: "#4c1d95", accentLight: "#c4b5fd", accentGradient: "linear-gradient(135deg, #4c1d95, #7c3aed, #c4b5fd)", text: "#f5f3ff", muted: "#a78bfa", cardBg: "rgba(124,58,237,0.06)" },
+      mint: { bg: "#0a0f0d", accent: "#064e3b", accentLight: "#6ee7b7", accentGradient: "linear-gradient(135deg, #064e3b, #059669, #6ee7b7)", text: "#ecfdf5", muted: "#6ee7b7", cardBg: "rgba(5,150,105,0.06)" },
+      coral: { bg: "#0f0a08", accent: "#c2410c", accentLight: "#fdba74", accentGradient: "linear-gradient(135deg, #c2410c, #f97316, #fdba74)", text: "#fff7ed", muted: "#fdba74", cardBg: "rgba(249,115,22,0.06)" },
+      // New modern palettes
+      arctic: { bg: "#0c1929", accent: "#0c4a6e", accentLight: "#e0f2fe", accentGradient: "linear-gradient(135deg, #0c4a6e, #38bdf8, #e0f2fe)", text: "#f0f9ff", muted: "#7dd3fc", cardBg: "rgba(56,189,248,0.06)" },
+      cherry: { bg: "#0f0508", accent: "#881337", accentLight: "#fda4af", accentGradient: "linear-gradient(135deg, #881337, #e11d48, #fda4af)", text: "#fff1f2", muted: "#fb7185", cardBg: "rgba(225,29,72,0.06)" },
+      bronze: { bg: "#0f0a03", accent: "#451a03", accentLight: "#fcd34d", accentGradient: "linear-gradient(135deg, #451a03, #b45309, #fcd34d)", text: "#fffbeb", muted: "#f59e0b", cardBg: "rgba(180,83,9,0.06)" },
+      forest: { bg: "#0a0f0a", accent: "#14532d", accentLight: "#bbf7d0", accentGradient: "linear-gradient(135deg, #14532d, #16a34a, #bbf7d0)", text: "#f0fdf4", muted: "#4ade80", cardBg: "rgba(22,163,74,0.06)" },
+      electric: { bg: "#0a0a1f", accent: "#1e1b4b", accentLight: "#c7d2fe", accentGradient: "linear-gradient(135deg, #1e1b4b, #4f46e5, #c7d2fe)", text: "#eef2ff", muted: "#818cf8", cardBg: "rgba(79,70,229,0.06)" },
+      magma: { bg: "#0f0805", accent: "#7c2d12", accentLight: "#fde68a", accentGradient: "linear-gradient(135deg, #7c2d12, #ea580c, #fde68a)", text: "#fff7ed", muted: "#fb923c", cardBg: "rgba(234,88,12,0.06)" },
+      grape: { bg: "#0a0520", accent: "#3b0764", accentLight: "#e9d5ff", accentGradient: "linear-gradient(135deg, #3b0764, #9333ea, #e9d5ff)", text: "#faf5ff", muted: "#c084fc", cardBg: "rgba(147,51,234,0.06)" },
+      steel: { bg: "#0f0e0d", accent: "#1c1917", accentLight: "#d6d3d1", accentGradient: "linear-gradient(135deg, #1c1917, #57534e, #d6d3d1)", text: "#fafaf9", muted: "#a8a29e", cardBg: "rgba(87,83,78,0.06)" },
+      tropical: { bg: "#0a0f0e", accent: "#134e4a", accentLight: "#fde047", accentGradient: "linear-gradient(135deg, #134e4a, #14b8a6, #fde047)", text: "#f0fdfa", muted: "#5eead4", cardBg: "rgba(20,184,166,0.06)" },
+      blush: { bg: "#0f0510", accent: "#831843", accentLight: "#fce7f3", accentGradient: "linear-gradient(135deg, #831843, #ec4899, #fce7f3)", text: "#fdf2f8", muted: "#f472b6", cardBg: "rgba(236,72,153,0.06)" },
     };
 
     const selectedPalette = palettes[colorPalette || "midnight"] || palettes.midnight;
@@ -378,14 +389,23 @@ PROIBIÇÕES DE LAYOUT:
 - NUNCA use float. Use flexbox ou grid.
 - NUNCA coloque SVG icons decorativos sem width e height explícitos.
 
-PALETA DE CORES (:root CSS variables):
+PALETA DE CORES (:root CSS variables) — VOCÊ DEVE USAR TODAS ESTAS CORES:
 --bg: ${selectedPalette.bg};
---accent: ${selectedPalette.accent};
---accent-light: ${selectedPalette.accentLight};
---accent-gradient: ${selectedPalette.accentGradient};
+--accent: ${selectedPalette.accent};          /* COR 1 — Use em: headers de seção, ícones, bordas hover, backgrounds de badges */
+--accent-light: ${selectedPalette.accentLight}; /* COR 2 — Use em: gradient text, botões secundários, highlights, underlines */
+--accent-gradient: ${selectedPalette.accentGradient}; /* GRADIENTE DAS 3 CORES — Use em: botões CTA, títulos gradient, orbs, backgrounds decorativos */
 --text: ${selectedPalette.text};
 --muted: ${selectedPalette.muted};
 --card-bg: ${selectedPalette.cardBg};
+
+USO OBRIGATÓRIO DAS 3 CORES DA PALETA (CRÍTICO — NÃO IGNORE):
+O cliente escolheu esta paleta com 3 cores específicas. As 3 DEVEM aparecer visualmente no site:
+1. COR ESCURA (--accent: ${selectedPalette.accent}): backgrounds de cards hover, bordas ativas, ícones de seção, fundos de badges, footer background sutil
+2. COR MÉDIA (extraída do gradiente): botões secundários, underlines decorativos, ícones de serviço, separadores, números de contagem
+3. COR CLARA (--accent-light: ${selectedPalette.accentLight}): gradient text nos títulos, hover de links, glow de botões, highlights de stats, bordas de inputs focus
+4. GRADIENTE COMPLETO (--accent-gradient): botões CTA principais, títulos hero em gradient text, orbs decorativos, badges de destaque, progress bars, botões de formulário
+NÃO use cores genéricas como azul (#2563eb) ou branco puro se a paleta é diferente. RESPEITE a paleta 100%.
+Cada seção do site deve ter pelo menos 2 das 3 cores da paleta visíveis.
 
 QUALIDADE VISUAL MANDATÓRIA:
 - Espaçamento GENEROSO: seções padding clamp(3rem,5vw,5rem) 1.5rem. Gap 1.5rem+ nos grids.
@@ -393,9 +413,9 @@ QUALIDADE VISUAL MANDATÓRIA:
 - Cards: padding 2rem, border-radius 1rem, border 1px solid rgba(255,255,255,0.06), background var(--card-bg)
 - Botões: padding 0.875rem 2rem, border-radius 9999px, font-weight 600, transition 0.3s
 - Sombras: 0 15px 40px rgba(0,0,0,0.2) cards, 0 0 30px rgba(accent,0.2) botões
-- Hover em TUDO: translateY(-4px), border-color accent, shadow intensifica
+- Hover em TUDO: translateY(-4px), border-color var(--accent), shadow intensifica
 - Gradient text: background var(--accent-gradient), -webkit-background-clip: text, -webkit-text-fill-color: transparent
-- Badges: background rgba(accent,0.1), color accent, padding 0.5rem 1.5rem, border-radius 9999px, font-size 0.8rem, font-weight 600, letter-spacing 0.05em, text-transform uppercase
+- Badges: background rgba(accent,0.1), color var(--accent-light), padding 0.5rem 1.5rem, border-radius 9999px, font-size 0.8rem, font-weight 600, letter-spacing 0.05em, text-transform uppercase
 ${imageInstructions}
 
 BACKGROUND TEMÁTICO:
