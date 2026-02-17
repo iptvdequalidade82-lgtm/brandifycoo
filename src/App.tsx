@@ -21,6 +21,7 @@ import PixPayment from "./pages/PixPayment";
 import Projetos from "./pages/Projetos";
 import Curso from "./pages/Curso";
 import AdminContabilidade from "./pages/AdminContabilidade";
+import AdminPreviews from "./pages/AdminPreviews";
 import PreviewSite from "./pages/PreviewSite";
 
 const queryClient = new QueryClient();
@@ -47,6 +48,7 @@ const App = () => (
             <Route path="/admin/agenda" element={<AdminAgenda />} />
             <Route path="/admin/leads" element={<AdminLeads />} />
             <Route path="/admin/contabilidade" element={<AdminContabilidade />} />
+            <Route path="/admin/previas" element={<AdminPreviews />} />
             <Route path="/admin/logs" element={<AdminLogs />} />
             <Route path="/pagamento-sucesso" element={<PaymentSuccess />} />
             <Route path="/pix/:id" element={<PixPayment />} />

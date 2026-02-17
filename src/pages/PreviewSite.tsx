@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Sparkles, Loader2, Monitor, Smartphone, RotateCcw, Check, Upload, X, Image, Building2 } from "lucide-react";
+import { ArrowLeft, Sparkles, Loader2, Monitor, Smartphone, RotateCcw, Check, Upload, X, Image, Building2, ThumbsUp, ThumbsDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const planLabels: Record<string, string> = {
@@ -68,6 +68,8 @@ export default function PreviewSite() {
   const [done, setDone] = useState(false);
   const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");
   const [elapsed, setElapsed] = useState(0);
+  const [previewId, setPreviewId] = useState<string | null>(null);
+  const [feedbackGiven, setFeedbackGiven] = useState<string | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -193,6 +195,33 @@ export default function PreviewSite() {
       }
 
       setDone(true);
+
+      // Save HTML to storage and record in DB
+      try {
+        let cleaned = fullHtml;
+        if (cleaned.startsWith("```html")) cleaned = cleaned.slice(7);
+        if (cleaned.startsWith("```")) cleaned = cleaned.slice(3);
+        if (cleaned.endsWith("```")) cleaned = cleaned.slice(0, -3);
+        const finalHtml = cleaned.trim();
+
+        const storagePath = `previews/${Date.now()}-${Math.random().toString(36).slice(2)}.html`;
+        const htmlBlob = new Blob([finalHtml], { type: "text/html" });
+        await supabase.storage.from("site-previews").upload(storagePath, htmlBlob, { upsert: true });
+
+        const { data: insertData } = await supabase.from("site_previews").insert({
+          client_name: businessName.trim(),
+          client_phone: phone.trim() || null,
+          segment: segment.trim() || null,
+          slogan: slogan.trim() || null,
+          plan,
+          color_palette: selectedPalette,
+          html_storage_path: storagePath,
+        }).select("id").single();
+
+        if (insertData) setPreviewId(insertData.id);
+      } catch (saveErr) {
+        console.error("Failed to save preview record:", saveErr);
+      }
     } catch (err: any) {
       console.error(err);
       setHtmlContent(`<html><body style="background:#111;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif"><p>${err.message || "Erro ao gerar prévia."}</p></body></html>`);
@@ -203,6 +232,19 @@ export default function PreviewSite() {
       setUploading(false);
     }
   }, [businessName, phone, slogan, cnpj, segment, description, logoFile, bannerFile, galleryFiles, plan, selectedPalette]);
+
+  const handleFeedback = async (type: "like" | "dislike") => {
+    setFeedbackGiven(type);
+    if (previewId) {
+      await supabase.from("site_previews").update({ feedback: type, feedback_at: new Date().toISOString() }).eq("id", previewId);
+    }
+    if (type === "like") {
+      window.open(
+        `https://wa.me/5543991065129?text=${encodeURIComponent(`Olá! Gerei uma prévia do site para "${businessName}" no plano ${plan} e adorei! Quero contratar.`)}`,
+        "_blank"
+      );
+    }
+  };
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -492,24 +534,59 @@ export default function PreviewSite() {
                 </div>
               </div>
 
-              {/* CTA */}
               {done && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="text-center pt-4"
+                  className="text-center pt-6 space-y-4"
                 >
-                  <p className="text-white/50 mb-4">Gostou da prévia? Entre em contato para transformar em realidade!</p>
-                  <motion.a
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    href={`https://wa.me/5543991065129?text=${encodeURIComponent(`Olá! Gerei uma prévia do site para "${businessName}" no plano ${plan} e gostei! Quero contratar.`)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold bg-gradient-to-r from-brand-accent to-brand-accent-deep text-white"
-                  >
-                    Quero meu site assim!
-                  </motion.a>
+                  <p className="text-white/50 text-lg">O que achou da prévia?</p>
+                  {!feedbackGiven ? (
+                    <div className="flex items-center justify-center gap-4">
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => handleFeedback("like")}
+                        className="flex items-center gap-2 px-8 py-4 rounded-2xl font-bold bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors text-lg"
+                      >
+                        <ThumbsUp size={22} /> Adorei!
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => handleFeedback("dislike")}
+                        className="flex items-center gap-2 px-8 py-4 rounded-2xl font-bold bg-white/[0.06] border border-white/10 text-white/50 hover:text-white/70 hover:bg-white/[0.1] transition-colors text-lg"
+                      >
+                        <ThumbsDown size={22} /> Não curti
+                      </motion.button>
+                    </div>
+                  ) : feedbackGiven === "like" ? (
+                    <div className="space-y-3">
+                      <p className="text-emerald-400 font-bold text-lg">🎉 Que ótimo! Redirecionamos você para o WhatsApp!</p>
+                      <p className="text-white/40 text-sm">Caso não tenha aberto, clique abaixo:</p>
+                      <motion.a
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        href={`https://wa.me/5543991065129?text=${encodeURIComponent(`Olá! Gerei uma prévia do site para "${businessName}" no plano ${plan} e adorei! Quero contratar.`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-600 text-white"
+                      >
+                        Abrir WhatsApp
+                      </motion.a>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <p className="text-white/60 font-medium">Obrigado pelo feedback! 🙏</p>
+                      <p className="text-white/30 text-sm">Registramos sua opinião. Quer tentar novamente com outras configurações?</p>
+                      <button
+                        onClick={() => { setHtmlContent(""); setDone(false); setFeedbackGiven(null); setPreviewId(null); }}
+                        className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-white/[0.06] border border-white/10 text-sm text-white/60 hover:text-white transition-colors"
+                      >
+                        <RotateCcw size={14} /> Gerar nova prévia
+                      </button>
+                    </div>
+                  )}
                 </motion.div>
               )}
             </motion.div>
