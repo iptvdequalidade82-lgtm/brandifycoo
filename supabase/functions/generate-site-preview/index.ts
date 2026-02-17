@@ -608,35 +608,68 @@ Gere o site HTML completo agora. APENAS código HTML puro, nada mais.`;
     }
 
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is not configured");
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    
+    let response;
+    let usedFallback = false;
 
-    const geminiModel = planKey === "essencial" ? "gemini-2.5-flash" : "gemini-2.5-pro";
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/openai/chat/completions`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${GEMINI_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: geminiModel,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        stream: true,
-      }),
-    });
+    // 1. Tentar com Gemini (sua chave)
+    if (GEMINI_API_KEY) {
+      const geminiModel = planKey === "essencial" ? "gemini-2.5-flash" : "gemini-2.5-pro";
+      try {
+        response = await fetch(`https://generativelanguage.googleapis.com/v1beta/openai/chat/completions`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${GEMINI_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: geminiModel,
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+            stream: true,
+          }),
+        });
+
+        if (!response.ok && (response.status === 429 || response.status >= 500)) {
+          console.warn(`Gemini API falhou (${response.status}). Tentando fallback para Lovable Cloud AI...`);
+          usedFallback = true;
+        }
+      } catch (err) {
+        console.error("Erro na chamada do Gemini:", err);
+        usedFallback = true;
+      }
+    } else {
+      usedFallback = true;
+    }
+
+    // 2. Fallback para Lovable Cloud AI
+    if (usedFallback || !response || !response.ok) {
+      const lovableModel = planKey === "essencial" ? "google/gemini-2.5-flash" : "google/gemini-2.5-pro";
+      response = await fetch(`https://ai.gateway.lovable.dev/v1/chat/completions`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: lovableModel,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+          stream: true,
+        }),
+      });
+    }
 
     if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Muitas requisições. Tente novamente em alguns segundos." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
       const t = await response.text();
-      console.error("Gemini API error:", response.status, t);
-      return new Response(JSON.stringify({ error: "Erro ao gerar prévia." }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      console.error("AI Gateway error:", response.status, t);
+      return new Response(JSON.stringify({ error: "Erro ao gerar prévia (todos os provedores falharam)." }), {
+        status: response.status, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
