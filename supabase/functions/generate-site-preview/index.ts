@@ -73,7 +73,7 @@ const planPrompts: Record<string, string> = {
 HERO (100vh):
 - Background: gradiente radial enorme (radial-gradient(ellipse 80% 60% at 50% 40%, rgba(accent,0.15), transparent))
 - Se houver imagem hero fornecida, use como background com overlay escuro (background: linear-gradient(180deg, rgba(bg,0.3) 0%, rgba(bg,0.85) 60%, var(--bg) 100%)), position: center, background-size: cover
-- Título GIGANTE: clamp(3.5rem, 8vw, 6rem), font-weight 800, letter-spacing -0.03em
+- Título GRANDE: font-size: clamp(2rem, 5vw, 3.5rem), font-weight 800, letter-spacing -0.03em
 - Uma palavra do título com background: var(--accent-gradient), -webkit-background-clip: text, color: transparent
 - Subtítulo em --muted, max-width 500px, font-size 1.15rem, line-height 1.7
 - UM botão CTA grande: padding 1.25rem 3rem, background var(--accent-gradient), border-radius 9999px, box-shadow 0 0 30px rgba(accent,0.3), hover scale(1.05)
@@ -116,7 +116,7 @@ HERO (100vh):
 - Background multi-camada: gradiente radial grande + padrão SVG sutil do nicho (opacity 0.03) + orb flutuante decorativo (div com blur enorme, position absolute, background accent, opacity 0.08, border-radius 50%, width 400px, height 400px, top -100px, right -100px, animation float 8s ease-in-out infinite)
 - Se houver imagem hero, use como background com overlay cinematográfico: background: linear-gradient(180deg, rgba(bg,0.2) 0%, rgba(bg,0.6) 40%, rgba(bg,0.95) 80%, var(--bg) 100%)
 - Badge no topo: "🚀 Presença Digital Premium" — background rgba(accent,0.1), padding 0.6rem 1.5rem, border-radius 9999px, border 1px solid rgba(accent,0.2), font-size 0.85rem
-- Título MONUMENTAL: clamp(3.5rem, 9vw, 7rem), font-weight 800, letter-spacing -0.04em, line-height 1.05. DUAS palavras-chave com gradient text
+- Título MONUMENTAL: font-size: clamp(2.2rem, 5vw, 4rem), font-weight 800, letter-spacing -0.04em, line-height 1.1. DUAS palavras-chave com gradient text
 - Subtítulo: max-width 550px, font-size 1.2rem, line-height 1.8, color --muted
 - 2 botões: Primário (gradient, glow shadow, hover scale) + Secundário (border 1px solid rgba(accent,0.3), background transparent, hover background rgba(accent,0.1))
 - Stats bar abaixo dos botões: 4 stats em row com dividers (números grandes font-size 1.5rem bold accent, labels pequenos muted)
@@ -182,7 +182,7 @@ HERO (100vh):
   3. Orbs decorativos flutuantes (2-3 divs com blur 120px+, accent gradient, opacity 0.08-0.12, position absolute, animation float com delays diferentes)
   4. Grid pattern sutil (background-image radial-gradient(rgba(accent,0.1) 1px, transparent 1px), background-size 30px 30px, opacity 0.3)
 - Badge animado: ícone ✨ + "Site Premium" — border accent, background rgba(accent,0.08), animação pulse sutil
-- Título ÉPICO: clamp(4rem, 10vw, 8rem), font-weight 900, letter-spacing -0.05em, line-height 1.0. MÚLTIPLAS palavras com gradient text. Pode ter <br> para quebra dramática
+- Título ÉPICO: font-size: clamp(2.5rem, 5vw, 4rem), font-weight 900, letter-spacing -0.04em, line-height 1.1. MÚLTIPLAS palavras com gradient text. Pode ter <br> para quebra dramática
 - Subtítulo sofisticado: font-size 1.3rem, line-height 1.8, max-width 600px, font-weight 300
 - 2 botões PREMIUM: Primário (gradient, padding 1.5rem 3.5rem, border-radius 9999px, box-shadow 0 0 40px rgba(accent,0.4), hover glow intensifica + scale(1.05)) + Ghost (border accent, backdrop-filter blur)
 - Stats impressionantes: 4 stats grandes em row
@@ -343,11 +343,40 @@ REGRAS ABSOLUTAS:
 - Retorne APENAS código HTML completo. NENHUM texto antes ou depois. NENHUM markdown. NENHUM \`\`\`.
 - O HTML deve ser documento completo: <!DOCTYPE html>, <html lang="pt-BR">, <head> com meta viewport e charset, <body>.
 - TODO o CSS inline dentro de <style> no <head>. NÃO use CSS externo exceto Google Fonts.
-- 100% responsivo com @media queries (640px, 768px, 1024px, 1280px).
+- 100% responsivo com @media queries (max-width: 768px) e (max-width: 480px).
 - Google Fonts CDN: Inter (300,400,500,600,700,800) corpo + Playfair Display (600,700,800,700italic) títulos.
 - scroll-behavior: smooth no html.
 - CSS custom properties para TODAS as cores.
 - O HTML DEVE ser extenso e completo — CADA seção descrita deve existir. NÃO simplifique, NÃO corte.
+
+CSS RESET OBRIGATÓRIO NO INÍCIO DO <style> (COPIE EXATAMENTE):
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; width: 100%; max-width: 100vw; -webkit-font-smoothing: antialiased; }
+img { max-width: 100%; height: auto; display: block; }
+
+REGRAS DE LAYOUT CRÍTICAS (NÃO IGNORE):
+- O HEADER fixo DEVE ter z-index: 1000 e height definida (ex: 70px).
+- O HERO DEVE ter padding-top de pelo menos 100px (para não ficar atrás do header fixo).
+- TODOS os containers devem ter max-width: 1280px, margin: 0 auto, padding: 0 1.5rem.
+- NUNCA use width fixo em pixels em textos ou containers — use max-width + width: 100%.
+- Títulos: use clamp() para responsividade MAS com limites SEGUROS:
+  h1: font-size: clamp(2rem, 5vw, 4rem) — NUNCA mais que 4rem no h1!
+  h2: font-size: clamp(1.5rem, 3.5vw, 2.5rem)
+  h3: font-size: clamp(1.1rem, 2vw, 1.5rem)
+- No @media (max-width: 768px): grids viram 1 coluna, padding reduz, font-sizes diminuem.
+- No @media (max-width: 480px): h1 max 1.8rem, h2 max 1.4rem, seções padding 2rem 1rem.
+- Imagens de background: SEMPRE use background-size: cover e background-position: center.
+- Flexbox/Grid com gap em vez de margin para espaçamento entre items.
+- TODAS as seções: width: 100%, overflow: hidden (para evitar scroll horizontal).
+
+PROIBIÇÕES DE LAYOUT:
+- NUNCA use font-size maior que 4rem em NENHUM elemento.
+- NUNCA use position: absolute em textos grandes sem container com position: relative e overflow: hidden.
+- NUNCA use vw para font-size sem clamp() com min e max seguros.
+- NUNCA deixe imagens sem max-width: 100%.
+- NUNCA use float. Use flexbox ou grid.
+- NUNCA coloque SVG icons decorativos sem width e height explícitos.
 
 PALETA DE CORES (:root CSS variables):
 --bg: ${selectedPalette.bg};
@@ -359,12 +388,12 @@ PALETA DE CORES (:root CSS variables):
 --card-bg: ${selectedPalette.cardBg};
 
 QUALIDADE VISUAL MANDATÓRIA:
-- Espaçamento GENEROSO: seções padding clamp(4rem,8vw,8rem) 2rem. Gap 2rem+ nos grids.
-- Tipografia expressiva: h1 clamp(3rem,7vw,6rem) weight 800 letter-spacing -0.03em, h2 clamp(2rem,5vw,3.5rem) weight 700, body 1rem/1.7
-- Cards: padding 2.5rem+, border-radius 1.25rem, border 1px solid rgba(255,255,255,0.06), background var(--card-bg)
-- Botões: padding 1rem 2.5rem+, border-radius 9999px, font-weight 600, transition 0.3s
-- Sombras: 0 20px 60px rgba(0,0,0,0.2) cards, 0 0 40px rgba(accent,0.2) botões
-- Hover em TUDO: translateY(-4px a -10px), border-color accent, shadow intensifica
+- Espaçamento GENEROSO: seções padding clamp(3rem,5vw,5rem) 1.5rem. Gap 1.5rem+ nos grids.
+- Tipografia expressiva: h1 clamp(2rem,5vw,3.5rem) weight 800 letter-spacing -0.03em, h2 clamp(1.5rem,3.5vw,2.5rem) weight 700, body 1rem/1.7
+- Cards: padding 2rem, border-radius 1rem, border 1px solid rgba(255,255,255,0.06), background var(--card-bg)
+- Botões: padding 0.875rem 2rem, border-radius 9999px, font-weight 600, transition 0.3s
+- Sombras: 0 15px 40px rgba(0,0,0,0.2) cards, 0 0 30px rgba(accent,0.2) botões
+- Hover em TUDO: translateY(-4px), border-color accent, shadow intensifica
 - Gradient text: background var(--accent-gradient), -webkit-background-clip: text, -webkit-text-fill-color: transparent
 - Badges: background rgba(accent,0.1), color accent, padding 0.5rem 1.5rem, border-radius 9999px, font-size 0.8rem, font-weight 600, letter-spacing 0.05em, text-transform uppercase
 ${imageInstructions}
