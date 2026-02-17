@@ -56,8 +56,15 @@ export default function AdminPreviews() {
   const handleViewHtml = async (preview: SitePreview) => {
     if (!preview.html_storage_path) return;
     const { data } = supabase.storage.from("site-previews").getPublicUrl(preview.html_storage_path);
-    setViewingHtml(data.publicUrl);
-    setViewingName(preview.client_name);
+    try {
+      const resp = await fetch(data.publicUrl);
+      const html = await resp.text();
+      setViewingHtml(html);
+      setViewingName(preview.client_name);
+    } catch {
+      setViewingHtml("<html><body style='background:#111;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh'><p>Erro ao carregar prévia</p></body></html>");
+      setViewingName(preview.client_name);
+    }
   };
 
   const stats = {
@@ -186,7 +193,7 @@ export default function AdminPreviews() {
                 <X size={18} />
               </button>
             </div>
-            <iframe src={viewingHtml} className="flex-1 w-full bg-white" title="Preview" sandbox="allow-scripts" />
+            <iframe srcDoc={viewingHtml} className="flex-1 w-full bg-white" title="Preview" sandbox="allow-scripts" />
           </div>
         </div>
       )}
