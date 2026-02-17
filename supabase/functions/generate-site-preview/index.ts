@@ -473,6 +473,21 @@ serve(async (req) => {
 
 MENTALIDADE: Você está criando uma PRÉVIA que vai fazer o cliente querer IMEDIATAMENTE contratar a agência. O site precisa ser tão bonito que o cliente pense "Eu PRECISO disso". Não economize em detalhes visuais.
 
+EXIGÊNCIAS DE DESIGN DE ALTO NÍVEL:
+- O design DEVE parecer feito por uma agência premium. Cada pixel importa.
+- Espaçamento generoso e intencional — white space é seu aliado. Seções apertadas são proibidas.
+- Gradientes suaves e sofisticados em vez de cores chapadas. Use transições de 3+ cores nos CTAs.
+- Sombras com profundidade real: combine box-shadow com filter: drop-shadow para efeito tridimensional.
+- Tipografia expressiva: contraste FORTE entre títulos (800-900 weight, tracking apertado) e corpo (300-400 weight, tracking normal).
+- Micro-interações CSS: hover em TODOS os elementos clicáveis com transform + shadow + color transitions simultâneos.
+- Glass morphism sutil: backdrop-filter: blur(20px) saturate(1.5) em cards e headers para profundidade.
+- Bordas luminosas em hover: border-color com transition e glow sutil usando box-shadow rgba(accent).
+- Imagens com tratamento profissional: border-radius generoso (1rem+), overlay gradientes cinematográficos, object-fit: cover perfeito.
+- Seções com backgrounds VARIADOS: alterne entre fundo sólido, gradiente sutil, e imagem com overlay para criar ritmo visual.
+- Elementos decorativos: orbs com blur, linhas diagonais sutis, padrões dot-grid em opacity baixa — tudo para evitar monotonia.
+- O site deve ter "respiro" — NUNCA empilhe elementos sem espaço adequado entre eles.
+- PROIBIDO: design genérico, templates sem personalidade, cores sem harmonia, textos apertados.
+
 REGRAS ABSOLUTAS:
 - Retorne APENAS código HTML completo. NENHUM texto antes ou depois. NENHUM markdown. NENHUM \`\`\`.
 - O HTML deve ser documento completo: <!DOCTYPE html>, <html lang="pt-BR">, <head> com meta viewport e charset, <body>.
