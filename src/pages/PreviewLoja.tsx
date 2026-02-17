@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -93,6 +93,13 @@ export default function PreviewLoja() {
   const [feedbackGiven, setFeedbackGiven] = useState<string | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [previewCount, setPreviewCount] = useState(0);
+
+  useEffect(() => {
+    supabase.from("site_previews").select("id", { count: "exact", head: true }).then(({ count }) => {
+      if (count) setPreviewCount(count);
+    });
+  }, [done]);
 
   const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -153,7 +160,11 @@ export default function PreviewLoja() {
       const productData = [];
       for (const p of validProducts) {
         let imageUrl: string | null = null;
-        if (p.imageFile) imageUrl = await uploadToStorage(p.imageFile, "products");
+        if (p.imageFile) {
+          imageUrl = await uploadToStorage(p.imageFile, "products");
+        } else if (p.imagePreview && p.imagePreview.startsWith("http")) {
+          imageUrl = p.imagePreview;
+        }
         productData.push({
           name: p.name.trim(),
           price: p.price.trim(),
@@ -321,6 +332,29 @@ export default function PreviewLoja() {
                 </h1>
                 <p className="text-white/50">Cadastre seus produtos e veja como sua loja ficará — com vitrine, carrinho e frete simulado.</p>
                 
+                {previewCount > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="mt-3 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.06] border border-white/10"
+                  >
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-accent opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-accent" />
+                    </span>
+                    <span className="text-xs text-white/50">
+                      <motion.span
+                        key={previewCount}
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="font-bold text-white/80"
+                      >
+                        {previewCount}
+                      </motion.span>
+                      {" "}sites já criados
+                    </span>
+                  </motion.div>
+                )}
                 {/* ADM TEST BUTTON - REMOVER DEPOIS */}
                 <button
                   type="button"
@@ -336,13 +370,13 @@ export default function PreviewLoja() {
                     setShippingValue("14,90");
                     setFreeShippingAbove("199,90");
                     setProducts([
-                      { name: "Camiseta Oversized Premium", price: "89,90", category: "Camisetas", imageFile: null, imagePreview: null },
-                      { name: "Calça Cargo Streetwear", price: "179,90", category: "Calças", imageFile: null, imagePreview: null },
-                      { name: "Jaqueta Corta-Vento", price: "249,90", category: "Jaquetas", imageFile: null, imagePreview: null },
-                      { name: "Tênis Urban Runner", price: "329,90", category: "Calçados", imageFile: null, imagePreview: null },
+                      { name: "Camiseta Oversized Premium", price: "89,90", category: "Camisetas", imageFile: null, imagePreview: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop" },
+                      { name: "Calça Cargo Streetwear", price: "179,90", category: "Calças", imageFile: null, imagePreview: "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=400&h=400&fit=crop" },
+                      { name: "Jaqueta Corta-Vento", price: "249,90", category: "Jaquetas", imageFile: null, imagePreview: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&h=400&fit=crop" },
+                      { name: "Tênis Urban Runner", price: "329,90", category: "Calçados", imageFile: null, imagePreview: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop" },
                     ]);
                   }}
-                  className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500/20 border border-red-500/40 text-red-400 text-xs font-bold uppercase tracking-wider hover:bg-red-500/30 transition-colors"
+                  className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-destructive/20 border border-destructive/40 text-destructive text-xs font-bold uppercase tracking-wider hover:bg-destructive/30 transition-colors"
                 >
                   🧪 Preencher Teste (ADM)
                 </button>
