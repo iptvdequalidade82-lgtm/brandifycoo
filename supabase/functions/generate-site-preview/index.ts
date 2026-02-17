@@ -5,11 +5,74 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Unsplash image helper — generates thematic image URLs based on the business segment
+function getSegmentImages(segment: string, businessName: string): { hero: string; about: string; gallery: string[]; team: string; cta: string } {
+  const s = (segment || businessName || "business").toLowerCase().trim();
+  
+  const segmentKeywords: Record<string, string> = {
+    barbearia: "barbershop,barber,haircut",
+    "clínica": "medical-clinic,healthcare,doctor",
+    "clínica odontológica": "dentist,dental-clinic,smile",
+    "odontologia": "dentist,dental,teeth",
+    restaurante: "restaurant,food,dining",
+    pizzaria: "pizza,italian-restaurant,food",
+    hamburgueria: "burger,hamburger,fast-food",
+    "cafeteria": "coffee-shop,cafe,barista",
+    padaria: "bakery,bread,pastry",
+    academia: "gym,fitness,workout",
+    "pet shop": "pet-store,dog-grooming,pets",
+    "veterinária": "veterinary,animal-care,pets",
+    advocacia: "law-office,lawyer,justice",
+    advogado: "law-office,lawyer,legal",
+    contabilidade: "accounting,finance,office",
+    "imobiliária": "real-estate,modern-house,property",
+    arquitetura: "architecture,modern-building,interior-design",
+    "loja de roupas": "fashion-store,clothing,boutique",
+    moda: "fashion,clothing,style",
+    "salão de beleza": "beauty-salon,hairdresser,makeup",
+    "estética": "beauty-treatment,skincare,spa",
+    "oficina mecânica": "auto-repair,mechanic,car-service",
+    "auto center": "car-service,automotive,tire",
+    fotografia: "photography-studio,camera,portrait",
+    "marketing": "digital-marketing,creative-agency,branding",
+    "tecnologia": "technology,coding,startup",
+    construção: "construction,building,architecture",
+    "educação": "education,school,learning",
+    "consultoria": "consulting,business-meeting,strategy",
+    "loja": "retail-store,shopping,products",
+    "floricultura": "flower-shop,florist,bouquet",
+    "joalheria": "jewelry,luxury,diamonds",
+    "hotel": "hotel,luxury-hotel,hospitality",
+    "pousada": "inn,bed-and-breakfast,cozy-lodge",
+  };
+
+  // Find best keyword match
+  let keywords = "professional,business,modern";
+  for (const [key, val] of Object.entries(segmentKeywords)) {
+    if (s.includes(key)) { keywords = val; break; }
+  }
+  const kws = keywords.split(",");
+  const ts = Date.now(); // cache buster
+
+  return {
+    hero: `https://source.unsplash.com/1920x1080/?${encodeURIComponent(kws[0])}&t=${ts}`,
+    about: `https://source.unsplash.com/800x600/?${encodeURIComponent(kws[1] || kws[0])}&t=${ts}1`,
+    gallery: [
+      `https://source.unsplash.com/600x400/?${encodeURIComponent(kws[0])}&t=${ts}2`,
+      `https://source.unsplash.com/600x400/?${encodeURIComponent(kws[1] || kws[0])}&t=${ts}3`,
+      `https://source.unsplash.com/600x400/?${encodeURIComponent(kws[2] || kws[0])}&t=${ts}4`,
+    ],
+    team: `https://source.unsplash.com/600x600/?professional-portrait&t=${ts}5`,
+    cta: `https://source.unsplash.com/1920x600/?${encodeURIComponent(kws[0])}-workspace&t=${ts}6`,
+  };
+}
+
 const planPrompts: Record<string, string> = {
-  essencial: `Crie um site ONE-PAGE IMPRESSIONANTE com 5 seções. Este site precisa parecer que foi feito por uma agência que cobra R$5.000+.
+  essencial: `Crie um site ONE-PAGE IMPRESSIONANTE com 5-6 seções. Este site precisa parecer que foi feito por uma agência que cobra R$5.000+.
 
 HERO (100vh):
 - Background: gradiente radial enorme (radial-gradient(ellipse 80% 60% at 50% 40%, rgba(accent,0.15), transparent))
+- Se houver imagem hero fornecida, use como background com overlay escuro (background: linear-gradient(180deg, rgba(bg,0.3) 0%, rgba(bg,0.85) 60%, var(--bg) 100%)), position: center, background-size: cover
 - Título GIGANTE: clamp(3.5rem, 8vw, 6rem), font-weight 800, letter-spacing -0.03em
 - Uma palavra do título com background: var(--accent-gradient), -webkit-background-clip: text, color: transparent
 - Subtítulo em --muted, max-width 500px, font-size 1.15rem, line-height 1.7
@@ -19,13 +82,14 @@ HERO (100vh):
 
 SOBRE:
 - Layout 2 colunas assimétrico (60/40). Coluna esquerda: título h2 com uma palavra em accent, parágrafo conciso, 3 bullet points com ícone SVG accent + texto
-- Coluna direita: imagem grande com border-radius 1.5rem, box-shadow 0 25px 60px rgba(0,0,0,0.3), rotação leve (transform: rotate(2deg)), borda sutil 1px rgba(accent,0.2)
+- Coluna direita: USAR IMAGEM REAL do segmento (da URL fornecida nos dados de imagem) com border-radius 1.5rem, box-shadow 0 25px 60px rgba(0,0,0,0.3), rotação leve (transform: rotate(2deg)), borda sutil 1px rgba(accent,0.2)
 
 SERVIÇOS:
 - Título centralizado com badge "Nossos Serviços" acima (background rgba(accent,0.1), color accent, padding 0.5rem 1.5rem, border-radius 9999px, font-size 0.85rem, font-weight 600, text-transform uppercase, letter-spacing 0.1em)
 - Grid 3 colunas. Cards com: padding 2.5rem, background var(--card-bg), border 1px solid rgba(255,255,255,0.06), border-radius 1rem
 - Cada card: ícone SVG 48px dentro de div com background var(--accent-gradient) opacity 0.1, border-radius 1rem, padding 1rem + título h3 bold + descrição 2 linhas em --muted
 - Hover: border-color var(--accent), box-shadow 0 0 30px rgba(accent,0.1), transform translateY(-4px)
+- IMPORTANTE: Crie serviços REALISTAS e ESPECÍFICOS para o segmento do cliente. Não invente serviços genéricos.
 
 CONTATO:
 - Layout 2 colunas. Esquerda: título, parágrafo, 3 itens de contato (email, telefone, localização) com ícone SVG accent
@@ -33,152 +97,165 @@ CONTATO:
 - Botão submit fullwidth com gradient
 
 FAQ:
-- 4 perguntas. Cada item: border-bottom 1px solid rgba(255,255,255,0.08), padding 1.5rem 0
+- 4 perguntas RELEVANTES ao segmento (não genéricas). Cada item: border-bottom 1px solid rgba(255,255,255,0.08), padding 1.5rem 0
 - Pergunta: font-weight 600, cursor pointer, display flex justify-content space-between, com ícone + SVG que rota no open
 - Resposta: max-height 0 overflow hidden transition, color --muted
 
 HEADER: position fixed, backdrop-filter blur(20px), background rgba(bg,0.8), border-bottom 1px solid rgba(255,255,255,0.06). Logo + 4 nav links (hover: color accent) + botão CTA pequeno com gradient.
-FOOTER: background rgba(255,255,255,0.02), border-top 1px solid rgba(255,255,255,0.06). Logo + links + redes sociais (ícones SVG em circles hover accent). Copyright com CNPJ se fornecido.`,
+FOOTER: background rgba(255,255,255,0.02), border-top 1px solid rgba(255,255,255,0.06). Logo + links + redes sociais (ícones SVG em circles hover accent). Copyright com CNPJ se fornecido.
 
-  profissional: `Crie um site ONE-PAGE de ALTÍSSIMO NÍVEL com 7 seções. O objetivo é que o cliente veja e QUEIRA IMEDIATAMENTE contratar. Padrão Awwwards / Dribbble / sites de agências de R$15.000+.
+CRIATIVIDADE OBRIGATÓRIA:
+- Adapte TODA a linguagem, ícones e serviços ao segmento específico do negócio
+- Use termos do nicho do cliente (ex: para barbearia use "corte", "barba", "degradê"; para clínica use "consulta", "tratamento", "cuidado")
+- Os depoimentos devem parecer reais e mencionar serviços específicos do negócio
+- O FAQ deve responder dúvidas REAIS que clientes desse segmento teriam`,
+
+  profissional: `Crie um site ONE-PAGE de ALTÍSSIMO NÍVEL com 7-8 seções. O objetivo é que o cliente veja e QUEIRA IMEDIATAMENTE contratar. Padrão Awwwards / Dribbble / sites de agências de R$15.000+.
 
 HERO (100vh):
 - Background multi-camada: gradiente radial grande + padrão SVG sutil do nicho (opacity 0.03) + orb flutuante decorativo (div com blur enorme, position absolute, background accent, opacity 0.08, border-radius 50%, width 400px, height 400px, top -100px, right -100px, animation float 8s ease-in-out infinite)
+- Se houver imagem hero, use como background com overlay cinematográfico: background: linear-gradient(180deg, rgba(bg,0.2) 0%, rgba(bg,0.6) 40%, rgba(bg,0.95) 80%, var(--bg) 100%)
 - Badge no topo: "🚀 Presença Digital Premium" — background rgba(accent,0.1), padding 0.6rem 1.5rem, border-radius 9999px, border 1px solid rgba(accent,0.2), font-size 0.85rem
-- Título MONUMENTAL: clamp(3.5rem, 9vw, 7rem), font-weight 800, letter-spacing -0.04em, line-height 1.05. DUAS palavras-chave com gradient text (background: var(--accent-gradient), -webkit-background-clip: text, color: transparent)
+- Título MONUMENTAL: clamp(3.5rem, 9vw, 7rem), font-weight 800, letter-spacing -0.04em, line-height 1.05. DUAS palavras-chave com gradient text
 - Subtítulo: max-width 550px, font-size 1.2rem, line-height 1.8, color --muted
 - 2 botões: Primário (gradient, glow shadow, hover scale) + Secundário (border 1px solid rgba(accent,0.3), background transparent, hover background rgba(accent,0.1))
 - Stats bar abaixo dos botões: 4 stats em row com dividers (números grandes font-size 1.5rem bold accent, labels pequenos muted)
 - Scroll indicator com animação bounce
 
-MARQUEE (opcional se couber):
+MARQUEE:
 - Faixa com scroll infinito CSS (@keyframes scroll: translateX(0) → translateX(-50%))
-- Logos de tecnologias ou parceiros em grayscale, opacity 0.4, gap 4rem
+- Textos ou parceiros em grayscale, opacity 0.4, gap 4rem
 - Divisores top/bottom com border 1px solid rgba(255,255,255,0.05)
 
 SOBRE:
 - Grid 2 colunas assimétrico. Esquerda: badge "Sobre Nós", título h2 impactante com palavra accent, 2 parágrafos curtos, 4 features em grid 2x2 (ícone accent + texto curto)
-- Direita: imagem com moldura complexa (border-radius 1.5rem, sombra dramática, borda accent sutil, e um elemento decorativo floating atrás — div com gradient, blur, position absolute, z-index -1)
+- Direita: IMAGEM REAL DO SEGMENTO com moldura complexa (border-radius 1.5rem, sombra dramática, borda accent sutil, e um elemento decorativo floating atrás — div com gradient, blur, position absolute, z-index -1)
+- Incluir bloco "Missão e Valores" — 3 cards pequenos com ícone + título + texto curto (Ex: Excelência, Confiança, Inovação) adaptados ao segmento
 
 SERVIÇOS:
 - Badge centralizado + título + subtítulo muted
 - Grid 3 colunas. Cards PREMIUM: padding 3rem, background var(--card-bg), border 1px solid rgba(255,255,255,0.06), border-radius 1.25rem
 - Ícone dentro de circle gradient (width 64px, height 64px, border-radius 1rem, background var(--accent-gradient), display flex align-items center justify-content center)
-- Ícone SVG em branco (stroke: white)
 - Título h3 + descrição + link "Saiba mais →" em accent
 - Hover: translateY(-8px), border-color accent, box-shadow 0 20px 60px rgba(accent,0.15)
+- SERVIÇOS 100% PERSONALIZADOS ao segmento. Se for barbearia: Corte Degradê, Barba Completa, etc. Se for clínica: Consulta, Exames, etc.
 
-PORTFÓLIO:
+PORTFÓLIO / GALERIA:
 - Badge + título
-- Grid 2x2 com aspect-ratio 16/10. Imagens com object-fit cover + overlay gradient (transparent → rgba(0,0,0,0.8) bottom)
+- Grid 2x2 com aspect-ratio 16/10. USAR IMAGENS REAIS fornecidas ou do segmento
 - Sobre o overlay: título do projeto + 2-3 tags (background rgba(accent,0.2), color accent-light, padding 0.3rem 0.8rem, border-radius 9999px, font-size 0.75rem)
-- Hover: overlay sobe, scale(1.05) na imagem, aparece botão "Ver Projeto"
+- Hover: overlay sobe, scale(1.05) na imagem, aparece botão "Ver Mais"
 
 DEPOIMENTOS:
 - Background section diferenciado (rgba(accent,0.03))
-- 1 depoimento DESTAQUE grande centralizado: citação com aspas decorativas SVG (font-size 4rem, accent, opacity 0.3), texto em itálico font-size 1.25rem, foto circular + nome + cargo abaixo
+- 1 depoimento DESTAQUE grande centralizado: citação com aspas decorativas SVG, texto em itálico font-size 1.25rem, foto circular + nome + cargo abaixo
 - 3 cards menores abaixo em grid: foto circular 48px + estrelas douradas (#FFD700) + texto + nome/cargo
+- DEPOIMENTOS REALISTAS mencionando serviços específicos do negócio e experiências do dia a dia
 
 CONTATO:
-- Grid 2 colunas. Esquerda: título, subtítulo, 4 itens info (ícone accent em circle rgba(accent,0.1) + label + valor). Abaixo: mapa embed ou box decorativo
-- Direita: form com floating labels (label position absolute, top 1rem, transition, input:focus label top -0.5rem font-size 0.8rem color accent). Inputs estilizados premium. Botão gradient fullwidth com ícone →
+- Grid 2 colunas. Esquerda: título, subtítulo, 4 itens info (ícone accent em circle rgba(accent,0.1) + label + valor). WhatsApp com link direto.
+- Direita: form com floating labels. Inputs estilizados premium. Botão gradient fullwidth com ícone →
 
 FAQ:
-- 5 perguntas accordion. Design premium: cards separados com background card-bg, border-radius 1rem, margin-bottom 0.75rem
-- Toggle com ícone + rotação. Resposta com padding, color muted
+- 5 perguntas accordion ESPECÍFICAS DO SEGMENTO. Design premium: cards separados com background card-bg, border-radius 1rem, margin-bottom 0.75rem
 
-HEADER: fixed, height 70px, backdrop-filter blur(25px), background rgba(bg,0.85), border-bottom 1px solid rgba(255,255,255,0.06). Logo + nav links com underline accent (::after width 0 → 100% no hover, height 2px, background accent-gradient) + CTA button gradient
-FOOTER: 4 colunas (brand+desc, links, serviços, contato). Newsletter input. Social icons em circles. Copyright bar separada. Se CNPJ fornecido, exibir.
+HEADER: fixed, height 70px, backdrop-filter blur(25px), background rgba(bg,0.85), border-bottom 1px solid rgba(255,255,255,0.06). Logo + nav links com underline accent + CTA button gradient
+FOOTER: 4 colunas (brand+desc, links, serviços, contato). Social icons em circles. Copyright bar separada.
 
 EFEITOS CSS OBRIGATÓRIOS:
-- @keyframes fadeInUp { from { opacity:0; transform:translateY(40px) } to { opacity:1; transform:translateY(0) } }
-- @keyframes float { 0%,100% { transform:translateY(0) } 50% { transform:translateY(-20px) } }
-- .animate-in: animation fadeInUp 0.8s ease both
-- JavaScript: IntersectionObserver que adiciona class 'animate-in' quando seção entra na viewport (threshold 0.1)
+- @keyframes fadeInUp, float, scroll (marquee)
+- IntersectionObserver que adiciona class visible quando seção entra na viewport
 - Smooth scroll nos links de navegação
-- Hover transitions em TODOS os elementos interativos (0.3s ease)`,
+- Hover transitions em TODOS os elementos interativos (0.3s ease)
+
+CRIATIVIDADE OBRIGATÓRIA:
+- O site INTEIRO deve respirar o segmento do cliente. Um site de barbearia deve ter vibe masculina e estilosa. Um site de clínica deve transmitir confiança e limpeza. Um site de restaurante deve dar água na boca.
+- Use terminologia do nicho em TUDO: títulos, descrições, FAQs, depoimentos
+- Cada depoimento deve mencionar um serviço real e uma experiência crível`,
 
   premium: `Crie um site ONE-PAGE CINEMATOGRÁFICO e ESPETACULAR com 9+ seções. Este é o nível mais alto — deve parecer um site de R$30.000+ feito por agência internacional. O cliente precisa ficar DE QUEIXO CAÍDO.
 
 HERO (100vh):
 - Background ÉPICO multi-camada:
-  1. Gradiente base (radial-gradient(ellipse 90% 70% at 50% 30%, rgba(accent,0.2), transparent 70%))
-  2. Segundo orb decorativo (position absolute, width 500px, height 500px, background var(--accent-gradient), filter blur(120px), opacity 0.12, top -150px, right -100px, animation float 10s ease-in-out infinite)
-  3. Terceiro orb menor (left side, accent-light color, animation com delay)
+  1. Se houver imagem hero: usar como fullscreen background com overlay cinematográfico complexo: background: linear-gradient(180deg, rgba(bg,0.1) 0%, rgba(bg,0.4) 30%, rgba(bg,0.8) 60%, var(--bg) 100%), com vignette radial adicional
+  2. Gradiente radial (radial-gradient(ellipse 90% 70% at 50% 30%, rgba(accent,0.2), transparent 70%))
+  3. Orbs decorativos flutuantes (2-3 divs com blur 120px+, accent gradient, opacity 0.08-0.12, position absolute, animation float com delays diferentes)
   4. Grid pattern sutil (background-image radial-gradient(rgba(accent,0.1) 1px, transparent 1px), background-size 30px 30px, opacity 0.3)
 - Badge animado: ícone ✨ + "Site Premium" — border accent, background rgba(accent,0.08), animação pulse sutil
 - Título ÉPICO: clamp(4rem, 10vw, 8rem), font-weight 900, letter-spacing -0.05em, line-height 1.0. MÚLTIPLAS palavras com gradient text. Pode ter <br> para quebra dramática
 - Subtítulo sofisticado: font-size 1.3rem, line-height 1.8, max-width 600px, font-weight 300
 - 2 botões PREMIUM: Primário (gradient, padding 1.5rem 3.5rem, border-radius 9999px, box-shadow 0 0 40px rgba(accent,0.4), hover glow intensifica + scale(1.05)) + Ghost (border accent, backdrop-filter blur)
-- Stats impressionantes: 4 stats grandes em row (números clamp(2rem,4vw,3rem), accent color, labels muted, dividers estilizados)
+- Stats impressionantes: 4 stats grandes em row
 - Mouse scroll indicator com animation bounce + pulse
 
 MARQUEE DE PARCEIROS/TECH:
 - Faixa fullwidth com @keyframes marquee (translateX(0) → translateX(-50%)), 20s linear infinite
 - Ícones/logos em grayscale filter, opacity 0.4, hover: grayscale(0) opacity(1)
-- Border top/bottom rgba(255,255,255,0.05)
 - Duplicar conteúdo para loop seamless
 
 SOBRE (com WOW factor):
 - Badge + título épico com accent word
 - Layout offset: texto esquerda (55%), imagem direita com composição complexa:
-  - Imagem principal com border-radius 2rem, box-shadow dramática (0 30px 80px rgba(0,0,0,0.4))
-  - Floating badge SOBRE a imagem (position absolute, bottom -20px, left -20px, background var(--bg), padding 1.5rem 2rem, border-radius 1rem, border 1px accent, shadow): número destaque + label (ex: "8+ Anos de Experiência")
-  - Elemento decorativo pontilhado atrás (border 2px dashed rgba(accent,0.2), border-radius 2rem, position absolute, inset -15px, z-index -1)
+  - IMAGEM REAL DO SEGMENTO com border-radius 2rem, box-shadow dramática
+  - Floating badge SOBRE a imagem (position absolute, bottom -20px, left -20px): número destaque + label (ex: "8+ Anos de Experiência")
+  - Elemento decorativo pontilhado atrás
+- Bloco "Nossa Essência": Missão, Visão e Valores em 3 cards elegantes com ícones temáticos do segmento
 - 4 features em lista com ícones accent checks
 
 SERVIÇOS (grid impactante):
-- Badge + título + subtítulo
-- Grid 2x3 cards com hover PREMIUM:
-  - Normal: padding 3rem, background card-bg, border rgba(255,255,255,0.06), border-radius 1.5rem
-  - Ícone: 64px circle com gradient background, ícone SVG white dentro
-  - Número do serviço: "01", "02"... em accent, font-size 3rem, opacity 0.1, position absolute top-right
-  - Título + descrição + "Saiba mais →" link
-  - HOVER: translateY(-10px), background gradient sutil, border-color accent, shadow dramática (0 25px 80px rgba(accent,0.2)), o ícone circle scale(1.1)
+- Grid 2x3 cards com hover PREMIUM
+- Número do serviço: "01", "02"... em accent, font-size 3rem, opacity 0.1, position absolute top-right
+- HOVER: translateY(-10px), background gradient sutil, border-color accent, shadow dramática
+- SERVIÇOS ULTRA-ESPECÍFICOS ao segmento com descrições detalhadas e benefícios
 
-PORTFÓLIO (showcase premium):
-- Badge + título
+PORTFÓLIO / GALERIA (showcase premium):
 - Layout alternado: projetos pares (imagem esquerda, texto direita) e ímpares (inverso)
-- Cada projeto: imagem com border-radius 1.5rem + aspect-ratio 16/10, ao lado: tag de categoria (accent pill), título h3, descrição curta, lista de tecnologias em tags, botão "Ver Projeto"
-- Imagem hover: scale(1.03), shadow aumenta
+- USAR TODAS AS IMAGENS REAIS disponíveis. Se não houver, usar imagens temáticas do segmento
+- Cada projeto: imagem com border-radius 1.5rem, tag de categoria, título h3, descrição curta, botão "Ver Projeto"
 
 NÚMEROS/RESULTADOS:
-- Background diferenciado: gradiente de accent super sutil + border top/bottom
-- Grid 4 colunas com números IMPACTANTES
-- Cada: número grande (font-size clamp(2.5rem,5vw,4rem), font-weight 900, accent gradient text) + label muted + ícone SVG pequeno
-- Dividers verticais estilizados entre items
+- Background diferenciado com gradiente accent sutil
+- Grid 4 colunas com números IMPACTANTES e RELEVANTES ao segmento
+- Números grandes accent gradient text + label muted + ícone SVG
 
 DEPOIMENTOS (social proof premium):
-- Quote destaque GRANDE: aspas decorativas SVG gigantes (accent, opacity 0.15), texto citação em Playfair Display italic font-size 1.5rem, line-height 1.8
-- Abaixo: foto circular 64px com border accent + nome bold + cargo muted + estrelas ★★★★★ (#FFD700)
-- Slider dots abaixo (3 dots, active = accent, others = muted opacity 0.3)
+- Quote destaque GRANDE com aspas decorativas SVG gigantes
 - 3 cards secundários em row abaixo
+- DEPOIMENTOS ULTRA-REALISTAS com nomes brasileiros, mencionando serviços ESPECÍFICOS, e sentimentos reais
 
 CTA SECTION (antes do contato):
 - Background: gradiente accent intenso ou imagem com overlay
-- Título grande branco, subtítulo, botão CTA ENORME branco com texto escuro
-- Simples e impactante. Gera urgência.
+- Título grande branco, subtítulo com urgência sutil e elegante, botão CTA ENORME
+- Frase de impacto que conecte com o segmento (ex: para barbearia: "Seu estilo merece o melhor")
 
 CONTATO (premium):
-- Grid 2 colunas. Esquerda: título épico, subtítulo, 4 info cards (ícone em circle accent bg + label + valor, cada um com border-radius, padding, background card-bg)
-- Direita: form PREMIUM com floating labels, inputs com focus ring accent, textarea, checkbox terms, botão gradient com ícone e hover glow
+- Grid 2 colunas. Esquerda: título épico, subtítulo, 4 info cards com ícone + label + valor
+- WhatsApp com link direto e destaque visual
+- Direita: form PREMIUM com floating labels, inputs com focus ring accent, botão gradient com ícone
 
 FAQ:
-- 6 perguntas em cards individuais (background card-bg, border-radius 1.25rem, margin-bottom 1rem)
-- Click toggle: ícone rota, resposta expande com max-height transition
-- JavaScript para toggle
+- 6 perguntas em cards individuais — PERGUNTAS REAIS do segmento
+- Click toggle com animação suave
 
-HEADER: fixed, height 72px, backdrop-filter blur(30px) saturate(1.5), background rgba(bg,0.8), border-bottom rgba(255,255,255,0.05). Logo + nav links com ::after underline animation + CTA gradient pill. Scroll: background more opaque.
-FOOTER ÉPICO: background linear-gradient(to bottom, var(--bg), darken). 4 colunas. Newsletter com input+button inline. Social icons. Awards/badges. Copyright bar com CNPJ.
+HEADER: fixed, height 72px, backdrop-filter blur(30px) saturate(1.5), background rgba(bg,0.8), border-bottom rgba(255,255,255,0.05). Logo + nav links + CTA gradient pill.
+FOOTER ÉPICO: 4 colunas. Newsletter. Social icons. Copyright bar com CNPJ.
 
 EFEITOS OBRIGATÓRIOS:
 - @keyframes fadeInUp, fadeIn, float, pulse, marquee
-- IntersectionObserver em todas as seções (class .animate-in com stagger delays: children nth-child(1) delay 0s, nth-child(2) 0.1s, etc.)
+- IntersectionObserver com stagger delays
 - Smooth scroll
-- Parallax sutil no hero (transform translateY com scroll listener leve)
-- Cursor glow sutil (div 200px blur seguindo o mouse, accent color, opacity 0.05) — via JS mousemove
+- Parallax sutil no hero
+- Cursor glow sutil (div 200px blur seguindo o mouse)
 - Hover effects em TODOS os elementos interativos
-- Prefers-reduced-motion: desabilitar animações`
+- Prefers-reduced-motion: desabilitar animações
+
+CRIATIVIDADE PREMIUM OBRIGATÓRIA:
+- O site deve contar uma HISTÓRIA sobre o negócio, não apenas listar informações
+- A linguagem deve transmitir autoridade e confiança absolutas
+- Cada seção deve ter uma transição visual elegante para a próxima
+- Use metáforas e copy sofisticada do nicho
+- Depoimentos com histórias mini-narrativas (ex: "Cheguei sem saber o que queria e saí com o melhor corte da minha vida")
+- O CTA final deve criar desejo, não pressão`
 };
 
 serve(async (req) => {
@@ -216,6 +293,9 @@ serve(async (req) => {
 
     const selectedPalette = palettes[colorPalette || "midnight"] || palettes.midnight;
 
+    // Get segment-based stock images
+    const segmentImages = getSegmentImages(segment || "", businessName || "");
+
     // Build image instructions
     let imageInstructions = "";
 
@@ -227,6 +307,8 @@ serve(async (req) => {
 
     if (bannerUrl) {
       imageInstructions += `\nBANNER HERO: Use esta imagem real como background do hero: ${bannerUrl}. Aplique um overlay escuro semi-transparente (background: linear-gradient(to bottom, rgba(0,0,0,0.6), var(--bg))) para manter legibilidade do texto. A imagem deve cobrir todo o hero com object-fit: cover.`;
+    } else {
+      imageInstructions += `\nIMAGEM HERO SUGERIDA: Use esta URL como imagem de fundo do hero com overlay escuro: ${segmentImages.hero}. Aplique overlay: background: linear-gradient(180deg, rgba(bg,0.3) 0%, rgba(bg,0.7) 50%, var(--bg) 100%). Se a imagem não carregar, use gradientes puros.`;
     }
 
     if (galleryUrls && galleryUrls.length > 0) {
@@ -235,7 +317,15 @@ serve(async (req) => {
         imageInstructions += `\n  - Foto ${i + 1}: ${url}`;
       });
       imageInstructions += `\nDistribua estas fotos nas seções mais visuais (portfólio, sobre, galeria, depoimentos). Use object-fit: cover e border-radius.`;
-      imageInstructions += `\nIMPORTANTE: Priorize SEMPRE as fotos reais do cliente. Só use https://placehold.co para imagens que faltarem.`;
+      imageInstructions += `\nIMPORTANTE: Priorize SEMPRE as fotos reais do cliente. Só use imagens temáticas para imagens que faltarem.`;
+    } else {
+      imageInstructions += `\nIMAGENS TEMÁTICAS DO SEGMENTO — Use estas URLs de imagens profissionais para enriquecer o site:`;
+      imageInstructions += `\n  - Seção Sobre: ${segmentImages.about}`;
+      segmentImages.gallery.forEach((url, i) => {
+        imageInstructions += `\n  - Galeria/Portfólio ${i + 1}: ${url}`;
+      });
+      imageInstructions += `\n  - CTA/Background: ${segmentImages.cta}`;
+      imageInstructions += `\nUse object-fit: cover, border-radius, e overlays quando necessário. Se alguma imagem não carregar, use https://placehold.co como fallback com dimensões adequadas.`;
     }
 
     // Build business info
