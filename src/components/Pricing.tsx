@@ -142,10 +142,10 @@ export default function Pricing() {
           className="absolute inset-0 md:hidden"
           style={{
             backgroundImage: `url(${earthMoonBg})`,
-            backgroundSize: '900px auto',
-            backgroundPosition: 'center top',
-            backgroundRepeat: 'repeat-y',
-            opacity: 0.45,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            opacity: 0.35,
             maskImage: 'linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)',
             WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)',
           }}
