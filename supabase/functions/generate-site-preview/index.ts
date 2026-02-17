@@ -6,73 +6,179 @@ const corsHeaders = {
 };
 
 const planPrompts: Record<string, string> = {
-  essencial: `Crie um site ONE-PAGE limpo e moderno com 5 seções bem espaçadas (Hero, Sobre, Serviços, Contato, FAQ).
+  essencial: `Crie um site ONE-PAGE IMPRESSIONANTE com 5 seções. Este site precisa parecer que foi feito por uma agência que cobra R$5.000+.
 
-PRINCÍPIOS DE DESIGN — Inspire-se em sites de agências digitais premium:
-- MUITO espaço em branco entre seções (padding: 8rem 2rem mínimo)
-- Poucos elementos por seção — cada seção tem UM propósito claro
-- Tipografia grande e impactante, sem excesso de texto
-- Layout limpo, respirado, sem acúmulo de informações
+HERO (100vh):
+- Background: gradiente radial enorme (radial-gradient(ellipse 80% 60% at 50% 40%, rgba(accent,0.15), transparent))
+- Título GIGANTE: clamp(3.5rem, 8vw, 6rem), font-weight 800, letter-spacing -0.03em
+- Uma palavra do título com background: var(--accent-gradient), -webkit-background-clip: text, color: transparent
+- Subtítulo em --muted, max-width 500px, font-size 1.15rem, line-height 1.7
+- UM botão CTA grande: padding 1.25rem 3rem, background var(--accent-gradient), border-radius 9999px, box-shadow 0 0 30px rgba(accent,0.3), hover scale(1.05)
+- Abaixo do CTA: uma fila de 3 mini-stats (ex: "100+ Clientes", "5★ Avaliação", "Desde 2020") com ícones SVG, separados por dividers verticais
+- Scroll indicator animado no bottom (bouncing chevron)
 
-ESTRUTURA:
-1. **HERO** — 100vh. Título enorme (clamp(3rem, 7vw, 5.5rem)) com apenas 1 linha de destaque. Subtítulo curto (máximo 15 palavras). UM único botão CTA. Fundo com gradiente radial sutil.
-2. **SOBRE** — Texto breve (máximo 3 frases) + uma imagem placeholder grande. Layout simples, 2 colunas no desktop.
-3. **SERVIÇOS** — Grid 3 colunas. Cards minimalistas: ícone SVG + título + 1 frase. Sem excesso de informação.
-4. **CONTATO** — Formulário simples (nome, email, mensagem). Design clean com inputs underline.
-5. **FAQ** — 4 perguntas no máximo. Accordion simples.
+SOBRE:
+- Layout 2 colunas assimétrico (60/40). Coluna esquerda: título h2 com uma palavra em accent, parágrafo conciso, 3 bullet points com ícone SVG accent + texto
+- Coluna direita: imagem grande com border-radius 1.5rem, box-shadow 0 25px 60px rgba(0,0,0,0.3), rotação leve (transform: rotate(2deg)), borda sutil 1px rgba(accent,0.2)
 
-NAVEGAÇÃO: Header fixo glassmorphism, logo + 4 links + CTA. Sem excessos.
-FOOTER: Mínimo — copyright + telefone + redes sociais.`,
+SERVIÇOS:
+- Título centralizado com badge "Nossos Serviços" acima (background rgba(accent,0.1), color accent, padding 0.5rem 1.5rem, border-radius 9999px, font-size 0.85rem, font-weight 600, text-transform uppercase, letter-spacing 0.1em)
+- Grid 3 colunas. Cards com: padding 2.5rem, background var(--card-bg), border 1px solid rgba(255,255,255,0.06), border-radius 1rem
+- Cada card: ícone SVG 48px dentro de div com background var(--accent-gradient) opacity 0.1, border-radius 1rem, padding 1rem + título h3 bold + descrição 2 linhas em --muted
+- Hover: border-color var(--accent), box-shadow 0 0 30px rgba(accent,0.1), transform translateY(-4px)
 
-  profissional: `Crie um site ONE-PAGE sofisticado com 7 seções espaçadas e bem organizadas (Hero, Sobre, Serviços, Portfólio, Depoimentos, Contato, FAQ).
+CONTATO:
+- Layout 2 colunas. Esquerda: título, parágrafo, 3 itens de contato (email, telefone, localização) com ícone SVG accent
+- Direita: formulário com inputs (background rgba(255,255,255,0.05), border 1px solid rgba(255,255,255,0.1), border-radius 0.75rem, padding 1rem 1.25rem, font-size 1rem). Focus: border-color var(--accent), box-shadow 0 0 0 3px rgba(accent,0.15)
+- Botão submit fullwidth com gradient
 
-PRINCÍPIOS DE DESIGN — Inspire-se em sites premiados de agências digitais como Brandify, Awwwards winners:
-- Espaçamento GENEROSO entre seções (padding: 8rem 2rem mínimo, gap amplo)
-- Cada seção respira — poucos elementos, muita presença visual
-- Tipografia expressiva: títulos grandes, subtítulos discretos
-- Cards com bastante padding interno, borders sutis, glassmorphism leve
-- NÃO acumule muitos elementos — qualidade > quantidade
+FAQ:
+- 4 perguntas. Cada item: border-bottom 1px solid rgba(255,255,255,0.08), padding 1.5rem 0
+- Pergunta: font-weight 600, cursor pointer, display flex justify-content space-between, com ícone + SVG que rota no open
+- Resposta: max-height 0 overflow hidden transition, color --muted
 
-ESTRUTURA:
-1. **HERO** — 100vh. Título grandioso (clamp(3rem, 8vw, 6rem)) com gradiente de texto na palavra-chave. Subtítulo curto. Dois botões (primário + outline). Badge sutil no topo.
-2. **SOBRE** — Layout 2 colunas assimétrico. Texto conciso (máx 4 frases) com 3 stats inline (ex: "5+ Anos", "200 Clientes", "98% Satisfação"). Imagem com border-radius.
-3. **SERVIÇOS** — Grid 3 colunas com cards glassmorphism. Cada card: ícone SVG + título + descrição curta (2 linhas máx). Hover com borda accent.
-4. **PORTFÓLIO** — Grid 2x2 com projetos. Imagem + overlay no hover com título. Simples e elegante.
-5. **DEPOIMENTOS** — 3 cards de depoimentos. Foto circular, nome, cargo, texto curto em itálico. Estrelas douradas.
-6. **CONTATO** — Layout 2 colunas: formulário clean + informações de contato com ícones.
-7. **FAQ** — 5 perguntas em accordion com transição suave.
+HEADER: position fixed, backdrop-filter blur(20px), background rgba(bg,0.8), border-bottom 1px solid rgba(255,255,255,0.06). Logo + 4 nav links (hover: color accent) + botão CTA pequeno com gradient.
+FOOTER: background rgba(255,255,255,0.02), border-top 1px solid rgba(255,255,255,0.06). Logo + links + redes sociais (ícones SVG em circles hover accent). Copyright com CNPJ se fornecido.`,
 
-NAVEGAÇÃO: Header fixo com backdrop-blur, logo + links com underline animado + botão CTA gradient. Menu mobile clean.
-FOOTER: 3 colunas (brand, links, contato). Copyright bar separada.`,
+  profissional: `Crie um site ONE-PAGE de ALTÍSSIMO NÍVEL com 7 seções. O objetivo é que o cliente veja e QUEIRA IMEDIATAMENTE contratar. Padrão Awwwards / Dribbble / sites de agências de R$15.000+.
 
-  premium: `Crie um site ONE-PAGE cinematográfico com 9 seções (Hero, Marquee, Sobre, Serviços, Portfólio, Números, Depoimentos, Contato, FAQ) e efeitos visuais premium.
+HERO (100vh):
+- Background multi-camada: gradiente radial grande + padrão SVG sutil do nicho (opacity 0.03) + orb flutuante decorativo (div com blur enorme, position absolute, background accent, opacity 0.08, border-radius 50%, width 400px, height 400px, top -100px, right -100px, animation float 8s ease-in-out infinite)
+- Badge no topo: "🚀 Presença Digital Premium" — background rgba(accent,0.1), padding 0.6rem 1.5rem, border-radius 9999px, border 1px solid rgba(accent,0.2), font-size 0.85rem
+- Título MONUMENTAL: clamp(3.5rem, 9vw, 7rem), font-weight 800, letter-spacing -0.04em, line-height 1.05. DUAS palavras-chave com gradient text (background: var(--accent-gradient), -webkit-background-clip: text, color: transparent)
+- Subtítulo: max-width 550px, font-size 1.2rem, line-height 1.8, color --muted
+- 2 botões: Primário (gradient, glow shadow, hover scale) + Secundário (border 1px solid rgba(accent,0.3), background transparent, hover background rgba(accent,0.1))
+- Stats bar abaixo dos botões: 4 stats em row com dividers (números grandes font-size 1.5rem bold accent, labels pequenos muted)
+- Scroll indicator com animação bounce
 
-PRINCÍPIOS DE DESIGN — Sites de agência digital de alto nível, estilo Brandify/Awwwards:
-- Espaçamento MUITO generoso — cada seção é quase uma página inteira
-- Poucos elementos por seção, mas cada um com máxima presença visual
-- Tipografia cinematográfica: títulos enormes, textos curtos e poderosos
-- Efeitos CSS sofisticados mas não excessivos
-- EQUILÍBRIO — cada seção deve ter no máximo 3-4 elementos principais
+MARQUEE (opcional se couber):
+- Faixa com scroll infinito CSS (@keyframes scroll: translateX(0) → translateX(-50%))
+- Logos de tecnologias ou parceiros em grayscale, opacity 0.4, gap 4rem
+- Divisores top/bottom com border 1px solid rgba(255,255,255,0.05)
 
-ESTRUTURA:
-1. **HERO** — 100vh com gradiente animado (@keyframes). Título épico (clamp(3.5rem, 8vw, 7rem)) com gradient text. Subtítulo curto. Dois botões CTA com glow. Scroll indicator no bottom.
-2. **MARQUEE** — Faixa de scroll infinito com nomes de parceiros/tecnologias. Estilo minimalista.
-3. **SOBRE** — Texto impactante (máx 3 frases) + stats grandes inline. Uma imagem hero com parallax.
-4. **SERVIÇOS** — Grid 2x3 cards glassmorphism. Ícone gradient + título + descrição curta. Hover com elevação.
-5. **PORTFÓLIO** — 4 projetos em cards grandes alternando (imagem esq/dir). Título + tags. Hover sofisticado.
-6. **NÚMEROS** — 4 métricas grandes com ícones. Layout horizontal. Background diferenciado.
-7. **DEPOIMENTOS** — Quote grande centralizado + 3 cards menores de depoimentos. Clean e elegante.
-8. **CONTATO** — Formulário premium com floating labels + info cards ao lado.
-9. **FAQ** — 6 perguntas em accordion premium.
+SOBRE:
+- Grid 2 colunas assimétrico. Esquerda: badge "Sobre Nós", título h2 impactante com palavra accent, 2 parágrafos curtos, 4 features em grid 2x2 (ícone accent + texto curto)
+- Direita: imagem com moldura complexa (border-radius 1.5rem, sombra dramática, borda accent sutil, e um elemento decorativo floating atrás — div com gradient, blur, position absolute, z-index -1)
 
-NAVEGAÇÃO: Header ultra-premium com blur, links com underline ::after, CTA com glow. Mobile: fullscreen menu staggered.
-FOOTER: 4 colunas (brand, nav, serviços, contato). CTA "Comece seu projeto". Social links. Copyright bar.
+SERVIÇOS:
+- Badge centralizado + título + subtítulo muted
+- Grid 3 colunas. Cards PREMIUM: padding 3rem, background var(--card-bg), border 1px solid rgba(255,255,255,0.06), border-radius 1.25rem
+- Ícone dentro de circle gradient (width 64px, height 64px, border-radius 1rem, background var(--accent-gradient), display flex align-items center justify-content center)
+- Ícone SVG em branco (stroke: white)
+- Título h3 + descrição + link "Saiba mais →" em accent
+- Hover: translateY(-8px), border-color accent, box-shadow 0 20px 60px rgba(accent,0.15)
 
-EFEITOS GLOBAIS:
-- Scroll animations (IntersectionObserver simples via script)
-- Glassmorphism nos cards
-- Gradientes animados sutis
-- Hover micro-interações (scale, glow)`,
+PORTFÓLIO:
+- Badge + título
+- Grid 2x2 com aspect-ratio 16/10. Imagens com object-fit cover + overlay gradient (transparent → rgba(0,0,0,0.8) bottom)
+- Sobre o overlay: título do projeto + 2-3 tags (background rgba(accent,0.2), color accent-light, padding 0.3rem 0.8rem, border-radius 9999px, font-size 0.75rem)
+- Hover: overlay sobe, scale(1.05) na imagem, aparece botão "Ver Projeto"
+
+DEPOIMENTOS:
+- Background section diferenciado (rgba(accent,0.03))
+- 1 depoimento DESTAQUE grande centralizado: citação com aspas decorativas SVG (font-size 4rem, accent, opacity 0.3), texto em itálico font-size 1.25rem, foto circular + nome + cargo abaixo
+- 3 cards menores abaixo em grid: foto circular 48px + estrelas douradas (#FFD700) + texto + nome/cargo
+
+CONTATO:
+- Grid 2 colunas. Esquerda: título, subtítulo, 4 itens info (ícone accent em circle rgba(accent,0.1) + label + valor). Abaixo: mapa embed ou box decorativo
+- Direita: form com floating labels (label position absolute, top 1rem, transition, input:focus label top -0.5rem font-size 0.8rem color accent). Inputs estilizados premium. Botão gradient fullwidth com ícone →
+
+FAQ:
+- 5 perguntas accordion. Design premium: cards separados com background card-bg, border-radius 1rem, margin-bottom 0.75rem
+- Toggle com ícone + rotação. Resposta com padding, color muted
+
+HEADER: fixed, height 70px, backdrop-filter blur(25px), background rgba(bg,0.85), border-bottom 1px solid rgba(255,255,255,0.06). Logo + nav links com underline accent (::after width 0 → 100% no hover, height 2px, background accent-gradient) + CTA button gradient
+FOOTER: 4 colunas (brand+desc, links, serviços, contato). Newsletter input. Social icons em circles. Copyright bar separada. Se CNPJ fornecido, exibir.
+
+EFEITOS CSS OBRIGATÓRIOS:
+- @keyframes fadeInUp { from { opacity:0; transform:translateY(40px) } to { opacity:1; transform:translateY(0) } }
+- @keyframes float { 0%,100% { transform:translateY(0) } 50% { transform:translateY(-20px) } }
+- .animate-in: animation fadeInUp 0.8s ease both
+- JavaScript: IntersectionObserver que adiciona class 'animate-in' quando seção entra na viewport (threshold 0.1)
+- Smooth scroll nos links de navegação
+- Hover transitions em TODOS os elementos interativos (0.3s ease)`,
+
+  premium: `Crie um site ONE-PAGE CINEMATOGRÁFICO e ESPETACULAR com 9+ seções. Este é o nível mais alto — deve parecer um site de R$30.000+ feito por agência internacional. O cliente precisa ficar DE QUEIXO CAÍDO.
+
+HERO (100vh):
+- Background ÉPICO multi-camada:
+  1. Gradiente base (radial-gradient(ellipse 90% 70% at 50% 30%, rgba(accent,0.2), transparent 70%))
+  2. Segundo orb decorativo (position absolute, width 500px, height 500px, background var(--accent-gradient), filter blur(120px), opacity 0.12, top -150px, right -100px, animation float 10s ease-in-out infinite)
+  3. Terceiro orb menor (left side, accent-light color, animation com delay)
+  4. Grid pattern sutil (background-image radial-gradient(rgba(accent,0.1) 1px, transparent 1px), background-size 30px 30px, opacity 0.3)
+- Badge animado: ícone ✨ + "Site Premium" — border accent, background rgba(accent,0.08), animação pulse sutil
+- Título ÉPICO: clamp(4rem, 10vw, 8rem), font-weight 900, letter-spacing -0.05em, line-height 1.0. MÚLTIPLAS palavras com gradient text. Pode ter <br> para quebra dramática
+- Subtítulo sofisticado: font-size 1.3rem, line-height 1.8, max-width 600px, font-weight 300
+- 2 botões PREMIUM: Primário (gradient, padding 1.5rem 3.5rem, border-radius 9999px, box-shadow 0 0 40px rgba(accent,0.4), hover glow intensifica + scale(1.05)) + Ghost (border accent, backdrop-filter blur)
+- Stats impressionantes: 4 stats grandes em row (números clamp(2rem,4vw,3rem), accent color, labels muted, dividers estilizados)
+- Mouse scroll indicator com animation bounce + pulse
+
+MARQUEE DE PARCEIROS/TECH:
+- Faixa fullwidth com @keyframes marquee (translateX(0) → translateX(-50%)), 20s linear infinite
+- Ícones/logos em grayscale filter, opacity 0.4, hover: grayscale(0) opacity(1)
+- Border top/bottom rgba(255,255,255,0.05)
+- Duplicar conteúdo para loop seamless
+
+SOBRE (com WOW factor):
+- Badge + título épico com accent word
+- Layout offset: texto esquerda (55%), imagem direita com composição complexa:
+  - Imagem principal com border-radius 2rem, box-shadow dramática (0 30px 80px rgba(0,0,0,0.4))
+  - Floating badge SOBRE a imagem (position absolute, bottom -20px, left -20px, background var(--bg), padding 1.5rem 2rem, border-radius 1rem, border 1px accent, shadow): número destaque + label (ex: "8+ Anos de Experiência")
+  - Elemento decorativo pontilhado atrás (border 2px dashed rgba(accent,0.2), border-radius 2rem, position absolute, inset -15px, z-index -1)
+- 4 features em lista com ícones accent checks
+
+SERVIÇOS (grid impactante):
+- Badge + título + subtítulo
+- Grid 2x3 cards com hover PREMIUM:
+  - Normal: padding 3rem, background card-bg, border rgba(255,255,255,0.06), border-radius 1.5rem
+  - Ícone: 64px circle com gradient background, ícone SVG white dentro
+  - Número do serviço: "01", "02"... em accent, font-size 3rem, opacity 0.1, position absolute top-right
+  - Título + descrição + "Saiba mais →" link
+  - HOVER: translateY(-10px), background gradient sutil, border-color accent, shadow dramática (0 25px 80px rgba(accent,0.2)), o ícone circle scale(1.1)
+
+PORTFÓLIO (showcase premium):
+- Badge + título
+- Layout alternado: projetos pares (imagem esquerda, texto direita) e ímpares (inverso)
+- Cada projeto: imagem com border-radius 1.5rem + aspect-ratio 16/10, ao lado: tag de categoria (accent pill), título h3, descrição curta, lista de tecnologias em tags, botão "Ver Projeto"
+- Imagem hover: scale(1.03), shadow aumenta
+
+NÚMEROS/RESULTADOS:
+- Background diferenciado: gradiente de accent super sutil + border top/bottom
+- Grid 4 colunas com números IMPACTANTES
+- Cada: número grande (font-size clamp(2.5rem,5vw,4rem), font-weight 900, accent gradient text) + label muted + ícone SVG pequeno
+- Dividers verticais estilizados entre items
+
+DEPOIMENTOS (social proof premium):
+- Quote destaque GRANDE: aspas decorativas SVG gigantes (accent, opacity 0.15), texto citação em Playfair Display italic font-size 1.5rem, line-height 1.8
+- Abaixo: foto circular 64px com border accent + nome bold + cargo muted + estrelas ★★★★★ (#FFD700)
+- Slider dots abaixo (3 dots, active = accent, others = muted opacity 0.3)
+- 3 cards secundários em row abaixo
+
+CTA SECTION (antes do contato):
+- Background: gradiente accent intenso ou imagem com overlay
+- Título grande branco, subtítulo, botão CTA ENORME branco com texto escuro
+- Simples e impactante. Gera urgência.
+
+CONTATO (premium):
+- Grid 2 colunas. Esquerda: título épico, subtítulo, 4 info cards (ícone em circle accent bg + label + valor, cada um com border-radius, padding, background card-bg)
+- Direita: form PREMIUM com floating labels, inputs com focus ring accent, textarea, checkbox terms, botão gradient com ícone e hover glow
+
+FAQ:
+- 6 perguntas em cards individuais (background card-bg, border-radius 1.25rem, margin-bottom 1rem)
+- Click toggle: ícone rota, resposta expande com max-height transition
+- JavaScript para toggle
+
+HEADER: fixed, height 72px, backdrop-filter blur(30px) saturate(1.5), background rgba(bg,0.8), border-bottom rgba(255,255,255,0.05). Logo + nav links com ::after underline animation + CTA gradient pill. Scroll: background more opaque.
+FOOTER ÉPICO: background linear-gradient(to bottom, var(--bg), darken). 4 colunas. Newsletter com input+button inline. Social icons. Awards/badges. Copyright bar com CNPJ.
+
+EFEITOS OBRIGATÓRIOS:
+- @keyframes fadeInUp, fadeIn, float, pulse, marquee
+- IntersectionObserver em todas as seções (class .animate-in com stagger delays: children nth-child(1) delay 0s, nth-child(2) 0.1s, etc.)
+- Smooth scroll
+- Parallax sutil no hero (transform translateY com scroll listener leve)
+- Cursor glow sutil (div 200px blur seguindo o mouse, accent color, opacity 0.05) — via JS mousemove
+- Hover effects em TODOS os elementos interativos
+- Prefers-reduced-motion: desabilitar animações`
 };
 
 serve(async (req) => {
@@ -139,54 +245,60 @@ serve(async (req) => {
     if (description) businessInfo.push(`Sobre: ${description} — use na seção "Sobre" em vez de texto genérico`);
     if (cnpj) businessInfo.push(`CNPJ: ${cnpj} — exiba no footer junto ao copyright`);
 
-    const systemPrompt = `Você é um desenvolvedor web senior e designer UI/UX de elite. Seu trabalho é gerar sites HTML extraordinários que parecem ter sido feitos por uma agência top do mercado.
+    const systemPrompt = `Você é um MESTRE em web design e desenvolvimento front-end. Seus sites ganham prêmios no Awwwards e CSS Design Awards. Cada pixel importa. Cada detalhe é intencional.
+
+MENTALIDADE: Você está criando uma PRÉVIA que vai fazer o cliente querer IMEDIATAMENTE contratar a agência. O site precisa ser tão bonito que o cliente pense "Eu PRECISO disso". Não economize em detalhes visuais.
 
 REGRAS ABSOLUTAS:
-- Retorne APENAS código HTML completo. NENHUM texto antes ou depois. NENHUM markdown. NENHUM bloco de código.
-- O HTML deve ser um documento completo: <!DOCTYPE html>, <html lang="pt-BR">, <head> com meta viewport e charset, <body>.
-- TODO o CSS deve ser inline dentro de uma tag <style> no <head>. NÃO use CSS externo exceto Google Fonts.
-- O site deve ser 100% responsivo usando @media queries (breakpoints: 768px, 1024px, 1280px).
-- Use Google Fonts via CDN: Inter (400,500,600,700) para corpo e Playfair Display (700,700italic) para títulos.
-- Inclua scroll-behavior: smooth no html.
-- Use CSS custom properties (variáveis) para todas as cores da paleta.
+- Retorne APENAS código HTML completo. NENHUM texto antes ou depois. NENHUM markdown. NENHUM \`\`\`.
+- O HTML deve ser documento completo: <!DOCTYPE html>, <html lang="pt-BR">, <head> com meta viewport e charset, <body>.
+- TODO o CSS inline dentro de <style> no <head>. NÃO use CSS externo exceto Google Fonts.
+- 100% responsivo com @media queries (640px, 768px, 1024px, 1280px).
+- Google Fonts CDN: Inter (300,400,500,600,700,800) corpo + Playfair Display (600,700,800,700italic) títulos.
+- scroll-behavior: smooth no html.
+- CSS custom properties para TODAS as cores.
+- O HTML DEVE ser extenso e completo — CADA seção descrita deve existir. NÃO simplifique, NÃO corte.
 
-PALETA DE CORES OBRIGATÓRIA:
---bg: ${selectedPalette.bg}
---accent: ${selectedPalette.accent}
---accent-light: ${selectedPalette.accentLight}
---accent-gradient: ${selectedPalette.accentGradient}
---text: ${selectedPalette.text}
---muted: ${selectedPalette.muted}
---card-bg: ${selectedPalette.cardBg}
+PALETA DE CORES (:root CSS variables):
+--bg: ${selectedPalette.bg};
+--accent: ${selectedPalette.accent};
+--accent-light: ${selectedPalette.accentLight};
+--accent-gradient: ${selectedPalette.accentGradient};
+--text: ${selectedPalette.text};
+--muted: ${selectedPalette.muted};
+--card-bg: ${selectedPalette.cardBg};
 
-Use estas variáveis CSS em TODO o site. Fundo principal: --bg, textos: --text, secundários: --muted.
-Para CTAs, botões e destaques: background: var(--accent-gradient).
-Para bordas e hovers: var(--accent).
-
-ESTILO DE DESIGN:
-- Espaçamento generoso (padding: 6rem 2rem nas seções, gap: 2rem nos grids)
-- Border-radius consistente (0.75rem cards, 0.5rem botões, 9999px badges)
-- Transições suaves (transition: all 0.3s ease)
-- Sombras accent (box-shadow: 0 0 40px rgba(accent, 0.15))
-- Cards com borda sutil (border: 1px solid rgba(255,255,255,0.08))
-- Tipografia clara: h1 clamp(2.5rem,5vw,4.5rem), h2 clamp(2rem,4vw,3rem), h3 1.5rem, body 1rem
-- Botões com padding generoso (1rem 2.5rem), font-weight 600
+QUALIDADE VISUAL MANDATÓRIA:
+- Espaçamento GENEROSO: seções padding clamp(4rem,8vw,8rem) 2rem. Gap 2rem+ nos grids.
+- Tipografia expressiva: h1 clamp(3rem,7vw,6rem) weight 800 letter-spacing -0.03em, h2 clamp(2rem,5vw,3.5rem) weight 700, body 1rem/1.7
+- Cards: padding 2.5rem+, border-radius 1.25rem, border 1px solid rgba(255,255,255,0.06), background var(--card-bg)
+- Botões: padding 1rem 2.5rem+, border-radius 9999px, font-weight 600, transition 0.3s
+- Sombras: 0 20px 60px rgba(0,0,0,0.2) cards, 0 0 40px rgba(accent,0.2) botões
+- Hover em TUDO: translateY(-4px a -10px), border-color accent, shadow intensifica
+- Gradient text: background var(--accent-gradient), -webkit-background-clip: text, -webkit-text-fill-color: transparent
+- Badges: background rgba(accent,0.1), color accent, padding 0.5rem 1.5rem, border-radius 9999px, font-size 0.8rem, font-weight 600, letter-spacing 0.05em, text-transform uppercase
 ${imageInstructions}
 
-BACKGROUND TEMÁTICO OBRIGATÓRIO:
-- Analise o nome "${businessName}"${segment ? ` (segmento: ${segment})` : ""} e crie um background SVG inline sutil que remeta ao nicho.
-- Exemplos: Barbearia → tesouras sutis; Clínica → ondas suaves; Tech → hexágonos; Restaurante → talheres abstratos; Genérico → formas geométricas.
-- Opacidade entre 0.03 e 0.06, usando a cor accent. Quase imperceptível.
-- Aplique como background-image via SVG data URI no body.
-- Adicione gradiente radial sutil no hero.
+BACKGROUND TEMÁTICO:
+- Analise "${businessName}"${segment ? ` (segmento: ${segment})` : ""} e crie background SVG inline SUTIL do nicho (opacity 0.02-0.05).
+- Orbs decorativos no hero (divs blur 100px+, accent gradient, opacity 0.05-0.1, position absolute).
 
 ANIMAÇÕES CSS:
-- @keyframes fadeInUp: opacity:0 translateY(30px) → opacity:1 translateY(0)
-- @keyframes fadeIn: opacity:0 → opacity:1
-- animation-delay escalonado (0.1s, 0.2s, 0.3s...)
-- animation-fill-mode: both
+@keyframes fadeInUp { from { opacity:0; transform:translateY(40px) } to { opacity:1; transform:translateY(0) } }
+@keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
+@keyframes float { 0%,100% { transform:translateY(0) } 50% { transform:translateY(-20px) } }
 
-ÍCONES: SVG inline (viewBox="0 0 24 24", stroke="currentColor", stroke-width="2", fill="none").`;
+JavaScript obrigatório no final do body:
+- IntersectionObserver: observa sections, adiciona class 'visible' com stagger
+- Smooth scroll nos links âncora
+- FAQ accordion toggle
+
+PROIBIDO:
+- Não use Lorem Ipsum. Crie textos realistas para o nicho "${segment || 'negócio'}".
+- Não use placeholder genérico se o cliente enviou fotos reais.
+- Não simplifique seções.
+
+ÍCONES: SVG inline (viewBox="0 0 24 24", stroke="currentColor", stroke-width="1.5", fill="none").`;
 
     const userPrompt = `${planPrompt}
 
@@ -206,7 +318,7 @@ Gere o site HTML completo agora. APENAS código HTML puro, nada mais.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-2.5-pro",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
