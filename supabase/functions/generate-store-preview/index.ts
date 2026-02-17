@@ -273,7 +273,21 @@ RESPONSIVO:
 - @media (max-width: 768px): nav vira hamburger, grid produtos 2 cols, footer 1 col
 - @media (max-width: 480px): info bar oculta, header simplificado, 1 col em tudo
 
-IMPORTANTE: O layout deve ser INDISTINGUÍVEL de uma loja real da Nuvemshop. Cada elemento, espaçamento, tipografia e interação deve parecer nativo da plataforma.`;
+IMPORTANTE: O layout deve ser INDISTINGUÍVEL de uma loja real da Nuvemshop. Cada elemento, espaçamento, tipografia e interação deve parecer nativo da plataforma.
+
+EXIGÊNCIAS DE DESIGN PREMIUM:
+- O visual deve parecer uma loja PROFISSIONAL de verdade — não um template amador.
+- Imagens de produto com aspect-ratio perfeito, hover zoom suave (scale 1.05), e sombras sutis.
+- Cards de produto com espaçamento interno generoso, tipografia limpa e hierarquia visual clara.
+- Botões com micro-interações: hover com lift (translateY -2px) + sombra intensificada + transition suave 0.3s.
+- Banner hero CINEMATOGRÁFICO: overlay gradiente sofisticado, tipografia grande e impactante, CTA bem posicionado.
+- Consistência de cores em TUDO: badges de desconto, botões, links, ícones — tudo na paleta escolhida.
+- Footer completo e profissional com layout em colunas, ícones de pagamento e redes sociais.
+- Responsividade PERFEITA: testar mentalmente cada breakpoint para garantir que nada quebre.
+- Hover effects em TODOS os elementos interativos (produtos, botões, links, ícones).
+- Sombras e bordas sutis nos cards para criar profundidade sem poluir.
+- Tipografia variada: use font-weight 300 para textos longos, 500 para labels, 700 para títulos.
+- PROIBIDO: design genérico sem personalidade, imagens cortadas, textos desalinhados, cores dissonantes.`;
 
     let userPrompt: string;
 
