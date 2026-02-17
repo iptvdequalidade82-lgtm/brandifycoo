@@ -329,6 +329,8 @@ Gere o HTML completo agora. APENAS código HTML.`;
 
     if (!response.ok) {
       if (response.status === 429) {
+        const rateLimitBody = await response.text();
+        console.error("Gemini 429 rate limit:", rateLimitBody);
         return new Response(JSON.stringify({ error: "Muitas requisições. Tente novamente em alguns segundos." }), {
           status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
