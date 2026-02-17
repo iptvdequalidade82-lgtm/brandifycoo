@@ -248,8 +248,9 @@ export default function PreviewLoja() {
 
               {/* Mode Tabs */}
               <div className="flex items-center gap-1 p-1 rounded-xl bg-white/[0.04] border border-white/10 mb-6">
-                <button onClick={() => setMode("ia")} className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg text-sm font-bold transition-all ${mode === "ia" ? "bg-gradient-to-r from-brand-accent to-brand-accent-deep text-white shadow-lg" : "text-white/40 hover:text-white/60"}`}>
+                <button onClick={() => setMode("ia")} className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg text-sm font-bold transition-all relative ${mode === "ia" ? "bg-gradient-to-r from-brand-accent to-brand-accent-deep text-white shadow-lg" : "text-white/40 hover:text-white/60"}`}>
                   <Wand2 size={16} /> Prévia Inteligente (IA)
+                  <span className="absolute -top-2.5 right-2 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider bg-emerald-500 text-white rounded-full leading-none">Recomendado</span>
                 </button>
                 <button onClick={() => setMode("manual")} className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg text-sm font-bold transition-all ${mode === "manual" ? "bg-white/10 text-white shadow-lg" : "text-white/40 hover:text-white/60"}`}>
                   <PenLine size={16} /> Preencher Manual
