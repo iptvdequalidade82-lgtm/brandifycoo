@@ -127,7 +127,7 @@ export default function PreviewSite() {
 
   const generate = useCallback(async () => {
     // In AI mode, segment is required; in manual mode, businessName is required
-    if (mode === "ia" && !segment.trim()) return;
+    if (mode === "ia" && (!segment.trim() || !businessName.trim() || !phone.trim())) return;
     if (mode === "manual" && !businessName.trim()) return;
 
     setGenerating(true);
@@ -284,7 +284,7 @@ export default function PreviewSite() {
     }
   };
 
-  const canGenerate = mode === "ia" ? !!segment.trim() : !!businessName.trim();
+  const canGenerate = mode === "ia" ? (!!segment.trim() && !!businessName.trim() && !!phone.trim()) : !!businessName.trim();
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -397,14 +397,14 @@ export default function PreviewSite() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <label className={labelClass}>Seu nome ou empresa <span className="text-white/30">(opcional)</span></label>
+                            <label className={labelClass}>Seu nome ou empresa *</label>
                             <input type="text" value={businessName} onChange={(e) => setBusinessName(e.target.value)}
-                              placeholder="Para personalizar a prévia" className={inputClass} maxLength={100} />
+                              placeholder="Para personalizar a prévia" className={inputClass} maxLength={100} required />
                           </div>
                           <div>
-                            <label className={labelClass}>WhatsApp <span className="text-white/30">(opcional)</span></label>
+                            <label className={labelClass}>WhatsApp *</label>
                             <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
-                              placeholder="(43) 99999-9999" className={inputClass} maxLength={20} />
+                              placeholder="(43) 99999-9999" className={inputClass} maxLength={20} required />
                           </div>
                         </div>
 
