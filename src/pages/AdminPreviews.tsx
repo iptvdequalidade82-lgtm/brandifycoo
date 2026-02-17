@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { ThumbsUp, ThumbsDown, Eye, Trash2, Phone, Calendar, Palette, X } from "lucide-react";
+import { ThumbsUp, ThumbsDown, Eye, Trash2, Phone, Calendar, Palette, X, MessageCircle, Info } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -120,11 +120,36 @@ export default function AdminPreviews() {
                   <tr key={p.id} className="hover:bg-white/[0.02] transition-colors">
                     <td className="py-3 pr-4">
                       <div>
-                        <p className="font-medium text-white">{p.client_name}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-white">{p.client_name}</p>
+                          {new Date(p.created_at) > new Date(Date.now() - 24 * 60 * 60 * 1000) && (
+                            <span className="bg-blue-500/20 text-blue-400 text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Novo</span>
+                          )}
+                        </div>
                         {p.client_phone && (
-                          <a href={`tel:${p.client_phone}`} className="flex items-center gap-1 text-xs text-white/30 hover:text-white/60 mt-0.5">
-                            <Phone size={10} /> {p.client_phone}
-                          </a>
+                          <div className="flex items-center gap-2 mt-1">
+                            <a 
+                              href={`tel:${p.client_phone.replace(/\D/g, '')}`} 
+                              className="flex items-center gap-1 text-xs text-white/30 hover:text-white/60 transition-colors"
+                              title="Ligar"
+                            >
+                              <Phone size={10} /> {p.client_phone}
+                            </a>
+                            <a 
+                              href={`https://wa.me/55${p.client_phone.replace(/\D/g, '')}`} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="p-1 rounded bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition-colors"
+                              title="WhatsApp"
+                            >
+                              <MessageCircle size={10} />
+                            </a>
+                          </div>
+                        )}
+                        {p.slogan && (
+                          <p className="text-[10px] text-white/20 italic mt-0.5 truncate max-w-[200px]" title={p.slogan}>
+                            "{p.slogan}"
+                          </p>
                         )}
                       </div>
                     </td>
