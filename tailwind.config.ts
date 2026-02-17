@@ -109,6 +109,9 @@ export default {
           "0%": { transform: "translateY(0)" },
           "100%": { transform: "translateY(-50%)" },
         },
+        "shimmer": {
+          "100%": { transform: "translateX(100%)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -119,6 +122,7 @@ export default {
         "float-slow": "float-slow 8s ease-in-out infinite",
         "pulse-glow": "pulse-glow 4s ease-in-out infinite",
         "grid-move": "grid-move 20s linear infinite",
+        "shimmer": "shimmer 2s infinite",
       },
     },
   },
