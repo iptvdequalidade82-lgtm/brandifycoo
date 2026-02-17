@@ -35,7 +35,15 @@ export default function PreviewSite() {
   const [htmlContent, setHtmlContent] = useState("");
   const [done, setDone] = useState(false);
   const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");
+  const [elapsed, setElapsed] = useState(0);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const estimatedTimes: Record<string, number> = {
+    essencial: 40,
+    profissional: 70,
+    premium: 100,
+  };
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -52,6 +60,10 @@ export default function PreviewSite() {
     setGenerating(true);
     setHtmlContent("");
     setDone(false);
+    setElapsed(0);
+    
+    // Start timer
+    timerRef.current = setInterval(() => setElapsed((e) => e + 1), 1000);
 
     try {
       const resp = await fetch(
@@ -119,6 +131,7 @@ export default function PreviewSite() {
       setHtmlContent(`<html><body style="background:#111;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif"><p>${err.message || "Erro ao gerar prévia."}</p></body></html>`);
       setDone(true);
     } finally {
+      if (timerRef.current) clearInterval(timerRef.current);
       setGenerating(false);
     }
   }, [businessName, phone, logoPreview, plan, selectedPalette]);
@@ -268,18 +281,25 @@ export default function PreviewSite() {
               className="space-y-4"
             >
               {/* Toolbar */}
-              <div className="flex items-center justify-between flex-wrap gap-3">
-                <div className="flex items-center gap-2">
-                  {generating && (
-                    <div className="flex items-center gap-2 text-brand-accent text-sm">
-                      <Loader2 size={16} className="animate-spin" />
-                      Gerando seu site...
-                    </div>
-                  )}
-                  {done && (
-                    <span className="text-sm text-green-400">✓ Prévia pronta!</span>
-                  )}
-                </div>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between flex-wrap gap-3">
+                  <div className="flex items-center gap-2">
+                    {generating && (
+                      <div className="flex items-center gap-3 text-sm">
+                        <Loader2 size={16} className="animate-spin text-blue-400" />
+                        <span className="text-white/80">Gerando seu site...</span>
+                        <span className="text-white/40 tabular-nums">
+                          {Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, "0")}
+                        </span>
+                        <span className="text-white/30">
+                          / ~{Math.floor((estimatedTimes[plan] || 60) / 60)}:{String((estimatedTimes[plan] || 60) % 60).padStart(2, "0")} estimado
+                        </span>
+                      </div>
+                    )}
+                    {done && (
+                      <span className="text-sm text-emerald-400">✓ Prévia pronta!</span>
+                    )}
+                  </div>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setViewMode("desktop")}
@@ -310,9 +330,21 @@ export default function PreviewSite() {
                     </>
                   )}
                 </div>
+                </div>
+
+                {/* Progress bar */}
+                {generating && (
+                  <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
+                    <motion.div
+                      className="h-full rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
+                      initial={{ width: "0%" }}
+                      animate={{ width: `${Math.min((elapsed / (estimatedTimes[plan] || 60)) * 100, 95)}%` }}
+                      transition={{ duration: 1, ease: "linear" }}
+                    />
+                  </div>
+                )}
               </div>
 
-              {/* iframe */}
               <div className="flex justify-center">
                 <div
                   className={`rounded-2xl overflow-hidden border border-white/10 bg-white transition-all duration-500 ${
