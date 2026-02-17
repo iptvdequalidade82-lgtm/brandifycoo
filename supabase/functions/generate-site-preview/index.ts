@@ -5,66 +5,190 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Unsplash image helper — generates thematic image URLs based on the business segment
+// Curated Unsplash image URLs by segment (direct links, always available)
 function getSegmentImages(segment: string, businessName: string): { hero: string; about: string; gallery: string[]; team: string; cta: string } {
   const s = (segment || businessName || "business").toLowerCase().trim();
-  
-  const segmentKeywords: Record<string, string> = {
-    barbearia: "barbershop,barber,haircut",
-    "clínica": "medical-clinic,healthcare,doctor",
-    "clínica odontológica": "dentist,dental-clinic,smile",
-    "odontologia": "dentist,dental,teeth",
-    restaurante: "restaurant,food,dining",
-    pizzaria: "pizza,italian-restaurant,food",
-    hamburgueria: "burger,hamburger,fast-food",
-    "cafeteria": "coffee-shop,cafe,barista",
-    padaria: "bakery,bread,pastry",
-    academia: "gym,fitness,workout",
-    "pet shop": "pet-store,dog-grooming,pets",
-    "veterinária": "veterinary,animal-care,pets",
-    advocacia: "law-office,lawyer,justice",
-    advogado: "law-office,lawyer,legal",
-    contabilidade: "accounting,finance,office",
-    "imobiliária": "real-estate,modern-house,property",
-    arquitetura: "architecture,modern-building,interior-design",
-    "loja de roupas": "fashion-store,clothing,boutique",
-    moda: "fashion,clothing,style",
-    "salão de beleza": "beauty-salon,hairdresser,makeup",
-    "estética": "beauty-treatment,skincare,spa",
-    "oficina mecânica": "auto-repair,mechanic,car-service",
-    "auto center": "car-service,automotive,tire",
-    fotografia: "photography-studio,camera,portrait",
-    "marketing": "digital-marketing,creative-agency,branding",
-    "tecnologia": "technology,coding,startup",
-    construção: "construction,building,architecture",
-    "educação": "education,school,learning",
-    "consultoria": "consulting,business-meeting,strategy",
-    "loja": "retail-store,shopping,products",
-    "floricultura": "flower-shop,florist,bouquet",
-    "joalheria": "jewelry,luxury,diamonds",
-    "hotel": "hotel,luxury-hotel,hospitality",
-    "pousada": "inn,bed-and-breakfast,cozy-lodge",
+
+  // Curated photo sets per segment using stable Unsplash direct URLs
+  const segmentPhotos: Record<string, { hero: string; about: string; gallery: string[]; team: string; cta: string }> = {
+    barbearia: {
+      hero: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1920&h=1080&fit=crop",
+      about: "https://images.unsplash.com/photo-1521590832167-7228f6faa6d2?w=800&h=600&fit=crop",
+      gallery: [
+        "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1585747860019-8e4b67e3614d?w=600&h=400&fit=crop",
+      ],
+      team: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=600&fit=crop",
+      cta: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=1920&h=600&fit=crop",
+    },
+    restaurante: {
+      hero: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1920&h=1080&fit=crop",
+      about: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=600&fit=crop",
+      gallery: [
+        "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=600&h=400&fit=crop",
+      ],
+      team: "https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=600&h=600&fit=crop",
+      cta: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1920&h=600&fit=crop",
+    },
+    pizzaria: {
+      hero: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=1920&h=1080&fit=crop",
+      about: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&h=600&fit=crop",
+      gallery: [
+        "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1588315029754-2dd089d39a1a?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?w=600&h=400&fit=crop",
+      ],
+      team: "https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=600&h=600&fit=crop",
+      cta: "https://images.unsplash.com/photo-1590947132387-155cc02f3212?w=1920&h=600&fit=crop",
+    },
+    hamburgueria: {
+      hero: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=1920&h=1080&fit=crop",
+      about: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=800&h=600&fit=crop",
+      gallery: [
+        "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=600&h=400&fit=crop",
+      ],
+      team: "https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=600&h=600&fit=crop",
+      cta: "https://images.unsplash.com/photo-1551782450-a2132b4ba21d?w=1920&h=600&fit=crop",
+    },
+    academia: {
+      hero: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1920&h=1080&fit=crop",
+      about: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&h=600&fit=crop",
+      gallery: [
+        "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=600&h=400&fit=crop",
+      ],
+      team: "https://images.unsplash.com/photo-1567013127542-490d757e51fc?w=600&h=600&fit=crop",
+      cta: "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?w=1920&h=600&fit=crop",
+    },
+    "pet shop": {
+      hero: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=1920&h=1080&fit=crop",
+      about: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=800&h=600&fit=crop",
+      gallery: [
+        "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1574158622682-e40e69881006?w=600&h=400&fit=crop",
+      ],
+      team: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&h=600&fit=crop",
+      cta: "https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=1920&h=600&fit=crop",
+    },
+    advocacia: {
+      hero: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1920&h=1080&fit=crop",
+      about: "https://images.unsplash.com/photo-1521791055366-0d553872125f?w=800&h=600&fit=crop",
+      gallery: [
+        "https://images.unsplash.com/photo-1505664194779-8beaceb93744?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&h=400&fit=crop",
+      ],
+      team: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&h=600&fit=crop",
+      cta: "https://images.unsplash.com/photo-1479142506502-19b3a3b7ff33?w=1920&h=600&fit=crop",
+    },
+    moda: {
+      hero: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920&h=1080&fit=crop",
+      about: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&h=600&fit=crop",
+      gallery: [
+        "https://images.unsplash.com/photo-1445205170230-053b83016050?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&h=400&fit=crop",
+      ],
+      team: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&h=600&fit=crop",
+      cta: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1920&h=600&fit=crop",
+    },
+    "salão de beleza": {
+      hero: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1920&h=1080&fit=crop",
+      about: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&h=600&fit=crop",
+      gallery: [
+        "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=600&h=400&fit=crop",
+      ],
+      team: "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=600&h=600&fit=crop",
+      cta: "https://images.unsplash.com/photo-1457972729786-0411a3b2b626?w=1920&h=600&fit=crop",
+    },
+    arquitetura: {
+      hero: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=1920&h=1080&fit=crop",
+      about: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&h=600&fit=crop",
+      gallery: [
+        "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=600&h=400&fit=crop",
+      ],
+      team: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&h=600&fit=crop",
+      cta: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1920&h=600&fit=crop",
+    },
+    fotografia: {
+      hero: "https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=1920&h=1080&fit=crop",
+      about: "https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=800&h=600&fit=crop",
+      gallery: [
+        "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1471341971476-ae15ff5dd4ea?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1493863641943-9b68992a8d07?w=600&h=400&fit=crop",
+      ],
+      team: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&h=600&fit=crop",
+      cta: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=1920&h=600&fit=crop",
+    },
+    tecnologia: {
+      hero: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1920&h=1080&fit=crop",
+      about: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&h=600&fit=crop",
+      gallery: [
+        "https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=600&h=400&fit=crop",
+        "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600&h=400&fit=crop",
+      ],
+      team: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=600&fit=crop",
+      cta: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920&h=600&fit=crop",
+    },
   };
 
-  // Find best keyword match
-  let keywords = "professional,business,modern";
-  for (const [key, val] of Object.entries(segmentKeywords)) {
-    if (s.includes(key)) { keywords = val; break; }
-  }
-  const kws = keywords.split(",");
-  const ts = Date.now(); // cache buster
-
-  return {
-    hero: `https://source.unsplash.com/1920x1080/?${encodeURIComponent(kws[0])}&t=${ts}`,
-    about: `https://source.unsplash.com/800x600/?${encodeURIComponent(kws[1] || kws[0])}&t=${ts}1`,
+  // Default fallback set
+  const defaultPhotos = {
+    hero: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1920&h=1080&fit=crop",
+    about: "https://images.unsplash.com/photo-1497215842964-222b430dc094?w=800&h=600&fit=crop",
     gallery: [
-      `https://source.unsplash.com/600x400/?${encodeURIComponent(kws[0])}&t=${ts}2`,
-      `https://source.unsplash.com/600x400/?${encodeURIComponent(kws[1] || kws[0])}&t=${ts}3`,
-      `https://source.unsplash.com/600x400/?${encodeURIComponent(kws[2] || kws[0])}&t=${ts}4`,
+      "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=600&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&h=400&fit=crop",
     ],
-    team: `https://source.unsplash.com/600x600/?professional-portrait&t=${ts}5`,
-    cta: `https://source.unsplash.com/1920x600/?${encodeURIComponent(kws[0])}-workspace&t=${ts}6`,
+    team: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&h=600&fit=crop",
+    cta: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=1920&h=600&fit=crop",
   };
+
+  // Find best match
+  for (const [key, photos] of Object.entries(segmentPhotos)) {
+    if (s.includes(key)) return photos;
+  }
+
+  // Check partial matches for broader terms
+  const broadMatch: Record<string, string> = {
+    "clínica": "advocacia", "odonto": "advocacia", "dentist": "advocacia",
+    "loja": "moda", "roupa": "moda", "boutique": "moda",
+    "café": "restaurante", "padaria": "restaurante", "cafeteria": "restaurante",
+    "burger": "hamburgueria", "hambur": "hamburgueria",
+    "pizza": "pizzaria",
+    "pet": "pet shop", "veterinár": "pet shop",
+    "advogad": "advocacia",
+    "beleza": "salão de beleza", "estética": "salão de beleza",
+    "mecânica": "tecnologia", "auto center": "tecnologia",
+    "marketing": "tecnologia", "consultoria": "tecnologia",
+    "construção": "arquitetura", "imobiliár": "arquitetura",
+    "hotel": "arquitetura", "pousada": "arquitetura",
+    "educação": "tecnologia", "escola": "tecnologia",
+    "floricultura": "salão de beleza", "joalheria": "moda",
+    "fitness": "academia", "gym": "academia", "crossfit": "academia",
+    "foto": "fotografia",
+    "barber": "barbearia", "barba": "barbearia",
+  };
+
+  for (const [key, ref] of Object.entries(broadMatch)) {
+    if (s.includes(key) && segmentPhotos[ref]) return segmentPhotos[ref];
+  }
+
+  return defaultPhotos;
 }
 
 const planPrompts: Record<string, string> = {
