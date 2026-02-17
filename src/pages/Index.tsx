@@ -9,10 +9,13 @@ import CTAFinal from "@/components/CTAFinal";
 import Footer from "@/components/Footer";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 import CursorGlow from "@/components/CursorGlow";
+import SplashScreen from "@/components/SplashScreen";
+import BottomSheetCTA from "@/components/BottomSheetCTA";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-black animated-bg relative overflow-hidden">
+      <SplashScreen />
       <CursorGlow />
       <Header />
       <Hero />
@@ -25,6 +28,7 @@ const Index = () => {
       <CTAFinal />
       <Footer />
       <FloatingWhatsApp />
+      <BottomSheetCTA />
     </div>
   );
 };

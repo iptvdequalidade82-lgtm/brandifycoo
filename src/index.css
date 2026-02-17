@@ -243,3 +243,17 @@
   scrollbar-width: thin;
   scrollbar-color: white transparent;
 }
+
+/* Hide horizontal scrollbar for swipeable sections */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Safe area padding for bottom sheet */
+.safe-area-pb {
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+}
