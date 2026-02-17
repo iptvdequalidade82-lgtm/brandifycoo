@@ -23,7 +23,7 @@ import Curso from "./pages/Curso";
 import AdminContabilidade from "./pages/AdminContabilidade";
 import AdminPreviews from "./pages/AdminPreviews";
 import PreviewSite from "./pages/PreviewSite";
-import PreviewLoja from "./pages/PreviewLoja";
+
 
 const queryClient = new QueryClient();
 
@@ -38,7 +38,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/projetos" element={<Projetos />} />
             <Route path="/preview-site" element={<PreviewSite />} />
-            <Route path="/preview-loja" element={<PreviewLoja />} />
+            
             <Route path="/curso" element={<Curso />} />
             
             <Route path="/trabalhe-conosco" element={<TrabalheConosco />} />

@@ -264,7 +264,7 @@ serve(async (req) => {
   }
 
   try {
-    const { plan, businessName, phone, slogan, cnpj, segment, description, logoUrl, bannerUrl, galleryUrls, colorPalette } = await req.json();
+    const { plan, businessName, phone, slogan, cnpj, segment, description, logoUrl, bannerUrl, galleryUrls, colorPalette, aiMode } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
@@ -442,7 +442,37 @@ PROIBIDO:
 
 ÍCONES: SVG inline (viewBox="0 0 24 24", stroke="currentColor", stroke-width="1.5", fill="none").`;
 
-    const userPrompt = `${planPrompt}
+    let userPrompt: string;
+
+    if (aiMode) {
+      // AI MODE: Generate everything from just the segment
+      userPrompt = `${planPrompt}
+
+MODO IA AUTOMÁTICO — CRIE TUDO DO ZERO:
+O cliente informou APENAS o segmento/ramo do negócio: "${segment || 'Empresa'}".
+${businessName ? `Nome sugerido (opcional, pode criar outro melhor): ${businessName}` : ""}
+${phone ? `Telefone: ${phone}` : ""}
+
+VOCÊ DEVE INVENTAR TUDO com criatividade profissional:
+- Nome fictício criativo e realista para o segmento (brasileiro, memorável, elegante)
+- Slogan marcante e profissional
+- Descrição completa da empresa (história, valores, diferenciais)
+- 4-6 serviços REAIS e ESPECÍFICOS do segmento com descrições detalhadas
+- 3-4 depoimentos ULTRA-REALISTAS com nomes brasileiros, mencionando serviços específicos
+- Perguntas FAQ relevantes ao segmento
+- Dados de contato fictícios mas realistas (endereço em cidade brasileira, email profissional, telefone)
+- Horários de funcionamento realistas para o segmento
+- Textos de copy persuasivos e profissionais
+
+IMPORTANTE: O resultado deve parecer um site REAL de uma empresa REAL. O cliente deve olhar e pensar "uau, é exatamente assim que meu site deve ser". Não use textos genéricos — mergulhe no universo do segmento "${segment}".
+
+- Plano: ${planKey}
+- Paleta: ${colorPalette || "midnight"}
+
+Gere o site HTML completo agora. APENAS código HTML puro, nada mais.`;
+    } else {
+      // MANUAL MODE: Use client-provided data
+      userPrompt = `${planPrompt}
 
 INFORMAÇÕES DO CLIENTE:
 - Nome da empresa: ${businessName || "Minha Empresa"}
@@ -452,6 +482,7 @@ ${businessInfo.length ? businessInfo.map(i => `- ${i}`).join("\n") : ""}
 - Paleta: ${colorPalette || "midnight"}
 
 Gere o site HTML completo agora. APENAS código HTML puro, nada mais.`;
+    }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
