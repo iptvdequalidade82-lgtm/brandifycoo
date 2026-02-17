@@ -93,8 +93,9 @@ export default function Hero() {
           transition={{ duration: 0.8, delay: 1.1 }}
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
-          <MagneticButton
-            as="a"
+          <motion.a
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             href="https://wa.me/5543991065129?text=Ol%C3%A1!%20Fiquei%20interessado%20nos%20servi%C3%A7os%20da%20Brandify%20e%20gostaria%20de%20solicitar%20um%20or%C3%A7amento%20para%20cria%C3%A7%C3%A3o%20de%20site."
             target="_blank"
             rel="noopener noreferrer"
@@ -102,15 +103,15 @@ export default function Hero() {
           >
             Solicitar Orçamento
             <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-          </MagneticButton>
-          <MagneticButton
-            as="a"
+          </motion.a>
+          <motion.a
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.95 }}
             href="#investimento"
             className="px-8 py-4 rounded-xl border border-white/20 text-white font-semibold hover:bg-white/10 gentle-animation text-center"
-            strength={0.2}
           >
             Nossos Serviços
-          </MagneticButton>
+          </motion.a>
         </motion.div>
 
         {/* Stats */}
