@@ -15,12 +15,12 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter,
 } from "@/components/ui/dialog";
-import { format, parseISO, isWithinInterval, startOfDay, endOfDay } from "date-fns";
+import { format, startOfDay, endOfDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
-  CalendarIcon, Download, Plus, Trash2, TrendingUp, TrendingDown, DollarSign, ArrowUpDown,
+  CalendarIcon, Download, Plus, Trash2, TrendingUp, TrendingDown, DollarSign, ArrowUpDown, Undo2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
@@ -35,6 +35,7 @@ const EXPENSE_CATEGORIES = [
   { value: "equipamento", label: "Equipamento" },
   { value: "servico_terceiro", label: "Serviço de Terceiro" },
   { value: "imposto", label: "Imposto / Taxa" },
+  { value: "reembolso", label: "Reembolso" },
   { value: "outros", label: "Outros" },
 ];
 
@@ -54,6 +55,7 @@ type LedgerEntry = {
   category: string;
   amount_cents: number;
   source: string;
+  projectId?: string;
 };
 
 export default function AdminContabilidade() {
@@ -72,25 +74,20 @@ export default function AdminContabilidade() {
   const [expAmount, setExpAmount] = useState("");
   const [expDate, setExpDate] = useState<Date | undefined>(new Date());
 
-  // Fetch projects (revenue)
+  // Refund dialog
+  const [refundOpen, setRefundOpen] = useState(false);
+  const [refundEntry, setRefundEntry] = useState<LedgerEntry | null>(null);
+  const [refundAmount, setRefundAmount] = useState("");
+  const [refundType, setRefundType] = useState<"total" | "parcial">("total");
+
+  // Fetch projects - only fully paid (payment_status = "paid")
   const { data: projects } = useQuery({
     queryKey: ["accounting-projects"],
     queryFn: async () => {
       const { data } = await supabase
         .from("projects")
         .select("id, title, client_name, total_amount_cents, amount_received_cents, created_at, status, payment_status")
-        .order("created_at", { ascending: false });
-      return data ?? [];
-    },
-  });
-
-  // Fetch proposals with status paid (init or full)
-  const { data: proposals } = useQuery({
-    queryKey: ["accounting-proposals"],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("proposals")
-        .select("id, title, client_name, amount_cents, init_amount_cents, status, created_at, updated_at")
+        .eq("payment_status", "paid")
         .order("created_at", { ascending: false });
       return data ?? [];
     },
@@ -118,28 +115,26 @@ export default function AdminContabilidade() {
 
   // Add expense
   const addExpense = useMutation({
-    mutationFn: async () => {
-      const amountCents = Math.round(parseFloat(expAmount.replace(",", ".")) * 100);
+    mutationFn: async (params?: { desc: string; cat: string; amount: number; date: string }) => {
+      const amountCents = params?.amount ?? Math.round(parseFloat(expAmount.replace(",", ".")) * 100);
+      const description = params?.desc ?? expDesc.trim();
+      const category = params?.cat ?? expCategory;
+      const date = params?.date ?? (expDate ? format(expDate, "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"));
+
       if (isNaN(amountCents) || amountCents <= 0) throw new Error("Valor inválido");
-      if (!expDesc.trim()) throw new Error("Descrição obrigatória");
+      if (!description) throw new Error("Descrição obrigatória");
 
       const { error } = await supabase.from("expenses").insert({
-        description: expDesc.trim(),
-        category: expCategory,
+        description,
+        category,
         amount_cents: amountCents,
-        expense_date: expDate ? format(expDate, "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"),
+        expense_date: date,
         created_by: user!.id,
       } as any);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["accounting-expenses"] });
-      setExpDesc("");
-      setExpAmount("");
-      setExpCategory("outros");
-      setExpDate(new Date());
-      setOpen(false);
-      toast({ title: "Despesa registrada!" });
     },
     onError: (e: any) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
   });
@@ -156,27 +151,83 @@ export default function AdminContabilidade() {
     },
   });
 
+  // Handle add expense from form
+  const handleAddExpense = async () => {
+    const amountCents = Math.round(parseFloat(expAmount.replace(",", ".")) * 100);
+    if (isNaN(amountCents) || amountCents <= 0) {
+      toast({ title: "Valor inválido", variant: "destructive" });
+      return;
+    }
+    if (!expDesc.trim()) {
+      toast({ title: "Descrição obrigatória", variant: "destructive" });
+      return;
+    }
+    await addExpense.mutateAsync({
+      desc: expDesc.trim(),
+      cat: expCategory,
+      amount: amountCents,
+      date: expDate ? format(expDate, "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"),
+    });
+    setExpDesc("");
+    setExpAmount("");
+    setExpCategory("outros");
+    setExpDate(new Date());
+    setOpen(false);
+    toast({ title: "Despesa registrada!" });
+  };
+
+  // Handle refund
+  const handleRefund = async () => {
+    if (!refundEntry) return;
+    const amountCents = refundType === "total"
+      ? refundEntry.amount_cents
+      : Math.round(parseFloat(refundAmount.replace(",", ".")) * 100);
+
+    if (isNaN(amountCents) || amountCents <= 0) {
+      toast({ title: "Valor inválido", variant: "destructive" });
+      return;
+    }
+    if (amountCents > refundEntry.amount_cents) {
+      toast({ title: "Valor do reembolso não pode ser maior que a receita", variant: "destructive" });
+      return;
+    }
+
+    await addExpense.mutateAsync({
+      desc: `Reembolso — ${refundEntry.description}`,
+      cat: "reembolso",
+      amount: amountCents,
+      date: format(new Date(), "yyyy-MM-dd"),
+    });
+
+    setRefundOpen(false);
+    setRefundEntry(null);
+    setRefundAmount("");
+    setRefundType("total");
+    toast({ title: "Reembolso registrado com sucesso!" });
+  };
+
   // Build unified ledger
   const ledger = useMemo<LedgerEntry[]>(() => {
     const entries: LedgerEntry[] = [];
 
-    // Revenue from projects that received payment
+    // Revenue only from fully paid projects
     (projects ?? []).forEach((p) => {
-      const received = p.amount_received_cents ?? 0;
+      const received = p.total_amount_cents ?? 0;
       if (received > 0) {
         entries.push({
           id: `proj-${p.id}`,
           date: p.created_at,
           type: "receita",
           description: `${p.title} — ${p.client_name}`,
-          category: "Projeto",
+          category: "Projeto (Quitado)",
           amount_cents: received,
           source: "projeto",
+          projectId: p.id,
         });
       }
     });
 
-    // Expenses
+    // Expenses (including refunds)
     (expenses ?? []).forEach((e) => {
       entries.push({
         id: `exp-${e.id}`,
@@ -238,11 +289,10 @@ export default function AdminContabilidade() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-bold text-white">Contabilidade</h2>
-            <p className="text-sm text-white/40">Receitas, despesas e exportação para o contador</p>
+            <p className="text-sm text-white/40">Apenas projetos 100% quitados · Despesas e reembolsos</p>
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
-            {/* Date range pickers */}
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" size="sm" className={cn("text-xs gap-1.5", !startDate && "text-muted-foreground")}>
@@ -294,7 +344,7 @@ export default function AdminContabilidade() {
                       <Select value={expCategory} onValueChange={setExpCategory}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          {EXPENSE_CATEGORIES.map((c) => (
+                          {EXPENSE_CATEGORIES.filter(c => c.value !== "reembolso").map((c) => (
                             <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
                           ))}
                         </SelectContent>
@@ -319,7 +369,7 @@ export default function AdminContabilidade() {
                       </PopoverContent>
                     </Popover>
                   </div>
-                  <Button className="w-full" onClick={() => addExpense.mutate()} disabled={addExpense.isPending}>
+                  <Button className="w-full" onClick={handleAddExpense} disabled={addExpense.isPending}>
                     {addExpense.isPending ? "Salvando..." : "Salvar Despesa"}
                   </Button>
                 </div>
@@ -384,7 +434,7 @@ export default function AdminContabilidade() {
                   <TableHead className="text-white/40 text-xs">Descrição</TableHead>
                   <TableHead className="text-white/40 text-xs">Categoria</TableHead>
                   <TableHead className="text-white/40 text-xs text-right">Valor</TableHead>
-                  <TableHead className="text-white/40 text-xs w-10"></TableHead>
+                  <TableHead className="text-white/40 text-xs w-20">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -405,9 +455,11 @@ export default function AdminContabilidade() {
                         "text-xs font-medium px-2 py-0.5 rounded-full",
                         entry.type === "receita"
                           ? "bg-emerald-500/10 text-emerald-400"
-                          : "bg-red-500/10 text-red-400"
+                          : entry.category === "Reembolso"
+                            ? "bg-orange-500/10 text-orange-400"
+                            : "bg-red-500/10 text-red-400"
                       )}>
-                        {entry.type === "receita" ? "Receita" : "Despesa"}
+                        {entry.type === "receita" ? "Receita" : entry.category === "Reembolso" ? "Reembolso" : "Despesa"}
                       </span>
                     </TableCell>
                     <TableCell className="text-sm text-white/80 max-w-[250px] truncate">
@@ -421,14 +473,32 @@ export default function AdminContabilidade() {
                       {entry.type === "despesa" ? "- " : ""}{formatCurrency(entry.amount_cents)}
                     </TableCell>
                     <TableCell>
-                      {entry.source === "manual" && (
-                        <button
-                          onClick={() => deleteExpense.mutate(entry.id.replace("exp-", ""))}
-                          className="text-white/20 hover:text-red-400 transition-colors"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      )}
+                      <div className="flex items-center gap-1">
+                        {/* Refund button for revenue entries */}
+                        {entry.type === "receita" && (
+                          <button
+                            onClick={() => {
+                              setRefundEntry(entry);
+                              setRefundType("total");
+                              setRefundAmount((entry.amount_cents / 100).toFixed(2).replace(".", ","));
+                              setRefundOpen(true);
+                            }}
+                            className="text-white/20 hover:text-orange-400 transition-colors"
+                            title="Registrar reembolso"
+                          >
+                            <Undo2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                        {/* Delete button for manual expenses */}
+                        {entry.source === "manual" && (
+                          <button
+                            onClick={() => deleteExpense.mutate(entry.id.replace("exp-", ""))}
+                            className="text-white/20 hover:text-red-400 transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -437,6 +507,72 @@ export default function AdminContabilidade() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Refund Dialog */}
+      <Dialog open={refundOpen} onOpenChange={setRefundOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Registrar Reembolso</DialogTitle>
+          </DialogHeader>
+          {refundEntry && (
+            <div className="space-y-4 pt-2">
+              <div className="p-3 rounded-lg bg-white/[0.04] border border-white/[0.08]">
+                <p className="text-sm text-white/80 font-medium">{refundEntry.description}</p>
+                <p className="text-xs text-white/40 mt-1">Valor total: {formatCurrency(refundEntry.amount_cents)}</p>
+              </div>
+
+              <div>
+                <label className="text-sm text-muted-foreground mb-2 block">Tipo de reembolso</label>
+                <div className="flex gap-2">
+                  <Button
+                    variant={refundType === "total" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => {
+                      setRefundType("total");
+                      setRefundAmount((refundEntry.amount_cents / 100).toFixed(2).replace(".", ","));
+                    }}
+                  >
+                    Total
+                  </Button>
+                  <Button
+                    variant={refundType === "parcial" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => {
+                      setRefundType("parcial");
+                      setRefundAmount("");
+                    }}
+                  >
+                    Parcial
+                  </Button>
+                </div>
+              </div>
+
+              {refundType === "parcial" && (
+                <div>
+                  <label className="text-sm text-muted-foreground mb-1 block">Valor do reembolso (R$)</label>
+                  <Input
+                    placeholder="0,00"
+                    value={refundAmount}
+                    onChange={(e) => setRefundAmount(e.target.value)}
+                    autoFocus
+                  />
+                </div>
+              )}
+
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setRefundOpen(false)}>Cancelar</Button>
+                <Button
+                  onClick={handleRefund}
+                  disabled={addExpense.isPending}
+                  className="bg-orange-600 hover:bg-orange-700"
+                >
+                  {addExpense.isPending ? "Processando..." : "Confirmar Reembolso"}
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }
