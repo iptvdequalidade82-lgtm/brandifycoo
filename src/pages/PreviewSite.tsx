@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Sparkles, Loader2, Monitor, Smartphone, Download, RotateCcw, Check } from "lucide-react";
+import { ArrowLeft, Sparkles, Loader2, Monitor, Smartphone, RotateCcw, Check } from "lucide-react";
 
 const planLabels: Record<string, string> = {
   essencial: "Essencial — até 6 páginas",
@@ -136,15 +136,6 @@ export default function PreviewSite() {
     }
   }, [businessName, phone, logoPreview, plan, selectedPalette]);
 
-  const downloadHtml = () => {
-    const blob = new Blob([htmlContent], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `preview-${businessName.replace(/\s+/g, "-").toLowerCase()}.html`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -314,20 +305,12 @@ export default function PreviewSite() {
                     <Smartphone size={18} />
                   </button>
                   {done && (
-                    <>
-                      <button
-                        onClick={downloadHtml}
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/[0.06] border border-white/10 text-sm text-white/70 hover:text-white transition-colors"
-                      >
-                        <Download size={14} /> Baixar HTML
-                      </button>
-                      <button
-                        onClick={() => { setHtmlContent(""); setDone(false); }}
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/[0.06] border border-white/10 text-sm text-white/70 hover:text-white transition-colors"
-                      >
-                        <RotateCcw size={14} /> Refazer
-                      </button>
-                    </>
+                    <button
+                      onClick={() => { setHtmlContent(""); setDone(false); }}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/[0.06] border border-white/10 text-sm text-white/70 hover:text-white transition-colors"
+                    >
+                      <RotateCcw size={14} /> Refazer
+                    </button>
                   )}
                 </div>
                 </div>

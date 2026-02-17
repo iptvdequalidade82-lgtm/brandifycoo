@@ -6,65 +6,73 @@ const corsHeaders = {
 };
 
 const planPrompts: Record<string, string> = {
-  essencial: `Crie um site ONE-PAGE premium com 6 seções distintas simulando páginas (Home/Hero, Sobre, Serviços, Galeria, Contato, FAQ).
+  essencial: `Crie um site ONE-PAGE limpo e moderno com 5 seções bem espaçadas (Hero, Sobre, Serviços, Contato, FAQ).
 
-ESTRUTURA OBRIGATÓRIA:
-1. **HERO** — Tela cheia (100vh). Título gigante (clamp(2.5rem, 6vw, 5rem)) com a palavra principal em destaque usando a cor accent. Subtítulo elegante. Um botão CTA grande e arredondado com hover suave. Background com gradiente radial sutil.
-2. **SOBRE** — Layout 2 colunas no desktop (texto + imagem placeholder). Texto curto e impactante sobre a empresa. Imagem placeholder com border-radius: 1.5rem e sombra.
-3. **SERVIÇOS** — Grid 3 colunas (2 no tablet, 1 no mobile). Cada card com ícone SVG inline, título e descrição curta. Cards com background semi-transparente, border sutil e hover com elevação.
-4. **GALERIA** — Grid masonry ou 3 colunas com imagens placeholder (https://placehold.co/600x400). Hover com zoom suave (transform: scale(1.05)) e overlay escuro com texto.
-5. **CONTATO** — Formulário com campos estilizados (nome, email, mensagem). Inputs com fundo transparente, border-bottom e focus com cor accent. Botão de envio estilizado.
-6. **FAQ** — Accordion com 5 perguntas frequentes genéricas para o segmento. Estilo clean com transição de abertura suave.
+PRINCÍPIOS DE DESIGN — Inspire-se em sites de agências digitais premium:
+- MUITO espaço em branco entre seções (padding: 8rem 2rem mínimo)
+- Poucos elementos por seção — cada seção tem UM propósito claro
+- Tipografia grande e impactante, sem excesso de texto
+- Layout limpo, respirado, sem acúmulo de informações
 
-NAVEGAÇÃO: Header fixo com backdrop-filter: blur(20px), logo (iniciais ou fornecido), links de navegação com scroll suave, botão CTA no header.
-FOOTER: Compacto com copyright, links de redes sociais (ícones SVG) e telefone.`,
+ESTRUTURA:
+1. **HERO** — 100vh. Título enorme (clamp(3rem, 7vw, 5.5rem)) com apenas 1 linha de destaque. Subtítulo curto (máximo 15 palavras). UM único botão CTA. Fundo com gradiente radial sutil.
+2. **SOBRE** — Texto breve (máximo 3 frases) + uma imagem placeholder grande. Layout simples, 2 colunas no desktop.
+3. **SERVIÇOS** — Grid 3 colunas. Cards minimalistas: ícone SVG + título + 1 frase. Sem excesso de informação.
+4. **CONTATO** — Formulário simples (nome, email, mensagem). Design clean com inputs underline.
+5. **FAQ** — 4 perguntas no máximo. Accordion simples.
 
-  profissional: `Crie um site ONE-PAGE sofisticado com 10 seções distintas simulando páginas (Home/Hero, Sobre, Serviços, Portfólio, Números/Estatísticas, Depoimentos, Blog Preview, Equipe, Contato, FAQ).
+NAVEGAÇÃO: Header fixo glassmorphism, logo + 4 links + CTA. Sem excessos.
+FOOTER: Mínimo — copyright + telefone + redes sociais.`,
 
-ESTRUTURA OBRIGATÓRIA:
-1. **HERO** — Tela cheia (100vh) com efeito de partículas CSS (dots animados via @keyframes). Título grandioso (clamp(3rem, 7vw, 6rem)) com gradiente de texto na palavra destaque. Dois botões CTA (primário preenchido + secundário outline). Badge animado "✨ Profissional" no topo.
-2. **SOBRE** — Layout assimétrico. Lado esquerdo: texto com timeline vertical estilizada (3 marcos da empresa). Lado direito: imagem grande com moldura decorativa CSS.
-3. **SERVIÇOS** — Grid 3 colunas com cards glassmorphism (backdrop-filter: blur(16px), background rgba branco/5%). Cada card com ícone grande em SVG, título, descrição, e um link "Saiba mais →". Hover: borda brilha na cor accent.
-4. **PORTFÓLIO** — Grid 2x3 com projetos. Cada item: imagem placeholder, overlay gradient no hover com título do projeto e categoria. Filtro de categorias no topo (botões estilizados).
-5. **NÚMEROS** — Seção com 4 contadores animados (ex: +150 Clientes, 98% Satisfação, 5 Anos, 24h Atendimento). Layout horizontal com divisores. Background com gradiente sutil.
-6. **DEPOIMENTOS** — Carrossel CSS (overflow-x: auto, scroll-snap) com 4 depoimentos. Cada card: foto circular placeholder, nome, cargo, texto em itálico, 5 estrelas douradas. 
-7. **BLOG PREVIEW** — 3 cards de artigos com imagem, data, categoria tag, título e excerpt. Hover com elevação. Link "Ver todos os artigos →".
-8. **EQUIPE** — Grid 3 colunas. Cada membro: foto circular placeholder, nome, cargo. Hover: redes sociais aparecem com transição.
-9. **CONTATO** — Layout 2 colunas: formulário completo (nome, email, telefone, assunto, mensagem) + informações de contato com ícones (endereço, telefone, email, horário). Mapa placeholder.
-10. **FAQ** — 6 perguntas em accordion elegante com ícone de + que rotaciona para ×.
+  profissional: `Crie um site ONE-PAGE sofisticado com 7 seções espaçadas e bem organizadas (Hero, Sobre, Serviços, Portfólio, Depoimentos, Contato, FAQ).
 
-NAVEGAÇÃO: Header fixo premium com backdrop-filter: blur(24px) saturate(180%). Logo + links + botão CTA com gradiente. Menu hambúrguer estilizado no mobile com menu fullscreen.
-FOOTER: Grande, 4 colunas (sobre, links, serviços, newsletter com input). Copyright bar separada.`,
+PRINCÍPIOS DE DESIGN — Inspire-se em sites premiados de agências digitais como Brandify, Awwwards winners:
+- Espaçamento GENEROSO entre seções (padding: 8rem 2rem mínimo, gap amplo)
+- Cada seção respira — poucos elementos, muita presença visual
+- Tipografia expressiva: títulos grandes, subtítulos discretos
+- Cards com bastante padding interno, borders sutis, glassmorphism leve
+- NÃO acumule muitos elementos — qualidade > quantidade
 
-  premium: `Crie um site ONE-PAGE ultra-premium e cinematográfico com 12+ seções (Home/Hero, Sobre, Serviços, Portfólio, Processo de Trabalho, Números, Depoimentos, Blog, Equipe, Pricing, Contato, FAQ) e efeitos visuais avançados.
+ESTRUTURA:
+1. **HERO** — 100vh. Título grandioso (clamp(3rem, 8vw, 6rem)) com gradiente de texto na palavra-chave. Subtítulo curto. Dois botões (primário + outline). Badge sutil no topo.
+2. **SOBRE** — Layout 2 colunas assimétrico. Texto conciso (máx 4 frases) com 3 stats inline (ex: "5+ Anos", "200 Clientes", "98% Satisfação"). Imagem com border-radius.
+3. **SERVIÇOS** — Grid 3 colunas com cards glassmorphism. Cada card: ícone SVG + título + descrição curta (2 linhas máx). Hover com borda accent.
+4. **PORTFÓLIO** — Grid 2x2 com projetos. Imagem placeholder + overlay no hover com título. Simples e elegante.
+5. **DEPOIMENTOS** — 3 cards de depoimentos. Foto circular, nome, cargo, texto curto em itálico. Estrelas douradas.
+6. **CONTATO** — Layout 2 colunas: formulário clean + informações de contato com ícones.
+7. **FAQ** — 5 perguntas em accordion com transição suave.
 
-ESTRUTURA OBRIGATÓRIA:
-1. **HERO** — Tela cheia com background de gradiente animado (CSS @keyframes gradient-shift, 3 cores que se movem). Título épico (clamp(3.5rem, 8vw, 7rem)) com efeito de texto gradient animado. Subtítulo com typing animation (CSS @keyframes). Dois botões CTA com efeito de glow/pulse. Scroll indicator animado no bottom.
-2. **MARQUEE** — Faixa horizontal com logos de tecnologias/parceiros em scroll infinito CSS (animation: marquee 20s linear infinite). Fundo sutil diferenciado.
-3. **SOBRE** — Layout cinematográfico. Imagem grande com parallax CSS (background-attachment: fixed ou transform). Texto em overlay com reveal animation. Stats inline (fundação, projetos, clientes).
-4. **SERVIÇOS** — Cards grandes em grid 2x3. Cada card: glassmorphism extremo, ícone com background gradient, título, descrição detalhada, lista de sub-itens, botão "Contratar". Hover: card inteiro se eleva com sombra dramática.
-5. **PROCESSO** — Timeline horizontal no desktop, vertical no mobile. 5 etapas com ícones, títulos e descrições. Linha conectora animada com gradient. Números grandes estilizados.
-6. **PORTFÓLIO** — Showcase premium com cards grandes alternando layout (imagem esquerda/direita). Cada projeto: imagem fullwidth, título, descrição, tags de tecnologia, link "Ver projeto →". Hover com overlay sofisticado.
-7. **NÚMEROS** — Background escuro diferenciado. 6 contadores grandes com ícones. Layout 3x2 com animação de contagem CSS.
-8. **DEPOIMENTOS** — Seção com quote grande centralizado + carrossel de 5 depoimentos menores. Foto, nome, cargo, empresa, rating com estrelas. Background com gradiente radial sutil.
-9. **BLOG** — 4 artigos em grid assimétrico (1 grande + 3 menores). Tags coloridas, data, autor com avatar, título, excerpt. Hover premium com image zoom.
-10. **EQUIPE** — Cards com foto grande, nome, cargo, bio curta. Hover: flip card revelando redes sociais e bio completa. Grid 4 colunas desktop.
-11. **PRICING** — 3 planos em cards. Card central destacado (scale 1.05, borda accent). Cada card: nome, preço, lista de features com checks, botão CTA. Badge "Popular" no central.
-12. **CONTATO** — Seção dividida. Esquerda: formulário grande com campos flutuantes (floating labels CSS). Direita: mapa estilizado placeholder + info cards empilhados (telefone, email, endereço). Background com gradiente.
-13. **FAQ** — 8 perguntas em accordion premium com animações suaves. Ícone rotativo. Hover nos items.
+NAVEGAÇÃO: Header fixo com backdrop-blur, logo + links com underline animado + botão CTA gradient. Menu mobile clean.
+FOOTER: 3 colunas (brand, links, contato). Copyright bar separada. Sem newsletter.`,
 
-NAVEGAÇÃO: Header ultra-premium. Logo animado. Links com underline animado (::after com scaleX transition). Mega dropdown suave no hover. Botão CTA com gradient e glow. No mobile: hambúrguer menu fullscreen com animação staggered dos links.
-FOOTER: Footer monumental. Background diferenciado. 5 colunas (brand com descrição, navegação, serviços, recursos, newsletter). CTA grande "Comece seu projeto". Social links com hover colorido. Copyright bar final com links legais.
+  premium: `Crie um site ONE-PAGE cinematográfico com 9 seções (Hero, Marquee, Sobre, Serviços, Portfólio, Números, Depoimentos, Contato, FAQ) e efeitos visuais premium.
 
-EFEITOS GLOBAIS OBRIGATÓRIOS:
-- Scroll-triggered animations em TODAS as seções (Intersection Observer via CSS ou inline script simples)
-- Smooth scroll com scroll-behavior: smooth
-- Cursor customizado CSS (opcional mas desejável)
-- Gradientes animados em backgrounds
-- Glassmorphism nos cards (backdrop-filter: blur)
-- Sombras dramáticas com cores (box-shadow com a cor accent em baixa opacidade)
-- Micro-interações em todos os botões (scale, glow, color shift)
-- Loading skeleton placeholder nos cards`,
+PRINCÍPIOS DE DESIGN — Sites de agência digital de alto nível, estilo Brandify/Awwwards:
+- Espaçamento MUITO generoso — cada seção é quase uma página inteira
+- Poucos elementos por seção, mas cada um com máxima presença visual
+- Tipografia cinematográfica: títulos enormes, textos curtos e poderosos
+- Efeitos CSS sofisticados mas não excessivos
+- EQUILÍBRIO — cada seção deve ter no máximo 3-4 elementos principais
+
+ESTRUTURA:
+1. **HERO** — 100vh com gradiente animado (@keyframes). Título épico (clamp(3.5rem, 8vw, 7rem)) com gradient text. Subtítulo curto. Dois botões CTA com glow. Scroll indicator no bottom.
+2. **MARQUEE** — Faixa de scroll infinito com nomes de parceiros/tecnologias. Estilo minimalista.
+3. **SOBRE** — Texto impactante (máx 3 frases) + stats grandes inline. Uma imagem hero com parallax.
+4. **SERVIÇOS** — Grid 2x3 cards glassmorphism. Ícone gradient + título + descrição curta. Hover com elevação.
+5. **PORTFÓLIO** — 4 projetos em cards grandes alternando (imagem esq/dir). Título + tags. Hover sofisticado.
+6. **NÚMEROS** — 4 métricas grandes com ícones. Layout horizontal. Background diferenciado.
+7. **DEPOIMENTOS** — Quote grande centralizado + 3 cards menores de depoimentos. Clean e elegante.
+8. **CONTATO** — Formulário premium com floating labels + info cards ao lado.
+9. **FAQ** — 6 perguntas em accordion premium.
+
+NAVEGAÇÃO: Header ultra-premium com blur, links com underline ::after, CTA com glow. Mobile: fullscreen menu staggered.
+FOOTER: 4 colunas (brand, nav, serviços, contato). CTA "Comece seu projeto". Social links. Copyright bar.
+
+EFEITOS GLOBAIS:
+- Scroll animations (IntersectionObserver simples via script)
+- Glassmorphism nos cards
+- Gradientes animados sutis
+- Hover micro-interações (scale, glow)`,
 };
 
 serve(async (req) => {
