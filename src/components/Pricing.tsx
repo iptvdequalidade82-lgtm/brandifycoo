@@ -363,6 +363,16 @@ export default function Pricing() {
                 Solicitar Orçamento
               </motion.a>
             </div>
+            
+            <Link
+              to="/preview-loja"
+              className="flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest transition-all p-4 rounded-xl border-2 border-brand-accent/50 text-brand-accent bg-brand-accent/5 hover:bg-brand-accent/10 hover:shadow-xl hover:shadow-brand-accent/10 group relative overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none" />
+              <Eye size={14} className="text-brand-accent/70" />
+              <span>prévia grátis da loja</span>
+            </Link>
+
             <p className="text-xs text-white/30 leading-relaxed">
               <span className="text-white/50 font-medium">Domínio é cobrado à parte:</span> a partir de R$ 40,00/ano. O registro fica na conta do próprio cliente.
             </p>

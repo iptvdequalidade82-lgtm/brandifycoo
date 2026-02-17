@@ -1,0 +1,449 @@
+import { useState, useRef, useCallback, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, Sparkles, Loader2, Monitor, Smartphone, RotateCcw, Wand2, PenLine, Plus, X, Store, ThumbsUp, ThumbsDown } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+
+const colorSchemes = [
+  { id: "modern", label: "Moderno", preview: "bg-gradient-to-r from-blue-600 to-emerald-500" },
+  { id: "elegant", label: "Elegante", preview: "bg-gradient-to-r from-purple-600 to-pink-500" },
+  { id: "warm", label: "Quente", preview: "bg-gradient-to-r from-orange-600 to-amber-500" },
+  { id: "dark", label: "Dark", preview: "bg-gradient-to-r from-slate-800 to-cyan-500" },
+  { id: "pink", label: "Rosa", preview: "bg-gradient-to-r from-pink-500 to-rose-400" },
+  { id: "green", label: "Natural", preview: "bg-gradient-to-r from-green-600 to-emerald-400" },
+];
+
+type Product = { name: string; price: string; category: string; imageUrl: string };
+
+const inputClass = "w-full px-4 py-3 rounded-xl bg-white/[0.06] border border-white/10 text-white placeholder:text-white/25 focus:outline-none focus:border-white/30 transition-colors";
+const labelClass = "block text-sm font-medium text-white/70 mb-1.5";
+
+export default function PreviewLoja() {
+  const [mode, setMode] = useState<"manual" | "ia">("ia");
+  const [storeName, setStoreName] = useState("");
+  const [segment, setSegment] = useState("");
+  const [phone, setPhone] = useState("");
+  const [selectedScheme, setSelectedScheme] = useState("modern");
+  const [products, setProducts] = useState<Product[]>([{ name: "", price: "", category: "", imageUrl: "" }]);
+
+  const [generating, setGenerating] = useState(false);
+  const [htmlContent, setHtmlContent] = useState("");
+  const [done, setDone] = useState(false);
+  const [viewMode, setViewMode] = useState<"desktop" | "mobile">("desktop");
+  const [elapsed, setElapsed] = useState(0);
+  const [previewCount, setPreviewCount] = useState(0);
+  const [feedbackGiven, setFeedbackGiven] = useState<string | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    supabase.from("site_previews").select("id", { count: "exact", head: true }).then(({ count }) => {
+      if (count) setPreviewCount(count);
+    });
+  }, [done]);
+
+  const addProduct = () => {
+    if (products.length < 8) setProducts([...products, { name: "", price: "", category: "", imageUrl: "" }]);
+  };
+
+  const removeProduct = (idx: number) => {
+    setProducts(products.filter((_, i) => i !== idx));
+  };
+
+  const updateProduct = (idx: number, field: keyof Product, value: string) => {
+    setProducts(products.map((p, i) => i === idx ? { ...p, [field]: value } : p));
+  };
+
+  const generate = useCallback(async () => {
+    if (mode === "ia" && !segment.trim()) return;
+    if (mode === "manual" && !storeName.trim()) return;
+
+    setGenerating(true);
+    setHtmlContent("");
+    setDone(false);
+    setElapsed(0);
+    setFeedbackGiven(null);
+    timerRef.current = setInterval(() => setElapsed((e) => e + 1), 1000);
+
+    try {
+      const payload: Record<string, any> = {
+        aiMode: mode === "ia",
+        segment: segment.trim() || "Moda",
+        colorScheme: selectedScheme,
+      };
+
+      if (mode === "ia") {
+        payload.storeName = storeName.trim() || null;
+        payload.phone = phone.trim() || null;
+      } else {
+        payload.storeName = storeName.trim();
+        payload.phone = phone.trim() || null;
+        payload.products = products.filter(p => p.name.trim());
+      }
+
+      const resp = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-store-preview`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!resp.ok || !resp.body) {
+        const err = await resp.json().catch(() => ({ error: "Erro ao gerar." }));
+        throw new Error(err.error || "Erro ao gerar prévia.");
+      }
+
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let fullHtml = "";
+
+      while (true) {
+        const { done: rDone, value } = await reader.read();
+        if (rDone) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        let idx: number;
+        while ((idx = buffer.indexOf("\n")) !== -1) {
+          let line = buffer.slice(0, idx);
+          buffer = buffer.slice(idx + 1);
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (!line.startsWith("data: ")) continue;
+          const json = line.slice(6).trim();
+          if (json === "[DONE]") break;
+          try {
+            const parsed = JSON.parse(json);
+            const content = parsed.choices?.[0]?.delta?.content;
+            if (content) {
+              fullHtml += content;
+              let cleaned = fullHtml;
+              if (cleaned.startsWith("```html")) cleaned = cleaned.slice(7);
+              if (cleaned.startsWith("```")) cleaned = cleaned.slice(3);
+              if (cleaned.endsWith("```")) cleaned = cleaned.slice(0, -3);
+              setHtmlContent(cleaned.trim());
+            }
+          } catch {
+            buffer = line + "\n" + buffer;
+            break;
+          }
+        }
+      }
+
+      setDone(true);
+
+      // Save to DB
+      try {
+        let cleaned = fullHtml;
+        if (cleaned.startsWith("```html")) cleaned = cleaned.slice(7);
+        if (cleaned.startsWith("```")) cleaned = cleaned.slice(3);
+        if (cleaned.endsWith("```")) cleaned = cleaned.slice(0, -3);
+        const finalHtml = cleaned.trim();
+
+        const storagePath = `previews/loja-${Date.now()}-${Math.random().toString(36).slice(2)}.html`;
+        const htmlBlob = new Blob([finalHtml], { type: "text/html" });
+        await supabase.storage.from("site-previews").upload(storagePath, htmlBlob, { upsert: true });
+
+        const displayName = mode === "ia" ? (storeName.trim() || `Loja IA — ${segment.trim()}`) : storeName.trim();
+        await supabase.from("site_previews").insert({
+          client_name: displayName,
+          client_phone: phone.trim() || null,
+          segment: segment.trim() || null,
+          plan: "nuvemshop",
+          color_palette: selectedScheme,
+          html_storage_path: storagePath,
+        });
+      } catch (saveErr) {
+        console.error("Failed to save:", saveErr);
+      }
+    } catch (err: any) {
+      console.error(err);
+      setHtmlContent(`<html><body style="background:#111;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif"><p>${err.message || "Erro ao gerar prévia."}</p></body></html>`);
+      setDone(true);
+    } finally {
+      if (timerRef.current) clearInterval(timerRef.current);
+      setGenerating(false);
+    }
+  }, [mode, storeName, segment, phone, products, selectedScheme]);
+
+  const handleFeedback = async (type: "like" | "dislike") => {
+    setFeedbackGiven(type);
+    if (type === "like") {
+      const name = storeName.trim() || segment.trim();
+      window.open(
+        `https://wa.me/5543991065129?text=${encodeURIComponent(`Olá! Gerei uma prévia da loja "${name}" e adorei! Quero contratar a configuração Nuvemshop.`)}`,
+        "_blank"
+      );
+    }
+  };
+
+  const canGenerate = mode === "ia" ? !!segment.trim() : !!storeName.trim();
+
+  const fillTestData = () => {
+    setStoreName("Luna Acessórios");
+    setSegment("Joias e acessórios femininos");
+    setPhone("(43) 99106-5129");
+    setSelectedScheme("elegant");
+    if (mode === "manual") {
+      setProducts([
+        { name: "Bracelete Aço Prata", price: "67,90", category: "Braceletes", imageUrl: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400&h=400&fit=crop" },
+        { name: "Colar Coração Dourado", price: "89,90", category: "Colares", imageUrl: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&h=400&fit=crop" },
+        { name: "Brinco Argola Click", price: "45,90", category: "Brincos", imageUrl: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400&h=400&fit=crop" },
+        { name: "Anel Solitário Rose", price: "54,90", category: "Anéis", imageUrl: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&h=400&fit=crop" },
+      ]);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-black text-white">
+      <header className="sticky top-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/10">
+        <div className="container mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
+          <Link to="/#investimento" className="flex items-center gap-2 text-sm text-white/60 hover:text-white transition-colors">
+            <ArrowLeft size={16} /> Voltar
+          </Link>
+          <div className="flex items-center gap-2 text-sm">
+            <Store size={14} className="text-brand-accent" />
+            <span className="text-white font-bold">Prévia Loja Virtual</span>
+          </div>
+        </div>
+      </header>
+
+      <div className="container mx-auto max-w-7xl px-4 py-8">
+        <AnimatePresence mode="wait">
+          {!htmlContent && !generating ? (
+            <motion.div
+              key="form"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="max-w-2xl mx-auto"
+            >
+              <div className="text-center mb-8">
+                <h1 className="font-display text-3xl md:text-4xl font-black mb-3">
+                  Visualize sua{" "}
+                  <span className="italic bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">
+                    loja virtual
+                  </span>
+                </h1>
+                <p className="text-white/50">
+                  Prévia com layout idêntico à Nuvemshop — veja como sua loja ficará antes de contratar.
+                </p>
+
+                {previewCount > 0 && (
+                  <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="mt-3 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.06] border border-white/10">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-accent opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-accent" />
+                    </span>
+                    <span className="text-xs text-white/50">
+                      <span className="font-bold text-white/80">{previewCount}</span> sites já criados
+                    </span>
+                  </motion.div>
+                )}
+              </div>
+
+              {/* Mode Tabs */}
+              <div className="flex items-center gap-1 p-1 rounded-xl bg-white/[0.04] border border-white/10 mb-6">
+                <button onClick={() => setMode("ia")} className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg text-sm font-bold transition-all ${mode === "ia" ? "bg-gradient-to-r from-brand-accent to-brand-accent-deep text-white shadow-lg" : "text-white/40 hover:text-white/60"}`}>
+                  <Wand2 size={16} /> Prévia Inteligente (IA)
+                </button>
+                <button onClick={() => setMode("manual")} className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg text-sm font-bold transition-all ${mode === "manual" ? "bg-white/10 text-white shadow-lg" : "text-white/40 hover:text-white/60"}`}>
+                  <PenLine size={16} /> Preencher Manual
+                </button>
+              </div>
+
+              <div className="space-y-6 bg-white/[0.04] border border-white/10 rounded-2xl p-6 md:p-8">
+                <AnimatePresence mode="wait">
+                  {mode === "ia" ? (
+                    <motion.div key="ia-form" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.2 }}>
+                      <div className="text-center mb-6">
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-accent/10 border border-brand-accent/20 text-brand-accent text-xs font-bold mb-3">
+                          <Wand2 size={12} /> A IA cria tudo por você
+                        </div>
+                        <p className="text-sm text-white/40">Informe o segmento e a IA gera produtos, preços, categorias e toda a loja.</p>
+                      </div>
+                      <div className="space-y-4">
+                        <div>
+                          <label className={labelClass}>Ramo / Segmento da loja *</label>
+                          <input className={inputClass} placeholder="Ex: Joias femininas, Roupas fitness, Pet shop..." value={segment} onChange={(e) => setSegment(e.target.value)} />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className={labelClass}>Nome da loja (opcional)</label>
+                            <input className={inputClass} placeholder="A IA pode criar um" value={storeName} onChange={(e) => setStoreName(e.target.value)} />
+                          </div>
+                          <div>
+                            <label className={labelClass}>WhatsApp (opcional)</label>
+                            <input className={inputClass} placeholder="(00) 00000-0000" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <motion.div key="manual-form" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className={labelClass}>Nome da loja *</label>
+                            <input className={inputClass} placeholder="Minha Loja" value={storeName} onChange={(e) => setStoreName(e.target.value)} />
+                          </div>
+                          <div>
+                            <label className={labelClass}>Segmento</label>
+                            <input className={inputClass} placeholder="Ex: Moda feminina" value={segment} onChange={(e) => setSegment(e.target.value)} />
+                          </div>
+                        </div>
+                        <div>
+                          <label className={labelClass}>WhatsApp (opcional)</label>
+                          <input className={inputClass} placeholder="(00) 00000-0000" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                        </div>
+
+                        {/* Products */}
+                        <div>
+                          <label className={labelClass}>Produtos (até 8)</label>
+                          <div className="space-y-3">
+                            {products.map((p, i) => (
+                              <div key={i} className="flex gap-2 items-start">
+                                <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-2">
+                                  <input className={inputClass + " text-xs"} placeholder="Nome" value={p.name} onChange={(e) => updateProduct(i, "name", e.target.value)} />
+                                  <input className={inputClass + " text-xs"} placeholder="Preço (ex: 89,90)" value={p.price} onChange={(e) => updateProduct(i, "price", e.target.value)} />
+                                  <input className={inputClass + " text-xs"} placeholder="Categoria" value={p.category} onChange={(e) => updateProduct(i, "category", e.target.value)} />
+                                  <input className={inputClass + " text-xs"} placeholder="URL imagem (opc.)" value={p.imageUrl} onChange={(e) => updateProduct(i, "imageUrl", e.target.value)} />
+                                </div>
+                                {products.length > 1 && (
+                                  <button onClick={() => removeProduct(i)} className="mt-2 text-white/30 hover:text-red-400 transition-colors"><X size={16} /></button>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                          {products.length < 8 && (
+                            <button onClick={addProduct} className="mt-2 flex items-center gap-1 text-xs text-brand-accent hover:text-brand-accent-deep transition-colors">
+                              <Plus size={14} /> Adicionar produto
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Color Scheme */}
+                <div>
+                  <label className={labelClass}>Esquema de cores</label>
+                  <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+                    {colorSchemes.map((c) => (
+                      <button
+                        key={c.id}
+                        onClick={() => setSelectedScheme(c.id)}
+                        className={`relative rounded-xl p-2 border-2 transition-all ${selectedScheme === c.id ? "border-white shadow-lg" : "border-white/10 hover:border-white/20"}`}
+                      >
+                        <div className={`w-full h-6 rounded-lg ${c.preview}`} />
+                        <span className="text-[10px] text-white/50 mt-1 block text-center">{c.label}</span>
+                        {selectedScheme === c.id && (
+                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-white rounded-full flex items-center justify-center">
+                            <div className="w-2 h-2 bg-black rounded-full" />
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* ADM Test Button */}
+                <button onClick={fillTestData} className="w-full py-2 text-xs text-white/20 hover:text-white/40 transition-colors border border-dashed border-white/10 hover:border-white/20 rounded-lg">
+                  ⚡ Preencher Teste (ADM)
+                </button>
+
+                <motion.button
+                  whileHover={canGenerate ? { scale: 1.02 } : {}}
+                  whileTap={canGenerate ? { scale: 0.98 } : {}}
+                  onClick={generate}
+                  disabled={!canGenerate}
+                  className={`w-full py-4 rounded-xl font-bold text-lg transition-all ${canGenerate ? "bg-gradient-to-r from-brand-accent to-brand-accent-deep text-white shadow-lg shadow-brand-accent/20 hover:shadow-xl" : "bg-white/10 text-white/30 cursor-not-allowed"}`}
+                >
+                  <span className="flex items-center justify-center gap-2">
+                    <Sparkles size={20} />
+                    Gerar Prévia da Loja
+                  </span>
+                </motion.button>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="preview"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="space-y-4"
+            >
+              {/* Controls */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  {generating && (
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-accent/10 border border-brand-accent/20">
+                      <Loader2 size={14} className="animate-spin text-brand-accent" />
+                      <span className="text-xs text-brand-accent font-medium">Gerando... {elapsed}s</span>
+                    </div>
+                  )}
+                  {done && (
+                    <span className="text-xs text-white/40">Gerado em {elapsed}s</span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => setViewMode("desktop")} className={`p-2 rounded-lg transition-colors ${viewMode === "desktop" ? "bg-white/10 text-white" : "text-white/30 hover:text-white/50"}`}><Monitor size={16} /></button>
+                  <button onClick={() => setViewMode("mobile")} className={`p-2 rounded-lg transition-colors ${viewMode === "mobile" ? "bg-white/10 text-white" : "text-white/30 hover:text-white/50"}`}><Smartphone size={16} /></button>
+                  {done && (
+                    <button onClick={() => { setHtmlContent(""); setDone(false); setFeedbackGiven(null); }} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/[0.06] text-white/50 hover:text-white text-xs transition-colors">
+                      <RotateCcw size={14} /> Nova prévia
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Iframe */}
+              <div className={`mx-auto transition-all duration-500 ${viewMode === "mobile" ? "max-w-[390px]" : "max-w-full"}`}>
+                <div className="rounded-2xl overflow-hidden border border-white/10 bg-white">
+                  <iframe
+                    ref={iframeRef}
+                    srcDoc={htmlContent}
+                    className="w-full bg-white"
+                    style={{ height: "80vh", border: "none" }}
+                    sandbox="allow-scripts allow-same-origin"
+                    title="Prévia da Loja Virtual"
+                  />
+                </div>
+              </div>
+
+              {/* Feedback */}
+              {done && !feedbackGiven && (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center gap-4 py-6">
+                  <p className="text-white/50 text-sm">O que achou da prévia?</p>
+                  <div className="flex gap-3">
+                    <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => handleFeedback("like")} className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-brand-accent to-brand-accent-deep text-white font-bold">
+                      <ThumbsUp size={18} /> Adorei! Quero contratar
+                    </motion.button>
+                    <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => handleFeedback("dislike")} className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white/[0.06] border border-white/10 text-white/60 font-bold hover:bg-white/10">
+                      <ThumbsDown size={18} /> Precisa melhorar
+                    </motion.button>
+                  </div>
+                </motion.div>
+              )}
+              {feedbackGiven === "like" && (
+                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center text-brand-accent text-sm font-medium py-4">
+                  ✨ Obrigado! Redirecionando para o WhatsApp...
+                </motion.p>
+              )}
+              {feedbackGiven === "dislike" && (
+                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center text-white/40 text-sm py-4">
+                  Obrigado pelo feedback! Clique em "Nova prévia" para gerar novamente.
+                </motion.p>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
