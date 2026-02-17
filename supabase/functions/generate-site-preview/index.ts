@@ -288,10 +288,13 @@ ANIMAÇÕES CSS:
 @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
 @keyframes float { 0%,100% { transform:translateY(0) } 50% { transform:translateY(-20px) } }
 
-JavaScript obrigatório no final do body:
-- IntersectionObserver: observa sections, adiciona class 'visible' com stagger
-- Smooth scroll nos links âncora
-- FAQ accordion toggle
+JavaScript obrigatório no final do body (dentro de <script>):
+- IntersectionObserver: observa .animate-on-scroll, adiciona class 'visible'. 
+- IMPORTANTE: No início do script, verifique todos .animate-on-scroll e se o rect.top < window.innerHeight, adicione 'visible' IMEDIATAMENTE para que o hero e o topo da página não fiquem invisíveis.
+- Smooth scroll nos links âncora.
+- FAQ accordion toggle.
+- Cursor glow sutil (se plano premium).
+- Parallax sutil no hero (se plano premium).
 
 PROIBIDO:
 - Não use Lorem Ipsum. Crie textos realistas para o nicho "${segment || 'negócio'}".
