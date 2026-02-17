@@ -21,6 +21,7 @@ import PixPayment from "./pages/PixPayment";
 import Projetos from "./pages/Projetos";
 import Curso from "./pages/Curso";
 import AdminContabilidade from "./pages/AdminContabilidade";
+import PreviewSite from "./pages/PreviewSite";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/projetos" element={<Projetos />} />
+            <Route path="/preview-site" element={<PreviewSite />} />
             <Route path="/curso" element={<Curso />} />
             
             <Route path="/trabalhe-conosco" element={<TrabalheConosco />} />

@@ -1,6 +1,7 @@
-import { Check, Star, Info, Sparkles, ChevronDown, X } from "lucide-react";
+import { Check, Star, Info, Sparkles, ChevronDown, X, Eye } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import TiltCard from "@/components/TiltCard";
 import earthMoonBg from "@/assets/earth-moon-bg.jpg";
 
@@ -264,6 +265,29 @@ export default function Pricing() {
               </TiltCard>
             </motion.div>
           ))}
+        </motion.div>
+
+        {/* Preview CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="text-center mt-10"
+        >
+          <p className="text-white/40 text-sm mb-4">Quer ver como ficaria o seu site antes de contratar?</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            {plans.map((p) => (
+              <Link
+                key={p.name}
+                to={`/preview-site?plano=${p.name.toLowerCase()}`}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium border border-white/10 bg-white/[0.04] text-white/70 hover:bg-white/[0.08] hover:text-white hover:border-brand-accent/30 transition-all"
+              >
+                <Eye size={14} className="text-brand-accent" />
+                Prévia {p.name}
+              </Link>
+            ))}
+          </div>
         </motion.div>
 
         {/* Hosting note - above Nuvemshop, below cards */}
