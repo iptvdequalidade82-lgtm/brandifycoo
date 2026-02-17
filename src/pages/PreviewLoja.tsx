@@ -320,6 +320,32 @@ export default function PreviewLoja() {
                   </span>
                 </h1>
                 <p className="text-white/50">Cadastre seus produtos e veja como sua loja ficará — com vitrine, carrinho e frete simulado.</p>
+                
+                {/* ADM TEST BUTTON - REMOVER DEPOIS */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStoreName("Style Wear");
+                    setPhone("(43) 99999-1234");
+                    setSlogan("Vista-se como você é");
+                    setSegment("Roupas e Moda");
+                    setCnpj("12.345.678/0001-00");
+                    setSelectedPalette("midnight");
+                    setShippingEnabled(true);
+                    setShippingCep("86010-000");
+                    setShippingValue("14,90");
+                    setFreeShippingAbove("199,90");
+                    setProducts([
+                      { name: "Camiseta Oversized Premium", price: "89,90", category: "Camisetas", imageFile: null, imagePreview: null },
+                      { name: "Calça Cargo Streetwear", price: "179,90", category: "Calças", imageFile: null, imagePreview: null },
+                      { name: "Jaqueta Corta-Vento", price: "249,90", category: "Jaquetas", imageFile: null, imagePreview: null },
+                      { name: "Tênis Urban Runner", price: "329,90", category: "Calçados", imageFile: null, imagePreview: null },
+                    ]);
+                  }}
+                  className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500/20 border border-red-500/40 text-red-400 text-xs font-bold uppercase tracking-wider hover:bg-red-500/30 transition-colors"
+                >
+                  🧪 Preencher Teste (ADM)
+                </button>
               </div>
 
               <div className="space-y-6 bg-white/[0.04] border border-white/10 rounded-2xl p-6 md:p-8">
