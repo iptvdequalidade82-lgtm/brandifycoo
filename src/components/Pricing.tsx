@@ -136,17 +136,32 @@ function NuvemshopPlans() {
 export default function Pricing() {
   return (
     <section id="investimento" className="relative py-28 md:py-36 px-6 overflow-visible bg-black text-white">
-      {/* Moon background - larger and more visible */}
-      <div
-        className="absolute -inset-x-20 -inset-y-10 bg-cover bg-center bg-no-repeat opacity-[0.40] md:opacity-[0.22] pointer-events-none"
-        style={{
-          backgroundImage: `url(${earthMoonBg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center 40%',
-          maskImage: 'linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)',
-        }}
-      />
+      {/* Moon background - larger and more visible on mobile */}
+      <div className="absolute inset-0 pointer-events-none" style={{ overflow: 'hidden' }}>
+        <div
+          className="absolute inset-0 md:hidden"
+          style={{
+            backgroundImage: `url(${earthMoonBg})`,
+            backgroundSize: '900px auto',
+            backgroundPosition: 'center top',
+            backgroundRepeat: 'repeat-y',
+            opacity: 0.45,
+            maskImage: 'linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)',
+          }}
+        />
+        <div
+          className="absolute inset-0 hidden md:block"
+          style={{
+            backgroundImage: `url(${earthMoonBg})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            opacity: 0.22,
+            maskImage: 'linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)',
+          }}
+        />
+      </div>
       {/* Ambient blobs */}
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full bg-brand-accent/10 blur-[150px] pointer-events-none animate-[pulse_6s_ease-in-out_infinite]" />
       <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full bg-brand-accent-deep/7 blur-[120px] pointer-events-none animate-[pulse_8s_ease-in-out_infinite]" />
