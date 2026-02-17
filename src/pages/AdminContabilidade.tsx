@@ -87,7 +87,7 @@ export default function AdminContabilidade() {
       const { data } = await supabase
         .from("projects")
         .select("id, title, client_name, total_amount_cents, amount_received_cents, created_at, status, payment_status")
-        .eq("payment_status", "paid")
+        .eq("payment_status", "full")
         .order("created_at", { ascending: false });
       return data ?? [];
     },
