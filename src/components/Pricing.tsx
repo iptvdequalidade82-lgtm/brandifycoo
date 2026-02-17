@@ -352,16 +352,14 @@ export default function Pricing() {
 
           <div className="px-7 md:px-10 pb-7 md:pb-10 space-y-4">
             <div className="flex flex-col sm:flex-row gap-3">
-              <motion.a
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                href="/preview-loja"
-                className="relative inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-bold border-2 border-brand-accent/40 bg-brand-accent/10 text-white hover:bg-brand-accent/20 hover:border-brand-accent/60 gentle-animation overflow-hidden group"
+              <Link
+                to="/preview-loja"
+                className="relative inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl text-xs font-black uppercase tracking-widest border-2 border-brand-accent/50 text-brand-accent bg-brand-accent/5 hover:bg-brand-accent/10 hover:shadow-xl hover:shadow-brand-accent/10 gentle-animation overflow-hidden group shadow-sm"
               >
-                <Sparkles size={18} className="animate-pulse" />
-                Prévia Grátis da Loja
-                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-              </motion.a>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none" />
+                <Sparkles size={14} className="animate-pulse text-brand-accent/70" />
+                <span>faça sua prévia grátis</span>
+              </Link>
               <motion.a
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
