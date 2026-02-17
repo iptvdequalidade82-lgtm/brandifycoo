@@ -133,6 +133,22 @@ ESTILO DE DESIGN:
 
 ${logoUrl ? `LOGO: Use esta URL para o logo da empresa: ${logoUrl}. Exiba com height: 40px no header.` : 'LOGO: Crie um logo sofisticado usando as iniciais do nome da empresa. Use um <span> com background: var(--accent), color: white, width: 44px, height: 44px, border-radius: 12px, display: inline-flex, align-items: center, justify-content: center, font-weight: 700, font-size: 1.1rem. Ao lado, o nome da empresa em font-weight: 700.'}
 
+BACKGROUND TEMÁTICO OBRIGATÓRIO:
+- Analise o nome da empresa ("${businessName}") e identifique o segmento/nicho (ex: barbearia, clínica, restaurante, advocacia, tech, etc).
+- Crie um background SVG inline sutil e elegante no body que remeta ao segmento da empresa. Exemplos:
+  - Barbearia: tesouras, navalhas ou linhas onduladas sutis
+  - Clínica/Saúde: cruzes médicas, ondas suaves, folhas
+  - Restaurante/Food: talheres, pratos, folhas de tempero abstratas
+  - Advocacia/Jurídico: colunas gregas, balanças estilizadas
+  - Tech/Digital: circuitos, hexágonos, grid de pontos
+  - Beleza/Estética: flores, pétalas, curvas orgânicas
+  - Fitness/Academia: linhas dinâmicas, formas geométricas angulares
+  - Genérico: formas geométricas abstratas, grid de pontos, ondas
+- O SVG deve ser MUITO sutil: opacidade entre 0.03 e 0.06, usando a cor accent.
+- Aplique como background-image via SVG data URI no body ou nas seções hero/sobre.
+- NÃO pode ser chamativo — deve ser quase imperceptível, apenas adicionando textura e personalidade.
+- Também adicione um gradiente radial sutil no hero (radial-gradient com accent em baixíssima opacidade).
+
 ANIMAÇÕES CSS OBRIGATÓRIAS:
 - @keyframes fadeInUp: de opacity:0 translateY(30px) para opacity:1 translateY(0)
 - @keyframes fadeIn: de opacity:0 para opacity:1
