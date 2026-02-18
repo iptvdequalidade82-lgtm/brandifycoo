@@ -23,6 +23,7 @@ import Curso from "./pages/Curso";
 import Planos from "./pages/Planos";
 import AdminContabilidade from "./pages/AdminContabilidade";
 import AdminPreviews from "./pages/AdminPreviews";
+import AdminConteudo from "./pages/AdminConteudo";
 import PreviewSite from "./pages/PreviewSite";
 import PreviewLoja from "./pages/PreviewLoja";
 
@@ -55,6 +56,7 @@ const App = () => (
             <Route path="/admin/leads" element={<AdminLeads />} />
             <Route path="/admin/contabilidade" element={<AdminContabilidade />} />
             <Route path="/admin/previas" element={<AdminPreviews />} />
+            <Route path="/admin/conteudo" element={<AdminConteudo />} />
             <Route path="/admin/logs" element={<AdminLogs />} />
             <Route path="/pagamento-sucesso" element={<PaymentSuccess />} />
             <Route path="/pix/:id" element={<PixPayment />} />
