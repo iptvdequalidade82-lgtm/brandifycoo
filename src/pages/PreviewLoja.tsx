@@ -5,12 +5,21 @@ import { ArrowLeft, Sparkles, Loader2, Monitor, Smartphone, RotateCcw, Wand2, Pe
 import { supabase } from "@/integrations/supabase/client";
 
 const colorSchemes = [
-  { id: "modern", label: "Moderno", preview: "bg-gradient-to-r from-blue-600 to-emerald-500" },
-  { id: "elegant", label: "Elegante", preview: "bg-gradient-to-r from-purple-600 to-pink-500" },
-  { id: "warm", label: "Quente", preview: "bg-gradient-to-r from-orange-600 to-amber-500" },
-  { id: "dark", label: "Dark", preview: "bg-gradient-to-r from-slate-800 to-cyan-500" },
-  { id: "pink", label: "Rosa", preview: "bg-gradient-to-r from-pink-500 to-rose-400" },
-  { id: "green", label: "Natural", preview: "bg-gradient-to-r from-green-600 to-emerald-400" },
+  { id: "modern", label: "Moderno", colors: ["#0ea5e9", "#06b6d4", "#f0fdfa"] },
+  { id: "midnight", label: "Midnight", colors: ["#0f172a", "#1e3a8a", "#38bdf8"] },
+  { id: "neon", label: "Neon", colors: ["#a855f7", "#06ffa5", "#0a0a0a"] },
+  { id: "sunset", label: "Sunset", colors: ["#f97316", "#ec4899", "#1e1b4b"] },
+  { id: "arctic", label: "Ártico", colors: ["#e0f2fe", "#0284c7", "#0c4a6e"] },
+  { id: "emerald", label: "Esmeralda", colors: ["#064e3b", "#10b981", "#d1fae5"] },
+  { id: "cyber", label: "Cyber", colors: ["#facc15", "#0f0f0f", "#a3e635"] },
+  { id: "rose", label: "Rosé", colors: ["#fda4af", "#9f1239", "#fff1f2"] },
+  { id: "lavender", label: "Lavanda", colors: ["#c4b5fd", "#4c1d95", "#ede9fe"] },
+  { id: "volcanic", label: "Vulcânico", colors: ["#dc2626", "#1c1917", "#fbbf24"] },
+  { id: "ocean", label: "Oceano", colors: ["#0077b6", "#00b4d8", "#caf0f8"] },
+  { id: "monochrome", label: "Mono", colors: ["#18181b", "#71717a", "#f4f4f5"] },
+  { id: "coral", label: "Coral", colors: ["#fb7185", "#fdba74", "#1e293b"] },
+  { id: "forest", label: "Floresta", colors: ["#14532d", "#4ade80", "#f0fdf4"] },
+  { id: "galaxy", label: "Galáxia", colors: ["#581c87", "#7c3aed", "#c084fc"] },
 ];
 
 type Product = { name: string; price: string; category: string; imageUrl: string };
@@ -322,14 +331,18 @@ export default function PreviewLoja() {
                 {/* Color Scheme */}
                 <div>
                   <label className={labelClass}>Esquema de cores</label>
-                  <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                     {colorSchemes.map((c) => (
                       <button
                         key={c.id}
                         onClick={() => setSelectedScheme(c.id)}
                         className={`relative rounded-xl p-2 border-2 transition-all ${selectedScheme === c.id ? "border-white shadow-lg" : "border-white/10 hover:border-white/20"}`}
                       >
-                        <div className={`w-full h-6 rounded-lg ${c.preview}`} />
+                        <div className="flex gap-0.5 w-full h-6 rounded-lg overflow-hidden">
+                          {c.colors.map((color, i) => (
+                            <div key={i} className="flex-1 h-full" style={{ backgroundColor: color }} />
+                          ))}
+                        </div>
                         <span className="text-[10px] text-white/50 mt-1 block text-center">{c.label}</span>
                         {selectedScheme === c.id && (
                           <div className="absolute -top-1 -right-1 w-4 h-4 bg-white rounded-full flex items-center justify-center">
