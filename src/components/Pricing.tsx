@@ -1,4 +1,4 @@
-import { Check, Star, Info, Sparkles, ChevronDown, X, Eye } from "lucide-react";
+import { Check, Star, Info, ChevronDown, X, Eye } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
@@ -269,15 +269,11 @@ export default function Pricing() {
                   <motion.div
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
-                    className={`relative flex items-center justify-center gap-2.5 py-4 px-6 rounded-xl font-black text-sm uppercase tracking-wider transition-all duration-300 ${
-                      plan.featured
-                        ? "bg-gradient-to-r from-yellow-400 via-amber-400 to-orange-400 text-black shadow-lg shadow-yellow-500/30 hover:shadow-xl hover:shadow-yellow-500/40"
-                        : "bg-gradient-to-r from-brand-accent to-brand-accent-deep text-white shadow-lg shadow-brand-accent/25 hover:shadow-xl hover:shadow-brand-accent/40"
-                    }`}
+                    className="relative flex items-center justify-center gap-2.5 py-4 px-6 rounded-xl font-black text-sm uppercase tracking-wider bg-gradient-to-r from-brand-accent to-brand-accent-deep text-white shadow-lg shadow-brand-accent/25 hover:shadow-xl hover:shadow-brand-accent/40 transition-all duration-300"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none" />
-                    <Sparkles size={16} className="animate-pulse" />
-                    <span>🎨 Prévia Grátis — Teste Agora!</span>
+                    <Eye size={16} />
+                    <span>prévia grátis — teste agora</span>
                   </motion.div>
                 </Link>
               </div>
@@ -377,8 +373,8 @@ export default function Pricing() {
                 className="relative flex items-center justify-center gap-2.5 py-4 px-6 rounded-xl font-black text-sm uppercase tracking-wider bg-gradient-to-r from-brand-accent to-brand-accent-deep text-white shadow-lg shadow-brand-accent/25 hover:shadow-xl hover:shadow-brand-accent/40 transition-all duration-300"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none" />
-                <Sparkles size={16} className="animate-pulse" />
-                <span>🎨 Prévia Grátis da Loja — Teste Agora!</span>
+                <Eye size={16} />
+                <span>prévia grátis da loja — teste agora</span>
               </motion.div>
             </Link>
 
