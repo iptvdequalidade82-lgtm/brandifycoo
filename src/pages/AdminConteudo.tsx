@@ -1,11 +1,11 @@
 import { useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -14,39 +14,23 @@ import {
 } from "lucide-react";
 
 type FeedPost = {
-  id: string;
-  day: string;
-  time: string;
-  title: string;
-  caption: string;
-  imageDescription: string;
-  contentType: string;
-  marketingTip: string;
-  generatedImage?: string;
-  isGeneratingImage?: boolean;
+  id: string; day: string; time: string; title: string; caption: string;
+  imageDescription: string; contentType: string; marketingTip: string;
+  generatedImage?: string; isGeneratingImage?: boolean;
 };
 
 type Story = {
-  id: string;
-  day: string;
-  type: string;
-  mainText: string;
-  visualDescription: string;
-  callToAction: string;
-  generatedImage?: string;
-  isGeneratingImage?: boolean;
+  id: string; day: string; type: string; mainText: string;
+  visualDescription: string; callToAction: string;
+  generatedImage?: string; isGeneratingImage?: boolean;
 };
 
 type WeekData = {
-  weekNumber: number;
-  theme: string;
-  strategy: string;
-  feedPosts: FeedPost[];
-  stories: Story[];
+  weekNumber: number; niche: string; theme: string; strategy: string;
+  feedPosts: FeedPost[]; stories: Story[];
 };
 
 type MonthPlan = {
-  niche: string;
   monthStrategy: string;
   weeks: WeekData[];
 };
@@ -71,21 +55,31 @@ const NICHES = [
 
 const DAYS_ORDER = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
 
+const WEEK_LABELS = ["Semana 1", "Semana 2", "Semana 3", "Semana 4"];
+
 export default function AdminConteudo() {
   const { toast } = useToast();
-  const [niche, setNiche] = useState("");
-  const [customNiche, setCustomNiche] = useState("");
+  const [weekNiches, setWeekNiches] = useState<string[]>(["", "", "", ""]);
+  const [customNiches, setCustomNiches] = useState<string[]>(["", "", "", ""]);
   const [brandContext, setBrandContext] = useState("");
   const [monthPlan, setMonthPlan] = useState<MonthPlan | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeWeek, setActiveWeek] = useState("1");
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
 
-  const selectedNiche = niche === "custom" ? customNiche : niche;
+  const setNicheForWeek = (weekIdx: number, value: string) => {
+    setWeekNiches((prev) => { const n = [...prev]; n[weekIdx] = value; return n; });
+  };
+  const setCustomNicheForWeek = (weekIdx: number, value: string) => {
+    setCustomNiches((prev) => { const n = [...prev]; n[weekIdx] = value; return n; });
+  };
+
+  const resolvedNiches = weekNiches.map((n, i) => n === "custom" ? customNiches[i] : n);
+  const allFilled = resolvedNiches.every((n) => n.trim().length > 0);
 
   const handleGenerate = async () => {
-    if (!selectedNiche) {
-      toast({ title: "Selecione um nicho", variant: "destructive" });
+    if (!allFilled) {
+      toast({ title: "Selecione um nicho para cada semana", variant: "destructive" });
       return;
     }
 
@@ -94,7 +88,7 @@ export default function AdminConteudo() {
 
     try {
       const { data, error } = await supabase.functions.invoke("generate-instagram-content", {
-        body: { niche: selectedNiche, brandContext },
+        body: { niches: resolvedNiches, brandContext },
       });
 
       if (error) throw error;
@@ -113,46 +107,31 @@ export default function AdminConteudo() {
   };
 
   const handleGenerateImage = async (weekIdx: number, itemId: string, description: string, type: "feed" | "story") => {
-    setMonthPlan((prev) => {
-      if (!prev) return prev;
-      const weeks = [...prev.weeks];
-      const week = { ...weeks[weekIdx] };
-      const key = type === "feed" ? "feedPosts" : "stories";
-      week[key] = (week[key] as any[]).map((i: any) => (i.id === itemId ? { ...i, isGeneratingImage: true } : i));
-      weeks[weekIdx] = week;
-      return { ...prev, weeks };
-    });
-
-    try {
-      const { data, error } = await supabase.functions.invoke("generate-instagram-image", {
-        body: { prompt: description, type },
-      });
-
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-
+    const updateWeekItem = (updating: boolean, imageUrl?: string) => {
       setMonthPlan((prev) => {
         if (!prev) return prev;
         const weeks = [...prev.weeks];
         const week = { ...weeks[weekIdx] };
         const key = type === "feed" ? "feedPosts" : "stories";
         week[key] = (week[key] as any[]).map((i: any) =>
-          i.id === itemId ? { ...i, generatedImage: data.imageUrl, isGeneratingImage: false } : i
+          i.id === itemId ? { ...i, isGeneratingImage: updating, ...(imageUrl ? { generatedImage: imageUrl } : {}) } : i
         );
         weeks[weekIdx] = week;
         return { ...prev, weeks };
       });
+    };
+
+    updateWeekItem(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-instagram-image", {
+        body: { prompt: description, type },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      updateWeekItem(false, data.imageUrl);
       toast({ title: "Imagem gerada! 🎨" });
     } catch (e: any) {
-      setMonthPlan((prev) => {
-        if (!prev) return prev;
-        const weeks = [...prev.weeks];
-        const week = { ...weeks[weekIdx] };
-        const key = type === "feed" ? "feedPosts" : "stories";
-        week[key] = (week[key] as any[]).map((i: any) => (i.id === itemId ? { ...i, isGeneratingImage: false } : i));
-        weeks[weekIdx] = week;
-        return { ...prev, weeks };
-      });
+      updateWeekItem(false);
       toast({ title: "Erro ao gerar imagem", description: e.message, variant: "destructive" });
     }
   };
@@ -174,48 +153,50 @@ export default function AdminConteudo() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-white">Conteúdo Instagram</h1>
-            <p className="text-sm text-white/40">Planejamento mensal com IA — escolha o nicho e gere o mês inteiro</p>
+            <p className="text-sm text-white/40">Planejamento mensal — um nicho diferente por semana</p>
           </div>
         </div>
 
         {/* Generator Form */}
-        <Card className="p-5 bg-white/[0.03] border-white/[0.06] space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-white/70">Nicho do cliente</label>
-              <Select value={niche} onValueChange={setNiche}>
-                <SelectTrigger className="bg-white/[0.05] border-white/10 text-white">
-                  <SelectValue placeholder="Selecione o nicho..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {NICHES.map((n) => (
-                    <SelectItem key={n} value={n}>{n}</SelectItem>
-                  ))}
-                  <SelectItem value="custom">✏️ Digitar outro nicho</SelectItem>
-                </SelectContent>
-              </Select>
-              {niche === "custom" && (
-                <Input
-                  placeholder="Ex: Pet shop premium..."
-                  value={customNiche}
-                  onChange={(e) => setCustomNiche(e.target.value)}
-                  className="bg-white/[0.05] border-white/10 text-white"
-                />
-              )}
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-white/70">Contexto adicional (opcional)</label>
-              <Textarea
-                placeholder="Ex: O cliente atende na zona sul de SP, foco em procedimentos estéticos..."
-                value={brandContext}
-                onChange={(e) => setBrandContext(e.target.value)}
-                className="bg-white/[0.05] border-white/10 text-white resize-none h-[76px]"
-              />
-            </div>
+        <Card className="p-5 bg-white/[0.03] border-white/[0.06] space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {WEEK_LABELS.map((label, idx) => (
+              <div key={idx} className="space-y-1.5">
+                <label className="text-sm font-medium text-white/70">{label}</label>
+                <Select value={weekNiches[idx]} onValueChange={(v) => setNicheForWeek(idx, v)}>
+                  <SelectTrigger className="bg-white/[0.05] border-white/10 text-white">
+                    <SelectValue placeholder="Selecione o nicho..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {NICHES.map((n) => (
+                      <SelectItem key={n} value={n}>{n}</SelectItem>
+                    ))}
+                    <SelectItem value="custom">✏️ Digitar outro nicho</SelectItem>
+                  </SelectContent>
+                </Select>
+                {weekNiches[idx] === "custom" && (
+                  <Input
+                    placeholder="Ex: Pet shop premium..."
+                    value={customNiches[idx]}
+                    onChange={(e) => setCustomNicheForWeek(idx, e.target.value)}
+                    className="bg-white/[0.05] border-white/10 text-white"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-white/70">Contexto adicional (opcional)</label>
+            <Textarea
+              placeholder="Ex: Focar em empresas de médio porte, região sudeste..."
+              value={brandContext}
+              onChange={(e) => setBrandContext(e.target.value)}
+              className="bg-white/[0.05] border-white/10 text-white resize-none h-[68px]"
+            />
           </div>
           <Button
             onClick={handleGenerate}
-            disabled={isGenerating || !selectedNiche}
+            disabled={isGenerating || !allFilled}
             className="w-full md:w-auto bg-gradient-to-r from-pink-500 via-purple-500 to-orange-500 hover:opacity-90 text-white font-semibold py-5"
           >
             {isGenerating ? (
@@ -229,31 +210,31 @@ export default function AdminConteudo() {
         {/* Results */}
         {monthPlan && (
           <div className="space-y-5">
-            {/* Month strategy */}
             <Card className="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-500/20">
               <div className="flex items-start gap-3">
                 <Lightbulb className="w-5 h-5 text-purple-400 mt-0.5 shrink-0" />
                 <div>
-                  <h3 className="font-semibold text-white text-sm">Estratégia mensal — {monthPlan.niche}</h3>
+                  <h3 className="font-semibold text-white text-sm">Estratégia mensal</h3>
                   <p className="text-white/60 text-sm mt-1">{monthPlan.monthStrategy}</p>
                 </div>
               </div>
             </Card>
 
             {/* Week selector */}
-            <div className="flex gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               {monthPlan.weeks?.map((week) => (
                 <button
                   key={week.weekNumber}
                   onClick={() => setActiveWeek(String(week.weekNumber))}
-                  className={`flex-1 p-3 rounded-xl border text-left transition-all ${
+                  className={`p-3 rounded-xl border text-left transition-all ${
                     String(week.weekNumber) === activeWeek
                       ? "bg-white/[0.08] border-purple-500/40 shadow-lg"
                       : "bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04]"
                   }`}
                 >
-                  <div className="text-xs text-white/40 font-semibold">Semana {week.weekNumber}</div>
-                  <div className="text-xs text-white/70 mt-0.5 truncate">{week.theme}</div>
+                  <div className="text-[10px] text-white/40 font-semibold uppercase">Semana {week.weekNumber}</div>
+                  <div className="text-sm text-white/90 font-medium mt-0.5 truncate">{week.niche}</div>
+                  <div className="text-[11px] text-white/40 mt-0.5 truncate">{week.theme}</div>
                 </button>
               ))}
             </div>
@@ -262,7 +243,9 @@ export default function AdminConteudo() {
             {currentWeek && (
               <div className="space-y-4">
                 <Card className="p-3 bg-white/[0.02] border-white/[0.06]">
-                  <p className="text-sm text-white/60"><span className="text-white/80 font-medium">Foco:</span> {currentWeek.strategy}</p>
+                  <p className="text-sm text-white/60">
+                    <span className="text-white/80 font-medium">Nicho:</span> {currentWeek.niche} · <span className="text-white/80 font-medium">Foco:</span> {currentWeek.strategy}
+                  </p>
                 </Card>
 
                 <Tabs defaultValue="feed" className="w-full">
@@ -275,7 +258,6 @@ export default function AdminConteudo() {
                     </TabsTrigger>
                   </TabsList>
 
-                  {/* Feed Posts */}
                   <TabsContent value="feed" className="space-y-4 mt-4">
                     {currentWeek.feedPosts?.map((post) => {
                       const isExpanded = expandedPost === post.id;
@@ -297,9 +279,7 @@ export default function AdminConteudo() {
                                 {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                               </button>
                             </div>
-
                             <h3 className="font-bold text-white">{post.title}</h3>
-
                             {isExpanded && (
                               <div className="space-y-4 pt-2">
                                 <div className="space-y-2">
@@ -311,29 +291,17 @@ export default function AdminConteudo() {
                                   </div>
                                   <p className="text-sm text-white/70 whitespace-pre-wrap bg-white/[0.03] rounded-lg p-3">{post.caption}</p>
                                 </div>
-
                                 {post.marketingTip && (
                                   <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
                                     <Lightbulb className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
                                     <p className="text-sm text-amber-200/80">{post.marketingTip}</p>
                                   </div>
                                 )}
-
                                 <div className="space-y-2">
                                   <div className="flex items-center justify-between">
                                     <span className="text-xs font-semibold text-white/50 uppercase">Arte do post</span>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => handleGenerateImage(weekIdx, post.id, post.imageDescription, "feed")}
-                                      disabled={post.isGeneratingImage}
-                                      className="text-purple-300 hover:text-purple-200 h-7 text-xs"
-                                    >
-                                      {post.isGeneratingImage ? (
-                                        <><RefreshCw className="w-3 h-3 mr-1 animate-spin" /> Gerando...</>
-                                      ) : (
-                                        <><ImageIcon className="w-3 h-3 mr-1" /> {post.generatedImage ? "Regerar" : "Gerar imagem"}</>
-                                      )}
+                                    <Button variant="ghost" size="sm" onClick={() => handleGenerateImage(weekIdx, post.id, post.imageDescription, "feed")} disabled={post.isGeneratingImage} className="text-purple-300 hover:text-purple-200 h-7 text-xs">
+                                      {post.isGeneratingImage ? <><RefreshCw className="w-3 h-3 mr-1 animate-spin" /> Gerando...</> : <><ImageIcon className="w-3 h-3 mr-1" /> {post.generatedImage ? "Regerar" : "Gerar imagem"}</>}
                                     </Button>
                                   </div>
                                   <p className="text-xs text-white/40 italic">{post.imageDescription}</p>
@@ -354,7 +322,6 @@ export default function AdminConteudo() {
                     })}
                   </TabsContent>
 
-                  {/* Stories */}
                   <TabsContent value="stories" className="space-y-3 mt-4">
                     {DAYS_ORDER.map((day) => {
                       const dayStories = currentWeek.stories?.filter((s) => s.day === day) || [];
@@ -367,20 +334,12 @@ export default function AdminConteudo() {
                             {dayStories.map((story) => (
                               <Card key={story.id} className="p-3 bg-white/[0.03] border-white/[0.06] space-y-2">
                                 <div className="flex items-center justify-between">
-                                  <span className="px-2 py-0.5 rounded-md bg-pink-500/20 text-pink-300 text-[10px] font-semibold uppercase">
-                                    {story.type}
-                                  </span>
+                                  <span className="px-2 py-0.5 rounded-md bg-pink-500/20 text-pink-300 text-[10px] font-semibold uppercase">{story.type}</span>
                                   <div className="flex gap-1">
                                     <Button variant="ghost" size="sm" onClick={() => copyToClipboard(story.mainText)} className="text-white/30 hover:text-white h-6 w-6 p-0">
                                       <Copy className="w-3 h-3" />
                                     </Button>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => handleGenerateImage(weekIdx, story.id, story.visualDescription, "story")}
-                                      disabled={story.isGeneratingImage}
-                                      className="text-white/30 hover:text-purple-300 h-6 w-6 p-0"
-                                    >
+                                    <Button variant="ghost" size="sm" onClick={() => handleGenerateImage(weekIdx, story.id, story.visualDescription, "story")} disabled={story.isGeneratingImage} className="text-white/30 hover:text-purple-300 h-6 w-6 p-0">
                                       {story.isGeneratingImage ? <RefreshCw className="w-3 h-3 animate-spin" /> : <ImageIcon className="w-3 h-3" />}
                                     </Button>
                                   </div>

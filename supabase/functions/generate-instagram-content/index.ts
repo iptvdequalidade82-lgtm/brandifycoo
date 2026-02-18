@@ -9,18 +9,22 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { niche, brandContext } = await req.json();
+    const { niches, brandContext } = await req.json();
+    // niches: string[] with 4 items, one per week
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
+    const nichesList = niches.map((n: string, i: number) => `- Semana ${i + 1}: ${n}`).join("\n");
+
     const systemPrompt = `Você é um estrategista de marketing digital e social media especialista em Instagram para a agência Brandify (@brandifycoo). A Brandify é uma agência de criação de sites e lojas virtuais com estética moderna, futurista e profissional — cores predominantes: azul royal (#2563eb), preto (#0a0a0a) e branco.
 
-Sua missão é gerar um PLANEJAMENTO MENSAL COMPLETO (4 semanas) de conteúdo para Instagram focado em um nicho específico do cliente.
+Sua missão é gerar um PLANEJAMENTO MENSAL COMPLETO (4 semanas) de conteúdo para Instagram. CADA SEMANA FOCA EM UM NICHO DE CLIENTE DIFERENTE.
 
 REGRAS POR SEMANA:
 - 2 posts para o feed
 - 14 stories (2 por dia, segunda a domingo)
+- Cada semana foca em um nicho diferente de cliente
 
 TOTAL DO MÊS: 8 posts no feed + 56 stories
 
@@ -28,25 +32,19 @@ Cada post do feed deve ter: título curto, legenda completa com emojis e hashtag
 Cada story deve ter: texto principal (curto, impactante), descrição do visual, tipo (enquete, dica, bastidor, CTA, depoimento, carrossel), dia da semana, CTA
 
 As legendas devem usar copywriting persuasivo com gatilhos mentais (urgência, prova social, autoridade, escassez).
-Foque em estratégias para atrair clientes do nicho especificado para contratar serviços de criação de sites e lojas virtuais.
+O conteúdo deve mostrar como a Brandify ajuda aquele nicho específico com sites e lojas virtuais.
 Tom de voz: profissional mas acessível, confiante, moderno.
-
-Cada semana deve ter um TEMA/FOCO diferente para manter variedade:
-- Semana 1: Autoridade e educação
-- Semana 2: Prova social e cases
-- Semana 3: Dores e soluções
-- Semana 4: Urgência e conversão
 
 Responda APENAS em JSON válido com esta estrutura:
 {
   "monthPlan": {
-    "niche": "string",
     "monthStrategy": "string (resumo geral da estratégia do mês em 3-4 frases)",
     "weeks": [
       {
         "weekNumber": 1,
-        "theme": "string (tema da semana)",
-        "strategy": "string (estratégia específica da semana)",
+        "niche": "string (nicho da semana)",
+        "theme": "string (tema/abordagem da semana)",
+        "strategy": "string (estratégia específica)",
         "feedPosts": [
           {
             "id": "w1-feed-1",
@@ -74,12 +72,14 @@ Responda APENAS em JSON válido com esta estrutura:
   }
 }`;
 
-    const userPrompt = `Gere o planejamento MENSAL de Instagram (4 semanas completas) para:
+    const userPrompt = `Gere o planejamento MENSAL de Instagram (4 semanas) com um NICHO DIFERENTE por semana:
 
-NICHO DO CLIENTE: ${niche}
+${nichesList}
+
 ${brandContext ? `CONTEXTO ADICIONAL: ${brandContext}` : ""}
 
-Lembre-se: 4 semanas, cada uma com 2 posts no feed + 14 stories. Total: 8 posts + 56 stories.`;
+Cada semana deve focar 100% no nicho indicado, mostrando como a Brandify pode ajudar aquele tipo de cliente.
+2 posts no feed + 14 stories por semana. Total: 8 posts + 56 stories.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
