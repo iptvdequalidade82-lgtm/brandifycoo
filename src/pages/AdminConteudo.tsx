@@ -55,34 +55,29 @@ const NICHES = [
 ];
 
 const DAYS_ORDER = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
-const WEEK_1_DAYS = ["Quinta", "Sexta", "Sábado", "Domingo"];
+const WEEK_3_DAYS = ["Quinta", "Sexta", "Sábado", "Domingo"];
 
-// Real dates starting Thu Feb 20, 2026
 const WEEK_DATES: Record<number, Record<string, string>> = {
-  1: { "Quinta": "20/02", "Sexta": "21/02", "Sábado": "22/02", "Domingo": "23/02" },
-  2: { "Segunda": "24/02", "Terça": "25/02", "Quarta": "26/02", "Quinta": "27/02", "Sexta": "28/02", "Sábado": "01/03", "Domingo": "02/03" },
-  3: { "Segunda": "03/03", "Terça": "04/03", "Quarta": "05/03", "Quinta": "06/03", "Sexta": "07/03", "Sábado": "08/03", "Domingo": "09/03" },
-  4: { "Segunda": "10/03", "Terça": "11/03", "Quarta": "12/03", "Quinta": "13/03", "Sexta": "14/03", "Sábado": "15/03", "Domingo": "16/03" },
+  3: { "Quinta": "20/02", "Sexta": "21/02", "Sábado": "22/02", "Domingo": "23/02" },
+  4: { "Segunda": "24/02", "Terça": "25/02", "Quarta": "26/02", "Quinta": "27/02", "Sexta": "28/02", "Sábado": "01/03", "Domingo": "02/03" },
 };
 
 const WEEK_RANGES: Record<number, string> = {
-  1: "20/02 – 23/02",
-  2: "24/02 – 02/03",
-  3: "03/03 – 09/03",
-  4: "10/03 – 16/03",
+  3: "20/02 – 23/02",
+  4: "24/02 – 02/03",
 };
 
-const getDaysForWeek = (weekNum: number) => weekNum === 1 ? WEEK_1_DAYS : DAYS_ORDER;
+const getDaysForWeek = (weekNum: number) => weekNum === 3 ? WEEK_3_DAYS : DAYS_ORDER;
 const getDateLabel = (weekNum: number, day: string) => WEEK_DATES[weekNum]?.[day] || "";
 
 export default function AdminConteudo() {
   const { toast } = useToast();
-  const [weekNiches, setWeekNiches] = useState<string[]>(["", "", "", ""]);
-  const [customNiches, setCustomNiches] = useState<string[]>(["", "", "", ""]);
+  const [weekNiches, setWeekNiches] = useState<string[]>(["", ""]);
+  const [customNiches, setCustomNiches] = useState<string[]>(["", ""]);
   const [brandContext, setBrandContext] = useState("");
   const [monthPlan, setMonthPlan] = useState<MonthPlan | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [activeWeek, setActiveWeek] = useState("1");
+  const [activeWeek, setActiveWeek] = useState("3");
   const [feedbackItemId, setFeedbackItemId] = useState<string | null>(null);
   const [imageHint, setImageHint] = useState("");
 
@@ -111,8 +106,8 @@ export default function AdminConteudo() {
       if (data?.error) throw new Error(data.error);
       const plan = data.monthPlan || data;
       setMonthPlan(plan);
-      setActiveWeek("1");
-      toast({ title: "Planejamento mensal gerado! 🎉" });
+      setActiveWeek("3");
+      toast({ title: "Planejamento gerado! 🎉" });
     } catch (e: any) {
       console.error(e);
       toast({ title: "Erro ao gerar conteúdo", description: e.message, variant: "destructive" });
@@ -212,7 +207,7 @@ export default function AdminConteudo() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-white">Conteúdo Instagram</h1>
-            <p className="text-sm text-white/40 mt-0.5">Planejamento mensal — um nicho diferente por semana</p>
+            <p className="text-sm text-white/40 mt-0.5">Planejamento quinzenal — Semana 3 e 4 de fevereiro</p>
           </div>
         </div>
 
@@ -225,9 +220,9 @@ export default function AdminConteudo() {
             <AccordionContent>
               <div className="space-y-5 pb-2">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  {["Semana 1", "Semana 2", "Semana 3", "Semana 4"].map((label, idx) => (
+                  {[{ label: "Semana 3", range: WEEK_RANGES[3] }, { label: "Semana 4", range: WEEK_RANGES[4] }].map((item, idx) => (
                     <div key={idx} className="space-y-1.5">
-                      <label className="text-sm font-medium text-white/70">{label} <span className="text-white/30 text-xs">({WEEK_RANGES[idx + 1]})</span></label>
+                      <label className="text-sm font-medium text-white/70">{item.label} <span className="text-white/30 text-xs">({item.range})</span></label>
                       <Select value={weekNiches[idx]} onValueChange={(v) => setNicheForWeek(idx, v)}>
                         <SelectTrigger className="bg-white/[0.05] border-white/10 text-white">
                           <SelectValue placeholder="Selecione o nicho..." />
