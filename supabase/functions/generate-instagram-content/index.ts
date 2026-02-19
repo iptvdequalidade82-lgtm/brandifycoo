@@ -111,7 +111,7 @@ IMPORTANTE: Cada semana deve focar 100% no nicho indicado, mostrando como a Bran
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "openai/gpt-5",
+        model: "openai/gpt-5-mini",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
