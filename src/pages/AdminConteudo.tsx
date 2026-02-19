@@ -6,11 +6,12 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import {
   Instagram, Sparkles, Calendar, Copy, Download, RefreshCw, ImageIcon,
-  Clock, Lightbulb, ChevronDown, ChevronUp,
+  Clock, Lightbulb, Eye, MessageSquare, X, Send,
 } from "lucide-react";
 
 type FeedPost = {
@@ -54,7 +55,6 @@ const NICHES = [
 ];
 
 const DAYS_ORDER = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
-
 const WEEK_LABELS = ["Semana 1", "Semana 2", "Semana 3", "Semana 4"];
 
 export default function AdminConteudo() {
@@ -65,7 +65,11 @@ export default function AdminConteudo() {
   const [monthPlan, setMonthPlan] = useState<MonthPlan | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeWeek, setActiveWeek] = useState("1");
-  const [expandedPost, setExpandedPost] = useState<string | null>(null);
+
+  // Dialog state
+  const [selectedPost, setSelectedPost] = useState<FeedPost | null>(null);
+  const [selectedStory, setSelectedStory] = useState<Story | null>(null);
+  const [imageHint, setImageHint] = useState("");
 
   const setNicheForWeek = (weekIdx: number, value: string) => {
     setWeekNiches((prev) => { const n = [...prev]; n[weekIdx] = value; return n; });
@@ -82,18 +86,14 @@ export default function AdminConteudo() {
       toast({ title: "Selecione um nicho para cada semana", variant: "destructive" });
       return;
     }
-
     setIsGenerating(true);
     setMonthPlan(null);
-
     try {
       const { data, error } = await supabase.functions.invoke("generate-instagram-content", {
         body: { niches: resolvedNiches, brandContext },
       });
-
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-
       const plan = data.monthPlan || data;
       setMonthPlan(plan);
       setActiveWeek("1");
@@ -106,7 +106,9 @@ export default function AdminConteudo() {
     }
   };
 
-  const handleGenerateImage = async (weekIdx: number, itemId: string, description: string, type: "feed" | "story") => {
+  const handleGenerateImage = async (weekIdx: number, itemId: string, description: string, type: "feed" | "story", hint?: string) => {
+    const fullPrompt = hint ? `${description}. OBSERVAÇÃO DO USUÁRIO: ${hint}` : description;
+
     const updateWeekItem = (updating: boolean, imageUrl?: string) => {
       setMonthPlan((prev) => {
         if (!prev) return prev;
@@ -121,17 +123,41 @@ export default function AdminConteudo() {
       });
     };
 
+    // Also update dialog state
+    if (type === "feed" && selectedPost?.id === itemId) {
+      setSelectedPost((p) => p ? { ...p, isGeneratingImage: true } : p);
+    }
+    if (type === "story" && selectedStory?.id === itemId) {
+      setSelectedStory((s) => s ? { ...s, isGeneratingImage: true } : s);
+    }
+
     updateWeekItem(true);
     try {
       const { data, error } = await supabase.functions.invoke("generate-instagram-image", {
-        body: { prompt: description, type },
+        body: { prompt: fullPrompt, type },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       updateWeekItem(false, data.imageUrl);
+
+      // Update dialog state with image
+      if (type === "feed" && selectedPost?.id === itemId) {
+        setSelectedPost((p) => p ? { ...p, isGeneratingImage: false, generatedImage: data.imageUrl } : p);
+      }
+      if (type === "story" && selectedStory?.id === itemId) {
+        setSelectedStory((s) => s ? { ...s, isGeneratingImage: false, generatedImage: data.imageUrl } : s);
+      }
+
+      setImageHint("");
       toast({ title: "Imagem gerada! 🎨" });
     } catch (e: any) {
       updateWeekItem(false);
+      if (type === "feed" && selectedPost?.id === itemId) {
+        setSelectedPost((p) => p ? { ...p, isGeneratingImage: false } : p);
+      }
+      if (type === "story" && selectedStory?.id === itemId) {
+        setSelectedStory((s) => s ? { ...s, isGeneratingImage: false } : s);
+      }
       toast({ title: "Erro ao gerar imagem", description: e.message, variant: "destructive" });
     }
   };
@@ -142,6 +168,22 @@ export default function AdminConteudo() {
   };
 
   const currentWeek = monthPlan?.weeks?.find((w) => String(w.weekNumber) === activeWeek);
+  const currentWeekIdx = currentWeek ? (currentWeek.weekNumber || 1) - 1 : 0;
+
+  const openPostDialog = (post: FeedPost) => {
+    // Sync with latest monthPlan data
+    const latestPost = currentWeek?.feedPosts?.find((p) => p.id === post.id) || post;
+    setSelectedPost(latestPost);
+    setSelectedStory(null);
+    setImageHint("");
+  };
+
+  const openStoryDialog = (story: Story) => {
+    const latestStory = currentWeek?.stories?.find((s) => s.id === story.id) || story;
+    setSelectedStory(latestStory);
+    setSelectedPost(null);
+    setImageHint("");
+  };
 
   return (
     <AdminLayout>
@@ -258,102 +300,67 @@ export default function AdminConteudo() {
                     </TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="feed" className="space-y-5 mt-5">
-                    {currentWeek.feedPosts?.map((post) => {
-                      const isExpanded = expandedPost === post.id;
-                      const weekIdx = (currentWeek.weekNumber || 1) - 1;
-                      return (
-                        <Card key={post.id} className="bg-white/[0.03] border-white/[0.06] overflow-hidden">
-                          <div className="p-5 space-y-4">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3 flex-wrap">
-                                <div className="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 text-xs font-semibold">
+                  {/* Feed - compact list */}
+                  <TabsContent value="feed" className="mt-5">
+                    <div className="grid grid-cols-1 gap-3">
+                      {currentWeek.feedPosts?.map((post) => (
+                        <Card
+                          key={post.id}
+                          className="p-4 bg-white/[0.03] border-white/[0.06] hover:bg-white/[0.05] transition-colors cursor-pointer group"
+                          onClick={() => openPostDialog(post)}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4 min-w-0 flex-1">
+                              <div className="flex items-center gap-2 shrink-0">
+                                <span className="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 text-xs font-semibold">
                                   <Calendar className="w-3 h-3 inline mr-1" />{post.day}
-                                </div>
-                                <div className="px-2.5 py-1 rounded-lg bg-white/[0.06] text-white/50 text-xs">
+                                </span>
+                                <span className="px-2 py-1 rounded-lg bg-white/[0.06] text-white/50 text-xs">
                                   <Clock className="w-3 h-3 inline mr-1" />{post.time}
-                                </div>
-                                <span className="text-xs text-white/30 uppercase">{post.contentType}</span>
+                                </span>
                               </div>
-                              <button onClick={() => setExpandedPost(isExpanded ? null : post.id)} className="text-white/40 hover:text-white">
-                                {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                              </button>
+                              <h3 className="font-semibold text-white text-sm truncate">{post.title}</h3>
+                              <span className="text-[10px] text-white/30 uppercase shrink-0">{post.contentType}</span>
                             </div>
-                            <h3 className="font-bold text-white">{post.title}</h3>
-                            {isExpanded && (
-                              <div className="space-y-5 pt-3">
-                                <div className="space-y-2">
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-xs font-semibold text-white/50 uppercase">Legenda</span>
-                                    <Button variant="ghost" size="sm" onClick={() => copyToClipboard(post.caption)} className="text-white/40 hover:text-white h-7 text-xs">
-                                      <Copy className="w-3 h-3 mr-1" /> Copiar
-                                    </Button>
-                                  </div>
-                                  <p className="text-sm text-white/70 whitespace-pre-wrap bg-white/[0.03] rounded-lg p-3">{post.caption}</p>
-                                </div>
-                                {post.marketingTip && (
-                                  <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                                    <Lightbulb className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
-                                    <p className="text-sm text-amber-200/80">{post.marketingTip}</p>
-                                  </div>
-                                )}
-                                <div className="space-y-2">
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-xs font-semibold text-white/50 uppercase">Arte do post</span>
-                                    <Button variant="ghost" size="sm" onClick={() => handleGenerateImage(weekIdx, post.id, post.imageDescription, "feed")} disabled={post.isGeneratingImage} className="text-purple-300 hover:text-purple-200 h-7 text-xs">
-                                      {post.isGeneratingImage ? <><RefreshCw className="w-3 h-3 mr-1 animate-spin" /> Gerando...</> : <><ImageIcon className="w-3 h-3 mr-1" /> {post.generatedImage ? "Regerar" : "Gerar imagem"}</>}
-                                    </Button>
-                                  </div>
-                                  <p className="text-xs text-white/40 italic">{post.imageDescription}</p>
-                                  {post.generatedImage && (
-                                    <div className="relative rounded-xl overflow-hidden border border-white/10">
-                                      <img src={post.generatedImage} alt={post.title} className="w-full max-w-md aspect-square object-cover" />
-                                      <a href={post.generatedImage} download={`feed-${post.id}.png`} className="absolute top-2 right-2 p-2 bg-black/60 rounded-lg hover:bg-black/80 transition-colors">
-                                        <Download className="w-4 h-4 text-white" />
-                                      </a>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            )}
+                            <div className="flex items-center gap-2 shrink-0 ml-3">
+                              {post.generatedImage && (
+                                <span className="w-2 h-2 rounded-full bg-green-400" title="Imagem gerada" />
+                              )}
+                              <Eye className="w-4 h-4 text-white/30 group-hover:text-white/60 transition-colors" />
+                            </div>
                           </div>
                         </Card>
-                      );
-                    })}
+                      ))}
+                    </div>
                   </TabsContent>
 
-                  <TabsContent value="stories" className="space-y-5 mt-5">
+                  {/* Stories - compact list grouped by day */}
+                  <TabsContent value="stories" className="mt-5 space-y-5">
                     {DAYS_ORDER.map((day) => {
                       const dayStories = currentWeek.stories?.filter((s) => s.day === day) || [];
                       if (dayStories.length === 0) return null;
-                      const weekIdx = (currentWeek.weekNumber || 1) - 1;
                       return (
-                        <div key={day} className="space-y-3">
-                          <h4 className="text-sm font-semibold text-white/50 uppercase tracking-wider">{day}</h4>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div key={day} className="space-y-2">
+                          <h4 className="text-xs font-semibold text-white/40 uppercase tracking-wider pl-1">{day}</h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                             {dayStories.map((story) => (
-                              <Card key={story.id} className="p-4 bg-white/[0.03] border-white/[0.06] space-y-3">
-                                <div className="flex items-center justify-between">
-                                  <span className="px-2 py-0.5 rounded-md bg-pink-500/20 text-pink-300 text-[10px] font-semibold uppercase">{story.type}</span>
-                                  <div className="flex gap-1">
-                                    <Button variant="ghost" size="sm" onClick={() => copyToClipboard(story.mainText)} className="text-white/30 hover:text-white h-6 w-6 p-0">
-                                      <Copy className="w-3 h-3" />
-                                    </Button>
-                                    <Button variant="ghost" size="sm" onClick={() => handleGenerateImage(weekIdx, story.id, story.visualDescription, "story")} disabled={story.isGeneratingImage} className="text-white/30 hover:text-purple-300 h-6 w-6 p-0">
-                                      {story.isGeneratingImage ? <RefreshCw className="w-3 h-3 animate-spin" /> : <ImageIcon className="w-3 h-3" />}
-                                    </Button>
+                              <Card
+                                key={story.id}
+                                className="p-3.5 bg-white/[0.03] border-white/[0.06] hover:bg-white/[0.05] transition-colors cursor-pointer group"
+                                onClick={() => openStoryDialog(story)}
+                              >
+                                <div className="flex items-center justify-between gap-3">
+                                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                                    <span className="px-2 py-0.5 rounded-md bg-pink-500/20 text-pink-300 text-[10px] font-semibold uppercase shrink-0">{story.type}</span>
+                                    <p className="text-sm text-white/80 truncate">{story.mainText}</p>
+                                  </div>
+                                  <div className="flex items-center gap-2 shrink-0">
+                                    {story.generatedImage && (
+                                      <span className="w-2 h-2 rounded-full bg-green-400" title="Imagem gerada" />
+                                    )}
+                                    <Eye className="w-3.5 h-3.5 text-white/30 group-hover:text-white/60 transition-colors" />
                                   </div>
                                 </div>
-                                <p className="text-sm text-white/80 font-medium">{story.mainText}</p>
-                                <p className="text-xs text-white/40">{story.callToAction}</p>
-                                {story.generatedImage && (
-                                  <div className="relative rounded-lg overflow-hidden border border-white/10">
-                                    <img src={story.generatedImage} alt={story.mainText} className="w-full aspect-[9/16] object-cover max-h-60" />
-                                    <a href={story.generatedImage} download={`story-${story.id}.png`} className="absolute top-1 right-1 p-1.5 bg-black/60 rounded-md">
-                                      <Download className="w-3 h-3 text-white" />
-                                    </a>
-                                  </div>
-                                )}
                               </Card>
                             ))}
                           </div>
@@ -366,6 +373,173 @@ export default function AdminConteudo() {
             )}
           </div>
         )}
+
+        {/* ============ Feed Post Dialog ============ */}
+        <Dialog open={!!selectedPost} onOpenChange={(open) => { if (!open) setSelectedPost(null); }}>
+          <DialogContent className="bg-[#0f0f0f] border-white/10 text-white max-w-2xl max-h-[85vh] overflow-y-auto">
+            {selectedPost && (
+              <>
+                <DialogHeader>
+                  <div className="flex items-center gap-3 flex-wrap mb-1">
+                    <span className="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 text-xs font-semibold">
+                      <Calendar className="w-3 h-3 inline mr-1" />{selectedPost.day}
+                    </span>
+                    <span className="px-2 py-1 rounded-lg bg-white/[0.06] text-white/50 text-xs">
+                      <Clock className="w-3 h-3 inline mr-1" />{selectedPost.time}
+                    </span>
+                    <span className="text-[10px] text-white/30 uppercase">{selectedPost.contentType}</span>
+                  </div>
+                  <DialogTitle className="text-lg">{selectedPost.title}</DialogTitle>
+                </DialogHeader>
+
+                <div className="space-y-6 mt-4">
+                  {/* Caption */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-white/50 uppercase">Legenda</span>
+                      <Button variant="ghost" size="sm" onClick={() => copyToClipboard(selectedPost.caption)} className="text-white/40 hover:text-white h-7 text-xs">
+                        <Copy className="w-3 h-3 mr-1" /> Copiar
+                      </Button>
+                    </div>
+                    <p className="text-sm text-white/70 whitespace-pre-wrap bg-white/[0.04] rounded-lg p-4 leading-relaxed">{selectedPost.caption}</p>
+                  </div>
+
+                  {/* Marketing tip */}
+                  {selectedPost.marketingTip && (
+                    <div className="flex items-start gap-2.5 p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                      <Lightbulb className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
+                      <p className="text-sm text-amber-200/80">{selectedPost.marketingTip}</p>
+                    </div>
+                  )}
+
+                  {/* Image section */}
+                  <div className="space-y-3">
+                    <span className="text-xs font-semibold text-white/50 uppercase">Arte do post</span>
+                    <p className="text-xs text-white/40 italic leading-relaxed">{selectedPost.imageDescription}</p>
+
+                    {selectedPost.generatedImage && (
+                      <div className="relative rounded-xl overflow-hidden border border-white/10">
+                        <img src={selectedPost.generatedImage} alt={selectedPost.title} className="w-full max-w-lg mx-auto aspect-square object-cover" />
+                        <a href={selectedPost.generatedImage} download={`feed-${selectedPost.id}.png`} className="absolute top-3 right-3 p-2 bg-black/60 rounded-lg hover:bg-black/80 transition-colors">
+                          <Download className="w-4 h-4 text-white" />
+                        </a>
+                      </div>
+                    )}
+
+                    {/* Hint / observation for image */}
+                    <div className="space-y-2 pt-2">
+                      <label className="text-xs text-white/40 flex items-center gap-1.5">
+                        <MessageSquare className="w-3 h-3" />
+                        Observação para {selectedPost.generatedImage ? "refazer" : "gerar"} a imagem (opcional)
+                      </label>
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Ex: Usar tons mais quentes, incluir logo no canto..."
+                          value={imageHint}
+                          onChange={(e) => setImageHint(e.target.value)}
+                          className="bg-white/[0.05] border-white/10 text-white text-sm flex-1"
+                        />
+                        <Button
+                          onClick={() => handleGenerateImage(currentWeekIdx, selectedPost.id, selectedPost.imageDescription, "feed", imageHint || undefined)}
+                          disabled={selectedPost.isGeneratingImage}
+                          className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white shrink-0"
+                        >
+                          {selectedPost.isGeneratingImage ? (
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                          ) : selectedPost.generatedImage ? (
+                            <><RefreshCw className="w-4 h-4 mr-1.5" /> Refazer</>
+                          ) : (
+                            <><ImageIcon className="w-4 h-4 mr-1.5" /> Gerar</>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* ============ Story Dialog ============ */}
+        <Dialog open={!!selectedStory} onOpenChange={(open) => { if (!open) setSelectedStory(null); }}>
+          <DialogContent className="bg-[#0f0f0f] border-white/10 text-white max-w-lg max-h-[85vh] overflow-y-auto">
+            {selectedStory && (
+              <>
+                <DialogHeader>
+                  <div className="flex items-center gap-3 mb-1">
+                    <span className="px-2.5 py-1 rounded-md bg-pink-500/20 text-pink-300 text-xs font-semibold uppercase">{selectedStory.type}</span>
+                    <span className="text-xs text-white/40">{selectedStory.day}</span>
+                  </div>
+                  <DialogTitle className="text-base">{selectedStory.mainText}</DialogTitle>
+                </DialogHeader>
+
+                <div className="space-y-5 mt-4">
+                  {/* CTA */}
+                  <div className="space-y-1.5">
+                    <span className="text-xs font-semibold text-white/50 uppercase">Call to Action</span>
+                    <div className="flex items-center justify-between bg-white/[0.04] rounded-lg p-3">
+                      <p className="text-sm text-white/70">{selectedStory.callToAction}</p>
+                      <Button variant="ghost" size="sm" onClick={() => copyToClipboard(selectedStory.callToAction)} className="text-white/30 hover:text-white h-7 w-7 p-0 shrink-0">
+                        <Copy className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Visual description */}
+                  <div className="space-y-1.5">
+                    <span className="text-xs font-semibold text-white/50 uppercase">Descrição visual</span>
+                    <p className="text-xs text-white/40 italic leading-relaxed">{selectedStory.visualDescription}</p>
+                  </div>
+
+                  {/* Main text copy */}
+                  <Button variant="outline" size="sm" onClick={() => copyToClipboard(selectedStory.mainText)} className="border-white/10 text-white/60 hover:text-white text-xs w-full">
+                    <Copy className="w-3 h-3 mr-1.5" /> Copiar texto principal
+                  </Button>
+
+                  {/* Image */}
+                  {selectedStory.generatedImage && (
+                    <div className="relative rounded-xl overflow-hidden border border-white/10">
+                      <img src={selectedStory.generatedImage} alt={selectedStory.mainText} className="w-full aspect-[9/16] object-cover max-h-80 mx-auto" />
+                      <a href={selectedStory.generatedImage} download={`story-${selectedStory.id}.png`} className="absolute top-3 right-3 p-2 bg-black/60 rounded-lg hover:bg-black/80 transition-colors">
+                        <Download className="w-4 h-4 text-white" />
+                      </a>
+                    </div>
+                  )}
+
+                  {/* Hint / observation for image */}
+                  <div className="space-y-2">
+                    <label className="text-xs text-white/40 flex items-center gap-1.5">
+                      <MessageSquare className="w-3 h-3" />
+                      Observação para {selectedStory.generatedImage ? "refazer" : "gerar"} a imagem (opcional)
+                    </label>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Ex: Mais minimalista, fundo escuro..."
+                        value={imageHint}
+                        onChange={(e) => setImageHint(e.target.value)}
+                        className="bg-white/[0.05] border-white/10 text-white text-sm flex-1"
+                      />
+                      <Button
+                        onClick={() => handleGenerateImage(currentWeekIdx, selectedStory.id, selectedStory.visualDescription, "story", imageHint || undefined)}
+                        disabled={selectedStory.isGeneratingImage}
+                        className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white shrink-0"
+                      >
+                        {selectedStory.isGeneratingImage ? (
+                          <RefreshCw className="w-4 h-4 animate-spin" />
+                        ) : selectedStory.generatedImage ? (
+                          <><RefreshCw className="w-4 h-4 mr-1.5" /> Refazer</>
+                        ) : (
+                          <><ImageIcon className="w-4 h-4 mr-1.5" /> Gerar</>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </AdminLayout>
   );
