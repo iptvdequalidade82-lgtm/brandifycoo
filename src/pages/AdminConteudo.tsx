@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,90 +16,44 @@ import {
   Lock, CalendarDays, Check,
 } from "lucide-react";
 
+// ── Types ──
 type FeedPost = {
   id: string; day: string; time: string; title: string; caption: string;
   imageDescription: string; contentType: string; marketingTip: string;
   generatedImage?: string; isGeneratingImage?: boolean; checked?: boolean;
 };
-
 type Story = {
   id: string; day: string; type: string; mainText: string;
   visualDescription: string; callToAction: string;
   generatedImage?: string; isGeneratingImage?: boolean; checked?: boolean;
 };
-
 type WeekData = {
   weekNumber: number; niche: string; theme: string; strategy: string;
   feedPosts: FeedPost[]; stories: Story[];
 };
-
-type MonthPlan = {
-  monthStrategy: string;
-  weeks: WeekData[];
-};
-
+type MonthPlan = { monthStrategy: string; weeks: WeekData[] };
 type MonthStatus = "concluido" | "em_andamento" | "aberto";
 
+type WeekLabel = { label: string; range: string; days: string[]; dates: string[] };
 type MonthConfig = {
-  key: string;
-  label: string;
-  shortLabel: string;
-  status: MonthStatus;
-  weeksCount: number;
-  weekLabels: { label: string; range: string; days: string[] }[];
+  key: string; label: string; shortLabel: string; status: MonthStatus;
+  monthIndex: number; year: number; weekLabels: WeekLabel[];
 };
 
+// ── Constants ──
 const NICHES = [
-  "Clínicas médicas e consultórios",
-  "Dentistas e odontologia",
-  "Advogados e escritórios de advocacia",
-  "Lojas de roupas e moda",
-  "Restaurantes e delivery",
-  "Salões de beleza e barbearias",
-  "Academias e personal trainers",
-  "Imobiliárias e corretores",
-  "Contabilidade e finanças",
-  "Petshops e veterinárias",
-  "Autoescolas e despachantes",
-  "Arquitetos e designers de interiores",
-  "Fotógrafos e produtoras",
-  "Educação e cursos online",
-  "Tecnologia e startups",
+  "Clínicas médicas e consultórios", "Dentistas e odontologia",
+  "Advogados e escritórios de advocacia", "Lojas de roupas e moda",
+  "Restaurantes e delivery", "Salões de beleza e barbearias",
+  "Academias e personal trainers", "Imobiliárias e corretores",
+  "Contabilidade e finanças", "Petshops e veterinárias",
+  "Autoescolas e despachantes", "Arquitetos e designers de interiores",
+  "Fotógrafos e produtoras", "Educação e cursos online", "Tecnologia e startups",
 ];
 
-const DAYS_ORDER = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
-
-const MONTHS: MonthConfig[] = [
-  {
-    key: "jan", label: "Janeiro", shortLabel: "Jan", status: "concluido", weeksCount: 4,
-    weekLabels: [
-      { label: "Semana 1", range: "05/01 – 11/01", days: DAYS_ORDER },
-      { label: "Semana 2", range: "12/01 – 18/01", days: DAYS_ORDER },
-      { label: "Semana 3", range: "19/01 – 25/01", days: DAYS_ORDER },
-      { label: "Semana 4", range: "26/01 – 01/02", days: DAYS_ORDER },
-    ],
-  },
-  {
-    key: "fev", label: "Fevereiro", shortLabel: "Fev", status: "em_andamento", weeksCount: 2,
-    weekLabels: [
-      { label: "Semana 3", range: "20/02 – 23/02", days: ["Quinta", "Sexta", "Sábado", "Domingo"] },
-      { label: "Semana 4", range: "24/02 – 02/03", days: DAYS_ORDER },
-    ],
-  },
-  ...["Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"].map((m, i) => ({
-    key: m.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").slice(0, 3),
-    label: m,
-    shortLabel: m.slice(0, 3),
-    status: "aberto" as MonthStatus,
-    weeksCount: 4,
-    weekLabels: [
-      { label: "Semana 1", range: "", days: DAYS_ORDER },
-      { label: "Semana 2", range: "", days: DAYS_ORDER },
-      { label: "Semana 3", range: "", days: DAYS_ORDER },
-      { label: "Semana 4", range: "", days: DAYS_ORDER },
-    ],
-  })),
-];
+const DAY_NAMES = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+const MONTH_NAMES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+const MONTH_SHORT = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
 const STATUS_CONFIG: Record<MonthStatus, { label: string; color: string; icon: React.ReactNode }> = {
   concluido: { label: "Concluído", color: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30", icon: <Check className="w-3 h-3" /> },
@@ -107,9 +61,115 @@ const STATUS_CONFIG: Record<MonthStatus, { label: string; color: string; icon: R
   aberto: { label: "Em aberto", color: "bg-white/10 text-white/40 border-white/10", icon: <Lock className="w-3 h-3" /> },
 };
 
+// ── Date Helpers ──
+function formatDate(d: Date) {
+  return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function getDayName(d: Date) {
+  return DAY_NAMES[d.getDay()];
+}
+
+/** Build week configs for a month, starting from `startFrom` date */
+function buildWeeksForMonth(year: number, monthIndex: number, startFrom: Date): WeekLabel[] {
+  // Get all remaining days in the month from startFrom
+  const lastDay = new Date(year, monthIndex + 1, 0).getDate();
+  const startDay = (startFrom.getFullYear() === year && startFrom.getMonth() === monthIndex)
+    ? startFrom.getDate()
+    : 1;
+
+  if (startDay > lastDay) return [];
+
+  // Collect all remaining dates
+  const allDates: Date[] = [];
+  for (let d = startDay; d <= lastDay; d++) {
+    allDates.push(new Date(year, monthIndex, d));
+  }
+
+  // Group into weeks (Monday-based)
+  const weeks: Date[][] = [];
+  let currentWeek: Date[] = [];
+
+  for (const date of allDates) {
+    const dow = date.getDay(); // 0=Sun
+    // Start new week on Monday (unless it's the very first batch)
+    if (dow === 1 && currentWeek.length > 0) {
+      weeks.push(currentWeek);
+      currentWeek = [];
+    }
+    currentWeek.push(date);
+  }
+  if (currentWeek.length > 0) weeks.push(currentWeek);
+
+  // Convert to WeekLabel
+  return weeks.map((dates, i) => {
+    const days = dates.map((d) => getDayName(d));
+    const dateStrs = dates.map((d) => formatDate(d));
+    const range = `${dateStrs[0]} – ${dateStrs[dateStrs.length - 1]}`;
+    return {
+      label: `Semana ${i + 1}`,
+      range,
+      days,
+      dates: dateStrs,
+    };
+  });
+}
+
+function buildMonthConfigs(today: Date): MonthConfig[] {
+  const year = 2026;
+  const currentMonth = today.getMonth(); // 0-indexed
+  const currentYear = today.getFullYear();
+
+  return Array.from({ length: 12 }, (_, i) => {
+    let status: MonthStatus;
+    if (currentYear > year || (currentYear === year && i < currentMonth)) {
+      status = "concluido";
+    } else if (currentYear === year && i === currentMonth) {
+      status = "em_andamento";
+    } else {
+      status = "aberto";
+    }
+
+    // For the current month, start from tomorrow; for future months, start from day 1
+    let startFrom: Date;
+    if (status === "em_andamento") {
+      startFrom = new Date(today);
+      startFrom.setDate(startFrom.getDate() + 1); // start from tomorrow
+    } else {
+      // First Monday of the month or day 1
+      startFrom = new Date(year, i, 1);
+    }
+
+    const weekLabels = status === "concluido"
+      ? [] // no weeks needed for completed months
+      : buildWeeksForMonth(year, i, startFrom);
+
+    return {
+      key: MONTH_SHORT[i].toLowerCase(),
+      label: MONTH_NAMES[i],
+      shortLabel: MONTH_SHORT[i],
+      status,
+      monthIndex: i,
+      year,
+      weekLabels,
+    };
+  });
+}
+
+// ── Component ──
 export default function AdminConteudo() {
   const { toast } = useToast();
-  const [activeMonth, setActiveMonth] = useState("fev");
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // Recompute months on each refresh
+  const months = useMemo(() => {
+    // refreshKey forces recompute
+    void refreshKey;
+    return buildMonthConfigs(new Date());
+  }, [refreshKey]);
+
+  const currentMonthKey = months.find((m) => m.status === "em_andamento")?.key || months[0].key;
+  const [activeMonth, setActiveMonth] = useState(currentMonthKey);
   const [monthPlans, setMonthPlans] = useState<Record<string, MonthPlan>>({});
   const [weekNiches, setWeekNiches] = useState<Record<string, string[]>>({});
   const [customNiches, setCustomNiches] = useState<Record<string, string[]>>({});
@@ -119,28 +179,29 @@ export default function AdminConteudo() {
   const [feedbackItemId, setFeedbackItemId] = useState<string | null>(null);
   const [imageHint, setImageHint] = useState("");
 
-  const currentMonthConfig = MONTHS.find((m) => m.key === activeMonth)!;
+  const currentMonthConfig = months.find((m) => m.key === activeMonth)!;
   const currentPlan = monthPlans[activeMonth] || null;
+  const weeksCount = currentMonthConfig.weekLabels.length;
 
   const getNiches = (monthKey: string) => {
-    const config = MONTHS.find((m) => m.key === monthKey)!;
-    return weekNiches[monthKey] || new Array(config.weeksCount).fill("");
+    const config = months.find((m) => m.key === monthKey)!;
+    return weekNiches[monthKey] || new Array(config.weekLabels.length).fill("");
   };
   const getCustomNiches = (monthKey: string) => {
-    const config = MONTHS.find((m) => m.key === monthKey)!;
-    return customNiches[monthKey] || new Array(config.weeksCount).fill("");
+    const config = months.find((m) => m.key === monthKey)!;
+    return customNiches[monthKey] || new Array(config.weekLabels.length).fill("");
   };
 
   const setNicheForWeek = (weekIdx: number, value: string) => {
     setWeekNiches((prev) => {
-      const arr = [...(prev[activeMonth] || new Array(currentMonthConfig.weeksCount).fill(""))];
+      const arr = [...(prev[activeMonth] || new Array(weeksCount).fill(""))];
       arr[weekIdx] = value;
       return { ...prev, [activeMonth]: arr };
     });
   };
   const setCustomNicheForWeek = (weekIdx: number, value: string) => {
     setCustomNiches((prev) => {
-      const arr = [...(prev[activeMonth] || new Array(currentMonthConfig.weeksCount).fill(""))];
+      const arr = [...(prev[activeMonth] || new Array(weeksCount).fill(""))];
       arr[weekIdx] = value;
       return { ...prev, [activeMonth]: arr };
     });
@@ -149,7 +210,17 @@ export default function AdminConteudo() {
   const niches = getNiches(activeMonth);
   const customs = getCustomNiches(activeMonth);
   const resolvedNiches = niches.map((n, i) => n === "custom" ? customs[i] : n);
-  const allFilled = resolvedNiches.every((n) => n.trim().length > 0);
+  const allFilled = resolvedNiches.length > 0 && resolvedNiches.every((n) => n.trim().length > 0);
+
+  const handleRegenerate = () => {
+    // Recompute weeks from today, clear old plan
+    setRefreshKey((k) => k + 1);
+    setMonthPlans((prev) => { const p = { ...prev }; delete p[activeMonth]; return p; });
+    setWeekNiches((prev) => { const p = { ...prev }; delete p[activeMonth]; return p; });
+    setCustomNiches((prev) => { const p = { ...prev }; delete p[activeMonth]; return p; });
+    setActiveWeek("1");
+    toast({ title: "Calendário atualizado! 📅", description: "Semanas recalculadas a partir de amanhã." });
+  };
 
   const handleGenerate = async () => {
     if (!allFilled) {
@@ -162,7 +233,6 @@ export default function AdminConteudo() {
         body: {
           niches: resolvedNiches,
           brandContext,
-          monthKey: activeMonth,
           monthLabel: currentMonthConfig.label,
           weeksConfig: currentMonthConfig.weekLabels,
         },
@@ -261,7 +331,7 @@ export default function AdminConteudo() {
 
         {/* Monthly Navigation */}
         <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-12 gap-2">
-          {MONTHS.map((month) => {
+          {months.map((month) => {
             const sc = STATUS_CONFIG[month.status];
             const isActive = month.key === activeMonth;
             return (
@@ -285,7 +355,7 @@ export default function AdminConteudo() {
 
         {/* Current Month Content */}
         <Card className="p-5 bg-white/[0.02] border-white/[0.06]">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
             <div className="flex items-center gap-3">
               <CalendarDays className="w-5 h-5 text-purple-400" />
               <h2 className="text-lg font-bold text-white">{currentMonthConfig.label} 2026</h2>
@@ -293,19 +363,41 @@ export default function AdminConteudo() {
                 {STATUS_CONFIG[currentMonthConfig.status].label}
               </Badge>
             </div>
+            {currentPlan && (
+              <Button variant="outline" size="sm" onClick={handleRegenerate} className="text-xs border-white/10 text-white/60 hover:text-white hover:bg-white/10">
+                <RefreshCw className="w-3.5 h-3.5 mr-1.5" /> Refazer planejamento (atualizar datas)
+              </Button>
+            )}
           </div>
 
-          {/* Completed month */}
+          {/* Info about date range */}
+          {weeksCount > 0 && (
+            <div className="mb-4 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+              <p className="text-xs text-blue-300/80 flex items-center gap-2">
+                <Calendar className="w-3.5 h-3.5 shrink-0" />
+                {currentMonthConfig.weekLabels.length} semana{currentMonthConfig.weekLabels.length > 1 ? "s" : ""} · {currentMonthConfig.weekLabels[0]?.range.split(" – ")[0]} a {currentMonthConfig.weekLabels[currentMonthConfig.weekLabels.length - 1]?.range.split(" – ")[1]} · Atualizado para hoje
+              </p>
+            </div>
+          )}
+
+          {/* Completed month with no plan */}
           {currentMonthConfig.status === "concluido" && !currentPlan && (
             <div className="text-center py-10">
               <CheckCircle2 className="w-12 h-12 text-emerald-400/40 mx-auto mb-3" />
               <p className="text-white/50 text-sm">Planejamento de {currentMonthConfig.label} já foi concluído.</p>
-              <p className="text-white/30 text-xs mt-1">Você pode gerar novamente se quiser.</p>
+            </div>
+          )}
+
+          {/* No weeks left */}
+          {weeksCount === 0 && currentMonthConfig.status !== "concluido" && (
+            <div className="text-center py-10">
+              <Calendar className="w-12 h-12 text-white/20 mx-auto mb-3" />
+              <p className="text-white/50 text-sm">Não há mais dias restantes neste mês.</p>
             </div>
           )}
 
           {/* Generator Form */}
-          {(currentMonthConfig.status !== "concluido" || currentPlan) && (
+          {weeksCount > 0 && (
             <Accordion type="single" collapsible defaultValue={currentPlan ? undefined : "generator"}>
               <AccordionItem value="generator" className="border-white/[0.06] bg-white/[0.03] rounded-lg border px-4">
                 <AccordionTrigger className="text-sm font-semibold text-white/70 hover:no-underline py-3">
@@ -317,7 +409,7 @@ export default function AdminConteudo() {
                       {currentMonthConfig.weekLabels.map((wl, idx) => (
                         <div key={idx} className="space-y-1.5">
                           <label className="text-sm font-medium text-white/70">
-                            {wl.label} {wl.range && <span className="text-white/30 text-xs">({wl.range})</span>}
+                            {wl.label} <span className="text-white/30 text-xs">({wl.range} · {wl.days.length} dias)</span>
                           </label>
                           <Select value={niches[idx] || ""} onValueChange={(v) => setNicheForWeek(idx, v)}>
                             <SelectTrigger className="bg-white/[0.05] border-white/10 text-white">
@@ -368,7 +460,6 @@ export default function AdminConteudo() {
           {/* Plan Results */}
           {currentPlan && (
             <div className="space-y-5 mt-5">
-              {/* Strategy */}
               <Card className="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-500/20">
                 <div className="flex items-start gap-3">
                   <Lightbulb className="w-5 h-5 text-purple-400 mt-0.5 shrink-0" />
@@ -379,17 +470,12 @@ export default function AdminConteudo() {
                 </div>
               </Card>
 
-              {/* Week tabs */}
               <Tabs value={activeWeek} onValueChange={setActiveWeek} className="w-full">
                 <TabsList className="bg-white/[0.05] border border-white/10 h-auto p-1 flex-wrap">
                   {currentPlan.weeks?.map((week, idx) => {
                     const wl = currentMonthConfig.weekLabels[idx];
                     return (
-                      <TabsTrigger
-                        key={idx}
-                        value={String(idx + 1)}
-                        className="data-[state=active]:bg-white/10 text-white/50 data-[state=active]:text-white px-4 py-2"
-                      >
+                      <TabsTrigger key={idx} value={String(idx + 1)} className="data-[state=active]:bg-white/10 text-white/50 data-[state=active]:text-white px-4 py-2">
                         {wl?.label || `Sem. ${week.weekNumber}`}
                         {wl?.range && <span className="text-white/30 ml-1 text-[10px]">{wl.range}</span>}
                       </TabsTrigger>
@@ -399,7 +485,7 @@ export default function AdminConteudo() {
 
                 {currentPlan.weeks?.map((week, weekIdx) => {
                   const wl = currentMonthConfig.weekLabels[weekIdx];
-                  const daysForWeek = wl?.days || DAYS_ORDER;
+                  const daysForWeek = wl?.days || ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
 
                   return (
                     <TabsContent key={weekIdx} value={String(weekIdx + 1)} className="mt-5 space-y-5">
@@ -411,24 +497,24 @@ export default function AdminConteudo() {
 
                       <Tabs defaultValue="feed" className="w-full">
                         <TabsList className="bg-white/[0.05] border border-white/10">
-                          <TabsTrigger value="feed" className="data-[state=active]:bg-white/10 text-white/60 data-[state=active]:text-white">
-                            📸 Feed ({week.feedPosts?.length || 0})
-                          </TabsTrigger>
-                          <TabsTrigger value="stories" className="data-[state=active]:bg-white/10 text-white/60 data-[state=active]:text-white">
-                            📱 Stories ({week.stories?.length || 0})
-                          </TabsTrigger>
+                          <TabsTrigger value="feed" className="data-[state=active]:bg-white/10 text-white/60 data-[state=active]:text-white">📸 Feed ({week.feedPosts?.length || 0})</TabsTrigger>
+                          <TabsTrigger value="stories" className="data-[state=active]:bg-white/10 text-white/60 data-[state=active]:text-white">📱 Stories ({week.stories?.length || 0})</TabsTrigger>
                         </TabsList>
 
                         {/* FEED */}
                         <TabsContent value="feed" className="mt-5">
                           <Accordion type="multiple" className="space-y-2">
-                            {daysForWeek.map((day) => {
+                            {daysForWeek.map((day, dayI) => {
                               const dayPosts = week.feedPosts?.filter((p) => p.day === day) || [];
                               if (dayPosts.length === 0) return null;
+                              const dateStr = wl?.dates?.[dayI] || "";
                               return (
                                 <AccordionItem key={day} value={`feed-${day}`} className="border-white/[0.06] bg-white/[0.02] rounded-lg px-4 border">
                                   <AccordionTrigger className="text-xs font-bold text-white/60 uppercase tracking-widest hover:no-underline py-3">
-                                    <span className="flex items-center gap-2"><Calendar className="w-3.5 h-3.5" /> {day}</span>
+                                    <span className="flex items-center gap-2">
+                                      <Calendar className="w-3.5 h-3.5" /> {day}
+                                      {dateStr && <span className="text-white/30 normal-case tracking-normal font-normal">{dateStr}</span>}
+                                    </span>
                                   </AccordionTrigger>
                                   <AccordionContent>
                                     <div className="space-y-3 pb-1">
@@ -439,9 +525,7 @@ export default function AdminConteudo() {
                                               {post.generatedImage ? (
                                                 <>
                                                   <img src={post.generatedImage} alt={post.title} className="w-full h-full object-cover aspect-square" />
-                                                  <a href={post.generatedImage} download={`feed-${post.id}.png`} className="absolute top-2 right-2 p-1.5 bg-black/60 rounded-lg hover:bg-black/80 transition-colors">
-                                                    <Download className="w-3.5 h-3.5 text-white" />
-                                                  </a>
+                                                  <a href={post.generatedImage} download={`feed-${post.id}.png`} className="absolute top-2 right-2 p-1.5 bg-black/60 rounded-lg hover:bg-black/80 transition-colors"><Download className="w-3.5 h-3.5 text-white" /></a>
                                                 </>
                                               ) : (
                                                 <div className="flex flex-col items-center gap-3 p-4">
@@ -469,12 +553,9 @@ export default function AdminConteudo() {
                                               )}
                                               <div className="flex items-center gap-2 pt-1">
                                                 <Button variant="ghost" size="sm" onClick={() => toggleChecked(weekIdx, post.id, "feed")} className={`h-7 text-xs ${post.checked ? "text-emerald-400 hover:text-emerald-300" : "text-white/40 hover:text-white"}`}>
-                                                  {post.checked ? <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> : <Circle className="w-3.5 h-3.5 mr-1" />}
-                                                  {post.checked ? "Conferido ✓" : "Conferir"}
+                                                  {post.checked ? <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> : <Circle className="w-3.5 h-3.5 mr-1" />}{post.checked ? "Conferido ✓" : "Conferir"}
                                                 </Button>
-                                                <Button variant="ghost" size="sm" onClick={() => copyToClipboard(post.caption)} className="text-white/40 hover:text-white h-7 text-xs">
-                                                  <Copy className="w-3 h-3 mr-1" /> Copiar legenda
-                                                </Button>
+                                                <Button variant="ghost" size="sm" onClick={() => copyToClipboard(post.caption)} className="text-white/40 hover:text-white h-7 text-xs"><Copy className="w-3 h-3 mr-1" /> Copiar legenda</Button>
                                                 {post.generatedImage && (
                                                   <Button variant="ghost" size="sm" onClick={() => toggleFeedback(post.id)} className="text-white/40 hover:text-white h-7 text-xs">
                                                     <MessageSquare className="w-3 h-3 mr-1" /> {feedbackItemId === post.id ? "Fechar" : "Refazer com dica"}
@@ -488,7 +569,7 @@ export default function AdminConteudo() {
                                                   <Textarea placeholder="Legenda..." value={post.caption} onChange={(e) => updateItemField(weekIdx, post.id, "feed", "caption", e.target.value)} className="bg-white/[0.05] border-white/10 text-white text-xs min-h-[60px] resize-none" />
                                                   <p className="text-[10px] text-white/40 uppercase tracking-wider font-semibold flex items-center gap-1 mt-2"><ImageIcon className="w-3 h-3" /> Refazer imagem com dica</p>
                                                   <div className="flex gap-2">
-                                                    <Input placeholder="Ex: Mais minimalista, tons escuros..." value={imageHint} onChange={(e) => setImageHint(e.target.value)} className="bg-white/[0.05] border-white/10 text-white text-xs flex-1 h-8" />
+                                                    <Input placeholder="Ex: Mais minimalista..." value={imageHint} onChange={(e) => setImageHint(e.target.value)} className="bg-white/[0.05] border-white/10 text-white text-xs flex-1 h-8" />
                                                     <Button size="sm" onClick={() => handleGenerateImage(weekIdx, post.id, post.imageDescription, "feed", imageHint || undefined)} disabled={post.isGeneratingImage} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white text-xs h-8 shrink-0">
                                                       {post.isGeneratingImage ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <><RefreshCw className="w-3.5 h-3.5 mr-1" /> Refazer</>}
                                                     </Button>
@@ -510,13 +591,18 @@ export default function AdminConteudo() {
                         {/* STORIES */}
                         <TabsContent value="stories" className="mt-5">
                           <Accordion type="multiple" className="space-y-2">
-                            {daysForWeek.map((day) => {
+                            {daysForWeek.map((day, dayI) => {
                               const dayStories = week.stories?.filter((s) => s.day === day) || [];
                               if (dayStories.length === 0) return null;
+                              const dateStr = wl?.dates?.[dayI] || "";
                               return (
                                 <AccordionItem key={day} value={`story-${day}`} className="border-white/[0.06] bg-white/[0.02] rounded-lg px-4 border">
                                   <AccordionTrigger className="text-xs font-bold text-white/60 uppercase tracking-widest hover:no-underline py-3">
-                                    <span className="flex items-center gap-2"><Calendar className="w-3.5 h-3.5" /> {day} ({dayStories.length} stories)</span>
+                                    <span className="flex items-center gap-2">
+                                      <Calendar className="w-3.5 h-3.5" /> {day}
+                                      {dateStr && <span className="text-white/30 normal-case tracking-normal font-normal">{dateStr}</span>}
+                                      ({dayStories.length} stories)
+                                    </span>
                                   </AccordionTrigger>
                                   <AccordionContent>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 pb-1">
@@ -526,9 +612,7 @@ export default function AdminConteudo() {
                                             {story.generatedImage ? (
                                               <>
                                                 <img src={story.generatedImage} alt={story.mainText} className="w-full h-full object-cover" />
-                                                <a href={story.generatedImage} download={`story-${story.id}.png`} className="absolute top-2 right-2 p-1.5 bg-black/60 rounded-lg hover:bg-black/80 transition-colors">
-                                                  <Download className="w-3 h-3 text-white" />
-                                                </a>
+                                                <a href={story.generatedImage} download={`story-${story.id}.png`} className="absolute top-2 right-2 p-1.5 bg-black/60 rounded-lg hover:bg-black/80 transition-colors"><Download className="w-3 h-3 text-white" /></a>
                                               </>
                                             ) : (
                                               <div className="flex flex-col items-center gap-2">
@@ -545,15 +629,10 @@ export default function AdminConteudo() {
                                             <p className="text-[10px] text-white/40 italic line-clamp-1">{story.callToAction}</p>
                                             <div className="flex items-center gap-1 pt-1">
                                               <Button variant="ghost" size="sm" onClick={() => toggleChecked(weekIdx, story.id, "story")} className={`h-6 p-0 px-1 text-[10px] ${story.checked ? "text-emerald-400 hover:text-emerald-300" : "text-white/30 hover:text-white"}`}>
-                                                {story.checked ? <CheckCircle2 className="w-3 h-3 mr-0.5" /> : <Circle className="w-3 h-3 mr-0.5" />}
-                                                {story.checked ? "✓" : "Conferir"}
+                                                {story.checked ? <CheckCircle2 className="w-3 h-3 mr-0.5" /> : <Circle className="w-3 h-3 mr-0.5" />}{story.checked ? "✓" : "Conferir"}
                                               </Button>
-                                              <Button variant="ghost" size="sm" onClick={() => copyToClipboard(story.mainText)} className="text-white/30 hover:text-white h-6 w-6 p-0">
-                                                <Copy className="w-3 h-3" />
-                                              </Button>
-                                              <Button variant="ghost" size="sm" onClick={() => toggleFeedback(story.id)} className="text-white/30 hover:text-white h-6 p-0 px-1 text-[10px]">
-                                                <Pencil className="w-3 h-3 mr-0.5" /> Editar
-                                              </Button>
+                                              <Button variant="ghost" size="sm" onClick={() => copyToClipboard(story.mainText)} className="text-white/30 hover:text-white h-6 w-6 p-0"><Copy className="w-3 h-3" /></Button>
+                                              <Button variant="ghost" size="sm" onClick={() => toggleFeedback(story.id)} className="text-white/30 hover:text-white h-6 p-0 px-1 text-[10px]"><Pencil className="w-3 h-3 mr-0.5" /> Editar</Button>
                                             </div>
                                             {feedbackItemId === story.id && (
                                               <div className="space-y-2 pt-2 border-t border-white/[0.06]">
