@@ -118,8 +118,32 @@ Cada semana deve focar 100% no nicho indicado, mostrando como a Brandify pode aj
     let jsonStr = content;
     const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
     if (jsonMatch) jsonStr = jsonMatch[1];
+    jsonStr = jsonStr.trim();
 
-    const parsed = JSON.parse(jsonStr.trim());
+    // Find JSON boundaries
+    const jsonStart = jsonStr.indexOf("{");
+    const jsonEnd = jsonStr.lastIndexOf("}");
+    if (jsonStart === -1 || jsonEnd === -1) throw new Error("No JSON found in response");
+    jsonStr = jsonStr.substring(jsonStart, jsonEnd + 1);
+
+    // Remove control characters that break JSON
+    jsonStr = jsonStr.replace(/[\x00-\x1F\x7F]/g, (ch) => {
+      if (ch === "\n" || ch === "\r" || ch === "\t") return ch;
+      return "";
+    });
+
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(jsonStr);
+    } catch {
+      // Fix common LLM JSON issues
+      jsonStr = jsonStr
+        .replace(/,\s*}/g, "}")
+        .replace(/,\s*]/g, "]")
+        .replace(/\\\n/g, "\\n")
+        .replace(/(?<!\\)\\(?!["\\/bfnrtu])/g, "\\\\");
+      parsed = JSON.parse(jsonStr);
+    }
 
     return new Response(JSON.stringify(parsed), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
