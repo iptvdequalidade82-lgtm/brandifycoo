@@ -17,19 +17,43 @@ serve(async (req) => {
     const aspectRatio = type === "story" ? "9:16" : "1:1";
     const dimensions = type === "story" ? "1080x1920" : "1080x1080";
 
-    const imagePrompt = `Crie uma arte de design gráfico profissional para Instagram ${type === "story" ? "no formato story vertical (9:16)" : "no formato feed quadrado (1:1)"} para a agência Brandify (@brandifycoo).
+    // Randomize layout style for variety
+    const layoutStyles = [
+      "layout com mockup de site em tela de notebook centralizado, texto acima e abaixo do mockup",
+      "layout minimalista com frase de impacto gigante ocupando 70% da arte, ícone pequeno abaixo",
+      "layout dividido em dois blocos: texto à esquerda, mockup de celular à direita",
+      "layout com fundo de gradiente escuro sutil (preto para azul marinho #1E3A8A muito escuro), texto centralizado com destaque em azul",
+      "layout tipo cartão escuro com borda fina azul (#2563eb), texto centralizado, ícone no topo",
+      "layout com mockup de celular mostrando um site, sobreposto sobre fundo preto com linhas geométricas sutis",
+      "layout estilo slide de apresentação: título bold no topo, subtexto menor embaixo, separados por linha azul fina",
+      "layout assimétrico: texto grande alinhado à esquerda, elementos gráficos abstratos (setas, círculos) à direita em azul",
+    ];
+    const randomLayout = layoutStyles[Math.floor(Math.random() * layoutStyles.length)];
 
-ESTILO VISUAL OBRIGATÓRIO (baseado no feed real da Brandify):
-- Fundo: predominantemente PRETO (#0a0a0a) ou gradiente escuro
-- Tipografia: fonte sans-serif bold/black moderna, texto grande e impactante em BRANCO, com palavras-chave destacadas em AZUL (#2563eb) ou com efeito de destaque
-- Layout: estilo template profissional do Canva Pro, limpo e organizado
-- Elementos: mockups de telas de celular/notebook mostrando sites, ícones minimalistas brancos, setas direcionais, linhas geométricas sutis, gradientes escuros
-- Marca: incluir @brandifycoo discretamente no canto inferior
-- TODO texto DEVE ser em PORTUGUÊS DO BRASIL, sem nenhuma palavra em inglês
-- NÃO incluir rostos humanos realistas, mãos, dedos ou fotos de pessoas
-- Usar silhuetas, ícones ou formas abstratas no lugar de pessoas
-- A arte deve parecer feita por um designer profissional no Canva, NÃO parecer gerada por IA
-- Tipografia precisa ser LEGÍVEL, sem distorções ou letras embaralhadas
+    const imagePrompt = `Crie uma arte de design gráfico profissional para Instagram ${type === "story" ? "no formato story vertical (9:16)" : "no formato feed quadrado (1:1)"} para a agência Brandify.
+
+PALETA DE CORES ESTRITA — USE APENAS ESTAS CORES:
+- Fundo: PRETO PURO (#000000) ou preto muito escuro (#0a0a0a)
+- Texto principal: BRANCO puro (#FFFFFF)
+- Cor de destaque/acento: AZUL ROYAL (#2563EB) — usar em palavras-chave, ícones de destaque, linhas decorativas
+- Cor secundária (opcional, sutil): azul marinho escuro (#1E3A8A) — apenas para gradientes sutis ou sombras
+- PROIBIDO usar: vermelho, verde, amarelo, laranja, rosa, roxo, ou qualquer cor vibrante fora do azul
+- O resultado final deve ser predominantemente PRETO com detalhes em BRANCO e AZUL, visual sóbrio e premium
+
+LOGO DA BRANDIFY — INCLUIR OBRIGATORIAMENTE:
+- No canto superior direito OU inferior direito da arte
+- A logo é composta por: o símbolo ">>" (duas setas/chevrons) em azul (#2563eb) seguido do texto "brandify" em branco, fonte sans-serif moderna
+- Tamanho pequeno/discreto mas legível
+- Abaixo ou ao lado da logo, incluir "@brandifycoo" em texto branco/cinza pequeno
+
+LAYOUT DESTA ARTE: ${randomLayout}
+
+REGRAS DE QUALIDADE:
+- Estilo: template profissional do Canva Pro, NÃO parecer gerado por IA
+- Tipografia: fonte sans-serif bold/black, texto LEGÍVEL sem distorções
+- TODO texto em PORTUGUÊS DO BRASIL, zero palavras em inglês
+- NÃO incluir rostos humanos, mãos, dedos ou fotos de pessoas — use silhuetas, ícones ou formas abstratas
+- Elementos gráficos: mockups de telas, ícones minimalistas, setas, linhas geométricas
 - Resolução: ${dimensions}
 
 CONTEÚDO DA ARTE: ${prompt}`;

@@ -60,16 +60,23 @@ REGRAS DE CONTEÚDO:
 - O conteúdo deve SEMPRE conectar o nicho do cliente com o serviço da Brandify (criação de sites/lojas virtuais)
 - Tom de voz: direto, confiante, provocativo mas profissional
 
-DESCRIÇÃO DAS ARTES (campo imageDescription):
-Descreva artes no estilo que a Brandify já usa no Instagram:
-- Fundo predominantemente preto/escuro
-- Texto em branco com palavras-chave em destaque (bold, maior, ou em azul)
-- Mockups de sites/lojas em telas de celular ou notebook quando relevante
-- Elementos gráficos: ícones minimalistas, setas, linhas geométricas
-- Logo da Brandify (ícone de duas setas >> em azul) no canto
-- @brandifycoo como marca d'água
-- Estilo visual similar a posts feitos no Canva Pro com templates dark profissionais
-- NUNCA incluir rostos humanos realistas, usar silhuetas ou ícones se necessário
+DESCRIÇÃO DAS ARTES (campo imageDescription e visualDescription):
+REGRA CRÍTICA: Cada arte deve ter uma descrição ÚNICA e DIFERENTE. Mesmo que dois posts abordem temas parecidos (ex: "clínica sem site" e "barbearia sem site"), a descrição visual deve variar COMPLETAMENTE em:
+- Layout (ora mockup de celular, ora texto gigante centralizado, ora divisão em blocos, ora estilo cartão, ora slide de apresentação)
+- Composição (ora texto à esquerda com gráfico à direita, ora centralizado, ora assimétrico)
+- Elementos visuais (ora mockup de notebook, ora ícones, ora setas, ora linhas geométricas, ora gráficos abstratos)
+- Ângulo do texto (ora frase provocativa curta, ora pergunta retórica, ora dado estatístico impactante)
+
+PALETA OBRIGATÓRIA — DESCREVA USANDO APENAS:
+- Fundo: PRETO PURO (#000000 / #0a0a0a) — sem cores quentes, sem gradientes coloridos
+- Texto: BRANCO (#FFFFFF)
+- Destaque: AZUL ROYAL (#2563eb) — para palavras-chave, ícones, linhas
+- PROIBIDO: vermelho, verde, amarelo, laranja, rosa, roxo ou qualquer cor vibrante
+- O visual deve ser SÓBRIO, PREMIUM e ESCURO
+
+LOGO: Mencionar na descrição que a logo da Brandify (símbolo ">>" em azul + texto "brandify" em branco) deve aparecer no canto superior direito ou inferior direito.
+@brandifycoo como marca d'água discreta.
+NUNCA incluir rostos humanos realistas — usar silhuetas, ícones ou formas abstratas.
 
 Responda APENAS em JSON válido com esta estrutura:
 {
