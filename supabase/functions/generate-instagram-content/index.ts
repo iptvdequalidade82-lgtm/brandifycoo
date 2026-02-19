@@ -57,8 +57,14 @@ REGRAS DE CONTEÚDO:
 - Cada post do feed deve ter: título curto e provocativo (estilo frase de impacto), legenda completa com emojis e hashtags, descrição detalhada da arte/imagem (para geração por IA), horário sugerido, dia da semana, tipo de conteúdo
 - Cada story deve ter: texto principal (curto, impactante), descrição do visual, tipo (enquete, dica, bastidor, CTA, depoimento, carrossel), dia da semana, CTA
 - As legendas devem usar copywriting persuasivo com gatilhos mentais (urgência, prova social, autoridade, escassez)
-- O conteúdo deve SEMPRE conectar o nicho do cliente com o serviço da Brandify (criação de sites/lojas virtuais)
 - Tom de voz: direto, confiante, provocativo mas profissional
+
+ESTRATÉGIA DE CONTEÚDO POR POST (REGRA OBRIGATÓRIA):
+Cada semana tem 2 posts no feed. Eles DEVEM seguir este padrão:
+- POST 1 — "DOR DO NICHO": Focado 100% na dor/problema específico do nicho da semana. Deve provocar, cutucar, mostrar o que o cliente do nicho está perdendo por não ter um site/loja profissional. Exemplo: "Sua clínica depende de indicação? Enquanto você espera, seu concorrente aparece no Google." É direto, agressivo, específico.
+- POST 2 — "NEUTRO/GERAL": Conteúdo mais amplo e generalizado sobre presença digital, vendas online, ou autoridade da Brandify. Não menciona o nicho diretamente. Exemplo: "80% dos clientes pesquisam no Google antes de comprar. Cadê seu site?", "Um site profissional trabalha por você 24h por dia", "Você sabia que empresas com site vendem 3x mais?". É inspiracional, educativo, serve pra qualquer público.
+
+PARA STORIES: Alternar entre conteúdo específico do nicho e conteúdo geral/bastidores da Brandify. Não deixar todos os stories focados apenas no nicho — intercalar com dicas gerais, provas sociais da Brandify, e CTAs universais.
 
 DESCRIÇÃO DAS ARTES (campo imageDescription e visualDescription):
 REGRA CRÍTICA: Cada arte deve ter uma descrição ÚNICA e DIFERENTE. Mesmo que dois posts abordem temas parecidos (ex: "clínica sem site" e "barbearia sem site"), a descrição visual deve variar COMPLETAMENTE em:
