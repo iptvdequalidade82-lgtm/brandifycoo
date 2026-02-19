@@ -9,13 +9,32 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { niches, brandContext } = await req.json();
-    // niches: string[] with 2 items (week 3 and week 4)
+    const { niches, brandContext, monthLabel, weeksConfig } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const nichesList = niches.map((n: string, i: number) => `- Semana ${i + 3}: ${n}`).join("\n");
+    const nichesList = niches.map((n: string, i: number) => {
+      const wl = weeksConfig?.[i];
+      return `- ${wl?.label || `Semana ${i + 1}`}: ${n}`;
+    }).join("\n");
+
+    const weeksCount = niches.length;
+
+    // Build calendar instructions
+    let calendarInstructions = "";
+    if (weeksConfig) {
+      calendarInstructions = weeksConfig.map((wc: any, i: number) => {
+        const days = wc.days || ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
+        const storiesCount = days.length * 2;
+        return `- ${wc.label} (${wc.range || ""}): ${days.length} dias (${days.join(", ")}). Gere 2 posts no feed + ${storiesCount} stories (2 por dia). Use weekNumber ${i + 1} no JSON.`;
+      }).join("\n");
+    }
+
+    const totalFeed = weeksCount * 2;
+    const totalStories = weeksConfig
+      ? weeksConfig.reduce((sum: number, wc: any) => sum + (wc.days?.length || 7) * 2, 0)
+      : weeksCount * 14;
 
     const systemPrompt = `Você é um estrategista de marketing digital e social media especialista em Instagram para a agência Brandify (@brandifycoo). A Brandify é uma agência de criação de sites profissionais e lojas virtuais que ajuda empresas de diversos nichos a venderem mais online.
 
@@ -29,15 +48,9 @@ IDENTIDADE VISUAL DA BRANDIFY:
 PROPOSTA DE VALOR CENTRAL:
 A Brandify cria sites e lojas virtuais que VENDEM. Cada post deve conectar o nicho do cliente com a necessidade de ter presença digital profissional. A mensagem central é: "Sua empresa do nicho X precisa de um site profissional pra vender mais, e a Brandify faz isso pra você."
 
-Sua missão é gerar um PLANEJAMENTO MENSAL COMPLETO (4 semanas) de conteúdo para Instagram. CADA SEMANA FOCA EM UM NICHO DE CLIENTE DIFERENTE.
+Sua missão é gerar um PLANEJAMENTO de conteúdo para Instagram para ${monthLabel || "o período"}. CADA SEMANA FOCA EM UM NICHO DE CLIENTE DIFERENTE.
 
-TOTAL: 4 posts no feed + 22 stories
-
-REGRAS POR SEMANA:
-- Semana 3 (Qui 20/02 a Dom 23/02 — 4 dias): 2 posts para o feed + 8 stories (2 por dia)
-- Semana 4 (Seg 24/02 a Dom 02/03 — 7 dias): 2 posts para o feed + 14 stories (2 por dia)
-
-TOTAL DO PLANEJAMENTO: 4 posts no feed + 22 stories
+TOTAL: ${totalFeed} posts no feed + ${totalStories} stories
 
 REGRAS DE CONTEÚDO:
 - Tudo em PORTUGUÊS DO BRASIL
@@ -45,7 +58,6 @@ REGRAS DE CONTEÚDO:
 - Cada story deve ter: texto principal (curto, impactante), descrição do visual, tipo (enquete, dica, bastidor, CTA, depoimento, carrossel), dia da semana, CTA
 - As legendas devem usar copywriting persuasivo com gatilhos mentais (urgência, prova social, autoridade, escassez)
 - O conteúdo deve SEMPRE conectar o nicho do cliente com o serviço da Brandify (criação de sites/lojas virtuais)
-- Exemplos de conexão: "Você tem uma clínica e depende só de indicação? Um site profissional muda isso.", "Seu restaurante tem delivery mas não tem site próprio? Está perdendo dinheiro."
 - Tom de voz: direto, confiante, provocativo mas profissional
 
 DESCRIÇÃO DAS ARTES (campo imageDescription):
@@ -62,32 +74,32 @@ Descreva artes no estilo que a Brandify já usa no Instagram:
 Responda APENAS em JSON válido com esta estrutura:
 {
   "monthPlan": {
-    "monthStrategy": "string (resumo geral da estratégia do mês em 3-4 frases)",
+    "monthStrategy": "string (resumo geral da estratégia em 3-4 frases)",
     "weeks": [
       {
-        "weekNumber": 3,
+        "weekNumber": 1,
         "niche": "string (nicho da semana)",
         "theme": "string (tema/abordagem da semana)",
         "strategy": "string (estratégia específica)",
         "feedPosts": [
           {
-            "id": "w3-feed-1",
+            "id": "w1-feed-1",
             "day": "Quinta",
             "time": "19:00",
             "title": "string",
             "caption": "string (legenda completa com emojis e hashtags)",
-            "imageDescription": "string (descrição DETALHADA da arte no estilo Brandify dark, incluindo textos que devem aparecer na imagem, layout, elementos visuais)",
+            "imageDescription": "string (descrição DETALHADA da arte)",
             "contentType": "carrossel|imagem|reels",
             "marketingTip": "string"
           }
         ],
         "stories": [
           {
-            "id": "w3-story-1",
+            "id": "w1-story-1",
             "day": "Quinta",
             "type": "dica|enquete|bastidor|CTA|depoimento|carrossel",
             "mainText": "string",
-            "visualDescription": "string (descrição detalhada do visual do story no estilo Brandify dark)",
+            "visualDescription": "string",
             "callToAction": "string"
           }
         ]
@@ -96,19 +108,17 @@ Responda APENAS em JSON válido com esta estrutura:
   }
 }`;
 
-    const userPrompt = `Gere o planejamento QUINZENAL de Instagram (2 semanas) com um NICHO DIFERENTE por semana:
+    const userPrompt = `Gere o planejamento de Instagram para ${monthLabel || "o período"} (${weeksCount} semanas) com um NICHO DIFERENTE por semana:
 
 ${nichesList}
 
 ${brandContext ? `CONTEXTO ADICIONAL: ${brandContext}` : ""}
 
-CALENDÁRIO REAL — SIGA RIGOROSAMENTE:
-- Semana 3 (weekNumber: 3): Quinta 20/02 a Domingo 23/02 (4 dias). Use SOMENTE os dias: Quinta, Sexta, Sábado, Domingo. IDs: w3-feed-1, w3-feed-2, w3-story-1 a w3-story-8. Gere 2 posts no feed + 8 stories (2 por dia).
-- Semana 4 (weekNumber: 4): Segunda 24/02 a Domingo 02/03 (7 dias). Use Segunda a Domingo. IDs: w4-feed-1, w4-feed-2, w4-story-1 a w4-story-14. Gere 2 posts no feed + 14 stories (2 por dia).
+${calendarInstructions ? `CALENDÁRIO — SIGA RIGOROSAMENTE:\n${calendarInstructions}` : ""}
 
-IMPORTANTE: Use weekNumber 3 e 4 (não 1 e 2). Na Semana 3 use SOMENTE Quinta, Sexta, Sábado e Domingo.
-Cada semana deve focar 100% no nicho indicado, mostrando como a Brandify pode ajudar aquele tipo de cliente a vender mais com um site/loja virtual profissional.
-Total: 4 posts no feed + 22 stories.`;
+IMPORTANTE: Use weekNumber sequencial (1, 2, 3...) e os IDs devem ser w1-feed-1, w1-story-1, w2-feed-1, etc.
+Cada semana deve focar 100% no nicho indicado, mostrando como a Brandify pode ajudar aquele tipo de cliente.
+Total: ${totalFeed} posts no feed + ${totalStories} stories.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -149,13 +159,11 @@ Total: 4 posts no feed + 22 stories.`;
     if (jsonMatch) jsonStr = jsonMatch[1];
     jsonStr = jsonStr.trim();
 
-    // Find JSON boundaries
     const jsonStart = jsonStr.indexOf("{");
     const jsonEnd = jsonStr.lastIndexOf("}");
     if (jsonStart === -1 || jsonEnd === -1) throw new Error("No JSON found in response");
     jsonStr = jsonStr.substring(jsonStart, jsonEnd + 1);
 
-    // Remove control characters that break JSON
     jsonStr = jsonStr.replace(/[\x00-\x1F\x7F]/g, (ch) => {
       if (ch === "\n" || ch === "\r" || ch === "\t") return ch;
       return "";
@@ -165,7 +173,6 @@ Total: 4 posts no feed + 22 stories.`;
     try {
       parsed = JSON.parse(jsonStr);
     } catch {
-      // Fix common LLM JSON issues
       jsonStr = jsonStr
         .replace(/,\s*}/g, "}")
         .replace(/,\s*]/g, "]")
