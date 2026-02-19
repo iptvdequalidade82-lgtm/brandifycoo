@@ -17,7 +17,20 @@ serve(async (req) => {
     const aspectRatio = type === "story" ? "9:16" : "1:1";
     const dimensions = type === "story" ? "1080x1920" : "1080x1080";
 
-    const imagePrompt = `Create a professional Instagram ${type === "story" ? "story (9:16 vertical)" : "feed post (1:1 square)"} design for a digital agency called Brandify. Style: modern, futuristic, clean. Primary colors: royal blue (#2563eb), black (#0a0a0a), white. The design should look like a professional social media post with clean typography, geometric elements, and a premium feel. ${prompt}. Ultra high resolution, ${dimensions}.`;
+    const imagePrompt = `Crie uma arte profissional para Instagram ${type === "story" ? "no formato story vertical (9:16)" : "no formato feed quadrado (1:1)"} para a agência digital Brandify (@brandifycoo).
+
+REGRAS OBRIGATÓRIAS:
+- TODO texto na imagem DEVE ser em PORTUGUÊS DO BRASIL, sem nenhuma palavra em inglês
+- Estilo: design gráfico profissional feito por designer humano, NÃO parecer gerado por IA
+- Tipografia limpa e legível, sem distorções ou letras embaralhadas
+- Se incluir texto, use fontes sans-serif modernas e bem espaçadas
+- Cores principais: azul royal (#2563eb), preto (#0a0a0a), branco
+- Visual moderno, elegante e minimalista com elementos geométricos sutis
+- Evitar: rostos humanos, mãos, dedos, elementos fotorrealistas complexos
+- Preferir: composições gráficas, ícones, mockups de telas, formas abstratas, gradientes
+- Qualidade: ultra alta resolução, ${dimensions}
+
+CONTEÚDO DA ARTE: ${prompt}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
