@@ -17,18 +17,20 @@ serve(async (req) => {
     const aspectRatio = type === "story" ? "9:16" : "1:1";
     const dimensions = type === "story" ? "1080x1920" : "1080x1080";
 
-    const imagePrompt = `Crie uma arte profissional para Instagram ${type === "story" ? "no formato story vertical (9:16)" : "no formato feed quadrado (1:1)"} para a agência digital Brandify (@brandifycoo).
+    const imagePrompt = `Crie uma arte de design gráfico profissional para Instagram ${type === "story" ? "no formato story vertical (9:16)" : "no formato feed quadrado (1:1)"} para a agência Brandify (@brandifycoo).
 
-REGRAS OBRIGATÓRIAS:
-- TODO texto na imagem DEVE ser em PORTUGUÊS DO BRASIL, sem nenhuma palavra em inglês
-- Estilo: design gráfico profissional feito por designer humano, NÃO parecer gerado por IA
-- Tipografia limpa e legível, sem distorções ou letras embaralhadas
-- Se incluir texto, use fontes sans-serif modernas e bem espaçadas
-- Cores principais: azul royal (#2563eb), preto (#0a0a0a), branco
-- Visual moderno, elegante e minimalista com elementos geométricos sutis
-- Evitar: rostos humanos, mãos, dedos, elementos fotorrealistas complexos
-- Preferir: composições gráficas, ícones, mockups de telas, formas abstratas, gradientes
-- Qualidade: ultra alta resolução, ${dimensions}
+ESTILO VISUAL OBRIGATÓRIO (baseado no feed real da Brandify):
+- Fundo: predominantemente PRETO (#0a0a0a) ou gradiente escuro
+- Tipografia: fonte sans-serif bold/black moderna, texto grande e impactante em BRANCO, com palavras-chave destacadas em AZUL (#2563eb) ou com efeito de destaque
+- Layout: estilo template profissional do Canva Pro, limpo e organizado
+- Elementos: mockups de telas de celular/notebook mostrando sites, ícones minimalistas brancos, setas direcionais, linhas geométricas sutis, gradientes escuros
+- Marca: incluir @brandifycoo discretamente no canto inferior
+- TODO texto DEVE ser em PORTUGUÊS DO BRASIL, sem nenhuma palavra em inglês
+- NÃO incluir rostos humanos realistas, mãos, dedos ou fotos de pessoas
+- Usar silhuetas, ícones ou formas abstratas no lugar de pessoas
+- A arte deve parecer feita por um designer profissional no Canva, NÃO parecer gerada por IA
+- Tipografia precisa ser LEGÍVEL, sem distorções ou letras embaralhadas
+- Resolução: ${dimensions}
 
 CONTEÚDO DA ARTE: ${prompt}`;
 
