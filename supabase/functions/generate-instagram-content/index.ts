@@ -101,8 +101,15 @@ ${nichesList}
 
 ${brandContext ? `CONTEXTO ADICIONAL: ${brandContext}` : ""}
 
-IMPORTANTE: Cada semana deve focar 100% no nicho indicado, mostrando como a Brandify pode ajudar aquele tipo de cliente a vender mais com um site/loja virtual profissional. As artes devem seguir o padrão visual da Brandify: fundo escuro, tipografia impactante, mockups de sites.
-2 posts no feed + 14 stories por semana. Total: 8 posts + 56 stories.`;
+CALENDÁRIO REAL — SIGA RIGOROSAMENTE:
+- Semana 1: Quinta-feira 20/02 a Domingo 23/02 (4 dias). Use os dias: Quinta, Sexta, Sábado, Domingo. Gere 2 posts no feed + 8 stories (2 por dia).
+- Semana 2: Segunda 24/02 a Domingo 02/03 (7 dias). Gere 2 posts no feed + 14 stories (2 por dia).
+- Semana 3: Segunda 03/03 a Domingo 09/03 (7 dias). Gere 2 posts no feed + 14 stories (2 por dia).
+- Semana 4: Segunda 10/03 a Domingo 16/03 (7 dias). Gere 2 posts no feed + 14 stories (2 por dia).
+
+IMPORTANTE: Na Semana 1 use SOMENTE os dias Quinta, Sexta, Sábado e Domingo. Nas semanas 2-4 use Segunda a Domingo.
+Cada semana deve focar 100% no nicho indicado, mostrando como a Brandify pode ajudar aquele tipo de cliente a vender mais com um site/loja virtual profissional. As artes devem seguir o padrão visual da Brandify: fundo escuro, tipografia impactante, mockups de sites.
+Total: 8 posts no feed + 50 stories.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

@@ -55,7 +55,25 @@ const NICHES = [
 ];
 
 const DAYS_ORDER = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
-const WEEK_LABELS = ["Semana 1", "Semana 2", "Semana 3", "Semana 4"];
+const WEEK_1_DAYS = ["Quinta", "Sexta", "Sábado", "Domingo"];
+
+// Real dates starting Thu Feb 20, 2026
+const WEEK_DATES: Record<number, Record<string, string>> = {
+  1: { "Quinta": "20/02", "Sexta": "21/02", "Sábado": "22/02", "Domingo": "23/02" },
+  2: { "Segunda": "24/02", "Terça": "25/02", "Quarta": "26/02", "Quinta": "27/02", "Sexta": "28/02", "Sábado": "01/03", "Domingo": "02/03" },
+  3: { "Segunda": "03/03", "Terça": "04/03", "Quarta": "05/03", "Quinta": "06/03", "Sexta": "07/03", "Sábado": "08/03", "Domingo": "09/03" },
+  4: { "Segunda": "10/03", "Terça": "11/03", "Quarta": "12/03", "Quinta": "13/03", "Sexta": "14/03", "Sábado": "15/03", "Domingo": "16/03" },
+};
+
+const WEEK_RANGES: Record<number, string> = {
+  1: "20/02 – 23/02",
+  2: "24/02 – 02/03",
+  3: "03/03 – 09/03",
+  4: "10/03 – 16/03",
+};
+
+const getDaysForWeek = (weekNum: number) => weekNum === 1 ? WEEK_1_DAYS : DAYS_ORDER;
+const getDateLabel = (weekNum: number, day: string) => WEEK_DATES[weekNum]?.[day] || "";
 
 export default function AdminConteudo() {
   const { toast } = useToast();
@@ -207,9 +225,9 @@ export default function AdminConteudo() {
             <AccordionContent>
               <div className="space-y-5 pb-2">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  {WEEK_LABELS.map((label, idx) => (
+                  {["Semana 1", "Semana 2", "Semana 3", "Semana 4"].map((label, idx) => (
                     <div key={idx} className="space-y-1.5">
-                      <label className="text-sm font-medium text-white/70">{label}</label>
+                      <label className="text-sm font-medium text-white/70">{label} <span className="text-white/30 text-xs">({WEEK_RANGES[idx + 1]})</span></label>
                       <Select value={weekNiches[idx]} onValueChange={(v) => setNicheForWeek(idx, v)}>
                         <SelectTrigger className="bg-white/[0.05] border-white/10 text-white">
                           <SelectValue placeholder="Selecione o nicho..." />
@@ -280,7 +298,7 @@ export default function AdminConteudo() {
                     value={String(week.weekNumber)}
                     className="data-[state=active]:bg-white/10 text-white/50 data-[state=active]:text-white px-4 py-2"
                   >
-                    Semana {week.weekNumber}
+                    Sem. {week.weekNumber} <span className="text-white/30 ml-1 text-[10px]">{WEEK_RANGES[week.weekNumber]}</span>
                   </TabsTrigger>
                 ))}
               </TabsList>
@@ -308,13 +326,14 @@ export default function AdminConteudo() {
                     {/* ===== FEED ===== */}
                     <TabsContent value="feed" className="mt-5">
                       <Accordion type="multiple" className="space-y-2">
-                        {DAYS_ORDER.map((day) => {
+                        {getDaysForWeek(week.weekNumber).map((day) => {
                           const dayPosts = week.feedPosts?.filter((p) => p.day === day) || [];
                           if (dayPosts.length === 0) return null;
+                          const dateLabel = getDateLabel(week.weekNumber, day);
                           return (
                             <AccordionItem key={day} value={`feed-${day}`} className="border-white/[0.06] bg-white/[0.02] rounded-lg px-4 border">
                               <AccordionTrigger className="text-xs font-bold text-white/60 uppercase tracking-widest hover:no-underline py-3">
-                                <span className="flex items-center gap-2"><Calendar className="w-3.5 h-3.5" /> {day}</span>
+                                <span className="flex items-center gap-2"><Calendar className="w-3.5 h-3.5" /> {day} {dateLabel && <span className="text-white/30 normal-case tracking-normal font-normal">{dateLabel}</span>}</span>
                               </AccordionTrigger>
                               <AccordionContent>
                                 <div className="space-y-3 pb-1">
@@ -441,13 +460,14 @@ export default function AdminConteudo() {
                     {/* ===== STORIES ===== */}
                     <TabsContent value="stories" className="mt-5">
                       <Accordion type="multiple" className="space-y-2">
-                        {DAYS_ORDER.map((day) => {
+                        {getDaysForWeek(week.weekNumber).map((day) => {
                           const dayStories = week.stories?.filter((s) => s.day === day) || [];
                           if (dayStories.length === 0) return null;
+                          const dateLabel = getDateLabel(week.weekNumber, day);
                           return (
                             <AccordionItem key={day} value={`story-${day}`} className="border-white/[0.06] bg-white/[0.02] rounded-lg px-4 border">
                               <AccordionTrigger className="text-xs font-bold text-white/60 uppercase tracking-widest hover:no-underline py-3">
-                                <span className="flex items-center gap-2"><Calendar className="w-3.5 h-3.5" /> {day} ({dayStories.length} stories)</span>
+                                <span className="flex items-center gap-2"><Calendar className="w-3.5 h-3.5" /> {day} {dateLabel && <span className="text-white/30 normal-case tracking-normal font-normal">{dateLabel}</span>} ({dayStories.length} stories)</span>
                               </AccordionTrigger>
                               <AccordionContent>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 pb-1">
