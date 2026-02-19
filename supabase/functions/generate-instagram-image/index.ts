@@ -44,7 +44,9 @@ Content: ${prompt}`;
         clearTimeout(timeout);
         console.log(`Direct Gemini response status: ${res.status}`);
         if (res.status === 429) {
-          console.error("Gemini direct: rate limited, waiting 5s and retrying...");
+          const errBody = await res.text();
+          console.error("Gemini direct: rate limited:", errBody.slice(0, 500));
+          console.error("Waiting 5s and retrying...");
           await new Promise(r => setTimeout(r, 5000));
           const controller2 = new AbortController();
           const timeout2 = setTimeout(() => controller2.abort(), 45000);
