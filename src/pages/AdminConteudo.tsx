@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -161,9 +161,7 @@ export default function AdminConteudo() {
   const { toast } = useToast();
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // Recompute months on each refresh
   const months = useMemo(() => {
-    // refreshKey forces recompute
     void refreshKey;
     return buildMonthConfigs(new Date());
   }, [refreshKey]);
@@ -178,6 +176,78 @@ export default function AdminConteudo() {
   const [activeWeek, setActiveWeek] = useState("1");
   const [feedbackItemId, setFeedbackItemId] = useState<string | null>(null);
   const [imageHint, setImageHint] = useState("");
+  const [isLoadingPlans, setIsLoadingPlans] = useState(true);
+
+  // Debounced save ref
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Load all plans from DB on mount
+  useEffect(() => {
+    const loadPlans = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("instagram_plans" as any)
+          .select("*")
+          .eq("year", 2026);
+        if (error) throw error;
+        if (data && Array.isArray(data)) {
+          const plans: Record<string, MonthPlan> = {};
+          const niches: Record<string, string[]> = {};
+          const customs: Record<string, string[]> = {};
+          for (const row of data as any[]) {
+            if (row.month_plan && Object.keys(row.month_plan).length > 0) {
+              plans[row.month_key] = row.month_plan as MonthPlan;
+            }
+            if (row.week_niches && Array.isArray(row.week_niches) && row.week_niches.length > 0) {
+              niches[row.month_key] = row.week_niches;
+            }
+            if (row.custom_niches && Array.isArray(row.custom_niches) && row.custom_niches.length > 0) {
+              customs[row.month_key] = row.custom_niches;
+            }
+          }
+          setMonthPlans(plans);
+          setWeekNiches(niches);
+          setCustomNiches(customs);
+        }
+      } catch (e) {
+        console.error("Failed to load plans:", e);
+      } finally {
+        setIsLoadingPlans(false);
+      }
+    };
+    loadPlans();
+  }, []);
+
+  // Save a specific month to DB (debounced for edits)
+  const savePlanToDb = useCallback(async (monthKey: string, plan: MonthPlan | null, niches: string[], customs: string[]) => {
+    try {
+      await supabase.from("instagram_plans" as any).upsert({
+        month_key: monthKey,
+        year: 2026,
+        month_plan: plan || {},
+        week_niches: niches || [],
+        custom_niches: customs || [],
+      } as any, { onConflict: "month_key,year" });
+    } catch (e) {
+      console.error("Failed to save plan:", e);
+    }
+  }, []);
+
+  // Debounced save on any plan/niches change (after initial load)
+  const hasLoaded = useRef(false);
+  useEffect(() => {
+    if (isLoadingPlans) return;
+    if (!hasLoaded.current) { hasLoaded.current = true; return; }
+    // Debounce save for the active month
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      const plan = monthPlans[activeMonth] || null;
+      const niches = weekNiches[activeMonth] || [];
+      const customs = customNiches[activeMonth] || [];
+      savePlanToDb(activeMonth, plan, niches, customs);
+    }, 1500);
+    return () => { if (saveTimerRef.current) clearTimeout(saveTimerRef.current); };
+  }, [monthPlans, weekNiches, customNiches, activeMonth, isLoadingPlans, savePlanToDb]);
 
   const currentMonthConfig = months.find((m) => m.key === activeMonth)!;
   const currentPlan = monthPlans[activeMonth] || null;
@@ -213,12 +283,13 @@ export default function AdminConteudo() {
   const allFilled = resolvedNiches.length > 0 && resolvedNiches.every((n) => n.trim().length > 0);
 
   const handleRegenerate = () => {
-    // Recompute weeks from today, clear old plan
     setRefreshKey((k) => k + 1);
     setMonthPlans((prev) => { const p = { ...prev }; delete p[activeMonth]; return p; });
     setWeekNiches((prev) => { const p = { ...prev }; delete p[activeMonth]; return p; });
     setCustomNiches((prev) => { const p = { ...prev }; delete p[activeMonth]; return p; });
     setActiveWeek("1");
+    // Delete from DB
+    supabase.from("instagram_plans" as any).delete().eq("month_key", activeMonth).eq("year", 2026).then(() => {});
     toast({ title: "Calendário atualizado! 📅", description: "Semanas recalculadas a partir de amanhã." });
   };
 

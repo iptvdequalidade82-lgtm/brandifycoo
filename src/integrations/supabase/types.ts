@@ -98,6 +98,39 @@ export type Database = {
         }
         Relationships: []
       }
+      instagram_plans: {
+        Row: {
+          created_at: string
+          custom_niches: Json
+          id: string
+          month_key: string
+          month_plan: Json
+          updated_at: string
+          week_niches: Json
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          custom_niches?: Json
+          id?: string
+          month_key: string
+          month_plan?: Json
+          updated_at?: string
+          week_niches?: Json
+          year?: number
+        }
+        Update: {
+          created_at?: string
+          custom_niches?: Json
+          id?: string
+          month_key?: string
+          month_plan?: Json
+          updated_at?: string
+          week_niches?: Json
+          year?: number
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           created_at: string
