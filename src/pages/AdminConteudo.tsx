@@ -198,55 +198,64 @@ export default function AdminConteudo() {
           </div>
         </div>
 
-        {/* Generator Form */}
-        <Card className="p-6 bg-white/[0.03] border-white/[0.06] space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {WEEK_LABELS.map((label, idx) => (
-              <div key={idx} className="space-y-1.5">
-                <label className="text-sm font-medium text-white/70">{label}</label>
-                <Select value={weekNiches[idx]} onValueChange={(v) => setNicheForWeek(idx, v)}>
-                  <SelectTrigger className="bg-white/[0.05] border-white/10 text-white">
-                    <SelectValue placeholder="Selecione o nicho..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {NICHES.map((n) => (
-                      <SelectItem key={n} value={n}>{n}</SelectItem>
-                    ))}
-                    <SelectItem value="custom">✏️ Digitar outro nicho</SelectItem>
-                  </SelectContent>
-                </Select>
-                {weekNiches[idx] === "custom" && (
-                  <Input
-                    placeholder="Ex: Pet shop premium..."
-                    value={customNiches[idx]}
-                    onChange={(e) => setCustomNicheForWeek(idx, e.target.value)}
-                    className="bg-white/[0.05] border-white/10 text-white"
+        {/* Generator Form - Collapsible */}
+        <Accordion type="single" collapsible defaultValue={monthPlan ? undefined : "generator"}>
+          <AccordionItem value="generator" className="border-white/[0.06] bg-white/[0.02] rounded-lg border px-4">
+            <AccordionTrigger className="text-sm font-semibold text-white/70 hover:no-underline py-3">
+              <span className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-purple-400" /> Gerar novo planejamento</span>
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="space-y-5 pb-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  {WEEK_LABELS.map((label, idx) => (
+                    <div key={idx} className="space-y-1.5">
+                      <label className="text-sm font-medium text-white/70">{label}</label>
+                      <Select value={weekNiches[idx]} onValueChange={(v) => setNicheForWeek(idx, v)}>
+                        <SelectTrigger className="bg-white/[0.05] border-white/10 text-white">
+                          <SelectValue placeholder="Selecione o nicho..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {NICHES.map((n) => (
+                            <SelectItem key={n} value={n}>{n}</SelectItem>
+                          ))}
+                          <SelectItem value="custom">✏️ Digitar outro nicho</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {weekNiches[idx] === "custom" && (
+                        <Input
+                          placeholder="Ex: Pet shop premium..."
+                          value={customNiches[idx]}
+                          onChange={(e) => setCustomNicheForWeek(idx, e.target.value)}
+                          className="bg-white/[0.05] border-white/10 text-white"
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-white/70">Contexto adicional (opcional)</label>
+                  <Textarea
+                    placeholder="Ex: Focar em empresas de médio porte, região sudeste..."
+                    value={brandContext}
+                    onChange={(e) => setBrandContext(e.target.value)}
+                    className="bg-white/[0.05] border-white/10 text-white resize-none h-[68px]"
                   />
-                )}
+                </div>
+                <Button
+                  onClick={handleGenerate}
+                  disabled={isGenerating || !allFilled}
+                  className="w-full md:w-auto bg-gradient-to-r from-pink-500 via-purple-500 to-orange-500 hover:opacity-90 text-white font-semibold py-5"
+                >
+                  {isGenerating ? (
+                    <><RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Gerando planejamento mensal...</>
+                  ) : (
+                    <><Sparkles className="w-4 h-4 mr-2" /> Gerar planejamento do mês</>
+                  )}
+                </Button>
               </div>
-            ))}
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-white/70">Contexto adicional (opcional)</label>
-            <Textarea
-              placeholder="Ex: Focar em empresas de médio porte, região sudeste..."
-              value={brandContext}
-              onChange={(e) => setBrandContext(e.target.value)}
-              className="bg-white/[0.05] border-white/10 text-white resize-none h-[68px]"
-            />
-          </div>
-          <Button
-            onClick={handleGenerate}
-            disabled={isGenerating || !allFilled}
-            className="w-full md:w-auto bg-gradient-to-r from-pink-500 via-purple-500 to-orange-500 hover:opacity-90 text-white font-semibold py-5"
-          >
-            {isGenerating ? (
-              <><RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Gerando planejamento mensal...</>
-            ) : (
-              <><Sparkles className="w-4 h-4 mr-2" /> Gerar planejamento do mês</>
-            )}
-          </Button>
-        </Card>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
 
         {/* Results */}
         {monthPlan && (
