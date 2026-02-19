@@ -24,79 +24,7 @@ Content: ${prompt}`;
 
     let imageUrl: string | undefined;
 
-    // Provider 1: Direct Gemini API (primary)
-    if (GEMINI_API_KEY && !imageUrl) {
-      const model = "gemini-2.5-flash-image";
-      console.log(`Trying direct Gemini: ${model}`);
-      try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 45000);
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
-        const res = await fetch(geminiUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          signal: controller.signal,
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: imagePrompt }] }],
-            generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
-          }),
-        });
-        clearTimeout(timeout);
-        console.log(`Direct Gemini response status: ${res.status}`);
-        if (res.status === 429) {
-          const errBody = await res.text();
-          console.error("Gemini direct: rate limited:", errBody.slice(0, 500));
-          console.error("Waiting 5s and retrying...");
-          await new Promise(r => setTimeout(r, 5000));
-          const controller2 = new AbortController();
-          const timeout2 = setTimeout(() => controller2.abort(), 45000);
-          const res2 = await fetch(geminiUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            signal: controller2.signal,
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: imagePrompt }] }],
-              generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
-            }),
-          });
-          clearTimeout(timeout2);
-          console.log(`Direct Gemini retry status: ${res2.status}`);
-          if (res2.ok) {
-            const data = await res2.json();
-            const parts2 = data.candidates?.[0]?.content?.parts;
-            if (parts2) {
-              for (const part of parts2) {
-                if (part.inlineData?.mimeType?.startsWith("image/")) {
-                  imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-                  console.log(`Direct Gemini retry succeeded`);
-                  break;
-                }
-              }
-            }
-          }
-        } else if (res.ok) {
-          const data = await res.json();
-          const parts = data.candidates?.[0]?.content?.parts;
-          if (parts) {
-            for (const part of parts) {
-              if (part.inlineData?.mimeType?.startsWith("image/")) {
-                imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-                console.log(`Direct Gemini ${model} succeeded`);
-                break;
-              }
-            }
-          }
-          if (!imageUrl) console.error("Direct Gemini: no image in response parts");
-        } else {
-          const t = await res.text();
-          console.error(`Direct Gemini ${model} failed:`, res.status, t.slice(0, 300));
-        }
-      } catch (e) {
-        console.error(`Direct Gemini threw:`, e);
-      }
-    }
-
-    // Provider 2: Lovable AI Gateway (fallback)
+    // Provider 1: Lovable AI Gateway (primary — no billing needed)
     if (LOVABLE_API_KEY && !imageUrl) {
       const gatewayModels = ["google/gemini-2.5-flash-image", "google/gemini-3-pro-image-preview"];
       for (const model of gatewayModels) {
@@ -137,6 +65,45 @@ Content: ${prompt}`;
         } catch (e) {
           console.error(`Gateway ${model} threw:`, e);
         }
+      }
+    }
+
+    // Provider 2: Direct Gemini API (fallback — requires billing for image models)
+    if (GEMINI_API_KEY && !imageUrl) {
+      const model = "gemini-2.5-flash-image";
+      console.log(`Trying direct Gemini fallback: ${model}`);
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 45000);
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+        const res = await fetch(geminiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          signal: controller.signal,
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: imagePrompt }] }],
+            generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
+          }),
+        });
+        clearTimeout(timeout);
+        if (res.ok) {
+          const data = await res.json();
+          const parts = data.candidates?.[0]?.content?.parts;
+          if (parts) {
+            for (const part of parts) {
+              if (part.inlineData?.mimeType?.startsWith("image/")) {
+                imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                console.log(`Direct Gemini succeeded`);
+                break;
+              }
+            }
+          }
+        } else {
+          const t = await res.text();
+          console.error(`Direct Gemini failed:`, res.status, t.slice(0, 300));
+        }
+      } catch (e) {
+        console.error(`Direct Gemini threw:`, e);
       }
     }
 
