@@ -11,19 +11,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import {
   Instagram, Sparkles, Calendar, Copy, Download, RefreshCw, ImageIcon,
-  Clock, Lightbulb, MessageSquare, Pencil,
+  Clock, Lightbulb, MessageSquare, Pencil, CheckCircle2, Circle,
 } from "lucide-react";
 
 type FeedPost = {
   id: string; day: string; time: string; title: string; caption: string;
   imageDescription: string; contentType: string; marketingTip: string;
-  generatedImage?: string; isGeneratingImage?: boolean;
+  generatedImage?: string; isGeneratingImage?: boolean; checked?: boolean;
 };
 
 type Story = {
   id: string; day: string; type: string; mainText: string;
   visualDescription: string; callToAction: string;
-  generatedImage?: string; isGeneratingImage?: boolean;
+  generatedImage?: string; isGeneratingImage?: boolean; checked?: boolean;
 };
 
 type WeekData = {
@@ -170,6 +170,20 @@ export default function AdminConteudo() {
     });
   };
 
+  const toggleChecked = (weekIdx: number, itemId: string, type: "feed" | "story") => {
+    setMonthPlan((prev) => {
+      if (!prev) return prev;
+      const weeks = [...prev.weeks];
+      const week = { ...weeks[weekIdx] };
+      const key = type === "feed" ? "feedPosts" : "stories";
+      week[key] = (week[key] as any[]).map((i: any) =>
+        i.id === itemId ? { ...i, checked: !i.checked } : i
+      );
+      weeks[weekIdx] = week;
+      return { ...prev, weeks };
+    });
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-8">
@@ -296,7 +310,7 @@ export default function AdminConteudo() {
                               <AccordionContent>
                                 <div className="space-y-3 pb-1">
                                   {dayPosts.map((post) => (
-                                    <Card key={post.id} className="bg-white/[0.03] border-white/[0.06] overflow-hidden">
+                                    <Card key={post.id} className={`border-white/[0.06] overflow-hidden transition-colors ${post.checked ? "bg-emerald-500/[0.06] border-emerald-500/20" : "bg-white/[0.03]"}`}>
                                       <div className="flex flex-col md:flex-row">
                                         {/* Image side */}
                                         <div className="md:w-56 shrink-0 bg-white/[0.02] flex items-center justify-center relative min-h-[180px]">
@@ -349,6 +363,15 @@ export default function AdminConteudo() {
 
                                           {/* Action buttons */}
                                           <div className="flex items-center gap-2 pt-1">
+                                            <Button
+                                              variant="ghost"
+                                              size="sm"
+                                              onClick={() => toggleChecked(week.weekNumber - 1, post.id, "feed")}
+                                              className={`h-7 text-xs ${post.checked ? "text-emerald-400 hover:text-emerald-300" : "text-white/40 hover:text-white"}`}
+                                            >
+                                              {post.checked ? <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> : <Circle className="w-3.5 h-3.5 mr-1" />}
+                                              {post.checked ? "Conferido ✓" : "Conferir"}
+                                            </Button>
                                             <Button variant="ghost" size="sm" onClick={() => copyToClipboard(post.caption)} className="text-white/40 hover:text-white h-7 text-xs">
                                               <Copy className="w-3 h-3 mr-1" /> Copiar legenda
                                             </Button>
@@ -420,7 +443,7 @@ export default function AdminConteudo() {
                               <AccordionContent>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 pb-1">
                                   {dayStories.map((story) => (
-                                    <Card key={story.id} className="bg-white/[0.03] border-white/[0.06] overflow-hidden flex flex-col">
+                                    <Card key={story.id} className={`border-white/[0.06] overflow-hidden flex flex-col transition-colors ${story.checked ? "bg-emerald-500/[0.06] border-emerald-500/20" : "bg-white/[0.03]"}`}>
                                       {/* Image area */}
                                       <div className="aspect-[9/16] max-h-52 bg-white/[0.02] flex items-center justify-center relative">
                                         {story.generatedImage ? (
@@ -452,6 +475,15 @@ export default function AdminConteudo() {
                                         <p className="text-[10px] text-white/40 italic line-clamp-1">{story.callToAction}</p>
 
                                         <div className="flex items-center gap-1 pt-1">
+                                          <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => toggleChecked(week.weekNumber - 1, story.id, "story")}
+                                            className={`h-6 p-0 px-1 text-[10px] ${story.checked ? "text-emerald-400 hover:text-emerald-300" : "text-white/30 hover:text-white"}`}
+                                          >
+                                            {story.checked ? <CheckCircle2 className="w-3 h-3 mr-0.5" /> : <Circle className="w-3 h-3 mr-0.5" />}
+                                            {story.checked ? "✓" : "Conferir"}
+                                          </Button>
                                           <Button variant="ghost" size="sm" onClick={() => copyToClipboard(story.mainText)} className="text-white/30 hover:text-white h-6 w-6 p-0">
                                             <Copy className="w-3 h-3" />
                                           </Button>
