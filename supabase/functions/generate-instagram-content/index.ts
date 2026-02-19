@@ -10,12 +10,12 @@ serve(async (req) => {
 
   try {
     const { niches, brandContext } = await req.json();
-    // niches: string[] with 4 items, one per week
+    // niches: string[] with 2 items (week 3 and week 4)
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const nichesList = niches.map((n: string, i: number) => `- Semana ${i + 1}: ${n}`).join("\n");
+    const nichesList = niches.map((n: string, i: number) => `- Semana ${i + 3}: ${n}`).join("\n");
 
     const systemPrompt = `Você é um estrategista de marketing digital e social media especialista em Instagram para a agência Brandify (@brandifycoo). A Brandify é uma agência de criação de sites profissionais e lojas virtuais que ajuda empresas de diversos nichos a venderem mais online.
 
@@ -31,12 +31,13 @@ A Brandify cria sites e lojas virtuais que VENDEM. Cada post deve conectar o nic
 
 Sua missão é gerar um PLANEJAMENTO MENSAL COMPLETO (4 semanas) de conteúdo para Instagram. CADA SEMANA FOCA EM UM NICHO DE CLIENTE DIFERENTE.
 
-REGRAS POR SEMANA:
-- 2 posts para o feed
-- 14 stories (2 por dia, segunda a domingo)
-- Cada semana foca em um nicho diferente de cliente
+TOTAL: 4 posts no feed + 22 stories
 
-TOTAL DO MÊS: 8 posts no feed + 56 stories
+REGRAS POR SEMANA:
+- Semana 3 (Qui 20/02 a Dom 23/02 — 4 dias): 2 posts para o feed + 8 stories (2 por dia)
+- Semana 4 (Seg 24/02 a Dom 02/03 — 7 dias): 2 posts para o feed + 14 stories (2 por dia)
+
+TOTAL DO PLANEJAMENTO: 4 posts no feed + 22 stories
 
 REGRAS DE CONTEÚDO:
 - Tudo em PORTUGUÊS DO BRASIL
@@ -64,14 +65,14 @@ Responda APENAS em JSON válido com esta estrutura:
     "monthStrategy": "string (resumo geral da estratégia do mês em 3-4 frases)",
     "weeks": [
       {
-        "weekNumber": 1,
+        "weekNumber": 3,
         "niche": "string (nicho da semana)",
         "theme": "string (tema/abordagem da semana)",
         "strategy": "string (estratégia específica)",
         "feedPosts": [
           {
-            "id": "w1-feed-1",
-            "day": "Segunda",
+            "id": "w3-feed-1",
+            "day": "Quinta",
             "time": "19:00",
             "title": "string",
             "caption": "string (legenda completa com emojis e hashtags)",
@@ -82,8 +83,8 @@ Responda APENAS em JSON válido com esta estrutura:
         ],
         "stories": [
           {
-            "id": "w1-story-1",
-            "day": "Segunda",
+            "id": "w3-story-1",
+            "day": "Quinta",
             "type": "dica|enquete|bastidor|CTA|depoimento|carrossel",
             "mainText": "string",
             "visualDescription": "string (descrição detalhada do visual do story no estilo Brandify dark)",
@@ -95,21 +96,19 @@ Responda APENAS em JSON válido com esta estrutura:
   }
 }`;
 
-    const userPrompt = `Gere o planejamento MENSAL de Instagram (4 semanas) com um NICHO DIFERENTE por semana:
+    const userPrompt = `Gere o planejamento QUINZENAL de Instagram (2 semanas) com um NICHO DIFERENTE por semana:
 
 ${nichesList}
 
 ${brandContext ? `CONTEXTO ADICIONAL: ${brandContext}` : ""}
 
 CALENDÁRIO REAL — SIGA RIGOROSAMENTE:
-- Semana 1: Quinta-feira 20/02 a Domingo 23/02 (4 dias). Use os dias: Quinta, Sexta, Sábado, Domingo. Gere 2 posts no feed + 8 stories (2 por dia).
-- Semana 2: Segunda 24/02 a Domingo 02/03 (7 dias). Gere 2 posts no feed + 14 stories (2 por dia).
-- Semana 3: Segunda 03/03 a Domingo 09/03 (7 dias). Gere 2 posts no feed + 14 stories (2 por dia).
-- Semana 4: Segunda 10/03 a Domingo 16/03 (7 dias). Gere 2 posts no feed + 14 stories (2 por dia).
+- Semana 3 (weekNumber: 3): Quinta 20/02 a Domingo 23/02 (4 dias). Use SOMENTE os dias: Quinta, Sexta, Sábado, Domingo. IDs: w3-feed-1, w3-feed-2, w3-story-1 a w3-story-8. Gere 2 posts no feed + 8 stories (2 por dia).
+- Semana 4 (weekNumber: 4): Segunda 24/02 a Domingo 02/03 (7 dias). Use Segunda a Domingo. IDs: w4-feed-1, w4-feed-2, w4-story-1 a w4-story-14. Gere 2 posts no feed + 14 stories (2 por dia).
 
-IMPORTANTE: Na Semana 1 use SOMENTE os dias Quinta, Sexta, Sábado e Domingo. Nas semanas 2-4 use Segunda a Domingo.
-Cada semana deve focar 100% no nicho indicado, mostrando como a Brandify pode ajudar aquele tipo de cliente a vender mais com um site/loja virtual profissional. As artes devem seguir o padrão visual da Brandify: fundo escuro, tipografia impactante, mockups de sites.
-Total: 8 posts no feed + 50 stories.`;
+IMPORTANTE: Use weekNumber 3 e 4 (não 1 e 2). Na Semana 3 use SOMENTE Quinta, Sexta, Sábado e Domingo.
+Cada semana deve focar 100% no nicho indicado, mostrando como a Brandify pode ajudar aquele tipo de cliente a vender mais com um site/loja virtual profissional.
+Total: 4 posts no feed + 22 stories.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
