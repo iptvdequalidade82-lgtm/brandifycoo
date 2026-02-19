@@ -145,21 +145,21 @@ export default function AdminConteudo() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* Header */}
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-gradient-to-br from-pink-500 via-purple-500 to-orange-500">
-            <Instagram className="w-6 h-6 text-white" />
+        <div className="flex items-center gap-4">
+          <div className="p-3 rounded-xl bg-gradient-to-br from-pink-500 via-purple-500 to-orange-500">
+            <Instagram className="w-7 h-7 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-white">Conteúdo Instagram</h1>
-            <p className="text-sm text-white/40">Planejamento mensal — um nicho diferente por semana</p>
+            <h1 className="text-2xl font-bold text-white">Conteúdo Instagram</h1>
+            <p className="text-sm text-white/40 mt-0.5">Planejamento mensal — um nicho diferente por semana</p>
           </div>
         </div>
 
         {/* Generator Form */}
-        <Card className="p-5 bg-white/[0.03] border-white/[0.06] space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Card className="p-6 bg-white/[0.03] border-white/[0.06] space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {WEEK_LABELS.map((label, idx) => (
               <div key={idx} className="space-y-1.5">
                 <label className="text-sm font-medium text-white/70">{label}</label>
@@ -209,41 +209,41 @@ export default function AdminConteudo() {
 
         {/* Results */}
         {monthPlan && (
-          <div className="space-y-5">
-            <Card className="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-500/20">
+          <div className="space-y-6">
+            <Card className="p-5 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-500/20">
               <div className="flex items-start gap-3">
                 <Lightbulb className="w-5 h-5 text-purple-400 mt-0.5 shrink-0" />
                 <div>
                   <h3 className="font-semibold text-white text-sm">Estratégia mensal</h3>
-                  <p className="text-white/60 text-sm mt-1">{monthPlan.monthStrategy}</p>
+                  <p className="text-white/60 text-sm mt-1.5 leading-relaxed">{monthPlan.monthStrategy}</p>
                 </div>
               </div>
             </Card>
 
             {/* Week selector */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {monthPlan.weeks?.map((week) => (
                 <button
                   key={week.weekNumber}
                   onClick={() => setActiveWeek(String(week.weekNumber))}
-                  className={`p-3 rounded-xl border text-left transition-all ${
+                  className={`p-4 rounded-xl border text-left transition-all ${
                     String(week.weekNumber) === activeWeek
-                      ? "bg-white/[0.08] border-purple-500/40 shadow-lg"
+                      ? "bg-white/[0.08] border-purple-500/40 shadow-lg shadow-purple-500/10"
                       : "bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04]"
                   }`}
                 >
-                  <div className="text-[10px] text-white/40 font-semibold uppercase">Semana {week.weekNumber}</div>
-                  <div className="text-sm text-white/90 font-medium mt-0.5 truncate">{week.niche}</div>
-                  <div className="text-[11px] text-white/40 mt-0.5 truncate">{week.theme}</div>
+                  <div className="text-[10px] text-white/40 font-semibold uppercase tracking-wider">Semana {week.weekNumber}</div>
+                  <div className="text-sm text-white/90 font-medium mt-1 truncate">{week.niche}</div>
+                  <div className="text-[11px] text-white/40 mt-1 truncate">{week.theme}</div>
                 </button>
               ))}
             </div>
 
             {/* Current week content */}
             {currentWeek && (
-              <div className="space-y-4">
-                <Card className="p-3 bg-white/[0.02] border-white/[0.06]">
-                  <p className="text-sm text-white/60">
+              <div className="space-y-5">
+                <Card className="p-4 bg-white/[0.02] border-white/[0.06]">
+                  <p className="text-sm text-white/60 leading-relaxed">
                     <span className="text-white/80 font-medium">Nicho:</span> {currentWeek.niche} · <span className="text-white/80 font-medium">Foco:</span> {currentWeek.strategy}
                   </p>
                 </Card>
@@ -258,13 +258,13 @@ export default function AdminConteudo() {
                     </TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="feed" className="space-y-4 mt-4">
+                  <TabsContent value="feed" className="space-y-5 mt-5">
                     {currentWeek.feedPosts?.map((post) => {
                       const isExpanded = expandedPost === post.id;
                       const weekIdx = (currentWeek.weekNumber || 1) - 1;
                       return (
                         <Card key={post.id} className="bg-white/[0.03] border-white/[0.06] overflow-hidden">
-                          <div className="p-4 space-y-3">
+                          <div className="p-5 space-y-4">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3 flex-wrap">
                                 <div className="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-300 text-xs font-semibold">
@@ -281,7 +281,7 @@ export default function AdminConteudo() {
                             </div>
                             <h3 className="font-bold text-white">{post.title}</h3>
                             {isExpanded && (
-                              <div className="space-y-4 pt-2">
+                              <div className="space-y-5 pt-3">
                                 <div className="space-y-2">
                                   <div className="flex items-center justify-between">
                                     <span className="text-xs font-semibold text-white/50 uppercase">Legenda</span>
@@ -322,17 +322,17 @@ export default function AdminConteudo() {
                     })}
                   </TabsContent>
 
-                  <TabsContent value="stories" className="space-y-3 mt-4">
+                  <TabsContent value="stories" className="space-y-5 mt-5">
                     {DAYS_ORDER.map((day) => {
                       const dayStories = currentWeek.stories?.filter((s) => s.day === day) || [];
                       if (dayStories.length === 0) return null;
                       const weekIdx = (currentWeek.weekNumber || 1) - 1;
                       return (
-                        <div key={day} className="space-y-2">
+                        <div key={day} className="space-y-3">
                           <h4 className="text-sm font-semibold text-white/50 uppercase tracking-wider">{day}</h4>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {dayStories.map((story) => (
-                              <Card key={story.id} className="p-3 bg-white/[0.03] border-white/[0.06] space-y-2">
+                              <Card key={story.id} className="p-4 bg-white/[0.03] border-white/[0.06] space-y-3">
                                 <div className="flex items-center justify-between">
                                   <span className="px-2 py-0.5 rounded-md bg-pink-500/20 text-pink-300 text-[10px] font-semibold uppercase">{story.type}</span>
                                   <div className="flex gap-1">
