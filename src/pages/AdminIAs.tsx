@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import ReactMarkdown from "react-markdown";
+import brandifyLogo from "@/assets/logo.jpg";
 import {
   Plus, Send, Trash2, MessageSquare, Image as ImageIcon, Bot, Sparkles, Loader2, ChevronLeft, ChevronRight, Paperclip, X,
 } from "lucide-react";
@@ -371,7 +372,7 @@ export default function AdminIAs() {
           <ScrollArea className="flex-1 p-4">
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center">
-                <Bot className="w-16 h-16 text-white/10 mb-4" />
+                <img src={brandifyLogo} alt="Brandify" className="w-16 h-16 rounded-2xl mb-4 opacity-60" />
                 <h2 className="text-xl font-semibold text-white/60 mb-2">Brandify IA</h2>
                 <p className="text-sm text-white/30 max-w-md">
                   Converse com GPT ou Gemini. Gere textos, imagens, estratégias de marketing e muito mais.
@@ -393,8 +394,8 @@ export default function AdminIAs() {
                 {messages.map((msg, i) => (
                   <div key={i} className={`flex gap-3 ${msg.role === "user" ? "justify-end" : ""}`}>
                     {msg.role === "assistant" && (
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shrink-0 mt-1">
-                        <Bot className="w-4 h-4 text-white" />
+                      <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 mt-1">
+                        <img src={brandifyLogo} alt="Brandify" className="w-full h-full object-cover" />
                       </div>
                     )}
                     <div className={`max-w-[80%] ${
@@ -422,8 +423,8 @@ export default function AdminIAs() {
                 ))}
                 {isLoading && messages[messages.length - 1]?.role === "user" && (
                   <div className="flex gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shrink-0">
-                      <Loader2 className="w-4 h-4 text-white animate-spin" />
+                    <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0">
+                      <img src={brandifyLogo} alt="Brandify" className="w-full h-full object-cover" />
                     </div>
                     <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl rounded-tl-md px-4 py-3">
                       {isGeneratingImage ? (
