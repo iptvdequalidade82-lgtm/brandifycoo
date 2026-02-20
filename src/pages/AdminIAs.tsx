@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import ReactMarkdown from "react-markdown";
 import {
-  Plus, Send, Trash2, MessageSquare, Image as ImageIcon, Bot, Sparkles, Loader2, ChevronLeft, ChevronRight,
+  Plus, Send, Trash2, MessageSquare, Image as ImageIcon, Bot, Sparkles, Loader2, ChevronLeft, ChevronRight, Paperclip, X,
 } from "lucide-react";
 
 type Msg = { role: "user" | "assistant"; content: string; image_urls?: string[]; model_used?: string };
@@ -34,9 +34,11 @@ export default function AdminIAs() {
   const [isLoading, setIsLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [imageMode, setImageMode] = useState(false);
+  const [attachedImages, setAttachedImages] = useState<string[]>([]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
 
@@ -116,25 +118,66 @@ export default function AdminIAs() {
     }
   };
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    Array.from(files).forEach((file) => {
+      if (!file.type.startsWith("image/")) {
+        toast({ title: "Formato inválido", description: "Selecione apenas imagens.", variant: "destructive" });
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        toast({ title: "Arquivo muito grande", description: "Máximo 10MB por imagem.", variant: "destructive" });
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (reader.result) setAttachedImages((prev) => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = "";
+  };
+
+  const removeAttachment = (idx: number) => {
+    setAttachedImages((prev) => prev.filter((_, i) => i !== idx));
+  };
+
   const handleSend = useCallback(async () => {
     const text = input.trim();
-    if (!text || isLoading) return;
+    if ((!text && attachedImages.length === 0) || isLoading) return;
 
+    const currentAttachments = [...attachedImages];
     setInput("");
+    setAttachedImages([]);
     setIsLoading(true);
 
     try {
       let convId = activeConvId;
       if (!convId) convId = await createConversation();
 
-      const userMsg: Msg = { role: "user", content: text };
+      const userMsg: Msg = { role: "user", content: text || "(imagem anexada)", image_urls: currentAttachments.length > 0 ? currentAttachments : undefined };
       setMessages((prev) => [...prev, userMsg]);
       await saveMessage(convId, userMsg);
 
       // Update title on first message
-      if (messages.length === 0) await updateConversationTitle(convId, text);
+      if (messages.length === 0) await updateConversationTitle(convId, text || "Imagem anexada");
 
-      const apiMessages = [...messages, userMsg].map((m) => ({ role: m.role, content: m.content }));
+      // Build API messages - for multimodal, use content array format
+      const apiMessages = [...messages, userMsg].map((m) => {
+        if (m.image_urls && m.image_urls.length > 0) {
+          const content: any[] = [];
+          if (m.content && m.content !== "(imagem anexada)") {
+            content.push({ type: "text", text: m.content });
+          }
+          m.image_urls.forEach((url) => {
+            content.push({ type: "image_url", image_url: { url } });
+          });
+          if (content.length === 0) content.push({ type: "text", text: "Analise esta imagem." });
+          return { role: m.role, content };
+        }
+        return { role: m.role, content: m.content };
+      });
 
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
@@ -235,7 +278,7 @@ export default function AdminIAs() {
     } finally {
       setIsLoading(false);
     }
-  }, [input, isLoading, activeConvId, messages, model, imageMode, user]);
+  }, [input, isLoading, activeConvId, messages, model, imageMode, attachedImages, user]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -248,6 +291,7 @@ export default function AdminIAs() {
     setActiveConvId(null);
     setMessages([]);
     setInput("");
+    setAttachedImages([]);
     textareaRef.current?.focus();
   };
 
@@ -403,24 +447,58 @@ export default function AdminIAs() {
 
           {/* Input */}
           <div className="p-4 border-t border-white/[0.06] bg-[#0a0a0a]">
-            <div className="max-w-3xl mx-auto flex gap-2">
-              <Textarea
-                ref={textareaRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder={imageMode ? "Descreva a imagem que deseja gerar..." : "Digite sua mensagem..."}
-                className="min-h-[48px] max-h-[200px] resize-none bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/30 rounded-xl focus:border-blue-500/50"
-                rows={1}
-              />
-              <Button
-                onClick={handleSend}
-                disabled={!input.trim() || isLoading}
-                className="h-12 w-12 shrink-0 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-30"
-                size="icon"
-              >
-                {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
-              </Button>
+            <div className="max-w-3xl mx-auto">
+              {/* Attached images preview */}
+              {attachedImages.length > 0 && (
+                <div className="flex gap-2 mb-3 flex-wrap">
+                  {attachedImages.map((img, i) => (
+                    <div key={i} className="relative group">
+                      <img src={img} alt="Anexo" className="w-16 h-16 object-cover rounded-lg border border-white/[0.1]" />
+                      <button
+                        onClick={() => removeAttachment(i)}
+                        className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-3 h-3 text-white" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex gap-2 items-end">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="h-12 w-12 shrink-0 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] flex items-center justify-center text-white/40 hover:text-white/70 transition-all"
+                  title="Anexar imagem"
+                >
+                  <Paperclip className="w-5 h-5" />
+                </button>
+                <Textarea
+                  ref={textareaRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder={attachedImages.length > 0 ? "Descreva o que fazer com a imagem..." : imageMode ? "Descreva a imagem que deseja gerar..." : "Digite sua mensagem..."}
+                  className="min-h-[48px] max-h-[200px] resize-none bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/30 rounded-xl focus:border-blue-500/50"
+                  rows={1}
+                />
+                <Button
+                  onClick={handleSend}
+                  disabled={(!input.trim() && attachedImages.length === 0) || isLoading}
+                  className="h-12 w-12 shrink-0 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-30"
+                  size="icon"
+                >
+                  {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+                </Button>
+              </div>
             </div>
           </div>
         </div>
