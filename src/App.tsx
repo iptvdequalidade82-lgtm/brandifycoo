@@ -26,6 +26,7 @@ import AdminPreviews from "./pages/AdminPreviews";
 import AdminConteudo from "./pages/AdminConteudo";
 import PreviewSite from "./pages/PreviewSite";
 import PreviewLoja from "./pages/PreviewLoja";
+import AdminIAs from "./pages/AdminIAs";
 
 
 const queryClient = new QueryClient();
@@ -57,6 +58,7 @@ const App = () => (
             <Route path="/admin/contabilidade" element={<AdminContabilidade />} />
             <Route path="/admin/previas" element={<AdminPreviews />} />
             <Route path="/admin/conteudo" element={<AdminConteudo />} />
+            <Route path="/admin/ias" element={<AdminIAs />} />
             <Route path="/admin/logs" element={<AdminLogs />} />
             <Route path="/pagamento-sucesso" element={<PaymentSuccess />} />
             <Route path="/pix/:id" element={<PixPayment />} />
