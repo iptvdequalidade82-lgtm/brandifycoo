@@ -36,7 +36,9 @@ serve(async (req) => {
       }
     }
 
-    const { messages, model, conversationId, generateImage } = await req.json();
+    const { messages: allMessages, model, conversationId, generateImage } = await req.json();
+    // Limit history to last 20 messages for performance
+    const messages = allMessages.slice(-20);
 
     // Image generation mode
     if (generateImage) {
