@@ -357,21 +357,10 @@ export default function AdminIAs() {
               ))}
             </div>
 
-            <button
-              onClick={() => setImageMode(!imageMode)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                imageMode
-                  ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
-                  : "text-white/40 hover:text-white/60 bg-white/[0.04]"
-              }`}
-            >
-              <ImageIcon className="w-3.5 h-3.5" />
-              Imagem
-            </button>
+
 
             <span className="ml-auto text-[11px] text-white/20">
               {model === "auto" ? "Auto" : model === "gpt" ? "GPT" : "Gemini"}
-              {imageMode ? " • Modo Imagem" : ""}
             </span>
           </div>
 
