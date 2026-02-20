@@ -35,6 +35,7 @@ export default function AdminIAs() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [imageMode, setImageMode] = useState(false);
   const [attachedImages, setAttachedImages] = useState<string[]>([]);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -153,6 +154,7 @@ export default function AdminIAs() {
     setInput("");
     setAttachedImages([]);
     setIsLoading(true);
+    if (shouldUseImageMode) setIsGeneratingImage(true);
 
     try {
       let convId = activeConvId;
@@ -279,6 +281,7 @@ export default function AdminIAs() {
       toast({ title: "Erro", description: e.message, variant: "destructive" });
     } finally {
       setIsLoading(false);
+      setIsGeneratingImage(false);
     }
   }, [input, isLoading, activeConvId, messages, model, imageMode, attachedImages, user, toast]);
 
@@ -423,11 +426,24 @@ export default function AdminIAs() {
                       <Loader2 className="w-4 h-4 text-white animate-spin" />
                     </div>
                     <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl rounded-tl-md px-4 py-3">
-                      <div className="flex gap-1">
-                        <div className="w-2 h-2 rounded-full bg-white/20 animate-bounce" style={{ animationDelay: "0ms" }} />
-                        <div className="w-2 h-2 rounded-full bg-white/20 animate-bounce" style={{ animationDelay: "150ms" }} />
-                        <div className="w-2 h-2 rounded-full bg-white/20 animate-bounce" style={{ animationDelay: "300ms" }} />
-                      </div>
+                      {isGeneratingImage ? (
+                        <div className="flex items-center gap-3">
+                          <div className="relative w-10 h-10 rounded-lg bg-white/[0.04] flex items-center justify-center overflow-hidden">
+                            <ImageIcon className="w-5 h-5 text-blue-400 animate-pulse" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-blue-500/10 to-transparent animate-pulse" />
+                          </div>
+                          <div>
+                            <p className="text-sm text-white/70 font-medium">Gerando imagem…</p>
+                            <p className="text-[11px] text-white/30">Isso pode levar alguns segundos</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex gap-1">
+                          <div className="w-2 h-2 rounded-full bg-white/20 animate-bounce" style={{ animationDelay: "0ms" }} />
+                          <div className="w-2 h-2 rounded-full bg-white/20 animate-bounce" style={{ animationDelay: "150ms" }} />
+                          <div className="w-2 h-2 rounded-full bg-white/20 animate-bounce" style={{ animationDelay: "300ms" }} />
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
