@@ -19,7 +19,7 @@ serve(async (req) => {
     const dimensions = type === "story" ? "1080x1920" : "1080x1080";
 
     const imagePrompt = `Professional dark graphic design for Instagram ${type === "story" ? "story (9:16 vertical)" : "feed post (1:1 square)"}.
-Style: minimalist, premium, Canva Pro template. Colors: black background, white text, blue (#2563EB) accents only. Sans-serif bold typography. No human faces or hands. Include small ">> brandify" logo and "@brandifycoo" watermark.
+Style: minimalist, premium, Canva Pro template. Colors: black background, white text, blue (#2563EB) accents only. Typography: elegant SERIF fonts only (like Playfair Display, Georgia, Didot, Bodoni, Times New Roman). Use bold and italic serif styles for headlines, classic serif for body text. The typography must feel luxurious and editorial, never use sans-serif fonts. No human faces or hands. Include small ">> brandify" logo and "@brandifycoo" watermark.
 Content: ${prompt}`;
 
     let imageUrl: string | undefined;
