@@ -18,20 +18,50 @@ serve(async (req) => {
     const aspectRatio = type === "story" ? "9:16" : "1:1";
     const dimensions = type === "story" ? "1080x1920" : "1080x1080";
 
-    const imagePrompt = `Create an Instagram ${type === "story" ? "story (9:16 vertical)" : "feed post (1:1 square)"} that looks EXACTLY like a real social media post made by a professional creative agency.
+    // Rotate between 4 visual models to avoid repetition
+    const visualModels = ["A", "B", "C", "D"];
+    const selectedModel = visualModels[Math.floor(Math.random() * visualModels.length)];
 
-REFERENCE STYLE (follow this precisely):
-The image must look like this example: A real photograph of a workspace — a hand holding a coffee mug in front of a monitor showing a project management tool (like Trello), with a keyboard, mouse pad, and pen holder visible. Over the photo, large elegant WHITE SERIF typography (like Playfair Display italic/bold) overlays the image with a short editorial headline. A smaller sans-serif credit line ("POR BRANDIFY") appears at top or bottom. The overall feel is: real, editorial, confident, behind-the-scenes.
+    const modelInstructions: Record<string, string> = {
+      A: `MODEL A — HUMAN BACKSTAGE (real life):
+- Real photograph of a creative workspace: desk with monitor/laptop, keyboard, coffee cup, human hands working, pen holders, notebooks
+- Natural warm window light, soft shadows, slight grain — candid and unstaged
+- Muted warm tones (gray, beige, soft brown) — like someone snapped it during a normal workday
+- The monitor may show a real-looking work tool (project board, analytics, website editor)
+- Imperfections welcome: slightly messy desk, real textures, natural grain`,
 
-📸 PHOTOGRAPH (background layer):
-- MUST be a real-looking photograph of a creative workspace/agency environment
-- Show: desk with monitor/laptop screen, keyboard, mouse, coffee cup, hand holding something, pen holders, natural window light
-- The monitor should show a real-looking work tool (project board, analytics, website editor, social media dashboard)
-- Natural warm lighting from a window, soft shadows, slight grain — NOT studio-perfect
-- Muted, slightly desaturated warm tones (gray, beige, soft brown)
-- The photo must feel candid and unstaged — like someone snapped it during work
+      B: `MODEL B — EDITORIAL CLEAN (Pinterest / magazine style):
+- Minimalist editorial composition with strong central imagery
+- Large breathing negative space — elegant and sophisticated
+- Think high-end magazine cover or Pinterest editorial board
+- Clean, structured layout with deliberate asymmetry
+- Soft neutral backdrop (off-white, light gray, warm beige) with one strong focal element
+- The focal element can be: a single object (book, phone, plant), an architectural detail, a texture close-up, or a lifestyle moment
+- Must feel curated but not artificial`,
 
-✍️ TYPOGRAPHY (overlay on top of the photo):
+      C: `MODEL C — CONCEPTUAL PROFESSIONAL (high-end design studio):
+- Creative, artistic, well-designed visual composition
+- Think premium design studio portfolio piece or art direction showcase
+- Can use collage elements, creative photography, surreal-but-grounded compositions
+- Strong visual concept tied to the content topic
+- Artistic but NEVER futuristic, cyberpunk, or neon
+- Must look intentional and human-made, like a designer crafted it by hand
+- Premium aesthetic: think Kinfolk, Cereal Magazine, or Monocle visual style`,
+
+      D: `MODEL D — PRODUCT/THEME IN REAL CONTEXT:
+- Real objects in realistic settings: phones showing interfaces, websites on screens, printed materials on desks, business cards, branded items
+- Integrated into believable real-world scenes (on a table, held by a hand, on a shelf)
+- NO floating objects, NO fake 3D mockups, NO artificial renders
+- Must feel like something you could photograph in the real world
+- Warm, natural lighting on physical objects with real shadows and reflections`,
+    };
+
+    const imagePrompt = `Create an Instagram ${type === "story" ? "story (9:16 vertical)" : "feed post (1:1 square)"} for a professional creative agency called BRANDIFY.
+
+🎯 VISUAL MODEL TO USE: ${selectedModel}
+${modelInstructions[selectedModel]}
+
+✍️ TYPOGRAPHY (overlay on top of the image):
 - MAIN HEADLINE: Large, elegant WHITE SERIF font (Playfair Display, Didot, or Bodoni style) — use ITALIC for emphasis on key words
 - The headline should be SHORT (3-8 words max), editorial, confident — like a magazine cover
 - Position: centered or upper portion of the image, large enough to be the focal point
@@ -40,17 +70,26 @@ The image must look like this example: A real photograph of a workspace — a ha
 - "@brandifycoo" as subtle watermark
 
 🎨 COLOR RULES:
-- Photo: warm muted tones (grays, beiges, soft browns)
+- Neutral base: soft black, warm gray, off-white, beige
 - All text: WHITE or off-white only
 - Blue (#2563EB) only for subtle accent on ONE keyword if needed — never dominant
 - FORBIDDEN: gradients, neon, glow, colored backgrounds, digital effects
 
-🚫 ABSOLUTELY AVOID:
-- Illustrations, 3D mockups, flat design, template aesthetics
-- Artificial/generated-looking backgrounds or objects
-- Perfect symmetry or hyper-clean compositions
-- Stock photo aesthetic — must feel REAL and candid
-- Any element that makes it look AI-generated
+📐 LAYOUT:
+- Short, confident, editorial tone — no aggressive marketing language
+- Minimal text, clean composition with clear hierarchy
+- Generous white/negative space
+- No loud CTAs
+
+🚫 ABSOLUTE RESTRICTIONS:
+- NO illustrations, 3D mockups, flat design, template aesthetics
+- NO futuristic, cyberpunk, neon, or glow effects
+- NO stock photo aesthetic or generic template look
+- NO hyper-perfect or overly polished results
+- NO repetitive "desk + laptop" if not Model A
+- If it looks AI-generated, the result is WRONG
+
+🧠 FINAL VALIDATION: "Does this look like something a real, established creative agency would post today?" If not → wrong.
 
 Content/topic for the headline: ${prompt}`;
 
