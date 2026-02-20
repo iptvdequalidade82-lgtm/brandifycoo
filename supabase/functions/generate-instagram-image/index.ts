@@ -18,9 +18,41 @@ serve(async (req) => {
     const aspectRatio = type === "story" ? "9:16" : "1:1";
     const dimensions = type === "story" ? "1080x1920" : "1080x1080";
 
-    const imagePrompt = `Professional dark graphic design for Instagram ${type === "story" ? "story (9:16 vertical)" : "feed post (1:1 square)"}.
-Style: minimalist, premium, Canva Pro template. Colors: black background, white text, blue (#2563EB) accents only. Typography: elegant SERIF fonts only (like Playfair Display, Georgia, Didot, Bodoni, Times New Roman). Use bold and italic serif styles for headlines, classic serif for body text. The typography must feel luxurious and editorial, never use sans-serif fonts. No human faces or hands. Include small ">> brandify" logo and "@brandifycoo" watermark.
-Content: ${prompt}`;
+    const imagePrompt = `Ultra-realistic editorial photograph for Instagram ${type === "story" ? "story (9:16 vertical format)" : "feed post (1:1 square format)"}.
+
+CRITICAL STYLE — MUST LOOK 100% HUMAN-MADE, NEVER AI-GENERATED:
+- Realistic photography of real work environments: desks with notebooks, smartphones, coffee cups, human hands typing or working
+- Behind-the-scenes of a real creative agency at work — no posed or artificial setups
+- Natural lighting, soft shadows, real-world imperfections (slightly messy desk, natural grain, warm tones)
+- The image must feel like it was taken by a professional photographer during a normal workday
+
+TYPOGRAPHY (overlaid on the photo):
+- Headlines: elegant editorial SERIF font (like Playfair Display, Didot, Bodoni, Georgia) — bold or italic
+- Supporting text: clean neutral sans-serif (like Inter, Helvetica, or similar)
+- NEVER use futuristic, tech-heavy, or exaggerated fonts
+- Text must breathe — generous white space, simple and elegant composition
+
+COLOR PALETTE:
+- Base: soft black, warm gray, off-white
+- Blue (#2563EB) only as a subtle, institutional accent — never dominant
+- FORBIDDEN: gradients, neon, glow effects, digital artifacts, vibrant saturated colors
+
+LAYOUT:
+- Generous negative space, text well-positioned and breathing
+- Simple, clean, editorial magazine composition
+- Short, confident, editorial headlines — no aggressive marketing or flashy CTAs
+
+ABSOLUTELY AVOID:
+- Illustrations, 3D mockups, futuristic elements, artificial backgrounds
+- "Too perfect" or hyper-polished images — they must feel real
+- Stock photo aesthetic or template look
+- Startup/tech visual clichés
+
+Include subtle ">> brandify" logo and "@brandifycoo" watermark in corner.
+
+FINAL PRINCIPLE: The result must look like "Created by a real agency, with real people, on a normal workday." If it looks like AI, the result is wrong.
+
+Content to feature: ${prompt}`;
 
     let imageUrl: string | undefined;
 
