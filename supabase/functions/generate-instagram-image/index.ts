@@ -56,48 +56,63 @@ serve(async (req) => {
 - Warm, natural lighting on physical objects with real shadows and reflections`,
     };
 
-    const imagePrompt = `Create an Instagram ${type === "story" ? "story (9:16 vertical)" : "feed post (1:1 square)"} for a professional creative agency called BRANDIFY.
+    const imagePrompt = `You are an award-winning art director creating an Instagram ${type === "story" ? "story (9:16 vertical, 1080x1920px)" : "feed post (1:1 square, 1080x1080px)"} for BRANDIFY, a premium Brazilian creative agency.
 
-🎯 VISUAL MODEL TO USE: ${selectedModel}
+🎯 VISUAL MODEL: ${selectedModel}
 ${modelInstructions[selectedModel]}
 
-✍️ TYPOGRAPHY (overlay on top of the image):
-- MAIN HEADLINE: Large, elegant WHITE SERIF font (Playfair Display, Didot, or Bodoni style) — use ITALIC for emphasis on key words
-- The headline should be SHORT (3-8 words max), editorial, confident — like a magazine cover
-- Position: centered or upper portion of the image, large enough to be the focal point
-- SECONDARY TEXT: Small sans-serif (Inter/Helvetica style) at bottom — a question or subheadline in white or light gray
-- CREDIT LINE: "POR BRANDIFY" in small spaced-out sans-serif at top or bottom
-- "@brandifycoo" as subtle watermark
+📸 PHOTOGRAPHIC QUALITY (CRITICAL):
+- The image must have the quality of a PROFESSIONAL DSLR photograph shot at f/1.8-2.8
+- Rich depth of field with beautiful bokeh in the background
+- Warm color grading like Kodak Portra 400 film — golden tones, creamy highlights, deep shadows
+- Visible film grain and natural texture — NEVER hyper-clean digital renders
+- Dramatic but natural lighting: golden hour, soft window light, or moody studio lighting
+- Color palette: warm earth tones (amber, cognac, espresso, cream, charcoal) with occasional cool accents
+- The overall mood should feel EXPENSIVE, CINEMATIC, and EDITORIAL — like a page from Kinfolk or Cereal magazine
 
-🎨 COLOR RULES:
-- Neutral base: soft black, warm gray, off-white, beige
-- All text: WHITE or off-white only
-- Blue (#2563EB) only for subtle accent on ONE keyword if needed — never dominant
-- FORBIDDEN: gradients, neon, glow, colored backgrounds, digital effects
+✍️ TYPOGRAPHY (MUST be overlaid on the image, integrated into the composition):
+- MAIN HEADLINE: Very large, bold WHITE SERIF font (Playfair Display Bold Italic or Didot Bold style)
+  - The headline must be SHORT (3-7 words), punchy, editorial — like a luxury magazine cover
+  - Position it as a DOMINANT element — it should command attention
+  - Use line breaks creatively for visual rhythm (e.g., stacking words)
+  - Add subtle drop shadow or dark overlay behind text for contrast and readability
+- SECONDARY LINE: Smaller sans-serif (Inter Light / Helvetica Neue Light) below or near the headline — a provocative question or subheadline
+- CREDIT: "POR BRANDIFY" in elegant small-caps spaced-out sans-serif
+- WATERMARK: "@brandifycoo" small and subtle in a corner
+- ALL TEXT must be WHITE or very light cream — high contrast against the image
 
-📐 LAYOUT:
-- Short, confident, editorial tone — no aggressive marketing language
-- Minimal text, clean composition with clear hierarchy
-- Generous white/negative space
-- No loud CTAs
+🎨 VISUAL RICHNESS (IMPORTANT — avoid "too simple"):
+- The composition must have LAYERS and DEPTH — foreground elements, mid-ground focus, background atmosphere
+- Include rich environmental details: textures of wood, leather, paper, concrete, fabric, glass
+- Use atmospheric elements: steam from coffee, dust particles in light beams, soft reflections, lens flare
+- The image should feel LIVED-IN and TACTILE — you can almost feel the textures
+- Think editorial fashion photography meets workspace documentary
+- Include at least 3-4 distinct visual elements that create a complete scene
 
-🚫 ABSOLUTE RESTRICTIONS:
-- NO illustrations, 3D mockups, flat design, template aesthetics
-- NO futuristic, cyberpunk, neon, or glow effects
-- NO stock photo aesthetic or generic template look
-- NO hyper-perfect or overly polished results
-- NO repetitive "desk + laptop" if not Model A
-- If it looks AI-generated, the result is WRONG
+📐 COMPOSITION:
+- Rule of thirds with intentional breaking for dramatic effect
+- Strong leading lines drawing the eye to the headline
+- Generous negative space where text lives, but rich detail elsewhere
+- The overall layout should feel DESIGNED, not just photographed
 
-🧠 FINAL VALIDATION: "Does this look like something a real, established creative agency would post today?" If not → wrong.
+🚫 ABSOLUTELY FORBIDDEN:
+- Flat, simple, or minimalist-only compositions (must have visual RICHNESS)
+- Illustrations, 3D renders, flat design, vector art, clipart
+- Neon, glow, gradients, cyberpunk, futuristic aesthetics
+- Stock photo look, template aesthetic, generic corporate imagery
+- Hyper-perfect, overly polished, plastic-looking renders
+- Plain solid color backgrounds
+- If it looks AI-generated or like a Canva template → WRONG
 
-Content/topic for the headline: ${prompt}`;
+🧠 QUALITY CHECK: This must look like it was shot by a professional photographer, styled by an art director, and designed by a senior graphic designer at a top creative agency. If it looks simple, generic, or AI-made → regenerate.
+
+CONTENT/TOPIC for the headline: ${prompt}`;
 
     let imageUrl: string | undefined;
 
     // Provider 1: Lovable AI Gateway (primary — no billing needed)
     if (LOVABLE_API_KEY && !imageUrl) {
-      const gatewayModels = ["google/gemini-2.5-flash-image", "google/gemini-3-pro-image-preview"];
+      const gatewayModels = ["google/gemini-3-pro-image-preview", "google/gemini-2.5-flash-image"];
       for (const model of gatewayModels) {
         if (imageUrl) break;
         console.log(`Trying gateway: ${model}`);
