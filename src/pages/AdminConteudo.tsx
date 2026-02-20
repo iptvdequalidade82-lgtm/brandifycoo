@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Instagram, Sparkles, Calendar, Copy, Download, RefreshCw, ImageIcon,
   Clock, Lightbulb, MessageSquare, Pencil, CheckCircle2, Circle,
-  Lock, CalendarDays, Check,
+  Lock, CalendarDays, Check, AlertTriangle,
 } from "lucide-react";
 
 // ── Types ──
@@ -133,8 +133,7 @@ function buildMonthConfigs(today: Date): MonthConfig[] {
     // For the current month, start from tomorrow; for future months, start from day 1
     let startFrom: Date;
     if (status === "em_andamento") {
-      startFrom = new Date(today);
-      startFrom.setDate(startFrom.getDate() + 1); // start from tomorrow
+      startFrom = new Date(today); // start from today (not tomorrow)
     } else {
       // First Monday of the month or day 1
       startFrom = new Date(year, i, 1);
@@ -154,6 +153,48 @@ function buildMonthConfigs(today: Date): MonthConfig[] {
       weekLabels,
     };
   });
+}
+
+/** Determine status of a day item: "atrasado" (past), "pendente" (today/future), "conferido" (checked) */
+function getDayItemStatus(dateStr: string, time: string, checked: boolean, monthIndex: number, year: number): { label: string; color: string } {
+  if (checked) return { label: "Conferido", color: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30" };
+
+  // Parse dateStr "DD/MM" into a Date
+  const parts = dateStr.split("/");
+  if (parts.length !== 2) return { label: "Pendente", color: "bg-blue-500/20 text-blue-300 border-blue-500/30" };
+  const day = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10) - 1;
+  const itemDate = new Date(year, month, day);
+
+  // Parse time "HH:MM"
+  const timeParts = time?.split(":") || [];
+  const itemHour = timeParts.length >= 2 ? parseInt(timeParts[0], 10) : 23;
+  const itemMin = timeParts.length >= 2 ? parseInt(timeParts[1], 10) : 59;
+  itemDate.setHours(itemHour, itemMin, 0, 0);
+
+  const now = new Date();
+  if (itemDate < now) return { label: "Atrasado", color: "bg-red-500/20 text-red-300 border-red-500/30" };
+  return { label: "Pendente", color: "bg-blue-500/20 text-blue-300 border-blue-500/30" };
+}
+
+/** Get overall day status from items */
+function getDayStatus(dateStr: string, items: { time?: string; checked?: boolean }[], monthIndex: number, year: number): { label: string; color: string } {
+  if (items.length === 0) return { label: "", color: "" };
+  const allChecked = items.every((i) => i.checked);
+  if (allChecked) return { label: "Conferido", color: "text-emerald-400" };
+
+  const parts = dateStr.split("/");
+  if (parts.length !== 2) return { label: "", color: "" };
+  const day = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10) - 1;
+  const dayDate = new Date(year, month, day);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const dayStart = new Date(dayDate);
+  dayStart.setHours(0, 0, 0, 0);
+
+  if (dayStart < today) return { label: "Atrasado", color: "text-red-400" };
+  return { label: "", color: "" };
 }
 
 // ── Component ──
@@ -579,12 +620,20 @@ export default function AdminConteudo() {
                               const dayPosts = week.feedPosts?.filter((p) => p.day === day) || [];
                               if (dayPosts.length === 0) return null;
                               const dateStr = wl?.dates?.[dayI] || "";
+                              const daySt = getDayStatus(dateStr, dayPosts, currentMonthConfig.monthIndex, currentMonthConfig.year);
                               return (
                                 <AccordionItem key={day} value={`feed-${day}`} className="border-white/[0.06] bg-white/[0.02] rounded-lg px-4 border">
                                   <AccordionTrigger className="text-xs font-bold text-white/60 uppercase tracking-widest hover:no-underline py-3">
                                     <span className="flex items-center gap-2">
                                       <Calendar className="w-3.5 h-3.5" /> {day}
                                       {dateStr && <span className="text-white/30 normal-case tracking-normal font-normal">{dateStr}</span>}
+                                      {daySt.label && (
+                                        <span className={`inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full normal-case tracking-normal font-semibold ${daySt.color}`}>
+                                          {daySt.label === "Atrasado" && <AlertTriangle className="w-2.5 h-2.5" />}
+                                          {daySt.label === "Conferido" && <CheckCircle2 className="w-2.5 h-2.5" />}
+                                          {daySt.label}
+                                        </span>
+                                      )}
                                     </span>
                                   </AccordionTrigger>
                                   <AccordionContent>
@@ -613,7 +662,19 @@ export default function AdminConteudo() {
                                                   <h3 className="font-semibold text-white text-sm">{post.title}</h3>
                                                   <span className="text-[10px] text-white/30 uppercase bg-white/[0.06] px-1.5 py-0.5 rounded">{post.contentType}</span>
                                                 </div>
-                                                <span className="text-xs text-white/40 shrink-0 flex items-center gap-1"><Clock className="w-3 h-3" /> {post.time}</span>
+                                                {(() => {
+                                                  const st = getDayItemStatus(dateStr, post.time, !!post.checked, currentMonthConfig.monthIndex, currentMonthConfig.year);
+                                                  return (
+                                                    <span className="shrink-0 flex items-center gap-1.5">
+                                                      <span className="text-xs text-white/40 flex items-center gap-1"><Clock className="w-3 h-3" /> {post.time}</span>
+                                                      <span className={`inline-flex items-center gap-0.5 text-[9px] px-1.5 py-0.5 rounded-full border font-semibold ${st.color}`}>
+                                                        {st.label === "Atrasado" && <AlertTriangle className="w-2.5 h-2.5" />}
+                                                        {st.label === "Conferido" && <CheckCircle2 className="w-2.5 h-2.5" />}
+                                                        {st.label}
+                                                      </span>
+                                                    </span>
+                                                  );
+                                                })()}
                                               </div>
                                               <p className="text-xs text-white/60 leading-relaxed line-clamp-3">{post.caption}</p>
                                               {post.marketingTip && (
@@ -666,6 +727,7 @@ export default function AdminConteudo() {
                               const dayStories = week.stories?.filter((s) => s.day === day) || [];
                               if (dayStories.length === 0) return null;
                               const dateStr = wl?.dates?.[dayI] || "";
+                              const daySt = getDayStatus(dateStr, dayStories, currentMonthConfig.monthIndex, currentMonthConfig.year);
                               return (
                                 <AccordionItem key={day} value={`story-${day}`} className="border-white/[0.06] bg-white/[0.02] rounded-lg px-4 border">
                                   <AccordionTrigger className="text-xs font-bold text-white/60 uppercase tracking-widest hover:no-underline py-3">
@@ -673,6 +735,13 @@ export default function AdminConteudo() {
                                       <Calendar className="w-3.5 h-3.5" /> {day}
                                       {dateStr && <span className="text-white/30 normal-case tracking-normal font-normal">{dateStr}</span>}
                                       ({dayStories.length} stories)
+                                      {daySt.label && (
+                                        <span className={`inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full normal-case tracking-normal font-semibold ${daySt.color}`}>
+                                          {daySt.label === "Atrasado" && <AlertTriangle className="w-2.5 h-2.5" />}
+                                          {daySt.label === "Conferido" && <CheckCircle2 className="w-2.5 h-2.5" />}
+                                          {daySt.label}
+                                        </span>
+                                      )}
                                     </span>
                                   </AccordionTrigger>
                                   <AccordionContent>
