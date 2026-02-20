@@ -148,6 +148,8 @@ export default function AdminIAs() {
     if ((!text && attachedImages.length === 0) || isLoading) return;
 
     const currentAttachments = [...attachedImages];
+    // Auto-detect: if images are attached, automatically use image mode
+    const shouldUseImageMode = imageMode || currentAttachments.length > 0;
     setInput("");
     setAttachedImages([]);
     setIsLoading(true);
@@ -182,7 +184,7 @@ export default function AdminIAs() {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
 
-      if (imageMode) {
+      if (shouldUseImageMode) {
         // Non-streaming image generation
         const resp = await fetch(CHAT_URL, {
           method: "POST",
@@ -278,7 +280,7 @@ export default function AdminIAs() {
     } finally {
       setIsLoading(false);
     }
-  }, [input, isLoading, activeConvId, messages, model, imageMode, attachedImages, user]);
+  }, [input, isLoading, activeConvId, messages, model, imageMode, attachedImages, user, toast]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
