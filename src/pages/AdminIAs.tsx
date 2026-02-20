@@ -150,8 +150,10 @@ export default function AdminIAs() {
     if ((!text && attachedImages.length === 0) || isLoading) return;
 
     const currentAttachments = [...attachedImages];
-    // Auto-detect: if images are attached, automatically use image mode
-    const shouldUseImageMode = imageMode || currentAttachments.length > 0;
+    // Auto-detect: if images are attached OR user is asking to generate/create an image
+    const imageKeywords = /\b(gere|gerar|crie|criar|faça|fazer|desenh|imagem|image|foto|ilustra|banner|logo|arte|design|poster|thumbnail)\b/i;
+    const isImageRequest = currentAttachments.length > 0 || (imageKeywords.test(text) && /\b(imagem|image|foto|ilustra|banner|logo|arte|design|poster|thumbnail)\b/i.test(text));
+    const shouldUseImageMode = imageMode || isImageRequest;
     setInput("");
     setAttachedImages([]);
     setIsLoading(true);
