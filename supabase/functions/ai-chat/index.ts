@@ -108,7 +108,7 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: "Você é um assistente de IA avançado da Brandify. Responda sempre em português brasileiro. Seja claro, profissional e útil. Você pode ajudar com textos, ideias, estratégias de marketing, copywriting, análise de dados e muito mais. Formate suas respostas com markdown quando apropriado.",
+            content: "Você é um assistente de IA avançado da Brandify. Responda sempre em português brasileiro. Seja claro, profissional e útil. Você pode ajudar com textos, ideias, estratégias de marketing, copywriting, análise de dados e muito mais. Formate suas respostas com markdown quando apropriado. IMPORTANTE: Você NÃO tem ferramentas externas. NUNCA responda com JSON, blocos de código com ações, ou formatos de tool-calling como {\"action\": ...}. Responda sempre em linguagem natural.",
           },
           ...messages,
         ],
