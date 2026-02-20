@@ -18,41 +18,41 @@ serve(async (req) => {
     const aspectRatio = type === "story" ? "9:16" : "1:1";
     const dimensions = type === "story" ? "1080x1920" : "1080x1080";
 
-    const imagePrompt = `Ultra-realistic editorial photograph for Instagram ${type === "story" ? "story (9:16 vertical format)" : "feed post (1:1 square format)"}.
+    const imagePrompt = `Create an Instagram ${type === "story" ? "story (9:16 vertical)" : "feed post (1:1 square)"} that looks EXACTLY like a real social media post made by a professional creative agency.
 
-CRITICAL STYLE — MUST LOOK 100% HUMAN-MADE, NEVER AI-GENERATED:
-- Realistic photography of real work environments: desks with notebooks, smartphones, coffee cups, human hands typing or working
-- Behind-the-scenes of a real creative agency at work — no posed or artificial setups
-- Natural lighting, soft shadows, real-world imperfections (slightly messy desk, natural grain, warm tones)
-- The image must feel like it was taken by a professional photographer during a normal workday
+REFERENCE STYLE (follow this precisely):
+The image must look like this example: A real photograph of a workspace — a hand holding a coffee mug in front of a monitor showing a project management tool (like Trello), with a keyboard, mouse pad, and pen holder visible. Over the photo, large elegant WHITE SERIF typography (like Playfair Display italic/bold) overlays the image with a short editorial headline. A smaller sans-serif credit line ("POR BRANDIFY") appears at top or bottom. The overall feel is: real, editorial, confident, behind-the-scenes.
 
-TYPOGRAPHY (overlaid on the photo):
-- Headlines: elegant editorial SERIF font (like Playfair Display, Didot, Bodoni, Georgia) — bold or italic
-- Supporting text: clean neutral sans-serif (like Inter, Helvetica, or similar)
-- NEVER use futuristic, tech-heavy, or exaggerated fonts
-- Text must breathe — generous white space, simple and elegant composition
+📸 PHOTOGRAPH (background layer):
+- MUST be a real-looking photograph of a creative workspace/agency environment
+- Show: desk with monitor/laptop screen, keyboard, mouse, coffee cup, hand holding something, pen holders, natural window light
+- The monitor should show a real-looking work tool (project board, analytics, website editor, social media dashboard)
+- Natural warm lighting from a window, soft shadows, slight grain — NOT studio-perfect
+- Muted, slightly desaturated warm tones (gray, beige, soft brown)
+- The photo must feel candid and unstaged — like someone snapped it during work
 
-COLOR PALETTE:
-- Base: soft black, warm gray, off-white
-- Blue (#2563EB) only as a subtle, institutional accent — never dominant
-- FORBIDDEN: gradients, neon, glow effects, digital artifacts, vibrant saturated colors
+✍️ TYPOGRAPHY (overlay on top of the photo):
+- MAIN HEADLINE: Large, elegant WHITE SERIF font (Playfair Display, Didot, or Bodoni style) — use ITALIC for emphasis on key words
+- The headline should be SHORT (3-8 words max), editorial, confident — like a magazine cover
+- Position: centered or upper portion of the image, large enough to be the focal point
+- SECONDARY TEXT: Small sans-serif (Inter/Helvetica style) at bottom — a question or subheadline in white or light gray
+- CREDIT LINE: "POR BRANDIFY" in small spaced-out sans-serif at top or bottom
+- "@brandifycoo" as subtle watermark
 
-LAYOUT:
-- Generous negative space, text well-positioned and breathing
-- Simple, clean, editorial magazine composition
-- Short, confident, editorial headlines — no aggressive marketing or flashy CTAs
+🎨 COLOR RULES:
+- Photo: warm muted tones (grays, beiges, soft browns)
+- All text: WHITE or off-white only
+- Blue (#2563EB) only for subtle accent on ONE keyword if needed — never dominant
+- FORBIDDEN: gradients, neon, glow, colored backgrounds, digital effects
 
-ABSOLUTELY AVOID:
-- Illustrations, 3D mockups, futuristic elements, artificial backgrounds
-- "Too perfect" or hyper-polished images — they must feel real
-- Stock photo aesthetic or template look
-- Startup/tech visual clichés
+🚫 ABSOLUTELY AVOID:
+- Illustrations, 3D mockups, flat design, template aesthetics
+- Artificial/generated-looking backgrounds or objects
+- Perfect symmetry or hyper-clean compositions
+- Stock photo aesthetic — must feel REAL and candid
+- Any element that makes it look AI-generated
 
-Include subtle ">> brandify" logo and "@brandifycoo" watermark in corner.
-
-FINAL PRINCIPLE: The result must look like "Created by a real agency, with real people, on a normal workday." If it looks like AI, the result is wrong.
-
-Content to feature: ${prompt}`;
+Content/topic for the headline: ${prompt}`;
 
     let imageUrl: string | undefined;
 
