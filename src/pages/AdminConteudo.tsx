@@ -693,24 +693,24 @@ export default function AdminConteudo() {
                                                   {post.checked ? <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> : <Circle className="w-3.5 h-3.5 mr-1" />}{post.checked ? "Conferido ✓" : "Conferir"}
                                                 </Button>
                                                 <Button variant="ghost" size="sm" onClick={() => copyToClipboard(post.caption)} className="text-white/40 hover:text-white h-7 text-xs"><Copy className="w-3 h-3 mr-1" /> Copiar legenda</Button>
-                                                {post.generatedImage && (
-                                                  <Button variant="ghost" size="sm" onClick={() => toggleFeedback(post.id)} className="text-white/40 hover:text-white h-7 text-xs">
-                                                    <MessageSquare className="w-3 h-3 mr-1" /> {feedbackItemId === post.id ? "Fechar" : "Refazer com dica"}
-                                                  </Button>
-                                                )}
+                                                <Button variant="ghost" size="sm" onClick={() => toggleFeedback(post.id)} className="text-white/30 hover:text-white h-7 text-xs"><Pencil className="w-3 h-3 mr-0.5" /> Editar</Button>
                                               </div>
-                                              {post.generatedImage && feedbackItemId === post.id && (
-                                                <div className="space-y-2 pt-1 border-t border-white/[0.06]">
-                                                  <p className="text-[10px] text-white/40 uppercase tracking-wider font-semibold flex items-center gap-1"><Pencil className="w-3 h-3" /> Editar conteúdo</p>
-                                                  <Input placeholder="Título do post..." value={post.title} onChange={(e) => updateItemField(weekIdx, post.id, "feed", "title", e.target.value)} className="bg-white/[0.05] border-white/10 text-white text-xs h-8" />
-                                                  <Textarea placeholder="Legenda..." value={post.caption} onChange={(e) => updateItemField(weekIdx, post.id, "feed", "caption", e.target.value)} className="bg-white/[0.05] border-white/10 text-white text-xs min-h-[60px] resize-none" />
-                                                  <p className="text-[10px] text-white/40 uppercase tracking-wider font-semibold flex items-center gap-1 mt-2"><ImageIcon className="w-3 h-3" /> Refazer imagem com dica</p>
-                                                  <div className="flex gap-2">
-                                                    <Input placeholder="Ex: Mais minimalista..." value={imageHint} onChange={(e) => setImageHint(e.target.value)} className="bg-white/[0.05] border-white/10 text-white text-xs flex-1 h-8" />
-                                                    <Button size="sm" onClick={() => handleGenerateImage(weekIdx, post.id, post.imageDescription, "feed", imageHint || undefined)} disabled={post.isGeneratingImage} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white text-xs h-8 shrink-0">
-                                                      {post.isGeneratingImage ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <><RefreshCw className="w-3.5 h-3.5 mr-1" /> Refazer</>}
-                                                    </Button>
-                                                  </div>
+                                              {feedbackItemId === post.id && (
+                                                <div className="space-y-2 pt-2 border-t border-white/[0.06]">
+                                                  <p className="text-[10px] text-white/40 uppercase tracking-wider font-semibold">Editar conteúdo</p>
+                                                  <Input placeholder="Título do post..." value={post.title} onChange={(e) => updateItemField(weekIdx, post.id, "feed", "title", e.target.value)} className="bg-white/[0.05] border-white/10 text-white text-[10px] h-7" />
+                                                  <Textarea placeholder="Legenda..." value={post.caption} onChange={(e) => updateItemField(weekIdx, post.id, "feed", "caption", e.target.value)} className="bg-white/[0.05] border-white/10 text-white text-[10px] min-h-[60px] resize-none" />
+                                                  {post.generatedImage && (
+                                                    <>
+                                                      <p className="text-[10px] text-white/40 uppercase tracking-wider font-semibold flex items-center gap-1 mt-1"><ImageIcon className="w-3 h-3" /> Refazer imagem</p>
+                                                      <div className="flex gap-1.5">
+                                                        <Input placeholder="Dica para refazer..." value={imageHint} onChange={(e) => setImageHint(e.target.value)} className="bg-white/[0.05] border-white/10 text-white text-[10px] flex-1 h-7" />
+                                                        <Button size="sm" onClick={() => handleGenerateImage(weekIdx, post.id, post.imageDescription, "feed", imageHint || undefined)} disabled={post.isGeneratingImage} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white h-7 w-7 p-0 shrink-0">
+                                                          {post.isGeneratingImage ? <RefreshCw className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+                                                        </Button>
+                                                      </div>
+                                                    </>
+                                                  )}
                                                 </div>
                                               )}
                                             </div>
