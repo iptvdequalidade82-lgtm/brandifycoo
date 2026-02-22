@@ -115,7 +115,7 @@ function buildWeeksForMonth(year: number, monthIndex: number, startFrom: Date): 
   });
 }
 
-function buildMonthConfigs(today: Date): MonthConfig[] {
+function buildMonthConfigs(today: Date, existingPlans?: Record<string, MonthPlan>): MonthConfig[] {
   const year = 2026;
   const currentMonth = today.getMonth(); // 0-indexed
   const currentYear = today.getFullYear();
@@ -130,21 +130,26 @@ function buildMonthConfigs(today: Date): MonthConfig[] {
       status = "aberto";
     }
 
-    // For the current month, start from tomorrow; for future months, start from day 1
+    const monthKey = MONTH_SHORT[i].toLowerCase();
+    const hasPlan = existingPlans && existingPlans[monthKey] && Object.keys(existingPlans[monthKey]).length > 0;
+
+    // If a plan already exists, show ALL days from day 1 so past content remains visible
+    // Only use "start from today" when there's NO plan yet (for generation)
     let startFrom: Date;
-    if (status === "em_andamento") {
-      startFrom = new Date(today); // start from today (not tomorrow)
+    if (hasPlan) {
+      startFrom = new Date(year, i, 1); // show full month
+    } else if (status === "em_andamento") {
+      startFrom = new Date(today); // start from today for new generation
     } else {
-      // First Monday of the month or day 1
       startFrom = new Date(year, i, 1);
     }
 
-    const weekLabels = status === "concluido"
-      ? [] // no weeks needed for completed months
+    const weekLabels = status === "concluido" && !hasPlan
+      ? [] // no weeks needed for completed months without a plan
       : buildWeeksForMonth(year, i, startFrom);
 
     return {
-      key: MONTH_SHORT[i].toLowerCase(),
+      key: monthKey,
       label: MONTH_NAMES[i],
       shortLabel: MONTH_SHORT[i],
       status,
@@ -202,13 +207,6 @@ export default function AdminConteudo() {
   const { toast } = useToast();
   const [refreshKey, setRefreshKey] = useState(0);
 
-  const months = useMemo(() => {
-    void refreshKey;
-    return buildMonthConfigs(new Date());
-  }, [refreshKey]);
-
-  const currentMonthKey = months.find((m) => m.status === "em_andamento")?.key || months[0].key;
-  const [activeMonth, setActiveMonth] = useState(currentMonthKey);
   const [monthPlans, setMonthPlans] = useState<Record<string, MonthPlan>>({});
   const [weekNiches, setWeekNiches] = useState<Record<string, string[]>>({});
   const [customNiches, setCustomNiches] = useState<Record<string, string[]>>({});
@@ -218,6 +216,14 @@ export default function AdminConteudo() {
   const [feedbackItemId, setFeedbackItemId] = useState<string | null>(null);
   const [imageHint, setImageHint] = useState("");
   const [isLoadingPlans, setIsLoadingPlans] = useState(true);
+
+  const months = useMemo(() => {
+    void refreshKey;
+    return buildMonthConfigs(new Date(), monthPlans);
+  }, [refreshKey, monthPlans]);
+
+  const currentMonthKey = months.find((m) => m.status === "em_andamento")?.key || months[0].key;
+  const [activeMonth, setActiveMonth] = useState(currentMonthKey);
 
   // Debounced save ref
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
