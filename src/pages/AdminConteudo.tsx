@@ -403,8 +403,25 @@ export default function AdminConteudo() {
     };
     updateWeekItem(true);
     try {
-      const { data, error } = await supabase.functions.invoke("generate-instagram-image", { body: { prompt: fullPrompt, type } });
-      if (error) throw error;
+      // Use raw fetch with longer timeout (120s) since image generation can take 60+ seconds
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 120000);
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      const session = (await supabase.auth.getSession()).data.session;
+      const res = await fetch(`${supabaseUrl}/functions/v1/generate-instagram-image`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": supabaseKey,
+          "Authorization": `Bearer ${session?.access_token || supabaseKey}`,
+        },
+        body: JSON.stringify({ prompt: fullPrompt, type }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || `Erro ${res.status}`);
       if (data?.error) throw new Error(data.error);
       updateWeekItem(false, data.imageUrl);
       setImageHint("");
