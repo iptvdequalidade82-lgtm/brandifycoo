@@ -117,7 +117,7 @@ function buildWeeksForMonth(year: number, monthIndex: number, startFrom: Date): 
 
 function buildMonthConfigs(today: Date, existingPlans?: Record<string, MonthPlan>): MonthConfig[] {
   const year = 2026;
-  const currentMonth = today.getMonth(); // 0-indexed
+  const currentMonth = today.getMonth();
   const currentYear = today.getFullYear();
 
   return Array.from({ length: 12 }, (_, i) => {
@@ -131,21 +131,32 @@ function buildMonthConfigs(today: Date, existingPlans?: Record<string, MonthPlan
     }
 
     const monthKey = MONTH_SHORT[i].toLowerCase();
-    const hasPlan = existingPlans && existingPlans[monthKey] && Object.keys(existingPlans[monthKey]).length > 0;
+    const plan = existingPlans?.[monthKey];
+    const hasPlan = plan && Object.keys(plan).length > 0;
 
-    // If a plan already exists, show ALL days from day 1 so past content remains visible
-    // Only use "start from today" when there's NO plan yet (for generation)
+    // If the plan has stored weekLabels, use those (they match the generated content)
+    if (hasPlan && (plan as any).savedWeekLabels) {
+      return {
+        key: monthKey,
+        label: MONTH_NAMES[i],
+        shortLabel: MONTH_SHORT[i],
+        status,
+        monthIndex: i,
+        year,
+        weekLabels: (plan as any).savedWeekLabels as WeekLabel[],
+      };
+    }
+
+    // For generation: current month starts from today, others from day 1
     let startFrom: Date;
-    if (hasPlan) {
-      startFrom = new Date(year, i, 1); // show full month
-    } else if (status === "em_andamento") {
-      startFrom = new Date(today); // start from today for new generation
+    if (status === "em_andamento") {
+      startFrom = new Date(today);
     } else {
       startFrom = new Date(year, i, 1);
     }
 
     const weekLabels = status === "concluido" && !hasPlan
-      ? [] // no weeks needed for completed months without a plan
+      ? []
       : buildWeeksForMonth(year, i, startFrom);
 
     return {
@@ -358,6 +369,8 @@ export default function AdminConteudo() {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       const plan = data.monthPlan || data;
+      // Save the weekLabels with the plan so dates are preserved across reloads
+      plan.savedWeekLabels = currentMonthConfig.weekLabels;
       setMonthPlans((prev) => ({ ...prev, [activeMonth]: plan }));
       setActiveWeek("1");
       toast({ title: `Planejamento de ${currentMonthConfig.label} gerado! 🎉` });
