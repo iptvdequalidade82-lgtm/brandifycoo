@@ -56,55 +56,51 @@ serve(async (req) => {
 - Warm, natural lighting on physical objects with real shadows and reflections`,
     };
 
-    const imagePrompt = `You are an award-winning art director creating an Instagram ${type === "story" ? "story (9:16 vertical, 1080x1920px)" : "feed post (1:1 square, 1080x1080px)"} for BRANDIFY, a premium Brazilian creative agency.
+    const imagePrompt = `Create a clean, high-end, professional social media ${type === "story" ? "story (9:16 vertical, 1080x1920px)" : "feed post (1:1 square, 1080x1080px)"} for BRANDIFY, a premium Brazilian creative agency.
+
+The image must look 100% realistic, like a real brand campaign — NOT AI-generated.
 
 🎯 VISUAL MODEL: ${selectedModel}
 ${modelInstructions[selectedModel]}
 
-📸 PHOTOGRAPHIC QUALITY (CRITICAL):
-- The image must have the quality of a PROFESSIONAL DSLR photograph shot at f/1.8-2.8
-- Rich depth of field with beautiful bokeh in the background
-- Warm color grading like Kodak Portra 400 film — golden tones, creamy highlights, deep shadows
-- Visible film grain and natural texture — NEVER hyper-clean digital renders
-- Dramatic but natural lighting: golden hour, soft window light, or moody studio lighting
-- Color palette: warm earth tones (amber, cognac, espresso, cream, charcoal) with occasional cool accents
-- The overall mood should feel EXPENSIVE, CINEMATIC, and EDITORIAL — like a page from Kinfolk or Cereal magazine
+📸 STYLE & MOOD:
+- Style: minimal, editorial, premium, corporate-modern
+- Mood: confident, aspirational, elegant, professional
+- Camera feel: real photography, DSLR look, shallow depth of field when needed
+- Lighting: natural soft light, studio-quality, realistic shadows
+- Colors: neutral palette (white, black, gray, soft beige), subtle accent colors only if necessary
+- Finish: ultra-polished, realistic, timeless, premium brand aesthetic
 
-✍️ TYPOGRAPHY (MUST be overlaid on the image, integrated into the composition):
-- MAIN HEADLINE: Very large, bold WHITE SERIF font (Playfair Display Bold Italic or Didot Bold style)
-  - The headline must be SHORT (3-7 words), punchy, editorial — like a luxury magazine cover
-  - Position it as a DOMINANT element — it should command attention
-  - Use line breaks creatively for visual rhythm (e.g., stacking words)
-  - Add subtle drop shadow or dark overlay behind text for contrast and readability
-- SECONDARY LINE: Smaller sans-serif (Inter Light / Helvetica Neue Light) below or near the headline — a provocative question or subheadline
-- CREDIT: "POR BRANDIFY" in elegant small-caps spaced-out sans-serif
+✍️ TYPOGRAPHY:
+- Modern sans-serif OR elegant serif font — clean kerning, perfect alignment
+- MAIN HEADLINE: Large, bold, high-contrast text — SHORT (3-7 words), punchy, editorial
+  - Can be WHITE on dark backgrounds or BLACK/DARK on light backgrounds
+  - Must be a DOMINANT visual element commanding attention
+  - Use creative line breaks for visual rhythm
+- SECONDARY LINE: Smaller, lighter weight text — a provocative question or subheadline
+- CREDIT: "POR BRANDIFY" in elegant small-caps spaced-out text
 - WATERMARK: "@brandifycoo" small and subtle in a corner
-- ALL TEXT must be WHITE or very light cream — high contrast against the image
-
-🎨 VISUAL RICHNESS (IMPORTANT — avoid "too simple"):
-- The composition must have LAYERS and DEPTH — foreground elements, mid-ground focus, background atmosphere
-- Include rich environmental details: textures of wood, leather, paper, concrete, fabric, glass
-- Use atmospheric elements: steam from coffee, dust particles in light beams, soft reflections, lens flare
-- The image should feel LIVED-IN and TACTILE — you can almost feel the textures
-- Think editorial fashion photography meets workspace documentary
-- Include at least 3-4 distinct visual elements that create a complete scene
+- No exaggerated text effects, no outlines, no glows — clean and editorial only
 
 📐 COMPOSITION:
-- Rule of thirds with intentional breaking for dramatic effect
-- Strong leading lines drawing the eye to the headline
-- Generous negative space where text lives, but rich detail elsewhere
-- The overall layout should feel DESIGNED, not just photographed
+- Balanced, spacious, strong negative space, rule of thirds
+- The subject/photo should be the hero — typography complements, never fights
+- Think luxury brand Instagram or LinkedIn campaign
+- Similar to Ferrari, Apple, Nike, or high-end marketing agencies
 
-🚫 ABSOLUTELY FORBIDDEN:
-- Flat, simple, or minimalist-only compositions (must have visual RICHNESS)
-- Illustrations, 3D renders, flat design, vector art, clipart
-- Neon, glow, gradients, cyberpunk, futuristic aesthetics
-- Stock photo look, template aesthetic, generic corporate imagery
-- Hyper-perfect, overly polished, plastic-looking renders
-- Plain solid color backgrounds
-- If it looks AI-generated or like a Canva template → WRONG
+🚫 ABSOLUTELY FORBIDDEN (NEGATIVE PROMPT):
+- AI artifacts, fake lighting, plastic skin, exaggerated realism
+- Surreal visuals, cartoon style, low-quality design
+- Stock-photo look, generic marketing layout
+- Futuristic UI, neon colors, cyberpunk aesthetics
+- Artificial textures, over-saturated colors
+- Exaggerated depth or surreal elements
+- "AI look" faces or objects
+- Random icons or generic illustrations
+- Flat design, vector art, clipart, Canva template look
+- If it looks AI-generated → WRONG. Regenerate.
 
-🧠 QUALITY CHECK: This must look like it was shot by a professional photographer, styled by an art director, and designed by a senior graphic designer at a top creative agency. If it looks simple, generic, or AI-made → regenerate.
+🧠 QUALITY CHECK: This must look like a REAL brand created it for Instagram or LinkedIn. Think luxury brands, tech companies, or professional marketing agencies. If it looks simple, generic, or AI-made → regenerate.
 
 CONTENT/TOPIC for the headline: ${prompt}`;
 
