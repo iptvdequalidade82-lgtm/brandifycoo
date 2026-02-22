@@ -147,9 +147,12 @@ function buildMonthConfigs(today: Date, existingPlans?: Record<string, MonthPlan
       };
     }
 
-    // For generation: current month starts from today, others from day 1
+    // If a plan EXISTS but has no savedWeekLabels, show from day 1 to display all content
+    // Only use "today" when there's NO plan yet (for generation)
     let startFrom: Date;
-    if (status === "em_andamento") {
+    if (hasPlan) {
+      startFrom = new Date(year, i, 1);
+    } else if (status === "em_andamento") {
       startFrom = new Date(today);
     } else {
       startFrom = new Date(year, i, 1);
