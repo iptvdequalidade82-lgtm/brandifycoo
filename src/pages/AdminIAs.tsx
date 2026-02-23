@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo, memo } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -23,6 +23,58 @@ const MODEL_OPTIONS = [
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`;
 
+// ── Memoized message bubble ──
+const ChatBubble = memo(({ msg }: { msg: Msg }) => (
+  <div className={`flex gap-3 ${msg.role === "user" ? "justify-end" : ""}`}>
+    {msg.role === "assistant" && (
+      <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 mt-1">
+        <img src={brandifyLogo} alt="Brandify" className="w-full h-full object-cover" />
+      </div>
+    )}
+    <div className={`max-w-[85%] md:max-w-[80%] ${
+      msg.role === "user"
+        ? "bg-blue-600/20 border border-blue-500/20 rounded-2xl rounded-tr-md px-4 py-3"
+        : "bg-white/[0.03] border border-white/[0.06] rounded-2xl rounded-tl-md px-4 py-3"
+    }`}>
+      {msg.image_urls && msg.image_urls.length > 0 && (
+        <div className="mb-3 space-y-2">
+          {msg.image_urls.map((url, j) => (
+            <img key={j} src={url} alt="Generated" className="rounded-xl max-w-full max-h-96 object-contain" />
+          ))}
+        </div>
+      )}
+      <div className="text-sm text-white/90 leading-relaxed prose prose-invert prose-sm max-w-none">
+        <ReactMarkdown>{msg.content}</ReactMarkdown>
+      </div>
+      {msg.model_used && (
+        <span className="text-[10px] text-white/20 mt-2 block">
+          {msg.model_used.includes("gemini") ? "Gemini" : msg.model_used.includes("gpt") ? "GPT" : msg.model_used}
+        </span>
+      )}
+    </div>
+  </div>
+));
+ChatBubble.displayName = "ChatBubble";
+
+// ── Streaming message (not memoized — updates frequently) ──
+const StreamingBubble = ({ content, modelUsed }: { content: string; modelUsed: string }) => (
+  <div className="flex gap-3">
+    <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 mt-1">
+      <img src={brandifyLogo} alt="Brandify" className="w-full h-full object-cover" />
+    </div>
+    <div className="max-w-[85%] md:max-w-[80%] bg-white/[0.03] border border-white/[0.06] rounded-2xl rounded-tl-md px-4 py-3">
+      <div className="text-sm text-white/90 leading-relaxed prose prose-invert prose-sm max-w-none">
+        <ReactMarkdown>{content}</ReactMarkdown>
+      </div>
+      {modelUsed && (
+        <span className="text-[10px] text-white/20 mt-2 block">
+          {modelUsed.includes("gemini") ? "Gemini" : modelUsed.includes("gpt") ? "GPT" : modelUsed}
+        </span>
+      )}
+    </div>
+  </div>
+);
+
 export default function AdminIAs() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -37,14 +89,32 @@ export default function AdminIAs() {
   const [imageMode, setImageMode] = useState(false);
   const [attachedImages, setAttachedImages] = useState<string[]>([]);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  // Streaming content kept in state for the live bubble only
+  const [streamingContent, setStreamingContent] = useState("");
+  const [streamingModel, setStreamingModel] = useState("");
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // Cache token to avoid repeated auth calls
+  const tokenRef = useRef<string | null>(null);
 
-  const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
 
-  useEffect(() => { scrollToBottom(); }, [messages]);
+  useEffect(() => { scrollToBottom(); }, [messages, streamingContent, scrollToBottom]);
+
+  // Pre-cache auth token
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      tokenRef.current = session?.access_token || null;
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      tokenRef.current = session?.access_token || null;
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   // Load conversations
   useEffect(() => {
@@ -95,20 +165,21 @@ export default function AdminIAs() {
     return conv.id;
   };
 
-  const saveMessage = async (convId: string, msg: Msg) => {
-    await supabase.from("ai_messages").insert({
+  // Fire-and-forget DB save (no await needed in the hot path)
+  const saveMessage = (convId: string, msg: Msg) => {
+    supabase.from("ai_messages").insert({
       conversation_id: convId,
       role: msg.role,
       content: msg.content,
       image_urls: msg.image_urls || [],
       model_used: msg.model_used || null,
-    });
+    }).then(({ error }) => { if (error) console.error("Save msg error:", error); });
   };
 
-  const updateConversationTitle = async (convId: string, firstMsg: string) => {
+  const updateConversationTitle = (convId: string, firstMsg: string) => {
     const title = firstMsg.slice(0, 60) + (firstMsg.length > 60 ? "…" : "");
-    await supabase.from("ai_conversations").update({ title }).eq("id", convId);
-    setConversations((prev) => prev.map((c) => (c.id === convId ? { ...c, title } : c)));
+    supabase.from("ai_conversations").update({ title }).eq("id", convId)
+      .then(() => setConversations((prev) => prev.map((c) => (c.id === convId ? { ...c, title } : c))));
   };
 
   const deleteConversation = async (convId: string) => {
@@ -150,13 +221,14 @@ export default function AdminIAs() {
     if ((!text && attachedImages.length === 0) || isLoading) return;
 
     const currentAttachments = [...attachedImages];
-    // Auto-detect: if images are attached OR user is asking to generate/create an image
     const imageKeywords = /\b(gere|gerar|crie|criar|faça|fazer|desenh|imagem|image|foto|ilustra|banner|logo|arte|design|poster|thumbnail)\b/i;
     const isImageRequest = currentAttachments.length > 0 || (imageKeywords.test(text) && /\b(imagem|image|foto|ilustra|banner|logo|arte|design|poster|thumbnail)\b/i.test(text));
     const shouldUseImageMode = imageMode || isImageRequest;
     setInput("");
     setAttachedImages([]);
     setIsLoading(true);
+    setStreamingContent("");
+    setStreamingModel("");
     if (shouldUseImageMode) setIsGeneratingImage(true);
 
     try {
@@ -165,39 +237,42 @@ export default function AdminIAs() {
 
       const userMsg: Msg = { role: "user", content: text || "(imagem anexada)", image_urls: currentAttachments.length > 0 ? currentAttachments : undefined };
       setMessages((prev) => [...prev, userMsg]);
-      await saveMessage(convId, userMsg);
 
-      // Update title on first message
-      if (messages.length === 0) await updateConversationTitle(convId, text || "Imagem anexada");
+      // Fire-and-forget saves — don't block the AI call
+      saveMessage(convId, userMsg);
+      if (messages.length === 0) updateConversationTitle(convId, text || "Imagem anexada");
 
-      // Build API messages - for multimodal, use content array format
+      // Build API messages — skip image data URLs from history to reduce payload size
       const apiMessages = [...messages, userMsg].map((m) => {
         if (m.image_urls && m.image_urls.length > 0) {
+          // Only send image data for the LAST user message (current one)
+          const isCurrentMsg = m === userMsg;
           const content: any[] = [];
           if (m.content && m.content !== "(imagem anexada)") {
             content.push({ type: "text", text: m.content });
           }
-          m.image_urls.forEach((url) => {
-            content.push({ type: "image_url", image_url: { url } });
-          });
-          if (content.length === 0) content.push({ type: "text", text: "Analise esta imagem." });
+          if (isCurrentMsg) {
+            m.image_urls.forEach((url) => {
+              content.push({ type: "image_url", image_url: { url } });
+            });
+          }
+          if (content.length === 0) content.push({ type: "text", text: "(imagem anexada anteriormente)" });
           return { role: m.role, content };
         }
         return { role: m.role, content: m.content };
       });
 
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
+      const token = tokenRef.current;
+      const headers = {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      };
 
       if (shouldUseImageMode) {
-        // Non-streaming image generation
         const resp = await fetch(CHAT_URL, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          },
+          headers,
           body: JSON.stringify({ messages: apiMessages, model, generateImage: true }),
         });
 
@@ -214,16 +289,12 @@ export default function AdminIAs() {
           model_used: data.model,
         };
         setMessages((prev) => [...prev, assistantMsg]);
-        await saveMessage(convId, assistantMsg);
+        saveMessage(convId, assistantMsg);
       } else {
-        // Streaming text
+        // Streaming text with batched UI updates
         const resp = await fetch(CHAT_URL, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          },
+          headers,
           body: JSON.stringify({ messages: apiMessages, model, conversationId: convId }),
         });
 
@@ -233,20 +304,30 @@ export default function AdminIAs() {
         }
 
         const modelUsed = resp.headers.get("X-Model-Used") || model;
+        setStreamingModel(modelUsed);
         const reader = resp.body!.getReader();
         const decoder = new TextDecoder();
         let buffer = "";
         let assistantSoFar = "";
 
-        const upsert = (chunk: string) => {
-          assistantSoFar += chunk;
-          setMessages((prev) => {
-            const last = prev[prev.length - 1];
-            if (last?.role === "assistant") {
-              return prev.map((m, i) => (i === prev.length - 1 ? { ...m, content: assistantSoFar } : m));
-            }
-            return [...prev, { role: "assistant", content: assistantSoFar, model_used: modelUsed }];
-          });
+        // Batch streaming updates with requestAnimationFrame
+        let pendingChunks = "";
+        let rafId: number | null = null;
+
+        const flushChunks = () => {
+          if (pendingChunks) {
+            assistantSoFar += pendingChunks;
+            pendingChunks = "";
+            setStreamingContent(assistantSoFar);
+          }
+          rafId = null;
+        };
+
+        const enqueueChunk = (chunk: string) => {
+          pendingChunks += chunk;
+          if (!rafId) {
+            rafId = requestAnimationFrame(flushChunks);
+          }
         };
 
         let streamDone = false;
@@ -267,20 +348,31 @@ export default function AdminIAs() {
             try {
               const parsed = JSON.parse(json);
               const content = parsed.choices?.[0]?.delta?.content;
-              if (content) upsert(content);
+              if (content) enqueueChunk(content);
             } catch { buffer = line + "\n" + buffer; break; }
           }
         }
 
-        // Save final assistant message
+        // Flush any remaining chunks
+        if (rafId) cancelAnimationFrame(rafId);
+        if (pendingChunks) {
+          assistantSoFar += pendingChunks;
+        }
+
+        // Move streaming content into messages array
         const finalMsg: Msg = { role: "assistant", content: assistantSoFar, model_used: modelUsed };
-        await saveMessage(convId, finalMsg);
+        setStreamingContent("");
+        setStreamingModel("");
+        setMessages((prev) => [...prev, finalMsg]);
+        saveMessage(convId, finalMsg);
       }
 
-      // Update conversation timestamp
-      await supabase.from("ai_conversations").update({ updated_at: new Date().toISOString() }).eq("id", convId);
+      // Update conversation timestamp (fire-and-forget)
+      supabase.from("ai_conversations").update({ updated_at: new Date().toISOString() }).eq("id", convId);
     } catch (e: any) {
       console.error(e);
+      setStreamingContent("");
+      setStreamingModel("");
       toast({ title: "Erro", description: e.message, variant: "destructive" });
     } finally {
       setIsLoading(false);
@@ -300,12 +392,18 @@ export default function AdminIAs() {
     setMessages([]);
     setInput("");
     setAttachedImages([]);
+    setStreamingContent("");
     textareaRef.current?.focus();
   };
 
+  // Memoized finalized messages list
+  const renderedMessages = useMemo(() => (
+    messages.map((msg, i) => <ChatBubble key={i} msg={msg} />)
+  ), [messages]);
+
   return (
     <AdminLayout>
-      <div className="flex h-[calc(100vh-7rem)] md:h-[calc(100vh-8rem)] -mx-6 -mt-6 overflow-hidden relative">
+      <div className="flex h-[calc(100vh-7rem)] md:h-[calc(100vh-8rem)] -mx-3 md:-mx-6 -mt-3 md:-mt-6 overflow-hidden relative">
         {/* Sidebar - overlay on mobile */}
         {sidebarOpen && (
           <div className="fixed inset-0 bg-black/60 z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
@@ -376,7 +474,7 @@ export default function AdminIAs() {
 
           {/* Messages */}
           <ScrollArea className="flex-1 px-3 md:px-4 py-4">
-            {messages.length === 0 ? (
+            {messages.length === 0 && !streamingContent ? (
               <div className="flex flex-col items-center justify-center h-full text-center px-4">
                 <img src={brandifyLogo} alt="Brandify" className="w-14 h-14 md:w-16 md:h-16 rounded-2xl mb-4 opacity-60" />
                 <h2 className="text-lg md:text-xl font-semibold text-white/60 mb-2">Brandify IA</h2>
@@ -397,37 +495,15 @@ export default function AdminIAs() {
               </div>
             ) : (
               <div className="max-w-3xl mx-auto space-y-6">
-                {messages.map((msg, i) => (
-                  <div key={i} className={`flex gap-3 ${msg.role === "user" ? "justify-end" : ""}`}>
-                    {msg.role === "assistant" && (
-                      <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 mt-1">
-                        <img src={brandifyLogo} alt="Brandify" className="w-full h-full object-cover" />
-                      </div>
-                    )}
-                    <div className={`max-w-[85%] md:max-w-[80%] ${
-                      msg.role === "user"
-                        ? "bg-blue-600/20 border border-blue-500/20 rounded-2xl rounded-tr-md px-4 py-3"
-                        : "bg-white/[0.03] border border-white/[0.06] rounded-2xl rounded-tl-md px-4 py-3"
-                    }`}>
-                      {msg.image_urls && msg.image_urls.length > 0 && (
-                        <div className="mb-3 space-y-2">
-                          {msg.image_urls.map((url, j) => (
-                            <img key={j} src={url} alt="Generated" className="rounded-xl max-w-full max-h-96 object-contain" />
-                          ))}
-                        </div>
-                      )}
-                      <div className="text-sm text-white/90 leading-relaxed prose prose-invert prose-sm max-w-none">
-                        <ReactMarkdown>{msg.content}</ReactMarkdown>
-                      </div>
-                      {msg.model_used && (
-                        <span className="text-[10px] text-white/20 mt-2 block">
-                          {msg.model_used.includes("gemini") ? "Gemini" : msg.model_used.includes("gpt") ? "GPT" : msg.model_used}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))}
-                {isLoading && messages[messages.length - 1]?.role === "user" && (
+                {renderedMessages}
+
+                {/* Streaming response (separate from memoized messages) */}
+                {streamingContent && (
+                  <StreamingBubble content={streamingContent} modelUsed={streamingModel} />
+                )}
+
+                {/* Loading indicator (waiting for first chunk or image) */}
+                {isLoading && !streamingContent && messages[messages.length - 1]?.role === "user" && (
                   <div className="flex gap-3">
                     <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0">
                       <img src={brandifyLogo} alt="Brandify" className="w-full h-full object-cover" />
@@ -462,7 +538,6 @@ export default function AdminIAs() {
           {/* Input */}
           <div className="p-3 md:p-4 border-t border-white/[0.06] bg-[#0a0a0a]">
             <div className="max-w-3xl mx-auto">
-              {/* Attached images preview */}
               {attachedImages.length > 0 && (
                 <div className="flex gap-2 mb-3 flex-wrap">
                   {attachedImages.map((img, i) => (
