@@ -112,7 +112,7 @@ const AdminDashboard = () => {
     else {
       toast.success(`Status: ${statusConfig[newStatus]?.label || newStatus}`);
       setProposals(prev => prev.map(p => p.id === id ? { ...p, status: newStatus } : p));
-      logActivity("proposal", id, "status_changed", user!.id, {
+      if (user) logActivity("proposal", id, "status_changed", user.id, {
         title: oldProposal?.title,
         client_name: oldProposal?.client_name,
         from: statusConfig[oldProposal?.status || "draft"]?.label || oldProposal?.status,
@@ -460,9 +460,9 @@ const AdminDashboard = () => {
       </AlertDialog>
 
       {/* Extracted Dialogs */}
-      <ProposalForm open={showForm} onOpenChange={setShowForm} userId={user!.id} onCreated={() => { fetchProposals(); fetchProjects(); }} />
+      <ProposalForm open={showForm} onOpenChange={setShowForm} userId={user?.id ?? ""} onCreated={() => { fetchProposals(); fetchProjects(); }} />
       <ProposalEditDialog proposal={editTarget} onClose={() => setEditTarget(null)} onSaved={fetchProposals} />
-      <ConvertProjectDialog proposal={convertTarget} onClose={() => setConvertTarget(null)} onConverted={() => { fetchProposals(); fetchProjects(); }} userId={user!.id} />
+      <ConvertProjectDialog proposal={convertTarget} onClose={() => setConvertTarget(null)} onConverted={() => { fetchProposals(); fetchProjects(); }} userId={user?.id ?? ""} />
     </AdminLayout>
   );
 };
