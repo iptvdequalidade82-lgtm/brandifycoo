@@ -7,8 +7,8 @@ import earthMoonBg from "@/assets/earth-moon-bg.jpg";
 
 const plans = [
   {
-    name: "Landing Page", price: "R$ 800", pricePrefix: "a partir de", desc: "Página única e objetiva para divulgar seu negócio ou serviço.",
-    features: ["Página única (one-page)", "Design responsivo", "Certificado SSL", "Formulário de contato", "Entrega rápida"],
+    name: "Landing Page", price: "R$ 800", pricePrefix: "a partir de", desc: "Página de vendas focada em conversão para seu produto ou serviço.",
+    features: ["Estrutura de alta conversão", "Seção de vídeo + CTA", "Apresentação do produto", "Design responsivo", "Certificado SSL", "Entrega rápida"],
     featured: false,
   },
   {
