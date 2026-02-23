@@ -74,6 +74,12 @@ export default function AdminContabilidade() {
   const [expAmount, setExpAmount] = useState("");
   const [expDate, setExpDate] = useState<Date | undefined>(new Date());
 
+  // New revenue form
+  const [revOpen, setRevOpen] = useState(false);
+  const [revDesc, setRevDesc] = useState("");
+  const [revAmount, setRevAmount] = useState("");
+  const [revDate, setRevDate] = useState<Date | undefined>(new Date());
+
   // Refund dialog
   const [refundOpen, setRefundOpen] = useState(false);
   const [refundEntry, setRefundEntry] = useState<LedgerEntry | null>(null);
@@ -110,6 +116,61 @@ export default function AdminContabilidade() {
         created_at: string;
         created_by: string;
       }[];
+    },
+  });
+
+  // Fetch extra revenue
+  const { data: extraRevenue } = useQuery({
+    queryKey: ["accounting-extra-revenue"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("extra_revenue")
+        .select("*")
+        .order("created_at", { ascending: false });
+      return (data ?? []) as {
+        id: string;
+        description: string;
+        amount_cents: number;
+        created_at: string;
+        created_by: string;
+      }[];
+    },
+  });
+
+  // Add extra revenue
+  const addRevenue = useMutation({
+    mutationFn: async () => {
+      const amountCents = Math.round(parseFloat(revAmount.replace(",", ".")) * 100);
+      if (isNaN(amountCents) || amountCents <= 0) throw new Error("Valor inválido");
+      if (!revDesc.trim()) throw new Error("Descrição obrigatória");
+
+      const { error } = await supabase.from("extra_revenue").insert({
+        description: revDesc.trim(),
+        amount_cents: amountCents,
+        created_by: user!.id,
+      } as any);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["accounting-extra-revenue"] });
+      setRevDesc("");
+      setRevAmount("");
+      setRevDate(new Date());
+      setRevOpen(false);
+      toast({ title: "Receita registrada!" });
+    },
+    onError: (e: any) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
+  });
+
+  // Delete extra revenue
+  const deleteRevenue = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("extra_revenue").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["accounting-extra-revenue"] });
+      toast({ title: "Receita removida" });
     },
   });
 
@@ -227,6 +288,19 @@ export default function AdminContabilidade() {
       }
     });
 
+    // Extra revenue (manual entries like Pix, transfers, etc.)
+    (extraRevenue ?? []).forEach((r) => {
+      entries.push({
+        id: `rev-${r.id}`,
+        date: r.created_at,
+        type: "receita",
+        description: r.description,
+        category: "Receita Manual",
+        amount_cents: r.amount_cents,
+        source: "manual-revenue",
+      });
+    });
+
     // Expenses (including refunds)
     (expenses ?? []).forEach((e) => {
       entries.push({
@@ -241,7 +315,7 @@ export default function AdminContabilidade() {
     });
 
     return entries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  }, [projects, expenses]);
+  }, [projects, expenses, extraRevenue]);
 
   // Filter by date range
   const filtered = useMemo(() => {
@@ -375,6 +449,32 @@ export default function AdminContabilidade() {
                 </div>
               </DialogContent>
             </Dialog>
+
+            <Dialog open={revOpen} onOpenChange={setRevOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="gap-1.5 text-xs bg-emerald-600 hover:bg-emerald-700">
+                  <Plus className="w-3.5 h-3.5" /> Nova Receita
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Registrar Receita Manual</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 pt-2">
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-1 block">Descrição</label>
+                    <Input placeholder="Ex: Pix do cliente João" value={revDesc} onChange={(e) => setRevDesc(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-1 block">Valor (R$)</label>
+                    <Input placeholder="0,00" value={revAmount} onChange={(e) => setRevAmount(e.target.value)} />
+                  </div>
+                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700" onClick={() => addRevenue.mutate()} disabled={addRevenue.isPending}>
+                    {addRevenue.isPending ? "Salvando..." : "Salvar Receita"}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 
@@ -494,6 +594,16 @@ export default function AdminContabilidade() {
                           <button
                             onClick={() => deleteExpense.mutate(entry.id.replace("exp-", ""))}
                             className="text-white/20 hover:text-red-400 transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                        {/* Delete button for manual revenue */}
+                        {entry.source === "manual-revenue" && (
+                          <button
+                            onClick={() => deleteRevenue.mutate(entry.id.replace("rev-", ""))}
+                            className="text-white/20 hover:text-red-400 transition-colors"
+                            title="Remover receita"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
