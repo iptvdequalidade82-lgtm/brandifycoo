@@ -470,18 +470,18 @@ export default function AdminConteudo() {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <div className="p-3 rounded-xl bg-gradient-to-br from-pink-500 via-purple-500 to-orange-500">
-            <Instagram className="w-7 h-7 text-white" />
+          <div className="flex items-center gap-3 md:gap-4">
+          <div className="p-2.5 md:p-3 rounded-xl bg-gradient-to-br from-pink-500 via-purple-500 to-orange-500">
+            <Instagram className="w-5 h-5 md:w-7 md:h-7 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white">Conteúdo Instagram</h1>
-            <p className="text-sm text-white/40 mt-0.5">Planejamento anual 2026 — um nicho por semana</p>
+            <h1 className="text-lg md:text-2xl font-bold text-white">Conteúdo Instagram</h1>
+            <p className="text-xs md:text-sm text-white/40 mt-0.5">Planejamento anual 2026</p>
           </div>
         </div>
 
         {/* Monthly Navigation */}
-        <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-12 gap-2">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-1.5 md:gap-2">
           {months.map((month) => {
             const sc = STATUS_CONFIG[month.status];
             const isActive = month.key === activeMonth;
@@ -505,8 +505,8 @@ export default function AdminConteudo() {
         </div>
 
         {/* Current Month Content */}
-        <Card className="p-5 bg-white/[0.02] border-white/[0.06]">
-          <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+        <Card className="p-3 md:p-5 bg-white/[0.02] border-white/[0.06]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
             <div className="flex items-center gap-3">
               <CalendarDays className="w-5 h-5 text-purple-400" />
               <h2 className="text-lg font-bold text-white">{currentMonthConfig.label} 2026</h2>
@@ -622,13 +622,13 @@ export default function AdminConteudo() {
               </Card>
 
               <Tabs value={activeWeek} onValueChange={setActiveWeek} className="w-full">
-                <TabsList className="bg-white/[0.05] border border-white/10 h-auto p-1 flex-wrap">
+                <TabsList className="bg-white/[0.05] border border-white/10 h-auto p-1 flex-wrap w-full">
                   {currentPlan.weeks?.map((week, idx) => {
                     const wl = currentMonthConfig.weekLabels[idx];
                     return (
-                      <TabsTrigger key={idx} value={String(idx + 1)} className="data-[state=active]:bg-white/10 text-white/50 data-[state=active]:text-white px-4 py-2">
-                        {wl?.label || `Sem. ${week.weekNumber}`}
-                        {wl?.range && <span className="text-white/30 ml-1 text-[10px]">{wl.range}</span>}
+                      <TabsTrigger key={idx} value={String(idx + 1)} className="data-[state=active]:bg-white/10 text-white/50 data-[state=active]:text-white px-2 md:px-4 py-1.5 md:py-2 text-xs md:text-sm flex-1 min-w-0">
+                        <span className="truncate">{wl?.label || `Sem. ${week.weekNumber}`}</span>
+                        {wl?.range && <span className="text-white/30 ml-1 text-[9px] md:text-[10px] hidden sm:inline">{wl.range}</span>}
                       </TabsTrigger>
                     );
                   })}
@@ -647,9 +647,9 @@ export default function AdminConteudo() {
                       </Card>
 
                       <Tabs defaultValue="feed" className="w-full">
-                        <TabsList className="bg-white/[0.05] border border-white/10">
-                          <TabsTrigger value="feed" className="data-[state=active]:bg-white/10 text-white/60 data-[state=active]:text-white">📸 Feed ({week.feedPosts?.length || 0})</TabsTrigger>
-                          <TabsTrigger value="stories" className="data-[state=active]:bg-white/10 text-white/60 data-[state=active]:text-white">📱 Stories ({week.stories?.length || 0})</TabsTrigger>
+                        <TabsList className="bg-white/[0.05] border border-white/10 w-full">
+                          <TabsTrigger value="feed" className="data-[state=active]:bg-white/10 text-white/60 data-[state=active]:text-white flex-1 text-xs md:text-sm">📸 Feed ({week.feedPosts?.length || 0})</TabsTrigger>
+                          <TabsTrigger value="stories" className="data-[state=active]:bg-white/10 text-white/60 data-[state=active]:text-white flex-1 text-xs md:text-sm">📱 Stories ({week.stories?.length || 0})</TabsTrigger>
                         </TabsList>
 
                         {/* FEED */}
@@ -679,8 +679,8 @@ export default function AdminConteudo() {
                                     <div className="space-y-3 pb-1">
                                       {dayPosts.map((post) => (
                                         <Card key={post.id} className={`border-white/[0.06] overflow-hidden transition-colors ${post.checked ? "bg-emerald-500/[0.06] border-emerald-500/20" : "bg-white/[0.03]"}`}>
-                                          <div className="flex flex-col md:flex-row">
-                                            <div className="md:w-56 shrink-0 bg-white/[0.02] flex items-center justify-center relative min-h-[180px]">
+                                          <div className="flex flex-col sm:flex-row">
+                                            <div className="sm:w-44 md:w-56 shrink-0 bg-white/[0.02] flex items-center justify-center relative min-h-[140px] md:min-h-[180px]">
                                               {post.generatedImage ? (
                                                 <>
                                                   <img src={post.generatedImage} alt={post.title} className="w-full h-full object-cover aspect-square" />
@@ -727,12 +727,12 @@ export default function AdminConteudo() {
                                                   <p className="text-xs text-amber-200/80 line-clamp-2">{post.marketingTip}</p>
                                                 </div>
                                               )}
-                                              <div className="flex items-center gap-2 pt-1">
-                                                <Button variant="ghost" size="sm" onClick={() => toggleChecked(weekIdx, post.id, "feed")} className={`h-7 text-xs ${post.checked ? "text-emerald-400 hover:text-emerald-300" : "text-white/40 hover:text-white"}`}>
+                                              <div className="flex items-center gap-1 md:gap-2 pt-1 flex-wrap">
+                                                <Button variant="ghost" size="sm" onClick={() => toggleChecked(weekIdx, post.id, "feed")} className={`h-7 text-[11px] md:text-xs ${post.checked ? "text-emerald-400 hover:text-emerald-300" : "text-white/40 hover:text-white"}`}>
                                                   {post.checked ? <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> : <Circle className="w-3.5 h-3.5 mr-1" />}{post.checked ? "Conferido ✓" : "Conferir"}
                                                 </Button>
-                                                <Button variant="ghost" size="sm" onClick={() => copyToClipboard(post.caption)} className="text-white/40 hover:text-white h-7 text-xs"><Copy className="w-3 h-3 mr-1" /> Copiar legenda</Button>
-                                                <Button variant="ghost" size="sm" onClick={() => toggleFeedback(post.id)} className="text-white/30 hover:text-white h-7 text-xs"><Pencil className="w-3 h-3 mr-0.5" /> Editar</Button>
+                                                <Button variant="ghost" size="sm" onClick={() => copyToClipboard(post.caption)} className="text-white/40 hover:text-white h-7 text-[11px] md:text-xs"><Copy className="w-3 h-3 mr-1" /> Copiar</Button>
+                                                <Button variant="ghost" size="sm" onClick={() => toggleFeedback(post.id)} className="text-white/30 hover:text-white h-7 text-[11px] md:text-xs"><Pencil className="w-3 h-3 mr-0.5" /> Editar</Button>
                                               </div>
                                               {feedbackItemId === post.id && (
                                                 <div className="space-y-2 pt-2 border-t border-white/[0.06]">
@@ -789,7 +789,7 @@ export default function AdminConteudo() {
                                     </span>
                                   </AccordionTrigger>
                                   <AccordionContent>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 pb-1">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pb-1">
                                       {dayStories.map((story) => (
                                         <Card key={story.id} className={`border-white/[0.06] overflow-hidden flex flex-col transition-colors ${story.checked ? "bg-emerald-500/[0.06] border-emerald-500/20" : "bg-white/[0.03]"}`}>
                                           <div className="aspect-[9/16] max-h-52 bg-white/[0.02] flex items-center justify-center relative">

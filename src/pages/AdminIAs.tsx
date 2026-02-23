@@ -305,13 +305,19 @@ export default function AdminIAs() {
 
   return (
     <AdminLayout>
-      <div className="flex h-[calc(100vh-8rem)] -mx-6 -mt-6 overflow-hidden">
-        {/* Sidebar */}
-        <div className={`${sidebarOpen ? "w-72" : "w-0"} transition-all duration-300 border-r border-white/[0.06] flex flex-col bg-[#0c0c0c] overflow-hidden`}>
-          <div className="p-3 border-b border-white/[0.06]">
-            <Button onClick={startNew} className="w-full gap-2 bg-white/[0.06] hover:bg-white/[0.10] text-white border-0" variant="outline" size="sm">
+      <div className="flex h-[calc(100vh-7rem)] md:h-[calc(100vh-8rem)] -mx-6 -mt-6 overflow-hidden relative">
+        {/* Sidebar - overlay on mobile */}
+        {sidebarOpen && (
+          <div className="fixed inset-0 bg-black/60 z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
+        )}
+        <div className={`${sidebarOpen ? "w-64 md:w-72" : "w-0"} transition-all duration-300 border-r border-white/[0.06] flex flex-col bg-[#0c0c0c] overflow-hidden ${sidebarOpen ? "fixed inset-y-0 left-0 z-50 md:relative md:inset-auto" : ""}`}>
+          <div className="p-3 border-b border-white/[0.06] flex items-center gap-2">
+            <Button onClick={startNew} className="flex-1 gap-2 bg-white/[0.06] hover:bg-white/[0.10] text-white border-0" variant="outline" size="sm">
               <Plus className="w-4 h-4" /> Nova conversa
             </Button>
+            <button onClick={() => setSidebarOpen(false)} className="md:hidden text-white/40 hover:text-white p-1">
+              <X className="w-5 h-5" />
+            </button>
           </div>
           <ScrollArea className="flex-1">
             <div className="p-2 space-y-1">
@@ -321,7 +327,7 @@ export default function AdminIAs() {
                   className={`group flex items-center gap-2 px-3 py-2.5 rounded-lg cursor-pointer text-sm transition-all ${
                     activeConvId === c.id ? "bg-white/[0.08] text-white" : "text-white/50 hover:bg-white/[0.04] hover:text-white/70"
                   }`}
-                  onClick={() => setActiveConvId(c.id)}
+                  onClick={() => { setActiveConvId(c.id); setSidebarOpen(false); }}
                 >
                   <MessageSquare className="w-4 h-4 shrink-0" />
                   <span className="truncate flex-1">{c.title}</span>
@@ -340,17 +346,17 @@ export default function AdminIAs() {
         {/* Main chat area */}
         <div className="flex-1 flex flex-col min-w-0">
           {/* Top bar */}
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-white/[0.06] bg-[#0a0a0a]">
-            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-white/40 hover:text-white transition-colors">
+          <div className="flex items-center gap-2 px-3 md:px-4 py-2 md:py-3 border-b border-white/[0.06] bg-[#0a0a0a]">
+            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-white/40 hover:text-white transition-colors shrink-0">
               {sidebarOpen ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
             </button>
 
-            <div className="flex items-center gap-1.5 bg-white/[0.04] rounded-lg p-1">
+            <div className="flex items-center gap-1 bg-white/[0.04] rounded-lg p-0.5 md:p-1">
               {MODEL_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
                   onClick={() => setModel(opt.value)}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                  className={`px-2 md:px-3 py-1 md:py-1.5 rounded-md text-[11px] md:text-xs font-medium transition-all ${
                     model === opt.value
                       ? "bg-white/[0.12] text-white shadow-sm"
                       : "text-white/40 hover:text-white/60"
@@ -363,20 +369,18 @@ export default function AdminIAs() {
               ))}
             </div>
 
-
-
-            <span className="ml-auto text-[11px] text-white/20">
+            <span className="ml-auto text-[11px] text-white/20 hidden md:inline">
               {model === "auto" ? "Auto" : model === "gpt" ? "GPT" : "Gemini"}
             </span>
           </div>
 
           {/* Messages */}
-          <ScrollArea className="flex-1 p-4">
+          <ScrollArea className="flex-1 px-3 md:px-4 py-4">
             {messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-center">
-                <img src={brandifyLogo} alt="Brandify" className="w-16 h-16 rounded-2xl mb-4 opacity-60" />
-                <h2 className="text-xl font-semibold text-white/60 mb-2">Brandify IA</h2>
-                <p className="text-sm text-white/30 max-w-md">
+              <div className="flex flex-col items-center justify-center h-full text-center px-4">
+                <img src={brandifyLogo} alt="Brandify" className="w-14 h-14 md:w-16 md:h-16 rounded-2xl mb-4 opacity-60" />
+                <h2 className="text-lg md:text-xl font-semibold text-white/60 mb-2">Brandify IA</h2>
+                <p className="text-xs md:text-sm text-white/30 max-w-md">
                   Converse com GPT ou Gemini. Gere textos, imagens, estratégias de marketing e muito mais.
                 </p>
                 <div className="flex gap-2 mt-6 flex-wrap justify-center">
@@ -384,7 +388,7 @@ export default function AdminIAs() {
                     <button
                       key={s}
                       onClick={() => { setInput(s); textareaRef.current?.focus(); }}
-                      className="px-4 py-2 rounded-xl text-xs text-white/50 bg-white/[0.04] hover:bg-white/[0.08] transition-all border border-white/[0.06]"
+                      className="px-3 md:px-4 py-2 rounded-xl text-[11px] md:text-xs text-white/50 bg-white/[0.04] hover:bg-white/[0.08] transition-all border border-white/[0.06]"
                     >
                       {s}
                     </button>
@@ -400,7 +404,7 @@ export default function AdminIAs() {
                         <img src={brandifyLogo} alt="Brandify" className="w-full h-full object-cover" />
                       </div>
                     )}
-                    <div className={`max-w-[80%] ${
+                    <div className={`max-w-[85%] md:max-w-[80%] ${
                       msg.role === "user"
                         ? "bg-blue-600/20 border border-blue-500/20 rounded-2xl rounded-tr-md px-4 py-3"
                         : "bg-white/[0.03] border border-white/[0.06] rounded-2xl rounded-tl-md px-4 py-3"
@@ -456,17 +460,17 @@ export default function AdminIAs() {
           </ScrollArea>
 
           {/* Input */}
-          <div className="p-4 border-t border-white/[0.06] bg-[#0a0a0a]">
+          <div className="p-3 md:p-4 border-t border-white/[0.06] bg-[#0a0a0a]">
             <div className="max-w-3xl mx-auto">
               {/* Attached images preview */}
               {attachedImages.length > 0 && (
                 <div className="flex gap-2 mb-3 flex-wrap">
                   {attachedImages.map((img, i) => (
                     <div key={i} className="relative group">
-                      <img src={img} alt="Anexo" className="w-16 h-16 object-cover rounded-lg border border-white/[0.1]" />
+                      <img src={img} alt="Anexo" className="w-14 h-14 md:w-16 md:h-16 object-cover rounded-lg border border-white/[0.1]" />
                       <button
                         onClick={() => removeAttachment(i)}
-                        className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center md:opacity-0 md:group-hover:opacity-100 transition-opacity"
                       >
                         <X className="w-3 h-3 text-white" />
                       </button>
@@ -486,10 +490,10 @@ export default function AdminIAs() {
                 />
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="h-12 w-12 shrink-0 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] flex items-center justify-center text-white/40 hover:text-white/70 transition-all"
+                  className="h-10 w-10 md:h-12 md:w-12 shrink-0 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] flex items-center justify-center text-white/40 hover:text-white/70 transition-all"
                   title="Anexar imagem"
                 >
-                  <Paperclip className="w-5 h-5" />
+                  <Paperclip className="w-4 h-4 md:w-5 md:h-5" />
                 </button>
                 <Textarea
                   ref={textareaRef}
@@ -497,16 +501,16 @@ export default function AdminIAs() {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder={attachedImages.length > 0 ? "Descreva o que fazer com a imagem..." : imageMode ? "Descreva a imagem que deseja gerar..." : "Digite sua mensagem..."}
-                  className="min-h-[48px] max-h-[200px] resize-none bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/30 rounded-xl focus:border-blue-500/50"
+                  className="min-h-[40px] md:min-h-[48px] max-h-[120px] md:max-h-[200px] resize-none bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/30 rounded-xl focus:border-blue-500/50 text-sm"
                   rows={1}
                 />
                 <Button
                   onClick={handleSend}
                   disabled={(!input.trim() && attachedImages.length === 0) || isLoading}
-                  className="h-12 w-12 shrink-0 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-30"
+                  className="h-10 w-10 md:h-12 md:w-12 shrink-0 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-30"
                   size="icon"
                 >
-                  {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+                  {isLoading ? <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" /> : <Send className="w-4 h-4 md:w-5 md:h-5" />}
                 </Button>
               </div>
             </div>

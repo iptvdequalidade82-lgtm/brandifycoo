@@ -117,7 +117,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         })}
       </div>
 
-      <main className="max-w-6xl mx-auto p-6">
+      <main className="max-w-6xl mx-auto p-3 md:p-6">
         {children}
       </main>
     </div>
