@@ -192,6 +192,36 @@ function getSegmentImages(segment: string, businessName: string): { hero: string
 }
 
 const planPrompts: Record<string, string> = {
+  "landing page": `Crie uma LANDING PAGE DE VENDAS simples e eficaz com 4-5 seções. É uma página focada em conversão para vender um produto ou serviço (infoproduto, curso, consultoria, etc).
+
+HERO (100vh):
+- Background: gradiente radial (radial-gradient(ellipse 80% 60% at 50% 40%, rgba(accent,0.15), transparent))
+- Se houver imagem hero, use como background com overlay escuro
+- Título GRANDE e direto: font-size: clamp(2rem, 5vw, 3.5rem), font-weight 800, foco em benefício principal
+- Subtítulo curto e persuasivo em --muted
+- UM botão CTA grande e chamativo: "QUERO AGORA", "GARANTIR MINHA VAGA", etc. — padding 1.25rem 3rem, background var(--accent-gradient), border-radius 9999px, box-shadow
+- Opcional: vídeo embed placeholder ou imagem do produto
+
+SOBRE O PRODUTO/SERVIÇO:
+- Seção explicando O QUE É o produto/serviço
+- 3-4 bullet points com ícones SVG mostrando os benefícios principais
+- Linguagem persuasiva de copywriting
+
+BENEFÍCIOS / PRA QUEM É:
+- Lista de "Para quem é" com ícones de check
+- Ou grid 2-3 colunas com cards simples dos diferenciais
+
+CTA FINAL:
+- Seção de fechamento com urgência (ex: "Vagas limitadas", "Oferta por tempo limitado")
+- Preço ou chamada para ação
+- Botão CTA grande repetido
+- Garantia ou selo de confiança (ex: "7 dias de garantia")
+
+HEADER: fixo, simples — logo + botão CTA pequeno. Sem muitos links de navegação.
+FOOTER: mínimo — apenas copyright e links legais.
+
+CRIATIVIDADE: Adapte toda a linguagem ao segmento. Use copywriting persuasivo e direto. O objetivo é CONVERTER.`,
+
   essencial: `Crie um site ONE-PAGE IMPRESSIONANTE com 5-6 seções. Este site precisa parecer que foi feito por uma agência que cobra R$5.000+.
 
 HERO (100vh):
@@ -630,8 +660,8 @@ Gere o site HTML completo agora. APENAS código HTML puro, nada mais.`;
       });
     }
 
-    // For essencial, only use flash. For profissional/premium, try pro first then fallback to flash.
-    const models = planKey === "essencial"
+    // Landing page and essencial use flash. Profissional/premium try pro first then fallback to flash.
+    const models = (planKey === "essencial" || planKey === "landing page")
       ? ["gemini-2.5-flash"]
       : ["gemini-2.5-pro", "gemini-2.5-flash"];
 
