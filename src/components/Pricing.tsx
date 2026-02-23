@@ -7,6 +7,11 @@ import earthMoonBg from "@/assets/earth-moon-bg.jpg";
 
 const plans = [
   {
+    name: "Landing Page", price: "R$ 800", pricePrefix: "a partir de", desc: "Página única e objetiva para divulgar seu negócio ou serviço.",
+    features: ["Página única (one-page)", "Design responsivo", "Certificado SSL", "Formulário de contato", "Entrega rápida"],
+    featured: false,
+  },
+  {
     name: "Essencial", price: "R$ 1.200", pricePrefix: "a partir de", desc: "Ideal para quem está começando e precisa de presença online.",
     features: ["Site de até 6 páginas", "Design responsivo", "Certificado SSL", "Auxílio no registro de domínio", "1h de manutenção mensal gratuita"],
     featured: false,
@@ -200,7 +205,7 @@ export default function Pricing() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-80px" }}
-          className="grid md:grid-cols-3 gap-6"
+          className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
         >
           {plans.map((plan) => (
             <motion.div
