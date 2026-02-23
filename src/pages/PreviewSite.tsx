@@ -5,6 +5,7 @@ import { ArrowLeft, Sparkles, Loader2, Monitor, Smartphone, RotateCcw, Check, Up
 import { supabase } from "@/integrations/supabase/client";
 
 const planLabels: Record<string, string> = {
+  "landing page": "Landing Page — página de vendas",
   essencial: "Essencial — até 6 páginas",
   profissional: "Profissional — até 10 páginas",
   premium: "Premium — páginas ilimitadas",
@@ -87,7 +88,7 @@ export default function PreviewSite() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const estimatedTimes: Record<string, number> = { essencial: 40, profissional: 70, premium: 100 };
+  const estimatedTimes: Record<string, number> = { "landing page": 30, essencial: 40, profissional: 70, premium: 100 };
 
   useEffect(() => {
     supabase.from("site_previews").select("id", { count: "exact", head: true }).then(({ count }) => {
