@@ -630,44 +630,60 @@ Gere o site HTML completo agora. APENAS código HTML puro, nada mais.`;
       });
     }
 
-    const geminiModel = planKey === "essencial" ? "gemini-2.5-flash" : "gemini-2.5-pro";
+    // For essencial, only use flash. For profissional/premium, try pro first then fallback to flash.
+    const models = planKey === "essencial"
+      ? ["gemini-2.5-flash"]
+      : ["gemini-2.5-pro", "gemini-2.5-flash"];
+
     let response: Response | null = null;
-    const maxRetries = 3;
 
-    for (let attempt = 0; attempt < maxRetries; attempt++) {
-      try {
-        response = await fetch(`https://generativelanguage.googleapis.com/v1beta/openai/chat/completions`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${GEMINI_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: geminiModel,
-            messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: userPrompt },
-            ],
-            stream: true,
-          }),
-        });
+    for (const model of models) {
+      let succeeded = false;
+      const maxRetries = 2;
 
-        if (response.ok) break;
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+          console.log(`Tentando modelo ${model} (tentativa ${attempt + 1}/${maxRetries})...`);
+          response = await fetch(`https://generativelanguage.googleapis.com/v1beta/openai/chat/completions`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${GEMINI_API_KEY}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model,
+              messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: userPrompt },
+              ],
+              stream: true,
+            }),
+          });
 
-        if (response.status === 429 && attempt < maxRetries - 1) {
-          console.warn(`Gemini API rate limited (429). Tentativa ${attempt + 1}/${maxRetries}. Aguardando...`);
-          await new Promise(r => setTimeout(r, (attempt + 1) * 3000));
-          continue;
-        }
+          if (response.ok) {
+            console.log(`Sucesso com modelo ${model}`);
+            succeeded = true;
+            break;
+          }
 
-        break;
-      } catch (err) {
-        console.error(`Erro na chamada do Gemini (tentativa ${attempt + 1}):`, err);
-        if (attempt < maxRetries - 1) {
-          await new Promise(r => setTimeout(r, (attempt + 1) * 2000));
-          continue;
+          if (response.status === 429 && attempt < maxRetries - 1) {
+            console.warn(`Gemini API rate limited (429) com ${model}. Tentativa ${attempt + 1}/${maxRetries}. Aguardando...`);
+            await new Promise(r => setTimeout(r, (attempt + 1) * 3000));
+            continue;
+          }
+
+          break;
+        } catch (err) {
+          console.error(`Erro na chamada do Gemini ${model} (tentativa ${attempt + 1}):`, err);
+          if (attempt < maxRetries - 1) {
+            await new Promise(r => setTimeout(r, (attempt + 1) * 2000));
+            continue;
+          }
         }
       }
+
+      if (succeeded) break;
+      console.warn(`Modelo ${model} falhou, tentando próximo...`);
     }
 
     if (!response || !response.ok) {
