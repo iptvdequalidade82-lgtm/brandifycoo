@@ -257,7 +257,15 @@ export default function AdminConteudo() {
           const customs: Record<string, string[]> = {};
           for (const row of data as any[]) {
             if (row.month_plan && Object.keys(row.month_plan).length > 0) {
-              plans[row.month_key] = row.month_plan as MonthPlan;
+              // Clean up any stuck isGeneratingImage flags from previous sessions
+              const plan = row.month_plan as MonthPlan;
+              if (plan.weeks) {
+                for (const week of plan.weeks) {
+                  if (week.feedPosts) week.feedPosts = week.feedPosts.map((p: any) => ({ ...p, isGeneratingImage: false }));
+                  if (week.stories) week.stories = week.stories.map((s: any) => ({ ...s, isGeneratingImage: false }));
+                }
+              }
+              plans[row.month_key] = plan;
             }
             if (row.week_niches && Array.isArray(row.week_niches) && row.week_niches.length > 0) {
               niches[row.month_key] = row.week_niches;
@@ -802,7 +810,7 @@ export default function AdminConteudo() {
                                               <div className="flex flex-col items-center gap-2">
                                                 <ImageIcon className="w-6 h-6 text-white/15" />
                                                 <Button size="sm" onClick={() => handleGenerateImage(weekIdx, story.id, story.visualDescription, "story")} disabled={story.isGeneratingImage} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white text-[10px] h-7 px-2">
-                                                  {story.isGeneratingImage ? <RefreshCw className="w-3 h-3 animate-spin" /> : <><ImageIcon className="w-3 h-3 mr-1" /> Gerar</>}
+                                                  {story.isGeneratingImage ? <><RefreshCw className="w-3 h-3 animate-spin mr-1" /> Gerando...</> : <><ImageIcon className="w-3 h-3 mr-1" /> Gerar</>}
                                                 </Button>
                                               </div>
                                             )}
