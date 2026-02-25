@@ -173,6 +173,11 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
   const hasActivePlan = !!userPlan;
   const MAX_WEEKLY = hasActivePlan ? Infinity : MAX_FREE_WEEKLY;
 
+  // Edit mode state
+  const [editingImage, setEditingImage] = useState<{ url: string; prompt: string; type: string; copy?: string } | null>(null);
+  const [editInstruction, setEditInstruction] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+
   useEffect(() => {
     setWeeklyCount(getWeeklyUsage(user?.id));
   }, [user?.id]);
@@ -328,6 +333,39 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
       setStep("describe");
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleEditImage = async (img: { url: string; prompt: string; type: string; copy?: string }, instruction: string) => {
+    if (!instruction.trim()) return;
+    if (weeklyCount >= MAX_WEEKLY) {
+      toast({ title: "Limite semanal atingido", description: "Cada edição conta como 1 uso.", variant: "destructive" });
+      return;
+    }
+    setIsEditing(true);
+    try {
+      const headers = await getAuthHeaders();
+      const res = await fetch(IMAGE_URL, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          prompt: `${img.prompt}. INSTRUÇÃO DE EDIÇÃO: ${instruction}`,
+          type: img.type,
+          referenceImage: img.url,
+        }),
+      });
+      if (!res.ok) throw new Error("Erro ao editar");
+      const data = await res.json();
+      if (!data.imageUrl) throw new Error("Nenhuma imagem gerada");
+      setGeneratedImages((prev) => [{ url: data.imageUrl, prompt: `${img.prompt} (editado: ${instruction})`, type: img.type, copy: img.copy }, ...prev]);
+      trackUsage();
+      toast({ title: "Post editado com sucesso! ✏️" });
+      setEditingImage(null);
+      setEditInstruction("");
+    } catch (e: any) {
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+    } finally {
+      setIsEditing(false);
     }
   };
 
@@ -491,15 +529,64 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
                             📋 Copiar legenda
                           </button>
                         )}
-                        <Button onClick={() => { const a = document.createElement("a"); a.href = img.url; a.download = `brandify-post-${i + 1}.png`; a.click(); }} size="sm" className="w-fit bg-white text-black hover:bg-white/90 border-0 text-xs font-medium h-8 px-4">
-                          <Download className="w-3.5 h-3.5 mr-1.5" />Baixar imagem
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button onClick={() => { const a = document.createElement("a"); a.href = img.url; a.download = `brandify-post-${i + 1}.png`; a.click(); }} size="sm" className="bg-white text-black hover:bg-white/90 border-0 text-xs font-medium h-8 px-4">
+                            <Download className="w-3.5 h-3.5 mr-1.5" />Baixar
+                          </Button>
+                          <Button onClick={() => { setEditingImage(img); setEditInstruction(""); }} size="sm" variant="outline" className="border-violet-500/30 text-violet-300 hover:bg-violet-500/20 hover:text-violet-200 text-xs font-medium h-8 px-4">
+                            <PenTool className="w-3.5 h-3.5 mr-1.5" />Editar
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </motion.div>
                 ))}
               </AnimatePresence>
             </div>
+          )}
+
+          {/* Edit image dialog */}
+          {editingImage && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+              <div className="bg-[#111115] border border-white/[0.08] rounded-2xl max-w-lg w-full p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-white font-semibold text-lg" style={{ fontFamily: "'Sora', sans-serif" }}>Editar post ✏️</h3>
+                  <button onClick={() => { setEditingImage(null); setEditInstruction(""); }} className="text-white/30 hover:text-white">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                <div className="flex gap-3">
+                  <img src={editingImage.url} alt="" className="w-24 h-24 rounded-xl object-cover border border-white/10 shrink-0" />
+                  <div className="flex-1 space-y-1">
+                    <p className="text-white/40 text-xs">Post original</p>
+                    <p className="text-white/60 text-xs line-clamp-3">{editingImage.prompt}</p>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-white/50 text-xs font-medium mb-1.5 block">O que você quer mudar?</label>
+                  <Textarea
+                    value={editInstruction}
+                    onChange={(e) => setEditInstruction(e.target.value)}
+                    placeholder="Ex: Troque a cor de fundo pra azul escuro, mude a frase para 'Inauguração dia 15'..."
+                    className="min-h-[80px] bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/25 resize-none rounded-xl text-sm"
+                  />
+                </div>
+                <p className="text-white/20 text-[11px]">⚠️ Cada edição conta como 1 criação do seu limite semanal</p>
+                <div className="flex gap-3">
+                  <Button onClick={() => { setEditingImage(null); setEditInstruction(""); }} variant="ghost" className="flex-1 text-white/40 hover:text-white">
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={() => handleEditImage(editingImage, editInstruction)}
+                    disabled={isEditing || !editInstruction.trim()}
+                    className="flex-1 bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 border-0 text-white font-medium"
+                  >
+                    {isEditing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <PenTool className="w-4 h-4 mr-2" />}
+                    {isEditing ? "Editando..." : "Refazer post"}
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
           )}
         </div>
       </ScrollArea>

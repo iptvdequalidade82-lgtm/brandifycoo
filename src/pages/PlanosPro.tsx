@@ -154,10 +154,15 @@ export default function PlanosPro() {
 
   return (
     <div className="min-h-screen bg-[#050508] text-white relative overflow-hidden">
-      {/* Background glow */}
+      {/* Background Earth image */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-amber-500/[0.03] rounded-full blur-[200px]" />
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920&q=80')] bg-cover bg-center opacity-[0.12]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050508] via-[#050508]/60 to-[#050508]" />
       </div>
+
+      {/* Glowing blue border line at top */}
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-400/60 to-transparent" />
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-blue-400/20 to-transparent blur-sm" />
 
       {/* Header */}
       <header className="relative z-10 flex items-center justify-between h-14 px-4 md:px-6 border-b border-white/[0.06]">
@@ -207,8 +212,11 @@ export default function PlanosPro() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className={`relative rounded-2xl bg-gradient-to-b ${plan.gradientBg} to-transparent border ${plan.borderColor} p-6 flex flex-col ${isHighlighted ? "md:-mt-4 md:pb-8 ring-1 ring-amber-500/30" : ""}`}
+                className={`relative rounded-2xl bg-gradient-to-b ${plan.gradientBg} to-transparent p-[1px] ${isHighlighted ? "md:-mt-4" : ""}`}
+                style={isHighlighted ? { background: `linear-gradient(180deg, rgba(59,130,246,0.3) 0%, rgba(59,130,246,0.05) 50%, transparent 100%)` } : undefined}
               >
+                {/* Inner card with glitter border effect */}
+                <div className={`rounded-2xl bg-[#0a0a12]/90 backdrop-blur-xl p-6 flex flex-col h-full border ${plan.borderColor} ${isHighlighted ? "ring-1 ring-blue-400/20 shadow-[0_0_30px_-5px_rgba(59,130,246,0.15)]" : ""}`}>
                 {plan.badge && (
                   <div className={`absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r ${plan.gradient} text-xs font-bold text-black`}>
                     {plan.badge}
@@ -268,6 +276,7 @@ export default function PlanosPro() {
                     ? `Assinar ${plan.name}`
                     : "Login e assinar"}
                 </Button>
+                </div>
               </motion.div>
             );
           })}
