@@ -47,9 +47,12 @@ function PostGenerator({ user }: { user: User }) {
   const { toast } = useToast();
   const [prompt, setPrompt] = useState("");
   const [postType, setPostType] = useState<"feed" | "story">("feed");
-  const [generatedImages, setGeneratedImages] = useState<{ url: string; prompt: string; type: string }[]>([]);
+  const [generatedImages, setGeneratedImages] = useState<{ url: string; prompt: string; type: string; copy?: string }[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [weeklyCount, setWeeklyCount] = useState(0);
+  const [step, setStep] = useState<"describe" | "copy" | "generating">("describe");
+  const [generatedCopy, setGeneratedCopy] = useState("");
+  const [isGeneratingCopy, setIsGeneratingCopy] = useState(false);
   const MAX_WEEKLY = 5;
 
   useEffect(() => {
@@ -71,15 +74,87 @@ function PostGenerator({ user }: { user: User }) {
     setWeeklyCount(filtered.length);
   };
 
-  const handleGenerate = async (customPrompt?: string) => {
+  const handleGenerateCopy = async (customPrompt?: string) => {
     const text = (customPrompt || prompt).trim();
     if (!text) return;
     if (weeklyCount >= MAX_WEEKLY) {
-      toast({ title: "Limite semanal atingido", description: `Você usou ${MAX_WEEKLY}/${MAX_WEEKLY} gerações. Tente na próxima semana.`, variant: "destructive" });
+      toast({ title: "Limite semanal atingido", description: `Você usou ${MAX_WEEKLY}/${MAX_WEEKLY} gerações.`, variant: "destructive" });
       return;
     }
     if (customPrompt) setPrompt(customPrompt);
+    setIsGeneratingCopy(true);
+    setStep("copy");
+    try {
+      const session = (await supabase.auth.getSession()).data.session;
+      const res = await fetch(CHAT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          messages: [
+            { role: "system", content: "Você é um copywriter especialista em redes sociais da agência Brandify. Crie uma copy curta e impactante para um post de Instagram baseado no pedido do cliente. Responda APENAS com a copy (legenda), sem explicações extras. Use emojis estrategicamente. Máximo 3 parágrafos curtos." },
+            { role: "user", content: text }
+          ],
+          model: "google/gemini-2.5-flash",
+        }),
+      });
+      if (!res.ok) throw new Error("Erro ao gerar copy");
+      const data = await res.json();
+      setGeneratedCopy(data.content || data.message || "");
+    } catch (e: any) {
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+      setStep("describe");
+    } finally {
+      setIsGeneratingCopy(false);
+    }
+  };
+
+  const handleGenerateImage = async () => {
     setIsGenerating(true);
+    setStep("generating");
+    try {
+      const session = (await supabase.auth.getSession()).data.session;
+      const imagePrompt = `Post profissional para Instagram: ${prompt}. Copy: ${generatedCopy}`;
+      const res = await fetch(IMAGE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ prompt: imagePrompt, type: postType }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Erro desconhecido" }));
+        throw new Error(err.error || `Erro ${res.status}`);
+      }
+      const data = await res.json();
+      if (!data.imageUrl) throw new Error("Nenhuma imagem gerada");
+      setGeneratedImages((prev) => [{ url: data.imageUrl, prompt, type: postType, copy: generatedCopy }, ...prev]);
+      trackUsage();
+      toast({ title: "Post criado com sucesso! 🎨" });
+      setStep("describe");
+      setPrompt("");
+      setGeneratedCopy("");
+    } catch (e: any) {
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+      setStep("copy");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleQuickGenerate = async (customPrompt: string) => {
+    setPrompt(customPrompt);
+    if (weeklyCount >= MAX_WEEKLY) {
+      toast({ title: "Limite semanal atingido", variant: "destructive" });
+      return;
+    }
+    setIsGenerating(true);
+    setStep("generating");
     try {
       const session = (await supabase.auth.getSession()).data.session;
       const res = await fetch(IMAGE_URL, {
@@ -89,19 +164,19 @@ function PostGenerator({ user }: { user: User }) {
           apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
           Authorization: `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ prompt: text, type: postType }),
+        body: JSON.stringify({ prompt: customPrompt, type: postType }),
       });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: "Erro desconhecido" }));
-        throw new Error(err.error || `Erro ${res.status}`);
-      }
+      if (!res.ok) throw new Error("Erro ao gerar");
       const data = await res.json();
       if (!data.imageUrl) throw new Error("Nenhuma imagem gerada");
-      setGeneratedImages((prev) => [{ url: data.imageUrl, prompt: text, type: postType }, ...prev]);
+      setGeneratedImages((prev) => [{ url: data.imageUrl, prompt: customPrompt, type: postType }, ...prev]);
       trackUsage();
-      toast({ title: "Post gerado com sucesso! 🎨" });
+      toast({ title: "Post gerado! 🎨" });
+      setStep("describe");
+      setPrompt("");
     } catch (e: any) {
       toast({ title: "Erro", description: e.message, variant: "destructive" });
+      setStep("describe");
     } finally {
       setIsGenerating(false);
     }
@@ -113,12 +188,12 @@ function PostGenerator({ user }: { user: User }) {
     <div className="flex flex-col h-full">
       <ScrollArea className="flex-1">
         <div className="max-w-4xl mx-auto px-4 md:px-8 py-8">
-          {/* Empty state / hero */}
-          {generatedImages.length === 0 && !isGenerating && (
+          {/* Hero */}
+          {generatedImages.length === 0 && step === "describe" && !isGenerating && (
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10 pt-8 md:pt-16">
               <div className="relative inline-block mb-6">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-600/20 to-pink-600/20 flex items-center justify-center border border-violet-500/20 mx-auto">
-                  <ImagePlus className="w-10 h-10 text-violet-400" />
+                <div className="w-20 h-20 rounded-2xl overflow-hidden border border-white/10 mx-auto shadow-lg shadow-violet-500/10">
+                  <img src={logo} alt="Brandify" className="w-full h-full object-cover" />
                 </div>
                 <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-gradient-to-r from-violet-500 to-pink-500 flex items-center justify-center">
                   <Sparkles className="w-3 h-3 text-white" />
@@ -127,43 +202,98 @@ function PostGenerator({ user }: { user: User }) {
               <h2 className="text-2xl md:text-3xl font-bold text-white mb-3" style={{ fontFamily: "'Sora', sans-serif" }}>
                 Escreva. A IA cria. Seu post fica <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">profissional.</span>
               </h2>
-              <p className="text-white/40 text-base max-w-lg mx-auto mb-2">
-                Com o nosso toque de IA, seu post se torna moderno e impactante — sem precisar de designer caro. Descreva a ideia e veja a mágica acontecer.
+              <p className="text-white/40 text-base max-w-lg mx-auto mb-1">
+                Com o nosso toque de IA, seu post se torna moderno e impactante — sem precisar de designer caro.
               </p>
-              <p className="text-white/25 text-sm">
-                {remaining} de {MAX_WEEKLY} criações disponíveis esta semana
+              <p className="text-white/30 text-sm max-w-md mx-auto mb-4">
+                Conte o que precisa: a IA cria a copy perfeita e depois gera o visual do post.
               </p>
+              <div className="flex items-center justify-center gap-2 md:gap-3 mb-6 flex-wrap">
+                {[
+                  { num: "1", label: "Descreva sua ideia" },
+                  { num: "2", label: "IA cria a copy" },
+                  { num: "3", label: "Gera o post visual" },
+                ].map((s, i) => (
+                  <div key={s.num} className="flex items-center gap-2">
+                    {i > 0 && <div className="w-4 md:w-6 h-px bg-white/10" />}
+                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+                      <span className="w-5 h-5 rounded-full bg-gradient-to-r from-violet-500/30 to-pink-500/30 flex items-center justify-center text-[10px] font-bold text-violet-300">{s.num}</span>
+                      <span className="text-white/40 text-xs">{s.label}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-white/20 text-sm">{remaining} de {MAX_WEEKLY} criações disponíveis esta semana</p>
             </motion.div>
           )}
 
-          {/* Generated images header */}
-          {generatedImages.length > 0 && (
+          {/* STEP: Copy review */}
+          {step === "copy" && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl mx-auto pt-8">
+              <div className="flex items-center gap-3 mb-6">
+                <button onClick={() => { setStep("describe"); setGeneratedCopy(""); }} className="text-white/30 hover:text-white/60 transition-colors">
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
+                <div>
+                  <h3 className="text-white font-semibold text-lg" style={{ fontFamily: "'Sora', sans-serif" }}>Copy gerada pela IA ✨</h3>
+                  <p className="text-white/30 text-sm">Revise a legenda e depois gere o post visual</p>
+                </div>
+              </div>
+              <div className="mb-4 px-4 py-3 rounded-xl bg-blue-600/10 border border-blue-500/15">
+                <p className="text-blue-300/60 text-xs font-medium uppercase tracking-wider mb-1">Sua ideia</p>
+                <p className="text-white/70 text-sm">{prompt}</p>
+              </div>
+              <div className="mb-6 px-5 py-4 rounded-xl bg-white/[0.03] border border-white/[0.08]">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-6 h-6 rounded-md overflow-hidden">
+                    <img src={logo} alt="" className="w-full h-full object-cover" />
+                  </div>
+                  <span className="text-white/40 text-xs font-medium">Brandify IA</span>
+                  {isGeneratingCopy && <Loader2 className="w-3 h-3 text-violet-400 animate-spin" />}
+                </div>
+                {isGeneratingCopy ? (
+                  <div className="space-y-2">
+                    <div className="h-4 bg-white/[0.06] rounded animate-pulse w-full" />
+                    <div className="h-4 bg-white/[0.06] rounded animate-pulse w-3/4" />
+                    <div className="h-4 bg-white/[0.06] rounded animate-pulse w-1/2" />
+                  </div>
+                ) : (
+                  <div className="text-white/80 text-sm leading-relaxed whitespace-pre-wrap">{generatedCopy}</div>
+                )}
+              </div>
+              {!isGeneratingCopy && generatedCopy && (
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button onClick={handleGenerateImage} className="flex-1 bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 border-0 text-white font-medium h-11">
+                    <Sparkles className="w-4 h-4 mr-2" />Gerar post visual agora
+                  </Button>
+                  <Button onClick={() => handleGenerateCopy()} variant="outline" className="border-white/10 text-white/50 hover:text-white hover:bg-white/[0.05] h-11">
+                    <Zap className="w-4 h-4 mr-2" />Refazer copy
+                  </Button>
+                  <Button onClick={() => { navigator.clipboard.writeText(generatedCopy); toast({ title: "Copy copiada! 📋" }); }} variant="outline" className="border-white/10 text-white/50 hover:text-white hover:bg-white/[0.05] h-11">
+                    📋 Copiar
+                  </Button>
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {/* Posts header */}
+          {generatedImages.length > 0 && step === "describe" && (
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-white font-semibold text-lg" style={{ fontFamily: "'Sora', sans-serif" }}>
-                  Seus posts
-                </h3>
-                <p className="text-white/30 text-sm">{remaining} gerações restantes esta semana</p>
+                <h3 className="text-white font-semibold text-lg" style={{ fontFamily: "'Sora', sans-serif" }}>Seus posts</h3>
+                <p className="text-white/30 text-sm">{remaining} criações restantes esta semana</p>
               </div>
             </div>
           )}
 
-          {/* Suggestion chips (only when empty) */}
-          {generatedImages.length === 0 && !isGenerating && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="mb-8"
-            >
-              <p className="text-white/30 text-xs font-medium uppercase tracking-wider mb-3 text-center">Ou escolha um nicho e veja o resultado</p>
+          {/* Suggestion chips */}
+          {generatedImages.length === 0 && step === "describe" && !isGenerating && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-8">
+              <p className="text-white/30 text-xs font-medium uppercase tracking-wider mb-3 text-center">Ou gere direto por nicho</p>
               <div className="flex flex-wrap justify-center gap-2">
                 {POST_SUGGESTIONS.map((s) => (
-                  <button
-                    key={s.label}
-                    onClick={() => handleGenerate(s.prompt)}
-                    className="group flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.08] hover:border-white/[0.15] text-white/60 hover:text-white text-sm transition-all duration-200"
-                  >
+                  <button key={s.label} onClick={() => handleQuickGenerate(s.prompt)} className="group flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.08] hover:border-white/[0.15] text-white/60 hover:text-white text-sm transition-all duration-200">
                     <span className="text-base">{s.icon}</span>
                     <span>{s.label}</span>
                   </button>
@@ -172,68 +302,44 @@ function PostGenerator({ user }: { user: User }) {
             </motion.div>
           )}
 
-          {/* Loading state */}
-          {isGenerating && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="flex flex-col items-center py-16 mb-6"
-            >
+          {/* Loading */}
+          {(isGenerating || step === "generating") && (
+            <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center py-16 mb-6">
               <div className="relative mb-6">
-                <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-violet-600/10 to-pink-600/10 border border-violet-500/20 flex items-center justify-center">
-                  <Loader2 className="w-10 h-10 text-violet-400 animate-spin" />
+                <div className="w-24 h-24 rounded-2xl overflow-hidden border border-violet-500/20 flex items-center justify-center">
+                  <img src={logo} alt="Brandify" className="w-full h-full object-cover opacity-30" />
+                  <Loader2 className="w-10 h-10 text-violet-400 animate-spin absolute" />
                 </div>
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-violet-500/5 to-pink-500/5 animate-pulse" />
               </div>
-              <h3 className="text-white font-medium text-lg mb-2" style={{ fontFamily: "'Sora', sans-serif" }}>
-                Gerando seu post...
-              </h3>
-              <p className="text-white/30 text-sm">Isso pode levar até 30 segundos</p>
+              <h3 className="text-white font-medium text-lg mb-2" style={{ fontFamily: "'Sora', sans-serif" }}>Criando seu post profissional...</h3>
+              <p className="text-white/30 text-sm">Nossa IA está trabalhando na arte perfeita</p>
               <div className="mt-4 w-48 h-1 rounded-full bg-white/[0.06] overflow-hidden">
-                <motion.div
-                  className="h-full rounded-full bg-gradient-to-r from-violet-500 to-pink-500"
-                  initial={{ width: "0%" }}
-                  animate={{ width: "90%" }}
-                  transition={{ duration: 25, ease: "easeOut" }}
-                />
+                <motion.div className="h-full rounded-full bg-gradient-to-r from-violet-500 to-pink-500" initial={{ width: "0%" }} animate={{ width: "90%" }} transition={{ duration: 25, ease: "easeOut" }} />
               </div>
             </motion.div>
           )}
 
           {/* Image grid */}
-          {generatedImages.length > 0 && (
+          {generatedImages.length > 0 && step === "describe" && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <AnimatePresence>
                 {generatedImages.map((img, i) => (
-                  <motion.div
-                    key={`${img.prompt}-${i}`}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                    className="group relative rounded-2xl overflow-hidden border border-white/[0.08] bg-white/[0.02] hover:border-white/[0.15] transition-all duration-300"
-                  >
+                  <motion.div key={`${img.prompt}-${i}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="group relative rounded-2xl overflow-hidden border border-white/[0.08] bg-white/[0.02] hover:border-white/[0.15] transition-all duration-300">
                     <img src={img.url} alt={img.prompt} className="w-full object-cover" loading="lazy" />
-                    {/* Hover overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-5">
                       <div className="space-y-3">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] uppercase tracking-wider text-white/40 font-medium px-2 py-0.5 rounded-md bg-white/10">
-                            {img.type === "feed" ? "Feed 1:1" : "Story 9:16"}
-                          </span>
-                        </div>
+                        <span className="text-[10px] uppercase tracking-wider text-white/40 font-medium px-2 py-0.5 rounded-md bg-white/10">
+                          {img.type === "feed" ? "Feed 1:1" : "Story 9:16"}
+                        </span>
                         <p className="text-white/70 text-xs line-clamp-2">{img.prompt}</p>
-                        <Button
-                          onClick={() => {
-                            const a = document.createElement("a");
-                            a.href = img.url;
-                            a.download = `brandify-post-${i + 1}.png`;
-                            a.click();
-                          }}
-                          size="sm"
-                          className="w-fit bg-white text-black hover:bg-white/90 border-0 text-xs font-medium h-8 px-4"
-                        >
-                          <Download className="w-3.5 h-3.5 mr-1.5" />
-                          Baixar imagem
+                        {img.copy && (
+                          <button onClick={() => { navigator.clipboard.writeText(img.copy!); toast({ title: "Copy copiada! 📋" }); }} className="text-violet-300/80 text-xs hover:text-violet-200 transition-colors text-left">
+                            📋 Copiar legenda
+                          </button>
+                        )}
+                        <Button onClick={() => { const a = document.createElement("a"); a.href = img.url; a.download = `brandify-post-${i + 1}.png`; a.click(); }} size="sm" className="w-fit bg-white text-black hover:bg-white/90 border-0 text-xs font-medium h-8 px-4">
+                          <Download className="w-3.5 h-3.5 mr-1.5" />Baixar imagem
                         </Button>
                       </div>
                     </div>
@@ -245,51 +351,37 @@ function PostGenerator({ user }: { user: User }) {
         </div>
       </ScrollArea>
 
-      {/* Bottom input bar */}
-      <div className="shrink-0 border-t border-white/[0.06] bg-[#0a0a0f]/80 backdrop-blur-xl">
-        <div className="max-w-4xl mx-auto px-4 md:px-8 py-4">
-          {/* Format selector */}
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-white/30 text-xs font-medium mr-1">Formato:</span>
-            {[
-              { value: "feed" as const, label: "Feed (1:1)", icon: "📐" },
-              { value: "story" as const, label: "Story (9:16)", icon: "📱" },
-            ].map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => setPostType(opt.value)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                  postType === opt.value
-                    ? "bg-violet-500/20 text-violet-300 border border-violet-500/30"
-                    : "text-white/30 hover:text-white/50 border border-transparent hover:bg-white/[0.04]"
-                }`}
-              >
-                {opt.icon} {opt.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Input */}
-          <div className="relative">
-            <Textarea
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Descreva o post dos seus sonhos — a IA transforma em realidade ✨"
-              className="min-h-[56px] max-h-[120px] bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/25 resize-none rounded-xl pr-14 text-sm focus:border-violet-500/40 focus:ring-1 focus:ring-violet-500/20"
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleGenerate(); }
-              }}
-            />
-            <Button
-              onClick={() => handleGenerate()}
-              disabled={isGenerating || !prompt.trim() || weeklyCount >= MAX_WEEKLY}
-              className="absolute bottom-2.5 right-2.5 h-9 w-9 p-0 rounded-lg bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 border-0 shadow-lg shadow-violet-500/20 disabled:shadow-none"
-            >
-              {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-            </Button>
+      {/* Bottom input — only on describe step */}
+      {step === "describe" && (
+        <div className="shrink-0 border-t border-white/[0.06] bg-[#0a0a0f]/80 backdrop-blur-xl">
+          <div className="max-w-4xl mx-auto px-4 md:px-8 py-4">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-white/30 text-xs font-medium mr-1">Formato:</span>
+              {[
+                { value: "feed" as const, label: "Feed (1:1)", icon: "📐" },
+                { value: "story" as const, label: "Story (9:16)", icon: "📱" },
+              ].map((opt) => (
+                <button key={opt.value} onClick={() => setPostType(opt.value)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${postType === opt.value ? "bg-violet-500/20 text-violet-300 border border-violet-500/30" : "text-white/30 hover:text-white/50 border border-transparent hover:bg-white/[0.04]"}`}>
+                  {opt.icon} {opt.label}
+                </button>
+              ))}
+            </div>
+            <div className="relative">
+              <Textarea
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder="Ex: Estou abrindo uma churrascaria e quero um post pra divulgar a inauguração..."
+                className="min-h-[56px] max-h-[120px] bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/25 resize-none rounded-xl pr-14 text-sm focus:border-violet-500/40 focus:ring-1 focus:ring-violet-500/20"
+                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleGenerateCopy(); } }}
+              />
+              <Button onClick={() => handleGenerateCopy()} disabled={isGeneratingCopy || !prompt.trim() || weeklyCount >= MAX_WEEKLY} className="absolute bottom-2.5 right-2.5 h-9 w-9 p-0 rounded-lg bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 border-0 shadow-lg shadow-violet-500/20 disabled:shadow-none">
+                {isGeneratingCopy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+              </Button>
+            </div>
+            <p className="text-white/15 text-[11px] mt-2 text-center">A IA cria a copy primeiro, depois gera o visual do post</p>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
