@@ -49,21 +49,21 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Verify admin
+    // Auth: allow anonymous access for basic chat, but track user if logged in
+    let userId: string | null = null;
+    let isAdmin = false;
     if (authHeader) {
       const token = authHeader.replace("Bearer ", "");
-      const anonClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!);
-      const { data: { user }, error } = await anonClient.auth.getUser(token);
-      if (error || !user) {
-        return new Response(JSON.stringify({ error: "Não autorizado" }), {
-          status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
-      if (!isAdmin) {
-        return new Response(JSON.stringify({ error: "Acesso negado" }), {
-          status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+      const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+      // If the token is NOT the anon key, try to authenticate the user
+      if (token !== anonKey) {
+        const anonClient = createClient(supabaseUrl, anonKey);
+        const { data: { user } } = await anonClient.auth.getUser(token);
+        if (user) {
+          userId = user.id;
+          const { data: adminCheck } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
+          isAdmin = !!adminCheck;
+        }
       }
     }
 

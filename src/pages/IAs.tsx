@@ -218,8 +218,29 @@ function PostGenerator({ user }: { user: User | null }) {
         }),
       });
       if (!res.ok) throw new Error("Erro ao gerar copy");
-      const data = await res.json();
-      setGeneratedCopy(data.content || data.message || "");
+      // Parse SSE stream to extract full text
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error("Sem resposta");
+      const decoder = new TextDecoder();
+      let fullText = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split("\n");
+        for (const line of lines) {
+          if (line.startsWith("data: ")) {
+            const jsonStr = line.slice(6).trim();
+            if (jsonStr === "[DONE]") continue;
+            try {
+              const parsed = JSON.parse(jsonStr);
+              const delta = parsed.choices?.[0]?.delta?.content;
+              if (delta) fullText += delta;
+            } catch { /* skip non-JSON lines */ }
+          }
+        }
+      }
+      setGeneratedCopy(fullText || "");
     } catch (e: any) {
       toast({ title: "Erro", description: e.message, variant: "destructive" });
       setStep("describe");
@@ -391,7 +412,7 @@ function PostGenerator({ user }: { user: User | null }) {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-white font-semibold text-lg" style={{ fontFamily: "'Sora', sans-serif" }}>Seus posts</h3>
-                <p className="text-white/30 text-sm">{remaining} criações restantes esta semana</p>
+                <p className="text-white/30 text-sm">{remaining} {remaining === 1 ? "criação restante" : "criações restantes"} hoje</p>
               </div>
             </div>
           )}
