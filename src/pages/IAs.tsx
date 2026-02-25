@@ -40,13 +40,12 @@ function getUsageKey(userId?: string): string {
   return `post_gen_${userId || getDeviceId()}`;
 }
 
-function getWeeklyUsage(userId?: string): number {
-  const weekAgo = new Date();
-  weekAgo.setDate(weekAgo.getDate() - 7);
+function getDailyUsage(userId?: string): number {
+  const today = new Date().toDateString();
   const stored = localStorage.getItem(getUsageKey(userId));
   if (!stored) return 0;
   try {
-    const valid = JSON.parse(stored).filter((d: string) => new Date(d) > weekAgo);
+    const valid = JSON.parse(stored).filter((d: string) => new Date(d).toDateString() === today);
     return valid.length;
   } catch {
     return 0;
@@ -58,11 +57,14 @@ function trackUsageLocal(userId?: string): number {
   const stored = localStorage.getItem(key);
   const data = stored ? JSON.parse(stored) : [];
   data.push(new Date().toISOString());
+  // Keep only last 7 days to avoid localStorage bloat
   const weekAgo = new Date();
   weekAgo.setDate(weekAgo.getDate() - 7);
   const filtered = data.filter((d: string) => new Date(d) > weekAgo);
   localStorage.setItem(key, JSON.stringify(filtered));
-  return filtered.length;
+  // Return today's count
+  const today = new Date().toDateString();
+  return filtered.filter((d: string) => new Date(d).toDateString() === today).length;
 }
 
 // ── Suggestion chips for post generator ──
@@ -83,7 +85,7 @@ const CHAT_SUGGESTIONS = [
   { icon: "📧", label: "Email marketing", prompt: "Escreva um email de boas-vindas para novos clientes de uma loja online de cosméticos" },
 ];
 
-const MAX_FREE_WEEKLY = 5;
+const MAX_FREE_DAILY = 5;
 const PLAN_LABELS: Record<string, string> = { basico: "Básico", pro: "Pro", premium: "Premium" };
 
 // ══════════════════════════════════════════════════
@@ -133,8 +135,8 @@ function ProBanner({ user, remaining, userPlan }: { user: User | null; remaining
           <div>
             <p className="text-white/80 text-xs font-medium">
               {remaining > 0
-               ? `${remaining} ${remaining === 1 ? "criação grátis restante" : "criações grátis restantes"} esta semana`
-                : "Limite atingido"
+               ? `${remaining} ${remaining === 1 ? "criação grátis restante" : "criações grátis restantes"} hoje`
+                : "Limite diário atingido"
               }
             </p>
             <p className="text-white/30 text-[10px] hidden sm:block">
@@ -163,7 +165,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
   const [postType, setPostType] = useState<"feed" | "story">("feed");
   const [generatedImages, setGeneratedImages] = useState<{ url: string; prompt: string; type: string; copy?: string }[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [weeklyCount, setWeeklyCount] = useState(0);
+  const [weeklyCount, setWeeklyCount] = useState(0); // kept name for minimal diff but tracks daily
   const [step, setStep] = useState<"describe" | "copy" | "generating">("describe");
   const [generatedCopy, setGeneratedCopy] = useState("");
   const [isGeneratingCopy, setIsGeneratingCopy] = useState(false);
@@ -171,7 +173,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
   const [referencePreview, setReferencePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const hasActivePlan = !!userPlan;
-  const MAX_WEEKLY = hasActivePlan ? Infinity : MAX_FREE_WEEKLY;
+  const MAX_WEEKLY = hasActivePlan ? Infinity : MAX_FREE_DAILY;
 
   // Edit mode state
   const [editingImage, setEditingImage] = useState<{ url: string; prompt: string; type: string; copy?: string } | null>(null);
@@ -179,7 +181,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    setWeeklyCount(getWeeklyUsage(user?.id));
+    setWeeklyCount(getDailyUsage(user?.id));
   }, [user?.id]);
 
   const trackUsage = () => {
@@ -222,7 +224,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
     const text = (customPrompt || prompt).trim();
     if (!text) return;
     if (weeklyCount >= MAX_WEEKLY) {
-      toast({ title: "Limite semanal atingido", description: `Você usou ${MAX_FREE_WEEKLY}/${MAX_FREE_WEEKLY} gerações gratuitas.`, variant: "destructive" });
+      toast({ title: "Limite diário atingido", description: `Você usou ${MAX_FREE_DAILY}/${MAX_FREE_DAILY} gerações gratuitas hoje.`, variant: "destructive" });
       return;
     }
     if (customPrompt) setPrompt(customPrompt);
@@ -308,7 +310,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
   const handleQuickGenerate = async (customPrompt: string) => {
     setPrompt(customPrompt);
     if (weeklyCount >= MAX_WEEKLY) {
-      toast({ title: "Limite semanal atingido", variant: "destructive" });
+      toast({ title: "Limite diário atingido", variant: "destructive" });
       return;
     }
     setIsGenerating(true);
@@ -339,7 +341,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
   const handleEditImage = async (img: { url: string; prompt: string; type: string; copy?: string }, instruction: string) => {
     if (!instruction.trim()) return;
     if (weeklyCount >= MAX_WEEKLY) {
-      toast({ title: "Limite semanal atingido", description: "Cada edição conta como 1 uso.", variant: "destructive" });
+      toast({ title: "Limite diário atingido", description: "Cada edição conta como 1 uso.", variant: "destructive" });
       return;
     }
     setIsEditing(true);
@@ -410,7 +412,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
                   </div>
                 ))}
               </div>
-              <p className="text-white/20 text-sm">{remaining} de {MAX_FREE_WEEKLY} criações disponíveis esta semana</p>
+              <p className="text-white/20 text-sm">{remaining} de {MAX_FREE_DAILY} criações disponíveis hoje</p>
             </motion.div>
           )}
 
@@ -571,7 +573,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
                     className="min-h-[80px] bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/25 resize-none rounded-xl text-sm"
                   />
                 </div>
-                <p className="text-white/20 text-[11px]">⚠️ Cada edição conta como 1 criação do seu limite semanal</p>
+                <p className="text-white/20 text-[11px]">⚠️ Cada edição conta como 1 criação do seu limite diário</p>
                 <div className="flex gap-3">
                   <Button onClick={() => { setEditingImage(null); setEditInstruction(""); }} variant="ghost" className="flex-1 text-white/40 hover:text-white">
                     Cancelar
@@ -1240,7 +1242,7 @@ export default function IAs() {
   }, [user]);
 
   useEffect(() => {
-    setWeeklyCount(getWeeklyUsage(user?.id));
+    setWeeklyCount(getDailyUsage(user?.id));
   }, [user?.id]);
 
   const handleSignOut = async () => {
@@ -1248,7 +1250,7 @@ export default function IAs() {
     navigate("/ias");
   };
 
-  const remaining = userPlan ? Infinity : Math.max(0, MAX_FREE_WEEKLY - weeklyCount);
+  const remaining = userPlan ? Infinity : Math.max(0, MAX_FREE_DAILY - weeklyCount);
 
   if (loading) {
     return (
