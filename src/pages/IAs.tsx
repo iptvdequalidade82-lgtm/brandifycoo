@@ -103,28 +103,28 @@ function ProBanner({ user, remaining }: { user: User | null; remaining: number }
     <motion.div
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mx-4 md:mx-6 mt-2 mb-0"
+      className="mx-3 md:mx-6 mt-2 mb-0"
     >
-      <div className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-yellow-500/10 border border-amber-500/20">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shrink-0">
-            <Crown className="w-4 h-4 text-white" />
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-3 py-2.5 rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-yellow-500/10 border border-amber-500/20">
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shrink-0">
+            <Crown className="w-3.5 h-3.5 text-white" />
           </div>
-          <div className="min-w-0">
-            <p className="text-white/80 text-xs font-medium truncate">
+          <div>
+            <p className="text-white/80 text-xs font-medium">
               {remaining > 0
                ? `${remaining} ${remaining === 1 ? "criação grátis restante" : "criações grátis restantes"} hoje`
                 : "Limite atingido"
               }
             </p>
-            <p className="text-white/30 text-[11px] truncate hidden sm:block">
+            <p className="text-white/30 text-[10px] hidden sm:block">
               Desbloqueie uso ilimitado e recursos Pro
             </p>
           </div>
         </div>
         <button
           onClick={handleUpgrade}
-          className="shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-lg bg-gradient-to-r from-amber-400 to-orange-500 text-black text-xs font-bold hover:from-amber-300 hover:to-orange-400 transition-all shadow-lg shadow-amber-500/20"
+          className="shrink-0 flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-gradient-to-r from-amber-400 to-orange-500 text-black text-xs font-bold hover:from-amber-300 hover:to-orange-400 transition-all shadow-lg shadow-amber-500/20 w-full sm:w-auto"
         >
           <Crown className="w-3.5 h-3.5" />
           <span>Pro R$39,90</span>
