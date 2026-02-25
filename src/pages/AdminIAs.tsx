@@ -5,11 +5,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import ReactMarkdown from "react-markdown";
 import brandifyLogo from "@/assets/logo.jpg";
 import {
   Plus, Send, Trash2, MessageSquare, Image as ImageIcon, Bot, Sparkles, Loader2, ChevronLeft, ChevronRight, Paperclip, X,
+  Users, Crown, Mail, Clock, CreditCard, CheckCircle, XCircle,
 } from "lucide-react";
 
 type Msg = { role: "user" | "assistant"; content: string; image_urls?: string[]; model_used?: string };
@@ -75,7 +77,213 @@ const StreamingBubble = ({ content, modelUsed }: { content: string; modelUsed: s
   </div>
 );
 
-export default function AdminIAs() {
+// ══════════════════════════════════════════════════
+// ██  SUBSCRIBERS PANEL
+// ══════════════════════════════════════════════════
+type UserWithSub = {
+  id: string;
+  email: string;
+  name: string | null;
+  created_at: string;
+  subscription?: {
+    plan: string;
+    status: string;
+    amount_cents: number;
+    payment_method: string | null;
+    paid_at: string | null;
+    expires_at: string | null;
+    created_at: string;
+  };
+};
+
+function SubscribersPanel() {
+  const [users, setUsers] = useState<UserWithSub[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadUsers();
+  }, []);
+
+  const loadUsers = async () => {
+    setLoading(true);
+    // Get all subscriptions
+    const { data: subs } = await supabase
+      .from("subscriptions")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    // Get profiles for user info
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("*");
+
+    // Build combined list
+    const userMap = new Map<string, UserWithSub>();
+
+    // Add profiles
+    profiles?.forEach((p: any) => {
+      userMap.set(p.user_id, {
+        id: p.user_id,
+        email: "",
+        name: p.full_name || null,
+        created_at: p.created_at,
+      });
+    });
+
+    // Attach subscriptions
+    subs?.forEach((s: any) => {
+      const existing = userMap.get(s.user_id);
+      if (existing) {
+        existing.subscription = {
+          plan: s.plan,
+          status: s.status,
+          amount_cents: s.amount_cents,
+          payment_method: s.payment_method,
+          paid_at: s.paid_at,
+          expires_at: s.expires_at,
+          created_at: s.created_at,
+        };
+      } else {
+        userMap.set(s.user_id, {
+          id: s.user_id,
+          email: "",
+          name: null,
+          created_at: s.created_at,
+          subscription: {
+            plan: s.plan,
+            status: s.status,
+            amount_cents: s.amount_cents,
+            payment_method: s.payment_method,
+            paid_at: s.paid_at,
+            expires_at: s.expires_at,
+            created_at: s.created_at,
+          },
+        });
+      }
+    });
+
+    setUsers(Array.from(userMap.values()).sort((a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    ));
+    setLoading(false);
+  };
+
+  const activeCount = users.filter(u => u.subscription?.status === "active").length;
+  const pendingCount = users.filter(u => u.subscription?.status === "pending").length;
+  const totalRevenue = users.reduce((sum, u) => sum + (u.subscription?.status === "active" ? (u.subscription.amount_cents || 0) : 0), 0);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-6 h-6 text-white/30 animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+          <Users className="w-4 h-4 text-blue-400 mb-2" />
+          <p className="text-2xl font-bold text-white">{users.length}</p>
+          <p className="text-xs text-white/40">Usuários</p>
+        </div>
+        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+          <Crown className="w-4 h-4 text-amber-400 mb-2" />
+          <p className="text-2xl font-bold text-white">{activeCount}</p>
+          <p className="text-xs text-white/40">Assinantes Pro</p>
+        </div>
+        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+          <Clock className="w-4 h-4 text-orange-400 mb-2" />
+          <p className="text-2xl font-bold text-white">{pendingCount}</p>
+          <p className="text-xs text-white/40">Pagamento Pendente</p>
+        </div>
+        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+          <CreditCard className="w-4 h-4 text-green-400 mb-2" />
+          <p className="text-2xl font-bold text-white">R$ {(totalRevenue / 100).toFixed(2).replace(".", ",")}</p>
+          <p className="text-xs text-white/40">Receita Ativa</p>
+        </div>
+      </div>
+
+      {/* Users table */}
+      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden">
+        <div className="px-4 py-3 border-b border-white/[0.06] flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-white">Usuários & Assinaturas</h3>
+          <Button onClick={loadUsers} variant="ghost" size="sm" className="text-white/40 hover:text-white h-7 text-xs">
+            Atualizar
+          </Button>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-white/[0.06]">
+                <th className="text-left text-white/40 font-medium px-4 py-2.5 text-xs">Usuário</th>
+                <th className="text-left text-white/40 font-medium px-4 py-2.5 text-xs">Plano</th>
+                <th className="text-left text-white/40 font-medium px-4 py-2.5 text-xs">Status</th>
+                <th className="text-left text-white/40 font-medium px-4 py-2.5 text-xs">Valor</th>
+                <th className="text-left text-white/40 font-medium px-4 py-2.5 text-xs">Pagamento</th>
+                <th className="text-left text-white/40 font-medium px-4 py-2.5 text-xs">Data</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((u) => (
+                <tr key={u.id} className="border-b border-white/[0.04] hover:bg-white/[0.02]">
+                  <td className="px-4 py-3">
+                    <div>
+                      <p className="text-white text-sm font-medium">{u.name || "Sem nome"}</p>
+                      <p className="text-white/30 text-xs">{u.id.slice(0, 8)}...</p>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    {u.subscription ? (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                        <Crown className="w-3 h-3" /> {u.subscription.plan.toUpperCase()}
+                      </span>
+                    ) : (
+                      <span className="text-white/20 text-xs">Grátis</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    {u.subscription?.status === "active" ? (
+                      <span className="inline-flex items-center gap-1 text-green-400 text-xs">
+                        <CheckCircle className="w-3 h-3" /> Ativo
+                      </span>
+                    ) : u.subscription?.status === "pending" ? (
+                      <span className="inline-flex items-center gap-1 text-orange-400 text-xs">
+                        <Clock className="w-3 h-3" /> Pendente
+                      </span>
+                    ) : (
+                      <span className="text-white/20 text-xs">—</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-white/60 text-xs">
+                    {u.subscription ? `R$ ${(u.subscription.amount_cents / 100).toFixed(2).replace(".", ",")}` : "—"}
+                  </td>
+                  <td className="px-4 py-3 text-white/40 text-xs capitalize">
+                    {u.subscription?.payment_method || "—"}
+                  </td>
+                  <td className="px-4 py-3 text-white/30 text-xs">
+                    {new Date(u.created_at).toLocaleDateString("pt-BR")}
+                  </td>
+                </tr>
+              ))}
+              {users.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="text-center py-12 text-white/20 text-sm">
+                    Nenhum usuário cadastrado ainda
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AdminChat() {
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -402,8 +610,8 @@ export default function AdminIAs() {
   ), [messages]);
 
   return (
-    <AdminLayout>
-      <div className="flex h-[calc(100vh-7rem)] md:h-[calc(100vh-8rem)] -mx-3 md:-mx-6 -mt-3 md:-mt-6 overflow-hidden relative">
+    <>
+      <div className="flex h-[calc(100vh-12rem)] md:h-[calc(100vh-13rem)] -mx-3 md:-mx-6 overflow-hidden relative">
         {/* Sidebar - overlay on mobile */}
         {sidebarOpen && (
           <div className="fixed inset-0 bg-black/60 z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
@@ -592,6 +800,31 @@ export default function AdminIAs() {
           </div>
         </div>
       </div>
+    </>
+  );
+}
+
+export default function AdminIAs() {
+  return (
+    <AdminLayout>
+      <Tabs defaultValue="subscribers" className="space-y-4 -mt-2">
+        <TabsList className="bg-white/[0.04] border border-white/[0.06]">
+          <TabsTrigger value="subscribers" className="data-[state=active]:bg-white/[0.08] data-[state=active]:text-white text-white/40 gap-1.5 text-xs">
+            <Users className="w-3.5 h-3.5" /> Assinantes
+          </TabsTrigger>
+          <TabsTrigger value="chat" className="data-[state=active]:bg-white/[0.08] data-[state=active]:text-white text-white/40 gap-1.5 text-xs">
+            <Bot className="w-3.5 h-3.5" /> Chat IA
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="subscribers" className="m-0">
+          <SubscribersPanel />
+        </TabsContent>
+
+        <TabsContent value="chat" className="m-0">
+          <AdminChat />
+        </TabsContent>
+      </Tabs>
     </AdminLayout>
   );
 }
