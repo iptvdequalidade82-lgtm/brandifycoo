@@ -153,16 +153,65 @@ export default function PlanosPro() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050508] text-white relative overflow-hidden">
-      {/* Background Earth image */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920&q=80')] bg-cover bg-center opacity-[0.12]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#050508] via-[#050508]/60 to-[#050508]" />
+    <div className="min-h-screen bg-[#030308] text-white relative overflow-hidden">
+      {/* Background — Earth visible at bottom center */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {/* Deep space base */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050510] via-[#080818] to-[#030308]" />
+
+        {/* Earth — large, visible at the bottom, as if you're in orbit looking down */}
+        <div
+          className="absolute -bottom-[40%] left-1/2 -translate-x-1/2 w-[140vw] h-[140vw] md:w-[900px] md:h-[900px] rounded-full opacity-40"
+          style={{
+            background: `radial-gradient(circle at 40% 35%, #1a4a8a 0%, #0d2d5a 25%, #071a3a 50%, #030810 75%, transparent 100%)`,
+            boxShadow: `0 0 120px 40px rgba(30,58,138,0.15), inset 0 0 80px 20px rgba(30,58,138,0.1)`,
+          }}
+        />
+        {/* Earth atmosphere glow */}
+        <div
+          className="absolute -bottom-[42%] left-1/2 -translate-x-1/2 w-[145vw] h-[145vw] md:w-[950px] md:h-[950px] rounded-full opacity-25"
+          style={{
+            background: `radial-gradient(circle at 40% 35%, transparent 45%, rgba(59,130,246,0.3) 48%, rgba(59,130,246,0.1) 52%, transparent 55%)`,
+          }}
+        />
+
+        {/* Moon — top right */}
+        <div
+          className="absolute top-12 right-8 md:top-16 md:right-16 w-16 h-16 md:w-24 md:h-24 rounded-full opacity-70"
+          style={{
+            background: `radial-gradient(circle at 35% 35%, #e8e4dc 0%, #c4bfb3 30%, #9a9488 60%, #6b675f 100%)`,
+            boxShadow: `0 0 30px 5px rgba(200,195,185,0.08), 0 0 60px 15px rgba(200,195,185,0.04)`,
+          }}
+        />
+        {/* Moon subtle craters */}
+        <div
+          className="absolute top-14 right-10 md:top-[72px] md:right-[72px] w-3 h-3 md:w-4 md:h-4 rounded-full opacity-20"
+          style={{ background: `radial-gradient(circle, #7a756d, transparent)` }}
+        />
+        <div
+          className="absolute top-16 right-14 md:top-20 md:right-20 w-2 h-2 md:w-3 md:h-3 rounded-full opacity-15"
+          style={{ background: `radial-gradient(circle, #7a756d, transparent)` }}
+        />
+
+        {/* Stars scattered */}
+        <div className="absolute top-[8%] left-[15%] w-1 h-1 rounded-full bg-white/40" />
+        <div className="absolute top-[12%] left-[35%] w-0.5 h-0.5 rounded-full bg-white/30" />
+        <div className="absolute top-[5%] left-[55%] w-1 h-1 rounded-full bg-white/25" />
+        <div className="absolute top-[18%] left-[75%] w-0.5 h-0.5 rounded-full bg-white/35" />
+        <div className="absolute top-[25%] left-[10%] w-0.5 h-0.5 rounded-full bg-white/20" />
+        <div className="absolute top-[30%] left-[85%] w-1 h-1 rounded-full bg-white/30" />
+        <div className="absolute top-[15%] left-[92%] w-0.5 h-0.5 rounded-full bg-white/25" />
+        <div className="absolute top-[22%] left-[48%] w-0.5 h-0.5 rounded-full bg-white/20" />
+        <div className="absolute top-[35%] left-[25%] w-1 h-1 rounded-full bg-blue-300/20" />
+        <div className="absolute top-[8%] left-[68%] w-0.5 h-0.5 rounded-full bg-white/30" />
+
+        {/* Subtle blue ambient glow from Earth */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[80%] h-[40%] bg-blue-500/[0.04] rounded-full blur-[100px]" />
       </div>
 
       {/* Glowing blue border line at top */}
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-400/60 to-transparent" />
-      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-blue-400/20 to-transparent blur-sm" />
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-400/50 to-transparent" />
+      <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-blue-400/15 to-transparent blur-sm" />
 
       {/* Header */}
       <header className="relative z-10 flex items-center justify-between h-14 px-4 md:px-6 border-b border-white/[0.06]">
