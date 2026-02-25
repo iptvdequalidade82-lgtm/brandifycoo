@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles, MessageSquare, ImagePlus, LogOut, ArrowLeft, Zap, Send,
   Download, Loader2, Plus, Trash2, X, PenTool, Lightbulb, LayoutGrid, Upload, Image,
+  User as UserIcon, Crown, Lock,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import logo from "@/assets/logo.jpg";
@@ -21,6 +22,47 @@ type Conversation = { id: string; title: string; model: string; created_at: stri
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`;
 const IMAGE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-instagram-image`;
+
+// ── Device ID for anonymous usage tracking ──
+function getDeviceId(): string {
+  const key = "brandify_device_id";
+  let id = localStorage.getItem(key);
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem(key, id);
+  }
+  return id;
+}
+
+// ── Usage tracking (works for both logged-in and anonymous) ──
+function getUsageKey(userId?: string): string {
+  return `post_gen_${userId || getDeviceId()}`;
+}
+
+function getWeeklyUsage(userId?: string): number {
+  const weekAgo = new Date();
+  weekAgo.setDate(weekAgo.getDate() - 7);
+  const stored = localStorage.getItem(getUsageKey(userId));
+  if (!stored) return 0;
+  try {
+    const valid = JSON.parse(stored).filter((d: string) => new Date(d) > weekAgo);
+    return valid.length;
+  } catch {
+    return 0;
+  }
+}
+
+function trackUsageLocal(userId?: string): number {
+  const key = getUsageKey(userId);
+  const stored = localStorage.getItem(key);
+  const data = stored ? JSON.parse(stored) : [];
+  data.push(new Date().toISOString());
+  const weekAgo = new Date();
+  weekAgo.setDate(weekAgo.getDate() - 7);
+  const filtered = data.filter((d: string) => new Date(d) > weekAgo);
+  localStorage.setItem(key, JSON.stringify(filtered));
+  return filtered.length;
+}
 
 // ── Suggestion chips for post generator ──
 const POST_SUGGESTIONS = [
@@ -40,10 +82,62 @@ const CHAT_SUGGESTIONS = [
   { icon: "📧", label: "Email marketing", prompt: "Escreva um email de boas-vindas para novos clientes de uma loja online de cosméticos" },
 ];
 
+const MAX_FREE_WEEKLY = 5;
+
+// ══════════════════════════════════════════════════
+// ██  PRO CTA BANNER
+// ══════════════════════════════════════════════════
+function ProBanner({ user, remaining }: { user: User | null; remaining: number }) {
+  const navigate = useNavigate();
+
+  const handleUpgrade = () => {
+    if (!user) {
+      // Redirect to login first, then back to /ias
+      navigate("/login?redirect=/ias&upgrade=pro");
+      return;
+    }
+    navigate("/planos-pro");
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="mx-4 md:mx-6 mt-2 mb-0"
+    >
+      <div className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-yellow-500/10 border border-amber-500/20">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shrink-0">
+            <Crown className="w-4 h-4 text-white" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-white/80 text-xs font-medium truncate">
+              {remaining > 0
+                ? `${remaining} criação${remaining !== 1 ? "ões" : ""} grátis restante${remaining !== 1 ? "s" : ""} esta semana`
+                : "Limite semanal atingido"
+              }
+            </p>
+            <p className="text-white/30 text-[11px] truncate hidden sm:block">
+              Desbloqueie uso ilimitado e recursos Pro
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={handleUpgrade}
+          className="shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-lg bg-gradient-to-r from-amber-400 to-orange-500 text-black text-xs font-bold hover:from-amber-300 hover:to-orange-400 transition-all shadow-lg shadow-amber-500/20"
+        >
+          <Crown className="w-3.5 h-3.5" />
+          <span>Pro R$39,90</span>
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
 // ══════════════════════════════════════════════════
 // ██  POST GENERATOR TAB
 // ══════════════════════════════════════════════════
-function PostGenerator({ user }: { user: User }) {
+function PostGenerator({ user }: { user: User | null }) {
   const { toast } = useToast();
   const [prompt, setPrompt] = useState("");
   const [postType, setPostType] = useState<"feed" | "story">("feed");
@@ -56,25 +150,17 @@ function PostGenerator({ user }: { user: User }) {
   const [referenceImage, setReferenceImage] = useState<string | null>(null);
   const [referencePreview, setReferencePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const MAX_WEEKLY = 5;
+  // TODO: Pro users get unlimited
+  const isPro = false;
+  const MAX_WEEKLY = isPro ? Infinity : MAX_FREE_WEEKLY;
 
   useEffect(() => {
-    const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
-    const stored = localStorage.getItem(`post_gen_${user.id}`);
-    if (stored) {
-      const valid = JSON.parse(stored).filter((d: string) => new Date(d) > weekAgo);
-      setWeeklyCount(valid.length);
-    }
-  }, [user.id]);
+    setWeeklyCount(getWeeklyUsage(user?.id));
+  }, [user?.id]);
 
   const trackUsage = () => {
-    const stored = localStorage.getItem(`post_gen_${user.id}`);
-    const data = stored ? JSON.parse(stored) : [];
-    data.push(new Date().toISOString());
-    const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
-    const filtered = data.filter((d: string) => new Date(d) > weekAgo);
-    localStorage.setItem(`post_gen_${user.id}`, JSON.stringify(filtered));
-    setWeeklyCount(filtered.length);
+    const newCount = trackUsageLocal(user?.id);
+    setWeeklyCount(newCount);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,25 +185,30 @@ function PostGenerator({ user }: { user: User }) {
     setReferencePreview(null);
   };
 
+  const getAuthHeaders = async () => {
+    const session = (await supabase.auth.getSession()).data.session;
+    return {
+      "Content-Type": "application/json",
+      apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      Authorization: `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+    };
+  };
+
   const handleGenerateCopy = async (customPrompt?: string) => {
     const text = (customPrompt || prompt).trim();
     if (!text) return;
     if (weeklyCount >= MAX_WEEKLY) {
-      toast({ title: "Limite semanal atingido", description: `Você usou ${MAX_WEEKLY}/${MAX_WEEKLY} gerações.`, variant: "destructive" });
+      toast({ title: "Limite semanal atingido", description: `Você usou ${MAX_FREE_WEEKLY}/${MAX_FREE_WEEKLY} gerações gratuitas.`, variant: "destructive" });
       return;
     }
     if (customPrompt) setPrompt(customPrompt);
     setIsGeneratingCopy(true);
     setStep("copy");
     try {
-      const session = (await supabase.auth.getSession()).data.session;
+      const headers = await getAuthHeaders();
       const res = await fetch(CHAT_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          Authorization: `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
+        headers,
         body: JSON.stringify({
           messages: [
             { role: "system", content: "Você é um copywriter especialista em redes sociais da agência Brandify. Crie uma copy curta e impactante para um post de Instagram baseado no pedido do cliente. Responda APENAS com a copy (legenda), sem explicações extras. Use emojis estrategicamente. Máximo 3 parágrafos curtos." },
@@ -141,15 +232,11 @@ function PostGenerator({ user }: { user: User }) {
     setIsGenerating(true);
     setStep("generating");
     try {
-      const session = (await supabase.auth.getSession()).data.session;
+      const headers = await getAuthHeaders();
       const imagePrompt = `Post profissional para Instagram: ${prompt}. Copy: ${generatedCopy}`;
       const res = await fetch(IMAGE_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          Authorization: `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
+        headers,
         body: JSON.stringify({ prompt: imagePrompt, type: postType, referenceImage }),
       });
       if (!res.ok) {
@@ -182,14 +269,10 @@ function PostGenerator({ user }: { user: User }) {
     setIsGenerating(true);
     setStep("generating");
     try {
-      const session = (await supabase.auth.getSession()).data.session;
+      const headers = await getAuthHeaders();
       const res = await fetch(IMAGE_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          Authorization: `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
+        headers,
         body: JSON.stringify({ prompt: customPrompt, type: postType, referenceImage }),
       });
       if (!res.ok) throw new Error("Erro ao gerar");
@@ -208,7 +291,7 @@ function PostGenerator({ user }: { user: User }) {
     }
   };
 
-  const remaining = MAX_WEEKLY - weeklyCount;
+  const remaining = Math.max(0, MAX_WEEKLY - weeklyCount);
 
   return (
     <div className="flex flex-col h-full">
@@ -249,7 +332,7 @@ function PostGenerator({ user }: { user: User }) {
                   </div>
                 ))}
               </div>
-              <p className="text-white/20 text-sm">{remaining} de {MAX_WEEKLY} criações disponíveis esta semana</p>
+              <p className="text-white/20 text-sm">{remaining} de {MAX_FREE_WEEKLY} criações disponíveis esta semana</p>
             </motion.div>
           )}
 
@@ -502,7 +585,7 @@ function detectImageIntentChat(text: string): boolean {
   return IMAGE_KEYWORDS_CHAT.some((kw) => lower.includes(kw));
 }
 
-function ChatTab({ user }: { user: User }) {
+function ChatTab({ user }: { user: User | null }) {
   const { toast } = useToast();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
@@ -532,9 +615,12 @@ function ChatTab({ user }: { user: User }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  useEffect(() => { loadConversations(); }, [user]);
+  useEffect(() => {
+    if (user) loadConversations();
+  }, [user]);
 
   const loadConversations = async () => {
+    if (!user) return;
     const { data } = await supabase
       .from("ai_conversations")
       .select("*")
@@ -590,7 +676,9 @@ function ChatTab({ user }: { user: User }) {
 
     try {
       let convId = activeConvId;
-      if (!convId) {
+      
+      // Only save to DB if user is logged in
+      if (!convId && user) {
         const { data, error } = await supabase
           .from("ai_conversations")
           .insert({ user_id: user.id, title: text.slice(0, 60) || "Imagem", model: "auto" })
@@ -605,10 +693,13 @@ function ChatTab({ user }: { user: User }) {
       // Build user message with optional image
       const userMsg: Msg = { role: "user", content: text, image_urls: currentAttachment ? [currentAttachment] : [] };
       setMessages((prev) => [...prev, userMsg]);
-      supabase.from("ai_messages").insert({
-        conversation_id: convId, role: "user", content: text,
-        image_urls: currentAttachment ? [currentAttachment.slice(0, 100) + "...(base64)"] : null,
-      });
+      
+      if (convId && user) {
+        supabase.from("ai_messages").insert({
+          conversation_id: convId, role: "user", content: text,
+          image_urls: currentAttachment ? [currentAttachment.slice(0, 100) + "...(base64)"] : null,
+        });
+      }
 
       // Determine if this is an image generation request
       const wantsImage = detectImageIntentChat(text);
@@ -635,6 +726,7 @@ function ChatTab({ user }: { user: User }) {
         apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
       };
       if (token) headers.Authorization = `Bearer ${token}`;
+      else headers.Authorization = `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`;
 
       if (wantsImage) {
         // ── IMAGE GENERATION MODE (non-streaming) ──
@@ -668,12 +760,14 @@ function ChatTab({ user }: { user: User }) {
 
           // Replace the loading message
           setMessages((prev) => [...prev.slice(0, -1), assistantMsg]);
-          supabase.from("ai_messages").insert({
-            conversation_id: convId, role: "assistant",
-            content: assistantMsg.content,
-            image_urls: data.imageUrl ? [data.imageUrl.slice(0, 100) + "...(base64)"] : null,
-            model_used: data.model,
-          });
+          if (convId && user) {
+            supabase.from("ai_messages").insert({
+              conversation_id: convId, role: "assistant",
+              content: assistantMsg.content,
+              image_urls: data.imageUrl ? [data.imageUrl.slice(0, 100) + "...(base64)"] : null,
+              model_used: data.model,
+            });
+          }
         } finally {
           setIsGeneratingImage(false);
         }
@@ -717,10 +811,14 @@ function ChatTab({ user }: { user: User }) {
         const finalMsg: Msg = { role: "assistant", content: full };
         setStreamingContent("");
         setMessages((prev) => [...prev, finalMsg]);
-        supabase.from("ai_messages").insert({ conversation_id: convId, role: "assistant", content: full });
+        if (convId && user) {
+          supabase.from("ai_messages").insert({ conversation_id: convId, role: "assistant", content: full });
+        }
       }
 
-      supabase.from("ai_conversations").update({ updated_at: new Date().toISOString() }).eq("id", convId);
+      if (convId && user) {
+        supabase.from("ai_conversations").update({ updated_at: new Date().toISOString() }).eq("id", convId);
+      }
     } catch (e: any) {
       setStreamingContent("");
       toast({ title: "Erro", description: e.message, variant: "destructive" });
@@ -745,8 +843,8 @@ function ChatTab({ user }: { user: User }) {
 
   return (
     <div className="flex h-full relative">
-      {/* Sidebar toggle */}
-      {conversations.length > 0 && (
+      {/* Sidebar toggle — only for logged-in users */}
+      {user && conversations.length > 0 && (
         <button
           onClick={() => setShowSidebar(!showSidebar)}
           className="absolute top-3 left-3 z-20 p-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-white/30 hover:text-white/60 transition-all"
@@ -848,6 +946,13 @@ function ChatTab({ user }: { user: User }) {
                     </button>
                   ))}
                 </div>
+
+                {!user && (
+                  <p className="text-white/20 text-xs mt-6">
+                    <Lock className="w-3 h-3 inline mr-1" />
+                    Faça login para salvar seu histórico de conversas
+                  </p>
+                )}
               </motion.div>
             ) : (
               <>
@@ -967,12 +1072,14 @@ function ChatTab({ user }: { user: User }) {
     </div>
   );
 }
+
 // ══════════════════════════════════════════════════
 // ██  MAIN PAGE
 // ══════════════════════════════════════════════════
 export default function IAs() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [weeklyCount, setWeeklyCount] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -986,49 +1093,21 @@ export default function IAs() {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    setWeeklyCount(getWeeklyUsage(user?.id));
+  }, [user?.id]);
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    navigate("/");
+    navigate("/ias");
   };
+
+  const remaining = Math.max(0, MAX_FREE_WEEKLY - weeklyCount);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-[#050508] flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-[#050508] flex items-center justify-center px-4 relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-violet-600/[0.04] rounded-full blur-[200px]" />
-          <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-blue-600/[0.03] rounded-full blur-[150px]" />
-        </div>
-        <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="text-center relative z-10 max-w-lg">
-          <div className="w-20 h-20 rounded-2xl overflow-hidden ring-2 ring-white/10 mx-auto mb-6 shadow-2xl">
-            <img src={logo} alt="Brandify" className="w-full h-full object-cover" />
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-3" style={{ fontFamily: "'Sora', sans-serif" }}>
-            IA Studio
-          </h1>
-          <p className="text-white/40 text-lg mb-8">
-            Crie posts profissionais e converse com IA. Tudo gratuito.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link to="/login">
-              <Button className="h-12 px-8 bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 text-white border-0 font-semibold text-base shadow-lg shadow-violet-500/20">
-                <Zap className="w-5 h-5 mr-2" /> Entrar
-              </Button>
-            </Link>
-            <Link to="/cadastro">
-              <Button variant="outline" className="h-12 px-8 bg-white/[0.04] border-white/[0.08] text-white hover:bg-white/[0.08] font-semibold text-base">
-                Criar conta grátis
-              </Button>
-            </Link>
-          </div>
-        </motion.div>
       </div>
     );
   }
@@ -1050,18 +1129,29 @@ export default function IAs() {
               IA Studio
             </span>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <Link to="/">
               <Button variant="ghost" size="sm" className="text-white/30 hover:text-white hover:bg-white/[0.05] text-xs h-8">
                 <ArrowLeft className="w-3.5 h-3.5 mr-1" /> Voltar
               </Button>
             </Link>
-            <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-white/30 hover:text-white hover:bg-white/[0.05] text-xs h-8">
-              <LogOut className="w-3.5 h-3.5 mr-1" /> Sair
-            </Button>
+            {user ? (
+              <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-white/30 hover:text-white hover:bg-white/[0.05] text-xs h-8">
+                <LogOut className="w-3.5 h-3.5 mr-1" /> Sair
+              </Button>
+            ) : (
+              <Link to="/login?redirect=/ias">
+                <Button size="sm" className="h-8 px-4 bg-white/[0.08] hover:bg-white/[0.12] text-white border border-white/[0.1] text-xs font-medium gap-1.5">
+                  <UserIcon className="w-3.5 h-3.5" /> Entrar
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </header>
+
+      {/* Pro banner */}
+      <ProBanner user={user} remaining={remaining} />
 
       {/* Tabs */}
       <Tabs defaultValue="posts" className="flex-1 flex flex-col overflow-hidden">

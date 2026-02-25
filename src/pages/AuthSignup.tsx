@@ -10,6 +10,8 @@ import { motion } from "framer-motion";
 import logo from "@/assets/logo.jpg";
 
 const AuthSignup = () => {
+  const searchParams = new URLSearchParams(window.location.search);
+  const redirectTo = searchParams.get("redirect") || "/ias";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,7 +35,7 @@ const AuthSignup = () => {
       password,
       options: {
         data: { full_name: name },
-        emailRedirectTo: window.location.origin + "/ias",
+        emailRedirectTo: window.location.origin + redirectTo,
       },
     });
     if (error) {
@@ -48,7 +50,7 @@ const AuthSignup = () => {
     setGoogleLoading(true);
     setError("");
     const { error } = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin + "/ias",
+      redirect_uri: window.location.origin + redirectTo,
     });
     if (error) {
       setError("Erro ao conectar com Google. Tente novamente.");
