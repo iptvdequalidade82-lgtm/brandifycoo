@@ -201,19 +201,153 @@ The user has uploaded a reference image (could be a logo, photo, or design idea)
 
     // ── Niche detection: add contextually relevant visual elements ──
     const nicheMap: Record<string, string> = {
-      "churrascaria|churrasco|grelha|churrasqueira|açougue|carnes": `🥩 NICHE — CHURRASCARIA/BBQ: Include smoking grill, charcoal flames, sizzling picanha, espeto/skewers, rustic wood cutting boards. Warm fire orange, ember red, smoky atmosphere. Environment: rustic steakhouse, outdoor BBQ pit, churrasqueira de tijolos.`,
-      "salão|salao|cabeleireiro|cabelo|beleza|beauty|estética|estetica|manicure|unhas": `💇 NICHE — BEAUTY SALON: Include scissors, hair styling, mirrors, salon chairs. Rose gold, soft pink, champagne tones. Environment: modern salon interior.`,
-      "academia|fitness|gym|treino|musculação|crossfit|personal": `🏋️ NICHE — FITNESS: Include dumbbells, barbells, weight plates, gym floor. Dark blacks, neon accents, steel grays. Environment: modern gym interior.`,
-      "restaurante|comida|food|gastronomia|pizza|hambúrguer|hamburgueria|sushi|padaria|confeitaria|bolo|café|cafeteria": `🍽️ NICHE — FOOD: Include beautifully plated dishes, chef hands, fresh ingredients, steam. Warm golden, rich browns, fresh greens. Environment: restaurant/kitchen.`,
-      "advocacia|advogado|jurídico|juridico|direito|escritório": `⚖️ NICHE — LAW: Include gavel, law books, scales of justice. Navy blue, dark wood, gold. Environment: elegant office.`,
-      "dentista|odontologia|clareamento|sorriso": `🦷 NICHE — DENTAL: Include bright smiles, clean clinical elements. Whites, light blues, mint green. Environment: modern dental office.`,
-      "imobiliária|imobiliaria|imóvel|casa|apartamento|corretor": `🏠 NICHE — REAL ESTATE: Include luxury property, keys, modern architecture. Warm whites, golden hour. Environment: luxury apartment.`,
-      "loja|roupa|moda|fashion|boutique|streetwear|tênis|sneaker": `👗 NICHE — FASHION: Include clothing racks, fashion accessories, styled outfits. Trendy colors. Environment: boutique interior.`,
-      "pet|veterinário|veterinario|cachorro|gato|banho e tosa": `🐾 NICHE — PET: Include cute dogs/cats, paw prints, grooming tools. Warm pastels. Environment: pet shop/vet clinic.`,
-      "barbearia|barbeiro|barba|corte masculino": `💈 NICHE — BARBERSHOP: Include straight razor, barber chair, pomade. Deep blacks, gold, chrome. Environment: modern barbershop.`,
-      "oficina|mecânica|mecanica|carro|auto|funilaria": `🔧 NICHE — AUTO: Include car parts, tools, lifted vehicle. Metallic grays, chrome. Environment: professional garage.`,
-      "escola|educação|educacao|curso|aula|professor": `📚 NICHE — EDUCATION: Include books, classroom, notebooks. Navy blue, warm wood. Environment: modern classroom.`,
-      "farmácia|farmacia|médico|medico|hospital|clínica médica": `🏥 NICHE — HEALTH: Include stethoscope, clean clinical elements. Whites, light blues. Environment: modern clinic.`,
+      // ALIMENTAÇÃO & BEBIDAS
+      "churrascaria|churrasco|grelha|churrasqueira|açougue|carnes|picanha": `🥩 NICHE — CHURRASCARIA/BBQ: Smoking grill, charcoal flames, sizzling picanha, espeto/skewers, rustic wood boards. Fire orange, ember red, smoky atmosphere.`,
+      "restaurante|comida|food|gastronomia|culinária|culinaria": `🍽️ NICHE — RESTAURANT: Beautifully plated dishes, chef hands, fresh ingredients, steam. Warm golden, rich browns.`,
+      "pizza|pizzaria": `🍕 NICHE — PIZZARIA: Wood-fired oven, stretching cheese, pizza paddle, rustic table. Warm reds, golden crust tones.`,
+      "hambúrguer|hamburgueria|burger|lanche|lanchonete|fast food": `🍔 NICHE — HAMBURGUERIA: Juicy stacked burger, melting cheese, crispy fries, craft beer. Dark moody, warm amber.`,
+      "sushi|japonês|japones|temaki|sashimi": `🍣 NICHE — JAPANESE FOOD: Sushi platter, chopsticks, soy sauce, bamboo mat, wasabi. Black, red, minimalist zen.`,
+      "padaria|confeitaria|bolo|doce|pão|panificadora": `🧁 NICHE — BAKERY: Fresh bread, pastries, flour dust, wooden shelves, cake displays. Warm cream, golden wheat tones.`,
+      "café|cafeteria|coffee|cappuccino|expresso": `☕ NICHE — COFFEE SHOP: Latte art, coffee beans, espresso machine, cozy mugs. Warm browns, cream, rustic wood.`,
+      "açaí|acai|sorveteria|sorvete|gelato|frozen": `🍦 NICHE — ICE CREAM/AÇAÍ: Colorful bowls, toppings, fruit, frozen treats. Vibrant purple, pink, tropical.`,
+      "cervejaria|cerveja|brewery|bar|pub|boteco": `🍺 NICHE — BAR/BREWERY: Craft beer taps, amber pints, bar counter, neon signs. Amber gold, dark wood, moody lighting.`,
+      "doceria|brigadeiro|chocolate|trufa": `🍫 NICHE — SWEETS: Artisan chocolates, brigadeiros, elegant packaging. Rich brown, gold accents, velvet.`,
+      "food truck|trailer|comida de rua": `🚚 NICHE — FOOD TRUCK: Street food, colorful truck, outdoor scene, casual vibes. Vibrant, urban, fun.`,
+      "nutrição|nutricionista|dieta|alimentação saudável|healthy": `🥗 NICHE — NUTRITION: Fresh salads, meal prep, measuring tape, healthy bowls. Fresh greens, clean whites.`,
+
+      // BELEZA & ESTÉTICA
+      "salão|salao|cabeleireiro|cabelo|beleza|beauty|hair": `💇 NICHE — BEAUTY SALON: Scissors, hair styling, mirrors, salon chairs. Rose gold, soft pink, champagne.`,
+      "barbearia|barbeiro|barba|corte masculino|fade": `💈 NICHE — BARBERSHOP: Straight razor, barber chair, pomade, hot towel. Deep blacks, gold, chrome.`,
+      "manicure|unhas|nail|pedicure|esmalteria": `💅 NICHE — NAIL SALON: Polished nails, nail art, UV lamp, color palette. Soft pink, nude, elegant.`,
+      "estética|estetica|skincare|limpeza de pele|peeling|facial": `✨ NICHE — AESTHETICS: Facial treatment, clean skin, spa elements, serums. Soft whites, rose, clinical elegance.`,
+      "maquiagem|makeup|maquiadora": `💄 NICHE — MAKEUP: Brushes, palettes, lipstick, mirror, beauty editorial. Glam, rich tones, editorial lighting.`,
+      "sobrancelha|micropigmentação|design de sobrancelha": `👁️ NICHE — BROW DESIGN: Precise brow shaping, micro tools, before/after. Clean, precise, soft tones.`,
+      "depilação|depilacao|laser|cera": `🌸 NICHE — HAIR REMOVAL: Clean skin, laser equipment, spa room. Soft pink, clinical white, calming.`,
+      "spa|massagem|relaxamento|terapia": `🧖 NICHE — SPA: Hot stones, essential oils, bamboo, towels, candles. Earth tones, zen, tranquil.`,
+      "perfumaria|perfume|fragrância|fragrancia": `🌹 NICHE — PERFUME: Elegant bottles, flowers, mist, luxury packaging. Gold, deep burgundy, sophisticated.`,
+
+      // SAÚDE & BEM-ESTAR
+      "dentista|odontologia|odontológico|clareamento|sorriso|ortodontia|implante": `🦷 NICHE — DENTAL: Bright smiles, clean clinical elements, dental tools. Whites, light blues, mint green.`,
+      "médico|medico|hospital|clínica médica|clinica medica|saúde|saude": `🏥 NICHE — HEALTH/MEDICAL: Stethoscope, white coat, clean clinical elements. Whites, light blues, professional.`,
+      "farmácia|farmacia|drogaria|medicamento": `💊 NICHE — PHARMACY: Medicine shelves, clean counter, health products. Green cross, white, clinical.`,
+      "psicólogo|psicologo|psicologia|terapia|saúde mental": `🧠 NICHE — PSYCHOLOGY: Calm environment, cozy office, warm light, notebook. Soft lavender, warm cream, peaceful.`,
+      "fisioterapia|fisioterapeuta|reabilitação|pilates|rpg": `🏃 NICHE — PHYSIOTHERAPY: Exercise equipment, stretching, rehabilitation. Blue, white, active, clinical.`,
+      "fonoaudiologia|fonoaudiólogo|fono": `🗣️ NICHE — SPEECH THERAPY: Communication, voice, calm office, kid-friendly. Soft blue, warm, professional.`,
+      "oftalmologista|ótica|otica|óculos|oculos|lente|optometria|visão": `👓 NICHE — OPTICIAN/EYEWEAR: Stylish glasses displays, eye chart, lens equipment, frames. Clean modern, sophisticated blacks, golds.`,
+      "dermatologista|dermatologia|pele": `🧴 NICHE — DERMATOLOGY: Healthy skin close-up, skincare products, clinical. Clean whites, soft pink, medical.`,
+      "ortopedia|ortopedista|coluna|joelho": `🦴 NICHE — ORTHOPEDICS: X-ray imagery, skeleton models, rehabilitation. Clinical blue, white, professional.`,
+      "pediatra|pediatria|criança|infantil": `👶 NICHE — PEDIATRICS: Happy children, colorful toys, friendly doctor. Bright pastels, playful, warm.`,
+      "veterinário|veterinaria|vet|animal|clínica veterinária": `🐾 NICHE — VETERINARY: Dogs/cats, stethoscope, clinic. Warm pastels, caring, professional.`,
+
+      // FITNESS & ESPORTES
+      "academia|fitness|gym|treino|musculação|crossfit|personal": `🏋️ NICHE — FITNESS/GYM: Dumbbells, barbells, weight plates, gym floor. Dark blacks, neon accents, steel grays.`,
+      "yoga|meditação|meditacao|mindfulness": `🧘 NICHE — YOGA: Mat, peaceful pose, nature, sunrise. Soft earth tones, zen, minimal.`,
+      "artes marciais|mma|jiu jitsu|muay thai|karate|boxe|luta": `🥊 NICHE — MARTIAL ARTS: Fight gloves, octagon, training, sweat. Dark reds, blacks, intense energy.`,
+      "futebol|soccer|campo|quadra": `⚽ NICHE — SOCCER: Ball, cleats, pitch, goal net. Green, white, action shots.`,
+      "corrida|running|maratona|atletismo": `🏃 NICHE — RUNNING: Track, running shoes, finish line, motion blur. Dynamic, energetic colors.`,
+      "natação|natacao|piscina|swimming": `🏊 NICHE — SWIMMING: Pool lanes, goggles, splash, underwater. Deep blue, aqua, clean.`,
+      "surf|praia|beach|stand up|sup": `🏄 NICHE — SURF: Waves, surfboard, beach sunset, ocean. Blue, sand, golden hour.`,
+      "ciclismo|bike|bicicleta|mountain bike": `🚴 NICHE — CYCLING: Bike, trail, helmet, road. Dynamic, outdoor greens, action.`,
+      "skate|skateboard": `🛹 NICHE — SKATE: Board, ramp, urban, streetwear. Grungy, bold, street culture.`,
+      "dança|danca|ballet|funk|studio de dança": `💃 NICHE — DANCE: Dance studio, mirrors, movement, expression. Vibrant, expressive, dynamic.`,
+
+      // SERVIÇOS PROFISSIONAIS
+      "advocacia|advogado|jurídico|juridico|direito|lei|escritório de advocacia": `⚖️ NICHE — LAW: Gavel, law books, scales of justice. Navy blue, dark wood, gold. Elegant office.`,
+      "contabilidade|contador|contábil|contabil|financeiro|fiscal": `📊 NICHE — ACCOUNTING: Calculator, spreadsheets, financial charts, documents. Navy, gray, professional.`,
+      "arquitetura|arquiteto|projeto|planta|design de interiores|decoração|decoracao": `📐 NICHE — ARCHITECTURE/DESIGN: Blueprints, models, modern buildings, drafting tools. Clean whites, blacks, minimal.`,
+      "engenharia|engenheiro|obra|construção|construcao|construtora|pedreiro|empreiteira": `🏗️ NICHE — CONSTRUCTION/ENGINEERING: Hard hat, crane, building site, blueprints, concrete. Safety yellow, steel gray, industrial.`,
+      "eletricista|elétrica|eletrica|instalação elétrica|fiação|quadro elétrico|energia": `⚡ NICHE — ELECTRICIAN: Wiring, electrical panel, multimeter, light bulbs, cable tools, safety gloves. Electric yellow, blue sparks, industrial gray.`,
+      "encanador|encanamento|hidráulica|hidraulica|cano|tubulação|vazamento|bombeiro hidráulico": `🔧 NICHE — PLUMBER: Pipes, wrench, water faucet, copper tubing, bathroom fixtures. Blue, chrome, industrial.`,
+      "pintor|pintura|tinta|parede|reforma": `🎨 NICHE — PAINTER: Paint roller, color swatches, fresh painted wall, brushes. Colorful, clean, fresh.`,
+      "marceneiro|marcenaria|madeira|móveis|moveis|carpintaria": `🪵 NICHE — CARPENTRY: Wood workshop, saw, custom furniture, wood grain. Warm wood tones, rustic, craftsmanship.`,
+      "serralheiro|serralheria|ferro|portão|grade|solda": `🔩 NICHE — METALWORK: Welding sparks, iron gate, metal workshop. Orange sparks, dark gray, industrial.`,
+      "vidraceiro|vidraçaria|vidro|espelho|box": `🪟 NICHE — GLASS: Glass panels, mirrors, clean reflections, frameless shower. Transparent, light blue, modern.`,
+      "dedetização|dedetizadora|controle de pragas|pest control": `🦟 NICHE — PEST CONTROL: Spray equipment, protective gear, clean home after. Green, white, professional.`,
+      "limpeza|faxina|cleaning|lavanderia|passadeira": `🧹 NICHE — CLEANING: Sparkling clean surfaces, cleaning supplies, before/after. Fresh blue, white, spotless.`,
+      "jardinagem|jardineiro|paisagismo|jardim|gramado": `🌿 NICHE — LANDSCAPING: Lush garden, tools, green lawn, flower beds. Fresh greens, earth tones, natural.`,
+      "mudança|frete|transporte|carreto": `🚚 NICHE — MOVING/FREIGHT: Truck, boxes, organized loading, team work. Blue, professional, reliable.`,
+      "segurança|vigilância|monitoramento|câmera|alarme|portaria": `🔒 NICHE — SECURITY: Cameras, control room, security guard, alarm system. Dark blue, black, authoritative.`,
+      "ar condicionado|climatização|refrigeração|hvac|split": `❄️ NICHE — AC/HVAC: AC unit, comfortable room, installation, fresh air. Cool blue, white, clean.`,
+      "energia solar|painel solar|fotovoltaica|solar": `☀️ NICHE — SOLAR ENERGY: Solar panels, rooftop, sun rays, green energy. Blue, yellow, sustainable green.`,
+      "desentupidora|desentupimento|esgoto": `🚿 NICHE — DRAIN CLEANING: Equipment, pipe clearing, professional service. Blue, gray, industrial.`,
+
+      // TECNOLOGIA & DIGITAL
+      "tecnologia|tech|software|app|aplicativo|startup|saas": `💻 NICHE — TECH: Laptop, code, modern workspace, digital screens. Electric blue, dark, futuristic-minimal.`,
+      "celular|smartphone|loja de celular|assistência técnica|conserto de celular|iphone|samsung": `📱 NICHE — CELL PHONE SHOP: Phone displays, repair tools, accessories, screen fix. Sleek black, electric blue, modern.`,
+      "informática|computador|notebook|pc|hardware": `🖥️ NICHE — COMPUTER: Hardware, components, setup, workstation. Dark, RGB accents, tech.`,
+      "marketing|marketing digital|social media|agência|agencia|tráfego|trafego": `📈 NICHE — DIGITAL MARKETING: Analytics dashboard, social icons, growth charts. Modern purple, blue, dynamic.`,
+      "fotografia|fotógrafo|fotografo|ensaio|foto|studio fotográfico": `📸 NICHE — PHOTOGRAPHY: Camera, lens, lighting setup, beautiful shot. Rich cinematic, dramatic light.`,
+      "videografia|vídeo|video|filmagem|produtora|audiovisual": `🎬 NICHE — VIDEO: Cinema camera, clapperboard, film reel, editing suite. Cinematic dark, rich color grading.`,
+      "design gráfico|designer|logo|identidade visual|branding": `🎨 NICHE — GRAPHIC DESIGN: Color palette, design tools, creative workspace. Creative, bold, modern.`,
+      "desenvolvimento|programação|programacao|desenvolvedor|dev|web": `👨‍💻 NICHE — DEVELOPMENT: Code editor, terminal, modern desk setup. Dark theme, green/blue code highlights.`,
+      "impressão|gráfica|grafica|banner|adesivo|comunicação visual": `🖨️ NICHE — PRINT SHOP: Large format printer, banners, business cards, vinyl. Colorful, professional, production.`,
+
+      // EDUCAÇÃO & FORMAÇÃO
+      "escola|colégio|colegio|ensino|infantil|creche": `🏫 NICHE — SCHOOL: Classroom, children, books, playground. Bright, playful, educational.`,
+      "faculdade|universidade|vestibular|enem|cursinho|pré-vestibular": `🎓 NICHE — UNIVERSITY: Campus, study groups, graduation. Navy, academic, aspirational.`,
+      "curso|treinamento|capacitação|workshop|mentoria|coaching": `📚 NICHE — COURSES/TRAINING: Whiteboard, presentation, group learning. Professional, inspiring.`,
+      "idiomas|inglês|ingles|espanhol|francês|lingua|language": `🌍 NICHE — LANGUAGES: World flags, conversation bubbles, study materials. International, colorful, educational.`,
+      "música|musica|instrumento|violão|guitarra|piano|bateria|escola de música": `🎵 NICHE — MUSIC: Instruments, sheet music, studio, performance. Rich, artistic, expressive.`,
+      "auto escola|autoescola|cnh|habilitação|habilitacao|carteira de motorista": `🚗 NICHE — DRIVING SCHOOL: Car with learner sign, steering wheel, traffic signs. Blue, yellow, educational.`,
+
+      // COMÉRCIO & VAREJO
+      "loja de roupa|moda|fashion|vestuário|boutique|streetwear|tênis|sneaker": `👗 NICHE — FASHION: Clothing racks, fabric textures, styled outfits. Trendy colors, editorial.`,
+      "joalheria|joia|ouro|prata|bijuteria|semi joia": `💎 NICHE — JEWELRY: Sparkling pieces, elegant display, velvet boxes. Gold, silver, luxury black.`,
+      "floricultura|flores|flower|buquê|arranjo|florista": `💐 NICHE — FLORIST: Beautiful arrangements, colorful petals, elegant vases. Vibrant, romantic, natural.`,
+      "supermercado|mercado|mercearia|hortifruti|atacado": `🛒 NICHE — SUPERMARKET: Fresh produce, organized aisles, shopping cart. Fresh, colorful, abundant.`,
+      "papelaria|material escolar|escritório|office": `📝 NICHE — STATIONERY: Notebooks, pens, organized desk, colorful supplies. Pastel, organized, creative.`,
+      "sex shop|lingerie|sensual": `🖤 NICHE — LINGERIE: Elegant fabrics, lace details, sophisticated setting. Deep red, black, sensual elegance.`,
+      "cosméticos|cosmético|cosmetico|skincare|dermocosmético": `🧴 NICHE — COSMETICS: Product bottles, serums, clean aesthetic. Soft pink, white, minimal luxury.`,
+      "brinquedo|toy|loja infantil|kids": `🧸 NICHE — TOY STORE: Colorful toys, playful setting, children joy. Bright, fun, energetic.`,
+      "varejo|loja|comércio|comercio|promoção|liquidação": `🏪 NICHE — RETAIL: Store displays, sale tags, shopping bags. Bold red, commercial, dynamic.`,
+      "móveis|moveis|colchão|colchao|decoração de interiores|home": `🛋️ NICHE — FURNITURE: Beautiful room setups, modern furniture, cozy spaces. Warm neutrals, elegant.`,
+      "material de construção|ferragista|ferragem|ferramentaria": `🏗️ NICHE — HARDWARE STORE: Tools, building materials, organized shelves. Industrial orange, gray.`,
+
+      // AUTOMOTIVO
+      "oficina|mecânica|mecanica|carro|auto|funilaria": `🔧 NICHE — AUTO SHOP: Car parts, tools, lifted vehicle, engine. Metallic grays, chrome. Garage.`,
+      "lavagem|lava jato|lava-jato|car wash|polimento|estética automotiva|estetica automotiva": `🚿 NICHE — CAR WASH: Shiny wet car, foam, pressure washer, gleaming finish. Blue, chrome, reflective.`,
+      "pneu|borracharia|alinhamento|balanceamento": `🛞 NICHE — TIRES: Tire stack, alignment machine, workshop. Black rubber, industrial, professional.`,
+      "autopeças|auto peças|peça automotiva|retífica": `⚙️ NICHE — AUTO PARTS: Engine components, organized shelves, car parts. Chrome, dark, industrial.`,
+      "moto|motocicleta|oficina de motos|motociclismo": `🏍️ NICHE — MOTORCYCLE: Bike, helmet, leather, speed. Dark chrome, rebellious, powerful.`,
+      "concessionária|concessionaria|revenda|seminovos|carros usados": `🚘 NICHE — CAR DEALER: Showroom, shiny cars, keys handover. Luxury, polished, professional.`,
+
+      // IMÓVEIS & MORADIA
+      "imobiliária|imobiliaria|imóvel|imovel|casa|apartamento|corretor|condomínio|condominio": `🏠 NICHE — REAL ESTATE: Luxury property, keys, modern architecture. Warm whites, golden hour.`,
+      "hotel|pousada|hospedagem|resort|airbnb": `🏨 NICHE — HOTEL: Luxury room, pool, concierge, lobby. Elegant gold, warm whites, hospitality.`,
+      "síndico|sindico|administradora|condomínio": `🏢 NICHE — CONDO MANAGEMENT: Building facade, common areas, organized. Professional blue, clean.`,
+
+      // EVENTOS & ENTRETENIMENTO
+      "festa|evento|buffet|decoração de festa|balão|aniversário|casamento|wedding": `🎉 NICHE — EVENTS: Balloons, decorations, tables, lighting, celebration. Festive gold, vibrant, elegant.`,
+      "dj|som|iluminação|iluminacao|balada|show|banda|música ao vivo": `🎧 NICHE — DJ/ENTERTAINMENT: Turntable, stage lights, crowd, speakers. Neon, dark, energetic.`,
+      "cinema|teatro|espetáculo|cultura": `🎭 NICHE — THEATER/CINEMA: Stage, curtains, spotlight, popcorn. Rich red, dramatic, artistic.`,
+      "parque|diversão|recreação|playground|lazer": `🎠 NICHE — AMUSEMENT: Fun rides, colorful, family joy. Bright, playful, exciting.`,
+
+      // PET & ANIMAIS
+      "pet|pet shop|cachorro|gato|banho e tosa|ração|animal de estimação": `🐾 NICHE — PET: Cute dogs/cats, paw prints, grooming tools. Warm pastels, playful.`,
+      "aquário|peixe|aquarismo": `🐠 NICHE — AQUARIUM: Colorful fish, tanks, aquatic plants. Deep blue, aquatic, serene.`,
+
+      // RELIGIÃO & COMUNIDADE
+      "igreja|pastor|culto|cristão|cristao|evangélico|evangelico|católico|catolico": `⛪ NICHE — CHURCH: Sanctuary, cross, worship, community. Warm gold, deep blue, spiritual.`,
+      "ong|social|comunidade|voluntário|voluntario|caridade": `🤝 NICHE — NGO/CHARITY: Helping hands, community, hope. Warm, compassionate, human.`,
+
+      // FINANÇAS & NEGÓCIOS
+      "banco|financeira|empréstimo|emprestimo|crédito|credito|consórcio|consorcio": `🏦 NICHE — FINANCE: Money, charts, secure vault, growth graphs. Dark green, gold, trustworthy.`,
+      "investimento|bolsa|trader|trading|cripto|bitcoin|ações|acoes": `📈 NICHE — INVESTMENTS: Stock charts, bull/bear, trading screens. Green/red, dark, dynamic.`,
+      "seguros|seguro|seguradora|proteção": `🛡️ NICHE — INSURANCE: Shield, family, protection, safety umbrella. Blue, trustworthy, reliable.`,
+      "consultoria|consultor|assessoria|gestão|gestao": `💼 NICHE — CONSULTING: Boardroom, strategy, presentation, leadership. Navy, gold, corporate.`,
+
+      // TRANSPORTE & LOGÍSTICA
+      "uber|motorista|transporte|táxi|taxi|99|corrida": `🚗 NICHE — RIDE SERVICE: Car, city streets, driver. Dark, urban, professional.`,
+      "logística|logistica|entrega|delivery|motoboy|envio|courier": `📦 NICHE — LOGISTICS/DELIVERY: Packages, delivery van, organized warehouse. Blue, brown, efficient.`,
+
+      // AGRO & NATUREZA
+      "agro|agrícola|agricola|fazenda|rural|pecuária|pecuaria|soja|milho|plantação": `🌾 NICHE — AGRICULTURE: Golden fields, tractor, harvest, sunrise over crops. Green, golden, earthy.`,
+      "paisagismo|piscina|piscineiro|manutenção de piscina": `🏊 NICHE — POOL: Crystal clear pool, maintenance tools, beautiful backyard. Aqua blue, clean, refreshing.`,
+
+      // MODA & ACESSÓRIOS
+      "tatuagem|tattoo|tatuador|estúdio de tatuagem": `🖋️ NICHE — TATTOO: Tattoo machine, ink, skin art, studio. Dark, artistic, edgy.`,
+      "ótica|relojoaria|relógio|relogio|acessórios|acessorios": `⌚ NICHE — WATCHES/ACCESSORIES: Luxury timepieces, displays, elegant details. Gold, black, sophisticated.`,
+      "costura|costureira|alfaiate|ateliê|atelie|sob medida": `🧵 NICHE — TAILOR: Sewing machine, fabric, measuring tape, needles. Classic, craftsmanship, elegant.`,
     };
 
     let nicheInstruction = "";
