@@ -19,6 +19,10 @@ const AuthLogin = () => {
   const [googleLoading, setGoogleLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Get redirect from URL params
+  const searchParams = new URLSearchParams(window.location.search);
+  const redirectTo = searchParams.get("redirect") || "/ias";
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -29,7 +33,7 @@ const AuthLogin = () => {
       setError("Email ou senha incorretos. Verifique e tente novamente.");
     } else {
       toast.success("Login realizado com sucesso!");
-      navigate("/ias");
+      navigate(redirectTo);
     }
     setLoading(false);
   };
@@ -38,7 +42,7 @@ const AuthLogin = () => {
     setGoogleLoading(true);
     setError("");
     const { error } = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin + "/ias",
+      redirect_uri: window.location.origin + redirectTo,
     });
     if (error) {
       setError("Erro ao conectar com Google. Tente novamente.");
