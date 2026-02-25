@@ -9,7 +9,7 @@ const corsHeaders = {
 
 const CAKTO_API_BASE = "https://api.cakto.com.br";
 const PRO_PRICE_REAIS = 39.90;
-const PRO_PLAN_NAME = "IA Studio Pro - Brandify";
+const PRO_PLAN_NAME = "Plano IA Brandify";
 
 async function getCaktoToken(): Promise<string> {
   const clientId = Deno.env.get("CAKTO_CLIENT_ID");
@@ -44,7 +44,8 @@ async function createCaktoOffer(
       price: priceReais,
       product: productId,
       status: "active",
-      type: "unique",
+      type: "recurring",
+      period: "monthly",
     }),
   });
 
