@@ -279,32 +279,37 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
         <div className="max-w-3xl mx-auto px-4 md:px-8 py-8">
           {/* WELCOME */}
           {step === "describe" && generatedImages.length === 0 && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center pt-8 md:pt-16">
-              <div className="relative inline-block mb-6">
-                <div className="w-20 h-20 rounded-2xl overflow-hidden border border-white/10 mx-auto shadow-lg shadow-violet-500/10">
-                  <img src={logo} alt="Brandify" className="w-full h-full object-cover" />
-                </div>
-                <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-gradient-to-r from-violet-500 to-pink-500 flex items-center justify-center">
-                  <Sparkles className="w-3 h-3 text-white" />
-                </div>
-              </div>
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-3" style={{ fontFamily: "'Sora', sans-serif" }}>
-                Descreva sua ideia. <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">A IA faz o resto.</span>
-              </h2>
-              <p className="text-white/40 text-sm max-w-md mx-auto mb-6">Conte o que precisa — a IA aprimora, você confirma e o post fica pronto.</p>
-              <div className="flex items-center justify-center gap-2 md:gap-3 mb-8 flex-wrap">
-                {[{ num: "1", label: "Descreva" }, { num: "2", label: "IA aprimora" }, { num: "3", label: "Gera o post" }].map((s, i) => (
-                  <div key={s.num} className="flex items-center gap-2">
-                    {i > 0 && <div className="w-4 md:w-6 h-px bg-white/10" />}
-                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06]">
-                      <span className="w-5 h-5 rounded-full bg-gradient-to-r from-violet-500/30 to-pink-500/30 flex items-center justify-center text-[10px] font-bold text-violet-300">{s.num}</span>
-                      <span className="text-white/40 text-xs">{s.label}</span>
-                    </div>
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="pt-6 md:pt-12">
+              {/* Hero Card — Gerador de Posts */}
+              <div className="relative rounded-3xl border border-white/[0.08] bg-gradient-to-br from-violet-500/[0.06] via-transparent to-pink-500/[0.04] p-8 md:p-12 text-center mb-8 overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(139,92,246,0.08),transparent_60%)] pointer-events-none" />
+                <div className="relative z-10">
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 mb-5">
+                    <ImagePlus className="w-3.5 h-3.5 text-violet-400" />
+                    <span className="text-violet-300/80 text-xs font-medium">Gerador de Posts</span>
                   </div>
-                ))}
+                  <h2 className="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight" style={{ fontFamily: "'Sora', sans-serif" }}>
+                    Crie posts<br />
+                    <span className="bg-gradient-to-r from-violet-400 via-pink-400 to-orange-400 bg-clip-text text-transparent">profissionais com IA</span>
+                  </h2>
+                  <p className="text-white/35 text-sm md:text-base max-w-md mx-auto mb-8">Descreva → IA aprimora → Post pronto</p>
+                  <div className="flex items-center justify-center gap-3 md:gap-4 mb-2">
+                    {[{ num: "1", label: "Descreva", icon: "✍️" }, { num: "2", label: "IA aprimora", icon: "✨" }, { num: "3", label: "Post pronto", icon: "🎨" }].map((s, i) => (
+                      <div key={s.num} className="flex items-center gap-3">
+                        {i > 0 && <div className="w-6 md:w-10 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />}
+                        <div className="flex flex-col items-center gap-1">
+                          <span className="text-xl md:text-2xl">{s.icon}</span>
+                          <span className="text-white/30 text-[10px] md:text-xs">{s.label}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
-              <div className="mb-8">
-                <p className="text-white/25 text-xs font-medium uppercase tracking-wider mb-3">Exemplos rápidos</p>
+
+              {/* Exemplos rápidos */}
+              <div className="mb-6">
+                <p className="text-white/20 text-xs font-medium uppercase tracking-wider mb-3 text-center">Exemplos rápidos</p>
                 <div className="flex flex-wrap justify-center gap-2">
                   {SUGGESTIONS.map((s) => (
                     <button key={s.label} onClick={() => { setPrompt(s.prompt); handleGenerateCopy(s.prompt); }} className="group flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.08] hover:border-white/[0.15] text-white/60 hover:text-white text-sm transition-all duration-200">
@@ -313,7 +318,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
                   ))}
                 </div>
               </div>
-              <p className="text-white/15 text-sm">{remaining === Infinity ? "∞" : remaining} de {MAX_FREE_DAILY} criações disponíveis hoje</p>
+              <p className="text-white/15 text-xs text-center">{remaining === Infinity ? "∞" : remaining} de {MAX_FREE_DAILY} criações disponíveis hoje</p>
             </motion.div>
           )}
 
