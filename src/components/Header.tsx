@@ -11,6 +11,7 @@ const navLinks = [
   { label: "Investimento", href: "#investimento" },
   { label: "Trabalhe Conosco", href: "/trabalhe-conosco" },
   { label: "Quem Somos", href: "/quem-somos" },
+  { label: "IAs", href: "/ias", highlight: true },
 ];
 
 export default function Header() {
@@ -73,9 +74,12 @@ export default function Header() {
               key={l.href}
               onClick={() => handleNav(l.href)}
               className={`text-sm bg-transparent border-none cursor-pointer gentle-animation hover:scale-105 font-medium ${
-                useTransparent ? 'text-white/80 hover:text-white' : 'text-white/70 hover:text-white'
+                (l as any).highlight
+                  ? 'bg-gradient-to-r from-blue-500 to-violet-500 text-transparent bg-clip-text font-semibold hover:from-blue-400 hover:to-violet-400'
+                  : useTransparent ? 'text-white/80 hover:text-white' : 'text-white/70 hover:text-white'
               }`}
             >
+              {(l as any).highlight && <span className="mr-1">✨</span>}
               {l.label}
             </button>
           ))}

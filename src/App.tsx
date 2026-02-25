@@ -27,7 +27,9 @@ import AdminConteudo from "./pages/AdminConteudo";
 import PreviewSite from "./pages/PreviewSite";
 import PreviewLoja from "./pages/PreviewLoja";
 import AdminIAs from "./pages/AdminIAs";
-
+import AuthLogin from "./pages/AuthLogin";
+import AuthSignup from "./pages/AuthSignup";
+import IAs from "./pages/IAs";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +42,9 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/login" element={<AuthLogin />} />
+            <Route path="/cadastro" element={<AuthSignup />} />
+            <Route path="/ias" element={<IAs />} />
             <Route path="/projetos" element={<Projetos />} />
             <Route path="/preview-site" element={<PreviewSite />} />
             <Route path="/preview-loja" element={<PreviewLoja />} />
