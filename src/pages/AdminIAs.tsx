@@ -11,8 +11,13 @@ import ReactMarkdown from "react-markdown";
 import brandifyLogo from "@/assets/logo.jpg";
 import {
   Plus, Send, Trash2, MessageSquare, Image as ImageIcon, Bot, Sparkles, Loader2, ChevronLeft, ChevronRight, Paperclip, X,
-  Users, Crown, Mail, Clock, CreditCard, CheckCircle, XCircle,
+  Users, Crown, Mail, Clock, CreditCard, CheckCircle, XCircle, MoreVertical,
 } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 type Msg = { role: "user" | "assistant"; content: string; image_urls?: string[]; model_used?: string };
 type Conversation = { id: string; title: string; model: string; created_at: string; updated_at: string };
@@ -110,6 +115,13 @@ function SubscribersPanel() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "active" | "pending" | "free">("all");
   const [search, setSearch] = useState("");
+  const { toast } = useToast();
+
+  // Dialog state for adding/editing plan
+  const [planDialogOpen, setPlanDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserWithSub | null>(null);
+  const [planForm, setPlanForm] = useState({ plan: "pro", amount: "39.90", durationDays: "30" });
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     loadUsers();
@@ -133,6 +145,79 @@ function SubscribersPanel() {
       console.error("Failed to load users:", e);
     }
     setLoading(false);
+  };
+
+  const openPlanDialog = (user: UserWithSub) => {
+    setSelectedUser(user);
+    setPlanForm({
+      plan: user.subscription?.plan || "pro",
+      amount: user.subscription ? (user.subscription.amount_cents / 100).toFixed(2) : "39.90",
+      durationDays: "30",
+    });
+    setPlanDialogOpen(true);
+  };
+
+  const handleSavePlan = async () => {
+    if (!selectedUser) return;
+    setSaving(true);
+    try {
+      const amountCents = Math.round(parseFloat(planForm.amount.replace(",", ".")) * 100);
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + parseInt(planForm.durationDays));
+
+      // If user already has an active subscription, update it
+      if (selectedUser.subscription?.id) {
+        const { error } = await supabase
+          .from("subscriptions")
+          .update({
+            plan: planForm.plan,
+            amount_cents: amountCents,
+            status: "active",
+            paid_at: new Date().toISOString(),
+            expires_at: expiresAt.toISOString(),
+            payment_method: "manual",
+          })
+          .eq("id", selectedUser.subscription.id);
+        if (error) throw error;
+      } else {
+        // Create new subscription
+        const { error } = await supabase
+          .from("subscriptions")
+          .insert({
+            user_id: selectedUser.id,
+            plan: planForm.plan,
+            amount_cents: amountCents,
+            status: "active",
+            paid_at: new Date().toISOString(),
+            expires_at: expiresAt.toISOString(),
+            payment_method: "manual",
+          });
+        if (error) throw error;
+      }
+
+      toast({ title: "Plano adicionado!", description: `${PLAN_LABELS[planForm.plan] || planForm.plan} ativado para ${selectedUser.email}` });
+      setPlanDialogOpen(false);
+      loadUsers();
+    } catch (e: any) {
+      console.error("Save plan error:", e);
+      toast({ title: "Erro", description: e.message || "Falha ao salvar plano", variant: "destructive" });
+    }
+    setSaving(false);
+  };
+
+  const handleRemovePlan = async (user: UserWithSub) => {
+    if (!user.subscription?.id) return;
+    try {
+      const { error } = await supabase
+        .from("subscriptions")
+        .update({ status: "cancelled" })
+        .eq("id", user.subscription.id);
+      if (error) throw error;
+      toast({ title: "Plano removido", description: `Assinatura de ${user.email} cancelada` });
+      loadUsers();
+    } catch (e: any) {
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+    }
   };
 
   const filtered = users
@@ -240,6 +325,7 @@ function SubscribersPanel() {
                 <th className="text-left text-white/40 font-medium px-4 py-2.5 text-xs hidden md:table-cell">Expira em</th>
                 <th className="text-left text-white/40 font-medium px-4 py-2.5 text-xs hidden lg:table-cell">Último login</th>
                 <th className="text-left text-white/40 font-medium px-4 py-2.5 text-xs">Cadastro</th>
+                <th className="text-right text-white/40 font-medium px-4 py-2.5 text-xs w-10">Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -295,11 +381,32 @@ function SubscribersPanel() {
                   <td className="px-4 py-3 text-white/30 text-xs">
                     {new Date(u.created_at).toLocaleDateString("pt-BR")}
                   </td>
+                  <td className="px-4 py-3 text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="p-1 rounded-md hover:bg-white/[0.08] text-white/40 hover:text-white transition-colors">
+                          <MoreVertical className="w-4 h-4" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="bg-[#1a1a1a] border-white/10 text-white min-w-[160px]">
+                        <DropdownMenuItem onClick={() => openPlanDialog(u)} className="text-xs cursor-pointer hover:bg-white/[0.08]">
+                          <Crown className="w-3.5 h-3.5 mr-2 text-amber-400" />
+                          {u.subscription?.status === "active" ? "Editar Plano" : "Adicionar Plano"}
+                        </DropdownMenuItem>
+                        {u.subscription?.status === "active" && (
+                          <DropdownMenuItem onClick={() => handleRemovePlan(u)} className="text-xs cursor-pointer hover:bg-white/[0.08] text-red-400">
+                            <XCircle className="w-3.5 h-3.5 mr-2" />
+                            Remover Plano
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </td>
                 </tr>
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="text-center py-12 text-white/20 text-sm">
+                  <td colSpan={8} className="text-center py-12 text-white/20 text-sm">
                     {search ? "Nenhum resultado para a busca" : "Nenhum usuário cadastrado ainda"}
                   </td>
                 </tr>
@@ -308,6 +415,67 @@ function SubscribersPanel() {
           </table>
         </div>
       </div>
+
+      {/* Plan Assignment Dialog */}
+      <Dialog open={planDialogOpen} onOpenChange={setPlanDialogOpen}>
+        <DialogContent className="bg-[#1a1a1a] border-white/10 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-white">
+              {selectedUser?.subscription?.status === "active" ? "Editar Plano" : "Adicionar Plano"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <p className="text-xs text-white/40 mb-1">Usuário</p>
+              <p className="text-sm text-white font-medium">{selectedUser?.email}</p>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs text-white/60">Plano</Label>
+              <Select value={planForm.plan} onValueChange={(v) => setPlanForm(prev => ({ ...prev, plan: v }))}>
+                <SelectTrigger className="bg-white/[0.04] border-white/10 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-[#1a1a1a] border-white/10 text-white">
+                  <SelectItem value="basico">Básico</SelectItem>
+                  <SelectItem value="pro">Pro</SelectItem>
+                  <SelectItem value="premium">Premium</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs text-white/60">Valor (R$)</Label>
+              <Input
+                value={planForm.amount}
+                onChange={(e) => setPlanForm(prev => ({ ...prev, amount: e.target.value }))}
+                className="bg-white/[0.04] border-white/10 text-white"
+                placeholder="39.90"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs text-white/60">Duração (dias)</Label>
+              <Select value={planForm.durationDays} onValueChange={(v) => setPlanForm(prev => ({ ...prev, durationDays: v }))}>
+                <SelectTrigger className="bg-white/[0.04] border-white/10 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-[#1a1a1a] border-white/10 text-white">
+                  <SelectItem value="30">30 dias</SelectItem>
+                  <SelectItem value="90">90 dias</SelectItem>
+                  <SelectItem value="180">180 dias</SelectItem>
+                  <SelectItem value="365">1 ano</SelectItem>
+                  <SelectItem value="36500">Vitalício (~100 anos)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setPlanDialogOpen(false)} className="text-white/50">Cancelar</Button>
+            <Button onClick={handleSavePlan} disabled={saving} className="bg-amber-500 hover:bg-amber-600 text-black font-medium">
+              {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Crown className="w-4 h-4 mr-2" />}
+              {saving ? "Salvando..." : "Ativar Plano"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
