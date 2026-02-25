@@ -10,7 +10,7 @@ import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles, MessageSquare, ImagePlus, LogOut, ArrowLeft, Zap, Send,
-  Download, Loader2, Plus, Trash2, X, Image as ImageIcon,
+  Download, Loader2, Plus, Trash2, X, PenTool, Lightbulb, LayoutGrid,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import logo from "@/assets/logo.jpg";
@@ -22,51 +22,63 @@ type Conversation = { id: string; title: string; model: string; created_at: stri
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`;
 const IMAGE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-instagram-image`;
 
-// ── Post Generator Tab ──
+// ── Suggestion chips for post generator ──
+const POST_SUGGESTIONS = [
+  { icon: "🍕", label: "Restaurante delivery", prompt: "Post profissional para restaurante de delivery promovendo pratos do dia com foto realista" },
+  { icon: "💇", label: "Salão de beleza", prompt: "Post para salão de beleza divulgando promoção de corte e coloração no fim de semana" },
+  { icon: "🏋️", label: "Academia fitness", prompt: "Post motivacional para academia promovendo plano trimestral com desconto" },
+  { icon: "⚖️", label: "Escritório de advocacia", prompt: "Post editorial para escritório de advocacia sobre direitos trabalhistas" },
+  { icon: "🦷", label: "Clínica odontológica", prompt: "Post para clínica odontológica promovendo clareamento dental com antes e depois" },
+  { icon: "🏠", label: "Imobiliária", prompt: "Post elegante para imobiliária divulgando apartamento de luxo com vista para o mar" },
+];
+
+// ── Suggestion chips for chat ──
+const CHAT_SUGGESTIONS = [
+  { icon: "📝", label: "Criar legenda", prompt: "Crie uma legenda profissional para um post de Instagram de uma loja de roupas femininas" },
+  { icon: "📊", label: "Estratégia de marketing", prompt: "Monte uma estratégia de marketing digital para uma clínica médica que quer mais pacientes" },
+  { icon: "💡", label: "Ideias de conteúdo", prompt: "Me dê 10 ideias de posts para Instagram de um restaurante japonês" },
+  { icon: "📧", label: "Email marketing", prompt: "Escreva um email de boas-vindas para novos clientes de uma loja online de cosméticos" },
+];
+
+// ══════════════════════════════════════════════════
+// ██  POST GENERATOR TAB
+// ══════════════════════════════════════════════════
 function PostGenerator({ user }: { user: User }) {
   const { toast } = useToast();
   const [prompt, setPrompt] = useState("");
   const [postType, setPostType] = useState<"feed" | "story">("feed");
-  const [generatedImages, setGeneratedImages] = useState<{ url: string; prompt: string }[]>([]);
+  const [generatedImages, setGeneratedImages] = useState<{ url: string; prompt: string; type: string }[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [weeklyCount, setWeeklyCount] = useState(0);
   const MAX_WEEKLY = 5;
 
-  // Check weekly usage
   useEffect(() => {
-    const checkUsage = async () => {
-      const weekAgo = new Date();
-      weekAgo.setDate(weekAgo.getDate() - 7);
-      const stored = localStorage.getItem(`post_gen_${user.id}`);
-      if (stored) {
-        const data = JSON.parse(stored);
-        const validEntries = data.filter((d: string) => new Date(d) > weekAgo);
-        setWeeklyCount(validEntries.length);
-      }
-    };
-    checkUsage();
+    const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
+    const stored = localStorage.getItem(`post_gen_${user.id}`);
+    if (stored) {
+      const valid = JSON.parse(stored).filter((d: string) => new Date(d) > weekAgo);
+      setWeeklyCount(valid.length);
+    }
   }, [user.id]);
 
   const trackUsage = () => {
     const stored = localStorage.getItem(`post_gen_${user.id}`);
     const data = stored ? JSON.parse(stored) : [];
     data.push(new Date().toISOString());
-    const weekAgo = new Date();
-    weekAgo.setDate(weekAgo.getDate() - 7);
+    const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
     const filtered = data.filter((d: string) => new Date(d) > weekAgo);
     localStorage.setItem(`post_gen_${user.id}`, JSON.stringify(filtered));
     setWeeklyCount(filtered.length);
   };
 
-  const handleGenerate = async () => {
-    if (!prompt.trim()) {
-      toast({ title: "Descreva o que deseja", description: "Ex: Post para clínica odontológica sobre clareamento dental", variant: "destructive" });
-      return;
-    }
+  const handleGenerate = async (customPrompt?: string) => {
+    const text = (customPrompt || prompt).trim();
+    if (!text) return;
     if (weeklyCount >= MAX_WEEKLY) {
-      toast({ title: "Limite semanal atingido", description: `Você já usou ${MAX_WEEKLY} gerações esta semana. Tente novamente na próxima semana.`, variant: "destructive" });
+      toast({ title: "Limite semanal atingido", description: `Você usou ${MAX_WEEKLY}/${MAX_WEEKLY} gerações. Tente na próxima semana.`, variant: "destructive" });
       return;
     }
+    if (customPrompt) setPrompt(customPrompt);
     setIsGenerating(true);
     try {
       const session = (await supabase.auth.getSession()).data.session;
@@ -77,195 +89,246 @@ function PostGenerator({ user }: { user: User }) {
           apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
           Authorization: `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ prompt: prompt.trim(), type: postType }),
+        body: JSON.stringify({ prompt: text, type: postType }),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: "Erro desconhecido" }));
         throw new Error(err.error || `Erro ${res.status}`);
       }
       const data = await res.json();
-      if (data.imageUrl) {
-        setGeneratedImages((prev) => [{ url: data.imageUrl, prompt: prompt.trim() }, ...prev]);
-        trackUsage();
-        toast({ title: "Post gerado com sucesso! 🎨" });
-      } else {
-        throw new Error("Nenhuma imagem foi gerada");
-      }
+      if (!data.imageUrl) throw new Error("Nenhuma imagem gerada");
+      setGeneratedImages((prev) => [{ url: data.imageUrl, prompt: text, type: postType }, ...prev]);
+      trackUsage();
+      toast({ title: "Post gerado com sucesso! 🎨" });
     } catch (e: any) {
-      toast({ title: "Erro ao gerar", description: e.message, variant: "destructive" });
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const handleDownload = (url: string, index: number) => {
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `brandify-post-${index + 1}.png`;
-    a.click();
-  };
+  const remaining = MAX_WEEKLY - weeklyCount;
 
   return (
     <div className="flex flex-col h-full">
-      {/* Generator Input */}
-      <div className="p-4 md:p-6 border-b border-white/[0.06]">
-        <div className="max-w-3xl mx-auto space-y-4">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500/20 to-pink-500/20 flex items-center justify-center border border-white/10">
-              <ImagePlus className="w-5 h-5 text-violet-400" />
-            </div>
-            <div>
-              <h2 className="text-white font-semibold text-lg" style={{ fontFamily: "'Sora', sans-serif" }}>
-                Gerador de Posts
+      <ScrollArea className="flex-1">
+        <div className="max-w-4xl mx-auto px-4 md:px-8 py-8">
+          {/* Empty state / hero */}
+          {generatedImages.length === 0 && !isGenerating && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10 pt-8 md:pt-16">
+              <div className="relative inline-block mb-6">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-600/20 to-pink-600/20 flex items-center justify-center border border-violet-500/20 mx-auto">
+                  <ImagePlus className="w-10 h-10 text-violet-400" />
+                </div>
+                <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-gradient-to-r from-violet-500 to-pink-500 flex items-center justify-center">
+                  <Sparkles className="w-3 h-3 text-white" />
+                </div>
+              </div>
+              <h2 className="text-2xl md:text-3xl font-bold text-white mb-3" style={{ fontFamily: "'Sora', sans-serif" }}>
+                Crie posts profissionais com IA
               </h2>
-              <p className="text-white/40 text-xs">
-                {weeklyCount}/{MAX_WEEKLY} gerações usadas esta semana
+              <p className="text-white/40 text-base max-w-lg mx-auto mb-2">
+                Descreva o que precisa e nossa IA gera imagens de alta qualidade para Instagram e redes sociais.
               </p>
+              <p className="text-white/25 text-sm">
+                {remaining} de {MAX_WEEKLY} gerações disponíveis esta semana
+              </p>
+            </motion.div>
+          )}
+
+          {/* Generated images header */}
+          {generatedImages.length > 0 && (
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-white font-semibold text-lg" style={{ fontFamily: "'Sora', sans-serif" }}>
+                  Seus posts
+                </h3>
+                <p className="text-white/30 text-sm">{remaining} gerações restantes esta semana</p>
+              </div>
             </div>
-          </div>
+          )}
 
+          {/* Suggestion chips (only when empty) */}
+          {generatedImages.length === 0 && !isGenerating && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="mb-8"
+            >
+              <p className="text-white/30 text-xs font-medium uppercase tracking-wider mb-3 text-center">Comece com um exemplo</p>
+              <div className="flex flex-wrap justify-center gap-2">
+                {POST_SUGGESTIONS.map((s) => (
+                  <button
+                    key={s.label}
+                    onClick={() => handleGenerate(s.prompt)}
+                    className="group flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.08] hover:border-white/[0.15] text-white/60 hover:text-white text-sm transition-all duration-200"
+                  >
+                    <span className="text-base">{s.icon}</span>
+                    <span>{s.label}</span>
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Loading state */}
+          {isGenerating && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex flex-col items-center py-16 mb-6"
+            >
+              <div className="relative mb-6">
+                <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-violet-600/10 to-pink-600/10 border border-violet-500/20 flex items-center justify-center">
+                  <Loader2 className="w-10 h-10 text-violet-400 animate-spin" />
+                </div>
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-violet-500/5 to-pink-500/5 animate-pulse" />
+              </div>
+              <h3 className="text-white font-medium text-lg mb-2" style={{ fontFamily: "'Sora', sans-serif" }}>
+                Gerando seu post...
+              </h3>
+              <p className="text-white/30 text-sm">Isso pode levar até 30 segundos</p>
+              <div className="mt-4 w-48 h-1 rounded-full bg-white/[0.06] overflow-hidden">
+                <motion.div
+                  className="h-full rounded-full bg-gradient-to-r from-violet-500 to-pink-500"
+                  initial={{ width: "0%" }}
+                  animate={{ width: "90%" }}
+                  transition={{ duration: 25, ease: "easeOut" }}
+                />
+              </div>
+            </motion.div>
+          )}
+
+          {/* Image grid */}
+          {generatedImages.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <AnimatePresence>
+                {generatedImages.map((img, i) => (
+                  <motion.div
+                    key={`${img.prompt}-${i}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    className="group relative rounded-2xl overflow-hidden border border-white/[0.08] bg-white/[0.02] hover:border-white/[0.15] transition-all duration-300"
+                  >
+                    <img src={img.url} alt={img.prompt} className="w-full object-cover" loading="lazy" />
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-5">
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] uppercase tracking-wider text-white/40 font-medium px-2 py-0.5 rounded-md bg-white/10">
+                            {img.type === "feed" ? "Feed 1:1" : "Story 9:16"}
+                          </span>
+                        </div>
+                        <p className="text-white/70 text-xs line-clamp-2">{img.prompt}</p>
+                        <Button
+                          onClick={() => {
+                            const a = document.createElement("a");
+                            a.href = img.url;
+                            a.download = `brandify-post-${i + 1}.png`;
+                            a.click();
+                          }}
+                          size="sm"
+                          className="w-fit bg-white text-black hover:bg-white/90 border-0 text-xs font-medium h-8 px-4"
+                        >
+                          <Download className="w-3.5 h-3.5 mr-1.5" />
+                          Baixar imagem
+                        </Button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          )}
+        </div>
+      </ScrollArea>
+
+      {/* Bottom input bar */}
+      <div className="shrink-0 border-t border-white/[0.06] bg-[#0a0a0f]/80 backdrop-blur-xl">
+        <div className="max-w-4xl mx-auto px-4 md:px-8 py-4">
           {/* Format selector */}
-          <div className="flex gap-2">
-            <button
-              onClick={() => setPostType("feed")}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                postType === "feed"
-                  ? "bg-white/10 text-white border border-white/20"
-                  : "text-white/40 hover:text-white/60 border border-transparent"
-              }`}
-            >
-              📐 Feed (1:1)
-            </button>
-            <button
-              onClick={() => setPostType("story")}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                postType === "story"
-                  ? "bg-white/10 text-white border border-white/20"
-                  : "text-white/40 hover:text-white/60 border border-transparent"
-              }`}
-            >
-              📱 Story (9:16)
-            </button>
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-white/30 text-xs font-medium mr-1">Formato:</span>
+            {[
+              { value: "feed" as const, label: "Feed (1:1)", icon: "📐" },
+              { value: "story" as const, label: "Story (9:16)", icon: "📱" },
+            ].map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setPostType(opt.value)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                  postType === opt.value
+                    ? "bg-violet-500/20 text-violet-300 border border-violet-500/30"
+                    : "text-white/30 hover:text-white/50 border border-transparent hover:bg-white/[0.04]"
+                }`}
+              >
+                {opt.icon} {opt.label}
+              </button>
+            ))}
           </div>
 
-          {/* Prompt input */}
+          {/* Input */}
           <div className="relative">
             <Textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Descreva o post que deseja... Ex: Post para restaurante japonês promovendo rodízio de sushi no fim de semana"
-              className="min-h-[100px] bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/30 resize-none rounded-xl pr-14 focus:border-violet-500/50 focus:ring-violet-500/20"
+              placeholder="Descreva o post que deseja criar..."
+              className="min-h-[56px] max-h-[120px] bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/25 resize-none rounded-xl pr-14 text-sm focus:border-violet-500/40 focus:ring-1 focus:ring-violet-500/20"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleGenerate(); }
               }}
             />
             <Button
-              onClick={handleGenerate}
+              onClick={() => handleGenerate()}
               disabled={isGenerating || !prompt.trim() || weeklyCount >= MAX_WEEKLY}
-              className="absolute bottom-3 right-3 h-10 w-10 p-0 rounded-lg bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 border-0"
+              className="absolute bottom-2.5 right-2.5 h-9 w-9 p-0 rounded-lg bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 border-0 shadow-lg shadow-violet-500/20 disabled:shadow-none"
             >
               {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
             </Button>
           </div>
-
-          {isGenerating && (
-            <motion.div
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl bg-violet-500/[0.08] border border-violet-500/20"
-            >
-              <Loader2 className="w-4 h-4 text-violet-400 animate-spin" />
-              <span className="text-violet-300 text-sm">Gerando seu post com IA... pode levar até 30 segundos</span>
-            </motion.div>
-          )}
         </div>
       </div>
-
-      {/* Generated Images Grid */}
-      <ScrollArea className="flex-1">
-        <div className="p-4 md:p-6">
-          <div className="max-w-3xl mx-auto">
-            {generatedImages.length === 0 && !isGenerating ? (
-              <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="w-20 h-20 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center mb-6">
-                  <ImagePlus className="w-10 h-10 text-white/20" />
-                </div>
-                <h3 className="text-white/50 font-medium text-lg mb-2" style={{ fontFamily: "'Sora', sans-serif" }}>
-                  Nenhum post gerado ainda
-                </h3>
-                <p className="text-white/30 text-sm max-w-md">
-                  Descreva o tipo de post que você quer e nossa IA vai criar uma imagem profissional para suas redes sociais.
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <AnimatePresence>
-                  {generatedImages.map((img, i) => (
-                    <motion.div
-                      key={`${img.prompt}-${i}`}
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="group relative rounded-xl overflow-hidden border border-white/[0.08] bg-white/[0.02]"
-                    >
-                      <img
-                        src={img.url}
-                        alt={img.prompt}
-                        className="w-full object-cover"
-                        loading="lazy"
-                      />
-                      {/* Overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                        <p className="text-white/80 text-xs line-clamp-2 mb-3">{img.prompt}</p>
-                        <Button
-                          onClick={() => handleDownload(img.url, i)}
-                          size="sm"
-                          className="w-fit bg-white/20 hover:bg-white/30 backdrop-blur-sm border-0 text-white text-xs"
-                        >
-                          <Download className="w-3.5 h-3.5 mr-1.5" />
-                          Baixar
-                        </Button>
-                      </div>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </div>
-            )}
-          </div>
-        </div>
-      </ScrollArea>
     </div>
   );
 }
 
-// ── Chat Bubble ──
+// ══════════════════════════════════════════════════
+// ██  CHAT TAB
+// ══════════════════════════════════════════════════
 const ChatBubble = memo(({ msg }: { msg: Msg }) => (
-  <div className={`flex gap-3 ${msg.role === "user" ? "justify-end" : ""}`}>
+  <div className={`flex gap-3 ${msg.role === "user" ? "justify-end" : ""} mb-5`}>
     {msg.role === "assistant" && (
-      <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 mt-1">
+      <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 mt-0.5 ring-1 ring-white/10">
         <img src={logo} alt="Brandify" className="w-full h-full object-cover" />
       </div>
     )}
-    <div className={`max-w-[85%] md:max-w-[75%] ${
+    <div className={`max-w-[80%] md:max-w-[70%] ${
       msg.role === "user"
-        ? "bg-blue-600/20 border border-blue-500/20 rounded-2xl rounded-tr-md px-4 py-3"
-        : "bg-white/[0.03] border border-white/[0.06] rounded-2xl rounded-tl-md px-4 py-3"
+        ? "bg-blue-600/15 border border-blue-500/15 rounded-2xl rounded-tr-sm px-4 py-3"
+        : "bg-white/[0.03] border border-white/[0.06] rounded-2xl rounded-tl-sm px-4 py-3"
     }`}>
       {msg.image_urls && msg.image_urls.length > 0 && (
-        <div className="mb-3 space-y-2">
+        <div className="mb-3">
           {msg.image_urls.map((url, j) => (
-            <img key={j} src={url} alt="" className="rounded-xl max-w-full max-h-96 object-contain" />
+            <img key={j} src={url} alt="" className="rounded-xl max-w-full max-h-80 object-contain" />
           ))}
         </div>
       )}
-      <div className="text-sm text-white/90 leading-relaxed prose prose-invert prose-sm max-w-none">
+      <div className="text-[13px] text-white/85 leading-relaxed prose prose-invert prose-sm max-w-none [&_p]:my-1 [&_ul]:my-1 [&_ol]:my-1 [&_li]:my-0.5 [&_h1]:text-base [&_h2]:text-sm [&_h3]:text-sm [&_code]:text-xs [&_code]:bg-white/10 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_pre]:bg-white/[0.05] [&_pre]:rounded-lg [&_pre]:p-3">
         <ReactMarkdown>{msg.content}</ReactMarkdown>
       </div>
     </div>
+    {msg.role === "user" && (
+      <div className="w-8 h-8 rounded-lg shrink-0 mt-0.5 bg-gradient-to-br from-blue-600/30 to-cyan-600/30 border border-blue-500/20 flex items-center justify-center">
+        <span className="text-xs font-medium text-blue-300">Eu</span>
+      </div>
+    )}
   </div>
 ));
 ChatBubble.displayName = "ChatBubble";
 
-// ── Chat Tab ──
 function ChatTab({ user }: { user: User }) {
   const { toast } = useToast();
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -292,9 +355,7 @@ function ChatTab({ user }: { user: User }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  useEffect(() => {
-    loadConversations();
-  }, [user]);
+  useEffect(() => { loadConversations(); }, [user]);
 
   const loadConversations = async () => {
     const { data } = await supabase
@@ -317,8 +378,8 @@ function ChatTab({ user }: { user: User }) {
     })();
   }, [activeConvId]);
 
-  const handleSend = useCallback(async () => {
-    const text = input.trim();
+  const handleSend = useCallback(async (customPrompt?: string) => {
+    const text = (customPrompt || input).trim();
     if (!text || isLoading) return;
     setInput("");
     setIsLoading(true);
@@ -416,7 +477,8 @@ function ChatTab({ user }: { user: User }) {
       {conversations.length > 0 && (
         <button
           onClick={() => setShowSidebar(!showSidebar)}
-          className="absolute top-3 left-3 z-20 p-2 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-white/40 hover:text-white transition-all"
+          className="absolute top-3 left-3 z-20 p-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-white/30 hover:text-white/60 transition-all"
+          title="Histórico de conversas"
         >
           <MessageSquare className="w-4 h-4" />
         </button>
@@ -426,36 +488,39 @@ function ChatTab({ user }: { user: User }) {
       <AnimatePresence>
         {showSidebar && (
           <>
-            <div className="fixed inset-0 bg-black/50 z-30 md:hidden" onClick={() => setShowSidebar(false)} />
+            <div className="fixed inset-0 bg-black/60 z-30" onClick={() => setShowSidebar(false)} />
             <motion.div
-              initial={{ x: -260 }}
+              initial={{ x: -280 }}
               animate={{ x: 0 }}
-              exit={{ x: -260 }}
-              className="absolute left-0 top-0 bottom-0 w-64 z-40 bg-[#0a0a0f] border-r border-white/[0.06] flex flex-col"
+              exit={{ x: -280 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="absolute left-0 top-0 bottom-0 w-72 z-40 bg-[#0a0a0f] border-r border-white/[0.06] flex flex-col"
             >
               <div className="p-3 border-b border-white/[0.06] flex items-center gap-2">
-                <Button onClick={startNew} size="sm" variant="outline" className="flex-1 gap-2 bg-white/[0.05] hover:bg-white/[0.1] text-white border-white/[0.1]">
+                <Button onClick={startNew} size="sm" variant="outline" className="flex-1 gap-2 bg-white/[0.04] hover:bg-white/[0.08] text-white/70 border-white/[0.08]">
                   <Plus className="w-4 h-4" /> Nova conversa
                 </Button>
-                <button onClick={() => setShowSidebar(false)} className="text-white/40 hover:text-white p-1">
+                <button onClick={() => setShowSidebar(false)} className="text-white/30 hover:text-white p-1.5 rounded-lg hover:bg-white/[0.06]">
                   <X className="w-4 h-4" />
                 </button>
               </div>
               <ScrollArea className="flex-1">
-                <div className="p-2 space-y-1">
+                <div className="p-2 space-y-0.5">
                   {conversations.map((c) => (
                     <div
                       key={c.id}
-                      className={`group flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer text-sm ${
-                        activeConvId === c.id ? "bg-white/[0.08] text-white" : "text-white/50 hover:bg-white/[0.04]"
+                      className={`group flex items-center gap-2.5 px-3 py-2.5 rounded-lg cursor-pointer text-sm transition-all ${
+                        activeConvId === c.id
+                          ? "bg-white/[0.08] text-white"
+                          : "text-white/40 hover:bg-white/[0.04] hover:text-white/60"
                       }`}
                       onClick={() => { setActiveConvId(c.id); setShowSidebar(false); }}
                     >
-                      <MessageSquare className="w-3.5 h-3.5 shrink-0" />
+                      <MessageSquare className="w-3.5 h-3.5 shrink-0 opacity-50" />
                       <span className="truncate flex-1">{c.title}</span>
                       <button
                         onClick={(e) => { e.stopPropagation(); deleteConv(c.id); }}
-                        className="opacity-0 group-hover:opacity-100 text-white/30 hover:text-red-400"
+                        className="opacity-0 group-hover:opacity-100 text-white/20 hover:text-red-400 p-0.5"
                       >
                         <Trash2 className="w-3 h-3" />
                       </button>
@@ -468,33 +533,75 @@ function ChatTab({ user }: { user: User }) {
         )}
       </AnimatePresence>
 
-      {/* Chat area */}
+      {/* Chat main */}
       <div className="flex-1 flex flex-col">
         <ScrollArea className="flex-1">
-          <div className="max-w-3xl mx-auto p-4 md:p-6 space-y-4">
+          <div className="max-w-3xl mx-auto px-4 md:px-8 py-6">
             {messages.length === 0 && !streamingContent ? (
-              <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="w-16 h-16 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center mb-6">
-                  <MessageSquare className="w-8 h-8 text-white/20" />
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col items-center pt-12 md:pt-20"
+              >
+                {/* Logo avatar */}
+                <div className="relative mb-6">
+                  <div className="w-20 h-20 rounded-2xl overflow-hidden ring-2 ring-white/10 shadow-2xl">
+                    <img src={logo} alt="Brandify" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center ring-2 ring-[#050508]">
+                    <Sparkles className="w-3.5 h-3.5 text-white" />
+                  </div>
                 </div>
-                <h3 className="text-white/50 font-medium text-lg mb-2" style={{ fontFamily: "'Sora', sans-serif" }}>
-                  Chat com IA
-                </h3>
-                <p className="text-white/30 text-sm max-w-md">
-                  Tire dúvidas, gere textos, crie estratégias de marketing e muito mais. Uso ilimitado.
+
+                <h2 className="text-2xl md:text-3xl font-bold text-white mb-3" style={{ fontFamily: "'Sora', sans-serif" }}>
+                  Como posso ajudar?
+                </h2>
+                <p className="text-white/35 text-sm text-center max-w-md mb-10">
+                  Sou o assistente da Brandify. Posso criar textos, legendas, estratégias de marketing e responder qualquer dúvida.
                 </p>
-              </div>
+
+                {/* Suggestion grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
+                  {CHAT_SUGGESTIONS.map((s) => (
+                    <button
+                      key={s.label}
+                      onClick={() => handleSend(s.prompt)}
+                      className="group flex items-start gap-3 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.07] hover:border-white/[0.15] text-left transition-all duration-200"
+                    >
+                      <span className="text-xl mt-0.5">{s.icon}</span>
+                      <div>
+                        <span className="text-white/70 group-hover:text-white text-sm font-medium block">{s.label}</span>
+                        <span className="text-white/25 text-xs line-clamp-1 mt-0.5">{s.prompt.slice(0, 50)}...</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
             ) : (
               <>
                 {messages.map((msg, i) => <ChatBubble key={i} msg={msg} />)}
                 {streamingContent && (
-                  <div className="flex gap-3">
-                    <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 mt-1">
+                  <div className="flex gap-3 mb-5">
+                    <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 mt-0.5 ring-1 ring-white/10">
                       <img src={logo} alt="Brandify" className="w-full h-full object-cover" />
                     </div>
-                    <div className="max-w-[85%] bg-white/[0.03] border border-white/[0.06] rounded-2xl rounded-tl-md px-4 py-3">
-                      <div className="text-sm text-white/90 leading-relaxed prose prose-invert prose-sm max-w-none">
+                    <div className="max-w-[80%] md:max-w-[70%] bg-white/[0.03] border border-white/[0.06] rounded-2xl rounded-tl-sm px-4 py-3">
+                      <div className="text-[13px] text-white/85 leading-relaxed prose prose-invert prose-sm max-w-none">
                         <ReactMarkdown>{streamingContent}</ReactMarkdown>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {isLoading && !streamingContent && (
+                  <div className="flex gap-3 mb-5">
+                    <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 mt-0.5 ring-1 ring-white/10">
+                      <img src={logo} alt="Brandify" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl rounded-tl-sm px-4 py-4">
+                      <div className="flex gap-1.5">
+                        <div className="w-2 h-2 rounded-full bg-white/20 animate-bounce" style={{ animationDelay: "0ms" }} />
+                        <div className="w-2 h-2 rounded-full bg-white/20 animate-bounce" style={{ animationDelay: "150ms" }} />
+                        <div className="w-2 h-2 rounded-full bg-white/20 animate-bounce" style={{ animationDelay: "300ms" }} />
                       </div>
                     </div>
                   </div>
@@ -506,24 +613,29 @@ function ChatTab({ user }: { user: User }) {
         </ScrollArea>
 
         {/* Input */}
-        <div className="p-4 border-t border-white/[0.06]">
-          <div className="max-w-3xl mx-auto relative">
-            <Textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Digite sua mensagem..."
-              className="min-h-[52px] max-h-[150px] bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/30 resize-none rounded-xl pr-14 focus:border-blue-500/50"
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
-              }}
-            />
-            <Button
-              onClick={handleSend}
-              disabled={isLoading || !input.trim()}
-              className="absolute bottom-2 right-2 h-9 w-9 p-0 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 border-0"
-            >
-              {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-            </Button>
+        <div className="shrink-0 border-t border-white/[0.06] bg-[#0a0a0f]/80 backdrop-blur-xl">
+          <div className="max-w-3xl mx-auto px-4 md:px-8 py-4">
+            <div className="relative">
+              <Textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Digite sua mensagem..."
+                className="min-h-[52px] max-h-[150px] bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/25 resize-none rounded-xl pr-14 text-sm focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
+                }}
+              />
+              <Button
+                onClick={() => handleSend()}
+                disabled={isLoading || !input.trim()}
+                className="absolute bottom-2.5 right-2.5 h-9 w-9 p-0 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 border-0 shadow-lg shadow-blue-500/20 disabled:shadow-none"
+              >
+                {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+              </Button>
+            </div>
+            <p className="text-white/15 text-[10px] text-center mt-2">
+              Powered by Brandify AI · Respostas podem conter imprecisões
+            </p>
           </div>
         </div>
       </div>
@@ -531,7 +643,9 @@ function ChatTab({ user }: { user: User }) {
   );
 }
 
-// ── Main Page ──
+// ══════════════════════════════════════════════════
+// ██  MAIN PAGE
+// ══════════════════════════════════════════════════
 export default function IAs() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -565,26 +679,27 @@ export default function IAs() {
     return (
       <div className="min-h-screen bg-[#050508] flex items-center justify-center px-4 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/3 left-1/3 w-[500px] h-[500px] bg-violet-600/5 rounded-full blur-[150px]" />
+          <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-violet-600/[0.04] rounded-full blur-[200px]" />
+          <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-blue-600/[0.03] rounded-full blur-[150px]" />
         </div>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center relative z-10 max-w-lg">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-6 border border-white/10">
-            <Sparkles className="w-10 h-10 text-violet-400" />
+        <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="text-center relative z-10 max-w-lg">
+          <div className="w-20 h-20 rounded-2xl overflow-hidden ring-2 ring-white/10 mx-auto mb-6 shadow-2xl">
+            <img src={logo} alt="Brandify" className="w-full h-full object-cover" />
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4" style={{ fontFamily: "'Sora', sans-serif" }}>
-            Ferramentas de IA
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-3" style={{ fontFamily: "'Sora', sans-serif" }}>
+            IA Studio
           </h1>
-          <p className="text-white/50 text-lg mb-8">
-            Crie posts profissionais para suas redes sociais com inteligência artificial. Faça login para começar.
+          <p className="text-white/40 text-lg mb-8">
+            Crie posts profissionais e converse com IA. Tudo gratuito.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link to="/login">
-              <Button className="h-12 px-8 bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 text-white border-0 font-semibold text-base">
+              <Button className="h-12 px-8 bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 text-white border-0 font-semibold text-base shadow-lg shadow-violet-500/20">
                 <Zap className="w-5 h-5 mr-2" /> Entrar
               </Button>
             </Link>
             <Link to="/cadastro">
-              <Button variant="outline" className="h-12 px-8 bg-white/[0.05] border-white/[0.1] text-white hover:bg-white/[0.1] font-semibold text-base">
+              <Button variant="outline" className="h-12 px-8 bg-white/[0.04] border-white/[0.08] text-white hover:bg-white/[0.08] font-semibold text-base">
                 Criar conta grátis
               </Button>
             </Link>
@@ -601,41 +716,43 @@ export default function IAs() {
         <div className="flex items-center justify-between h-14 px-4 md:px-6">
           <div className="flex items-center gap-3">
             <Link to="/">
-              <img src={logo} alt="Brandify" className="h-8 w-8 rounded-full ring-1 ring-white/20" />
+              <div className="w-8 h-8 rounded-lg overflow-hidden ring-1 ring-white/15">
+                <img src={logo} alt="Brandify" className="w-full h-full object-cover" />
+              </div>
             </Link>
-            <div className="h-5 w-px bg-white/10" />
+            <div className="h-5 w-px bg-white/[0.08]" />
             <span className="text-white font-semibold text-sm flex items-center gap-1.5" style={{ fontFamily: "'Sora', sans-serif" }}>
-              <Sparkles className="w-4 h-4 text-violet-400" />
+              <Sparkles className="w-3.5 h-3.5 text-violet-400" />
               IA Studio
             </span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <Link to="/">
-              <Button variant="ghost" size="sm" className="text-white/40 hover:text-white hover:bg-white/[0.05] text-xs">
+              <Button variant="ghost" size="sm" className="text-white/30 hover:text-white hover:bg-white/[0.05] text-xs h-8">
                 <ArrowLeft className="w-3.5 h-3.5 mr-1" /> Voltar
               </Button>
             </Link>
-            <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-white/40 hover:text-white hover:bg-white/[0.05] text-xs">
+            <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-white/30 hover:text-white hover:bg-white/[0.05] text-xs h-8">
               <LogOut className="w-3.5 h-3.5 mr-1" /> Sair
             </Button>
           </div>
         </div>
       </header>
 
-      {/* Content with Tabs */}
+      {/* Tabs */}
       <Tabs defaultValue="posts" className="flex-1 flex flex-col overflow-hidden">
         <div className="shrink-0 border-b border-white/[0.06] px-4 md:px-6">
-          <TabsList className="bg-transparent h-11 p-0 gap-4">
+          <TabsList className="bg-transparent h-10 p-0 gap-6">
             <TabsTrigger
               value="posts"
-              className="bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-white data-[state=active]:shadow-none text-white/40 hover:text-white/60 rounded-none border-b-2 border-transparent data-[state=active]:border-violet-500 px-1 pb-3 pt-2 text-sm font-medium transition-all"
+              className="bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-white data-[state=active]:shadow-none text-white/30 hover:text-white/50 rounded-none border-b-2 border-transparent data-[state=active]:border-violet-500 px-0 pb-2.5 pt-2 text-sm font-medium transition-all"
             >
               <ImagePlus className="w-4 h-4 mr-2" />
               Gerador de Posts
             </TabsTrigger>
             <TabsTrigger
               value="chat"
-              className="bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-white data-[state=active]:shadow-none text-white/40 hover:text-white/60 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-1 pb-3 pt-2 text-sm font-medium transition-all"
+              className="bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-white data-[state=active]:shadow-none text-white/30 hover:text-white/50 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-0 pb-2.5 pt-2 text-sm font-medium transition-all"
             >
               <MessageSquare className="w-4 h-4 mr-2" />
               Chat com IA
