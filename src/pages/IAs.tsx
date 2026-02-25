@@ -125,13 +125,13 @@ function PostGenerator({ user }: { user: User }) {
                 </div>
               </div>
               <h2 className="text-2xl md:text-3xl font-bold text-white mb-3" style={{ fontFamily: "'Sora', sans-serif" }}>
-                Crie posts profissionais com IA
+                Escreva. A IA cria. Seu post fica <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">profissional.</span>
               </h2>
               <p className="text-white/40 text-base max-w-lg mx-auto mb-2">
-                Descreva o que precisa e nossa IA gera imagens de alta qualidade para Instagram e redes sociais.
+                Com o nosso toque de IA, seu post se torna moderno e impactante — sem precisar de designer caro. Descreva a ideia e veja a mágica acontecer.
               </p>
               <p className="text-white/25 text-sm">
-                {remaining} de {MAX_WEEKLY} gerações disponíveis esta semana
+                {remaining} de {MAX_WEEKLY} criações disponíveis esta semana
               </p>
             </motion.div>
           )}
@@ -156,7 +156,7 @@ function PostGenerator({ user }: { user: User }) {
               transition={{ delay: 0.2 }}
               className="mb-8"
             >
-              <p className="text-white/30 text-xs font-medium uppercase tracking-wider mb-3 text-center">Comece com um exemplo</p>
+              <p className="text-white/30 text-xs font-medium uppercase tracking-wider mb-3 text-center">Ou escolha um nicho e veja o resultado</p>
               <div className="flex flex-wrap justify-center gap-2">
                 {POST_SUGGESTIONS.map((s) => (
                   <button
@@ -274,7 +274,7 @@ function PostGenerator({ user }: { user: User }) {
             <Textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Descreva o post que deseja criar..."
+              placeholder="Descreva o post dos seus sonhos — a IA transforma em realidade ✨"
               className="min-h-[56px] max-h-[120px] bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/25 resize-none rounded-xl pr-14 text-sm focus:border-violet-500/40 focus:ring-1 focus:ring-violet-500/20"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleGenerate(); }
