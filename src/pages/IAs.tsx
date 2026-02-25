@@ -160,12 +160,7 @@ function PostGenerator({ user }: { user: User }) {
       if (!data.imageUrl) throw new Error("Nenhuma imagem gerada");
       setGeneratedImages((prev) => [{ url: data.imageUrl, prompt, type: postType, copy: generatedCopy }, ...prev]);
       trackUsage();
-      toast({ title: "Post criado com sucesso! 🎨" });
-      setStep("describe");
-      setPrompt("");
-      setGeneratedCopy("");
       removeReference();
-      trackUsage();
       toast({ title: "Post criado com sucesso! 🎨" });
       setStep("describe");
       setPrompt("");
