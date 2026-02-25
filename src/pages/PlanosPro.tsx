@@ -12,7 +12,7 @@ const features = [
   "Criações ilimitadas de posts",
   "Chat com IA ilimitado",
   "Histórico de conversas salvo",
-  "Acesso a todos os modelos visuais (18+)",
+  "Acesso a todos os modelos visuais",
   "Geração de imagens em alta resolução",
   "Suporte prioritário",
   "Novos modelos visuais todo mês",
@@ -131,7 +131,7 @@ export default function PlanosPro() {
         >
           <div className="flex items-baseline gap-1 mb-6 justify-center">
             <span className="text-white/40 text-lg">R$</span>
-            <span className="text-5xl font-black text-white" style={{ fontFamily: "'Sora', sans-serif" }}>39</span>
+            <span className="text-5xl font-black text-white" style={{ fontFamily: "'Sora', sans-serif" }}>49</span>
             <span className="text-2xl font-bold text-white">,90</span>
             <span className="text-white/30 text-sm ml-1">/mês</span>
           </div>
