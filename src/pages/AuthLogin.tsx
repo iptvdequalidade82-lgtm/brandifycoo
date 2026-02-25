@@ -76,7 +76,7 @@ const AuthLogin = () => {
             <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500/20 to-violet-500/20 flex items-center justify-center mx-auto mb-4 border border-white/10">
               <Sparkles className="w-7 h-7 text-blue-400" />
             </div>
-            <h1 className="text-2xl font-bold text-white" style={{ fontFamily: "'Sora', sans-serif" }}>Entrar nas IAs</h1>
+            <h1 className="text-2xl font-bold text-white" style={{ fontFamily: "'Sora', sans-serif" }}>Faça login</h1>
             <p className="text-white/50 text-sm mt-2">Acesse as ferramentas de IA da Brandify</p>
           </div>
 
