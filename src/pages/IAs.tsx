@@ -481,6 +481,27 @@ const ChatBubble = memo(({ msg }: { msg: Msg }) => (
 ));
 ChatBubble.displayName = "ChatBubble";
 
+// Keywords that trigger image generation on the frontend
+const IMAGE_KEYWORDS_CHAT = [
+  "gerar imagem", "gere uma imagem", "crie uma imagem", "criar imagem",
+  "gerar foto", "crie uma foto", "criar foto",
+  "gerar logo", "crie um logo", "criar logo", "crie uma logo",
+  "gerar arte", "crie uma arte", "criar arte",
+  "gerar ilustração", "crie uma ilustração",
+  "gerar banner", "crie um banner", "criar banner",
+  "gerar post", "crie um post visual",
+  "editar imagem", "edite essa imagem", "editar essa foto",
+  "modifique essa imagem", "altere essa imagem",
+  "recrie essa imagem", "recriar imagem", "refazer imagem",
+  "transforme essa imagem", "melhore essa imagem",
+  "desenhe", "desenhar", "ilustre", "ilustrar",
+];
+
+function detectImageIntentChat(text: string): boolean {
+  const lower = text.toLowerCase();
+  return IMAGE_KEYWORDS_CHAT.some((kw) => lower.includes(kw));
+}
+
 function ChatTab({ user }: { user: User }) {
   const { toast } = useToast();
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -490,8 +511,12 @@ function ChatTab({ user }: { user: User }) {
   const [isLoading, setIsLoading] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");
   const [showSidebar, setShowSidebar] = useState(false);
+  const [chatAttachment, setChatAttachment] = useState<string | null>(null);
+  const [chatAttachmentPreview, setChatAttachmentPreview] = useState<string | null>(null);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const tokenRef = useRef<string | null>(null);
+  const chatFileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -530,19 +555,45 @@ function ChatTab({ user }: { user: User }) {
     })();
   }, [activeConvId]);
 
+  const handleChatFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      toast({ title: "Arquivo muito grande", description: "Máximo 10MB", variant: "destructive" });
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      setChatAttachment(result);
+      setChatAttachmentPreview(result);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
+  const removeChatAttachment = () => {
+    setChatAttachment(null);
+    setChatAttachmentPreview(null);
+  };
+
   const handleSend = useCallback(async (customPrompt?: string) => {
     const text = (customPrompt || input).trim();
-    if (!text || isLoading) return;
+    if ((!text && !chatAttachment) || isLoading) return;
     setInput("");
     setIsLoading(true);
     setStreamingContent("");
+
+    const currentAttachment = chatAttachment;
+    setChatAttachment(null);
+    setChatAttachmentPreview(null);
 
     try {
       let convId = activeConvId;
       if (!convId) {
         const { data, error } = await supabase
           .from("ai_conversations")
-          .insert({ user_id: user.id, title: text.slice(0, 60), model: "auto" })
+          .insert({ user_id: user.id, title: text.slice(0, 60) || "Imagem", model: "auto" })
           .select()
           .single();
         if (error) throw error;
@@ -551,55 +602,124 @@ function ChatTab({ user }: { user: User }) {
         setActiveConvId(convId);
       }
 
-      const userMsg: Msg = { role: "user", content: text };
+      // Build user message with optional image
+      const userMsg: Msg = { role: "user", content: text, image_urls: currentAttachment ? [currentAttachment] : [] };
       setMessages((prev) => [...prev, userMsg]);
-      supabase.from("ai_messages").insert({ conversation_id: convId, role: "user", content: text });
-
-      const apiMessages = [...messages, userMsg].map((m) => ({ role: m.role, content: m.content }));
-      const token = tokenRef.current;
-      const resp = await fetch(CHAT_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-        },
-        body: JSON.stringify({ messages: apiMessages, model: "auto", conversationId: convId }),
+      supabase.from("ai_messages").insert({
+        conversation_id: convId, role: "user", content: text,
+        image_urls: currentAttachment ? [currentAttachment.slice(0, 100) + "...(base64)"] : null,
       });
 
-      if (!resp.ok) {
-        const err = await resp.json().catch(() => ({ error: "Erro" }));
-        throw new Error(err.error || `Erro ${resp.status}`);
-      }
+      // Determine if this is an image generation request
+      const wantsImage = detectImageIntentChat(text);
 
-      const reader = resp.body!.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
-      let full = "";
+      // Build API message content (multimodal if attachment present)
+      const buildContent = (msgText: string, imgData?: string | null) => {
+        if (!imgData) return msgText;
+        return [
+          { type: "text", text: msgText },
+          { type: "image_url", image_url: { url: imgData } },
+        ];
+      };
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        let idx: number;
-        while ((idx = buffer.indexOf("\n")) !== -1) {
-          let line = buffer.slice(0, idx);
-          buffer = buffer.slice(idx + 1);
-          if (line.endsWith("\r")) line = line.slice(0, -1);
-          if (!line.startsWith("data: ")) continue;
-          const json = line.slice(6).trim();
-          if (json === "[DONE]") break;
-          try {
-            const c = JSON.parse(json).choices?.[0]?.delta?.content;
-            if (c) { full += c; setStreamingContent(full); }
-          } catch {}
+      const apiMessages = [...messages, { role: "user", content: text }]
+        .slice(-20)
+        .map((m, i, arr) => ({
+          role: m.role,
+          content: i === arr.length - 1 ? buildContent(text, currentAttachment) : m.content,
+        }));
+
+      const token = tokenRef.current;
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      };
+      if (token) headers.Authorization = `Bearer ${token}`;
+
+      if (wantsImage) {
+        // ── IMAGE GENERATION MODE (non-streaming) ──
+        setIsGeneratingImage(true);
+        setMessages((prev) => [...prev, { role: "assistant", content: "🎨 Gerando imagem... Isso pode levar alguns segundos.", image_urls: [] }]);
+
+        try {
+          const resp = await fetch(CHAT_URL, {
+            method: "POST",
+            headers,
+            body: JSON.stringify({
+              messages: apiMessages,
+              model: "auto",
+              conversationId: convId,
+              generateImage: true,
+            }),
+          });
+
+          if (!resp.ok) {
+            const err = await resp.json().catch(() => ({ error: "Erro" }));
+            throw new Error(err.error || `Erro ${resp.status}`);
+          }
+
+          const data = await resp.json();
+          const assistantMsg: Msg = {
+            role: "assistant",
+            content: data.content || "Aqui está a imagem gerada! 🎨",
+            image_urls: data.imageUrl ? [data.imageUrl] : [],
+            model_used: data.model,
+          };
+
+          // Replace the loading message
+          setMessages((prev) => [...prev.slice(0, -1), assistantMsg]);
+          supabase.from("ai_messages").insert({
+            conversation_id: convId, role: "assistant",
+            content: assistantMsg.content,
+            image_urls: data.imageUrl ? [data.imageUrl.slice(0, 100) + "...(base64)"] : null,
+            model_used: data.model,
+          });
+        } finally {
+          setIsGeneratingImage(false);
         }
+      } else {
+        // ── TEXT STREAMING MODE ──
+        const resp = await fetch(CHAT_URL, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ messages: apiMessages, model: "auto", conversationId: convId }),
+        });
+
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({ error: "Erro" }));
+          throw new Error(err.error || `Erro ${resp.status}`);
+        }
+
+        const reader = resp.body!.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+        let full = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          let idx: number;
+          while ((idx = buffer.indexOf("\n")) !== -1) {
+            let line = buffer.slice(0, idx);
+            buffer = buffer.slice(idx + 1);
+            if (line.endsWith("\r")) line = line.slice(0, -1);
+            if (!line.startsWith("data: ")) continue;
+            const json = line.slice(6).trim();
+            if (json === "[DONE]") break;
+            try {
+              const c = JSON.parse(json).choices?.[0]?.delta?.content;
+              if (c) { full += c; setStreamingContent(full); }
+            } catch {}
+          }
+        }
+
+        const finalMsg: Msg = { role: "assistant", content: full };
+        setStreamingContent("");
+        setMessages((prev) => [...prev, finalMsg]);
+        supabase.from("ai_messages").insert({ conversation_id: convId, role: "assistant", content: full });
       }
 
-      const finalMsg: Msg = { role: "assistant", content: full };
-      setStreamingContent("");
-      setMessages((prev) => [...prev, finalMsg]);
-      supabase.from("ai_messages").insert({ conversation_id: convId, role: "assistant", content: full });
       supabase.from("ai_conversations").update({ updated_at: new Date().toISOString() }).eq("id", convId);
     } catch (e: any) {
       setStreamingContent("");
@@ -607,7 +727,7 @@ function ChatTab({ user }: { user: User }) {
     } finally {
       setIsLoading(false);
     }
-  }, [input, isLoading, activeConvId, messages, user, toast]);
+  }, [input, isLoading, activeConvId, messages, user, toast, chatAttachment]);
 
   const startNew = () => {
     setActiveConvId(null);
@@ -744,7 +864,7 @@ function ChatTab({ user }: { user: User }) {
                     </div>
                   </div>
                 )}
-                {isLoading && !streamingContent && (
+                {isLoading && !streamingContent && !isGeneratingImage && (
                   <div className="flex gap-3 mb-5">
                     <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 mt-0.5 ring-1 ring-white/10">
                       <img src={logo} alt="Brandify" className="w-full h-full object-cover" />
@@ -758,6 +878,26 @@ function ChatTab({ user }: { user: User }) {
                     </div>
                   </div>
                 )}
+                {isGeneratingImage && (
+                  <div className="flex gap-3 mb-5">
+                    <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 mt-0.5 ring-1 ring-white/10">
+                      <img src={logo} alt="Brandify" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl rounded-tl-sm px-5 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="relative">
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500/20 to-pink-500/20 flex items-center justify-center">
+                            <Loader2 className="w-5 h-5 text-violet-400 animate-spin" />
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-white/70 text-sm font-medium">Gerando imagem...</p>
+                          <p className="text-white/30 text-xs">Isso pode levar alguns segundos</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </>
             )}
             <div ref={messagesEndRef} />
@@ -767,26 +907,59 @@ function ChatTab({ user }: { user: User }) {
         {/* Input */}
         <div className="shrink-0 border-t border-white/[0.06] bg-[#0a0a0f]/80 backdrop-blur-xl">
           <div className="max-w-3xl mx-auto px-4 md:px-8 py-4">
+            {/* Attachment preview */}
+            {chatAttachmentPreview && (
+              <div className="flex items-center gap-3 mb-3">
+                <div className="relative group">
+                  <img src={chatAttachmentPreview} alt="Anexo" className="w-14 h-14 rounded-lg object-cover border border-white/10" />
+                  <button
+                    onClick={removeChatAttachment}
+                    className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500/80 hover:bg-red-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X className="w-3 h-3 text-white" />
+                  </button>
+                </div>
+                <div>
+                  <p className="text-white/50 text-xs font-medium">Imagem anexada</p>
+                  <p className="text-white/25 text-[11px]">A IA pode analisar, editar ou recriar</p>
+                </div>
+              </div>
+            )}
+            <input
+              ref={chatFileRef}
+              type="file"
+              accept="image/*"
+              onChange={handleChatFileUpload}
+              className="hidden"
+            />
             <div className="relative">
               <Textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Digite sua mensagem..."
-                className="min-h-[52px] max-h-[150px] bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/25 resize-none rounded-xl pr-14 text-sm focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20"
+                placeholder={chatAttachment ? "Descreva o que quer fazer com a imagem..." : "Digite sua mensagem... (peça imagens, edições, textos, estratégias)"}
+                className="min-h-[52px] max-h-[150px] bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/25 resize-none rounded-xl pl-12 pr-14 text-sm focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20"
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
                 }}
               />
+              {/* Upload button */}
+              <button
+                onClick={() => chatFileRef.current?.click()}
+                className="absolute bottom-2.5 left-2.5 h-9 w-9 rounded-lg flex items-center justify-center text-white/30 hover:text-white/60 hover:bg-white/[0.06] transition-all"
+                title="Anexar imagem (logo, foto, referência)"
+              >
+                <ImagePlus className="w-4.5 h-4.5" />
+              </button>
               <Button
                 onClick={() => handleSend()}
-                disabled={isLoading || !input.trim()}
+                disabled={isLoading || (!input.trim() && !chatAttachment)}
                 className="absolute bottom-2.5 right-2.5 h-9 w-9 p-0 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 border-0 shadow-lg shadow-blue-500/20 disabled:shadow-none"
               >
                 {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               </Button>
             </div>
             <p className="text-white/15 text-[10px] text-center mt-2">
-              Powered by Brandify AI · Respostas podem conter imprecisões
+              📎 Anexe imagens para editar/recriar • Peça "crie uma imagem de..." para gerar • GPT para texto, Gemini para visual
             </p>
           </div>
         </div>
@@ -794,7 +967,6 @@ function ChatTab({ user }: { user: User }) {
     </div>
   );
 }
-
 // ══════════════════════════════════════════════════
 // ██  MAIN PAGE
 // ══════════════════════════════════════════════════
