@@ -6,6 +6,37 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Keywords that indicate image generation/editing intent
+const IMAGE_KEYWORDS = [
+  "gerar imagem", "gere uma imagem", "crie uma imagem", "criar imagem",
+  "gerar foto", "crie uma foto", "criar foto",
+  "gerar logo", "crie um logo", "criar logo", "crie uma logo",
+  "gerar arte", "crie uma arte", "criar arte",
+  "gerar ilustração", "crie uma ilustração",
+  "gerar banner", "crie um banner", "criar banner",
+  "gerar post", "crie um post visual",
+  "editar imagem", "edite essa imagem", "editar essa foto",
+  "modifique essa imagem", "altere essa imagem",
+  "recrie essa imagem", "recriar imagem", "refazer imagem",
+  "transforme essa imagem", "melhore essa imagem",
+  "generate image", "create image", "edit image",
+  "desenhe", "desenhar", "ilustre", "ilustrar",
+];
+
+function detectImageIntent(text: string): boolean {
+  const lower = text.toLowerCase();
+  return IMAGE_KEYWORDS.some((kw) => lower.includes(kw));
+}
+
+function hasImageAttachment(messages: any[]): boolean {
+  const last = messages[messages.length - 1];
+  if (!last) return false;
+  if (Array.isArray(last.content)) {
+    return last.content.some((p: any) => p.type === "image_url");
+  }
+  return false;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -37,65 +68,130 @@ serve(async (req) => {
     }
 
     const { messages: allMessages, model, conversationId, generateImage } = await req.json();
-    // Limit history to last 20 messages for performance
     const messages = allMessages.slice(-20);
 
-    // Image generation mode
-    if (generateImage) {
-      const imageModel = model === "gpt" ? "google/gemini-2.5-flash-image" : "google/gemini-2.5-flash-image";
-      const lastMessage = messages[messages.length - 1];
+    // Extract text from last message for intent detection
+    const lastMsg = messages[messages.length - 1];
+    const lastText = typeof lastMsg?.content === "string"
+      ? lastMsg.content
+      : Array.isArray(lastMsg?.content)
+        ? lastMsg.content.find((p: any) => p.type === "text")?.text || ""
+        : "";
 
-      const payload: any = {
-        model: imageModel,
-        messages: [lastMessage],
-        modalities: ["image", "text"],
-      };
+    // Auto-detect: should we generate/edit an image?
+    const hasAttachment = hasImageAttachment(messages);
+    const wantsImage = generateImage || detectImageIntent(lastText);
+    const shouldGenerateImage = wantsImage || (hasAttachment && detectImageIntent(lastText));
 
-      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+    // ═══════════════════════════════════════════
+    // IMAGE GENERATION / EDITING MODE
+    // ═══════════════════════════════════════════
+    if (shouldGenerateImage) {
+      // Use Gemini for image generation (best at multimodal)
+      const imageModels = ["google/gemini-3-pro-image-preview", "google/gemini-2.5-flash-image"];
 
-      if (res.status === 429) {
-        return new Response(JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns minutos." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      let imageUrl: string | undefined;
+      let textContent = "";
+
+      for (const imageModel of imageModels) {
+        if (imageUrl) break;
+        console.log(`Image gen: trying ${imageModel}`);
+
+        try {
+          const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${LOVABLE_API_KEY}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: imageModel,
+              messages: [
+                {
+                  role: "system",
+                  content: "Você é um designer profissional da Brandify. Quando pedido para gerar ou editar imagens, crie visuais de alta qualidade, modernos e profissionais. Se receber uma imagem de referência, analise-a e incorpore seus elementos (cores, estilo, logo) no resultado.",
+                },
+                lastMsg,
+              ],
+              modalities: ["image", "text"],
+            }),
+          });
+
+          if (res.status === 429) {
+            return new Response(JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns minutos." }), {
+              status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
+          }
+          if (res.status === 402) {
+            return new Response(JSON.stringify({ error: "Créditos insuficientes." }), {
+              status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
+          }
+
+          if (res.ok) {
+            const data = await res.json();
+            imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+            textContent = data.choices?.[0]?.message?.content || "";
+            if (imageUrl) {
+              console.log(`Image gen succeeded with ${imageModel}`);
+            }
+          } else {
+            const t = await res.text();
+            console.error(`${imageModel} failed:`, res.status, t.slice(0, 300));
+          }
+        } catch (e) {
+          console.error(`${imageModel} threw:`, e);
+        }
+      }
+
+      if (!imageUrl) {
+        return new Response(JSON.stringify({
+          content: "Desculpe, não consegui gerar a imagem no momento. Tente novamente em alguns instantes.",
+          model: "error",
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      if (res.status === 402) {
-        return new Response(JSON.stringify({ error: "Créditos insuficientes." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
 
-      if (!res.ok) {
-        const t = await res.text();
-        console.error("Image gen failed:", res.status, t.slice(0, 500));
-        throw new Error("Falha ao gerar imagem");
-      }
-
-      const data = await res.json();
-      const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-      const textContent = data.choices?.[0]?.message?.content || "";
-
-      return new Response(JSON.stringify({ imageUrl, content: textContent, model: imageModel }), {
+      return new Response(JSON.stringify({ imageUrl, content: textContent || "Aqui está a imagem gerada! 🎨", model: imageModels[0] }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Text chat mode with streaming
+    // ═══════════════════════════════════════════
+    // TEXT CHAT MODE (with smart model routing)
+    // ═══════════════════════════════════════════
     let aiModel: string;
     if (model === "gpt") {
       aiModel = "openai/gpt-5-mini";
     } else if (model === "gemini") {
       aiModel = "google/gemini-3-flash-preview";
     } else {
-      // Auto mode - default to gemini flash for speed
-      aiModel = "google/gemini-3-flash-preview";
+      // Auto mode: use GPT for complex reasoning, Gemini for speed
+      // If there's an image attachment but no image generation intent, use Gemini (better at vision)
+      if (hasAttachment) {
+        aiModel = "google/gemini-3-flash-preview";
+      } else {
+        aiModel = "google/gemini-3-flash-preview";
+      }
     }
+
+    // Clean base64 from old messages to reduce payload
+    const cleanedMessages = messages.map((m: any, i: number) => {
+      if (i === messages.length - 1) return m; // keep last message intact
+      if (typeof m.content === "string") return m;
+      if (Array.isArray(m.content)) {
+        return {
+          ...m,
+          content: m.content.filter((p: any) => p.type !== "image_url"),
+        };
+      }
+      return m;
+    }).filter((m: any) => {
+      // Remove messages that became empty after cleaning
+      if (Array.isArray(m.content) && m.content.length === 0) return false;
+      return true;
+    });
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -108,9 +204,9 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: "Você é um assistente de IA avançado da Brandify. Responda sempre em português brasileiro. Seja claro, profissional e útil. Você pode ajudar com textos, ideias, estratégias de marketing, copywriting, análise de dados e muito mais. Formate suas respostas com markdown quando apropriado. IMPORTANTE: Você NÃO tem ferramentas externas. NUNCA responda com JSON, blocos de código com ações, ou formatos de tool-calling como {\"action\": ...}. Responda sempre em linguagem natural.",
+            content: "Você é um assistente de IA avançado da Brandify. Responda sempre em português brasileiro. Seja claro, profissional e útil. Você pode ajudar com textos, ideias, estratégias de marketing, copywriting, análise de dados e muito mais. Se o usuário enviar uma imagem, analise-a e responda sobre ela. Formate suas respostas com markdown quando apropriado. IMPORTANTE: Você NÃO tem ferramentas externas. NUNCA responda com JSON, blocos de código com ações, ou formatos de tool-calling como {\"action\": ...}. Responda sempre em linguagem natural. Se o usuário pedir para GERAR ou CRIAR uma imagem, diga que você está processando a solicitação.",
           },
-          ...messages,
+          ...cleanedMessages,
         ],
         stream: true,
       }),
@@ -133,7 +229,6 @@ serve(async (req) => {
       throw new Error("Erro no gateway de IA");
     }
 
-    // Stream response back with model info header
     return new Response(response.body, {
       headers: {
         ...corsHeaders,
