@@ -18,8 +18,8 @@ serve(async (req) => {
     const aspectRatio = type === "story" ? "9:16" : "1:1";
     const dimensions = type === "story" ? "1080x1920" : "1080x1080";
 
-    // Rotate between 10 visual models trained from real reference posts
-    const visualModels = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+    // Rotate between 18 visual models trained from real reference posts
+    const visualModels = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R"];
     const selectedModel = visualModels[Math.floor(Math.random() * visualModels.length)];
 
     const modelInstructions: Record<string, string> = {
@@ -116,6 +116,76 @@ serve(async (req) => {
 - Design tool icons (Photoshop toolbar, pen tool icons) floating as subtle background elements
 - Mood: powerful, tech-forward, aggressive launch energy
 - Reference: Black cat with red glowing eyes, "MIAL - Método IA Lucrativa" dark launch post`,
+
+      K: `MODEL K — BEACH/LIFESTYLE RETROSPECTIVE:
+- Person at beach or outdoor lifestyle setting — relaxed, confident pose
+- GIANT white typography (numbers or words) as background element, person IN FRONT of text
+- Text so large it extends beyond the frame edges
+- Mix of handwritten script + bold block text
+- Small design elements: measurement scale on sides, brand credits in corners
+- Bright blue sky, warm natural light, summer vibes
+- Reference: "RETROSPECTIVA 2025" with giant white numbers behind beach person`,
+
+      L: `MODEL L — SURREAL FLYING OBJECT WITH FLOWERS:
+- Object (car, product, person) FLOATING in the sky among clouds
+- Surrounded by flowers, petals, or natural organic elements
+- Dreamy, magical composition — surreal but beautiful
+- GIANT 3D-perspective typography that wraps around or behind the floating object
+- Script/handwritten accent text in contrasting color (red, orange)
+- Warm golden/sunset tones mixed with floral colors
+- Reference: Red Porsche flying among clouds and flowers with giant perspective text`,
+
+      M: `MODEL M — MONOCHROMATIC BOLD WITH ANIMAL:
+- Strong single-color background (gold/yellow, red, blue, green)
+- Hyper-detailed animal as hero: lion, leopard, tiger, eagle, wolf
+- GIANT bold typography with TEXTURE FILL — text filled with animal print or material pattern
+- Mix of script + massive bold text for hierarchy
+- Small decorative elements: checkered bars, star icons, brand watermarks
+- Reference: Golden leopard on yellow with textured "GRADIENTS" text`,
+
+      N: `MODEL N — CLASSICAL STATUE REMIX:
+- Greek/Roman marble statue REMIXED with modern elements (fur coat, gold chains, sneakers)
+- Bright sky background with fluffy clouds — pastel palette (pink, baby blue)
+- GIANT white text behind statue using CLIPPING MASK
+- Elegant script + massive bold text combination
+- Measurement scale and technical marks on edges
+- Reference: Greek statue with pink fur coat, "Posts dos ALUNOS" giant text`,
+
+      O: `MODEL O — GOLDEN HOUR SPORTS ACTION:
+- Dynamic sports action: basketball dunk, soccer, boxing, MMA
+- Golden hour lighting with LIGHT TRAIL effects (glowing streaks around athlete)
+- Low-angle dramatic camera — athlete looks heroic
+- Bold white + gold/orange typography at top
+- Mix of block sans-serif + hand-brushed text
+- Lens flare and bokeh effects — cinematic sports photography
+- Reference: Basketball player mid-dunk with golden light trails, "PROMPTS SPORTS"`,
+
+      P: `MODEL P — FUTURISTIC FASHION EDITORIAL:
+- Strong single-color background (electric blue, hot pink, chrome silver)
+- Person in futuristic/metallic fashion: chrome jacket, reflective visor, metallic helmet
+- Profile or 3/4 angle portrait — editorial fashion photography
+- GIANT text same color as background but different shade — embossed/debossed effect
+- Mix of elegant script + massive block letters
+- Technical marks: measurement scale, year, category labels
+- Reference: Woman in chrome blue outfit with tonal "TEXTURAS" text`,
+
+      Q: `MODEL Q — CHROME/METALLIC ANIMAL TYPOGRAPHY:
+- Deep black background — pure darkness
+- Hyper-detailed animal face: white tiger, wolf, eagle, panther
+- Animal has GLOWING EYES (electric blue, ice white)
+- CHROME/METALLIC 3D typography arching above — letters look like liquid metal
+- Script accent text in white or silver
+- Monochromatic cool palette: black, white, silver, ice blue
+- Reference: White tiger with blue eyes, chrome "ESTAMPAS" text arching above`,
+
+      R: `MODEL R — VIBRANT COLOR-BLOCKED WITH VEHICLE:
+- Rich saturated single-color environment (emerald green, deep red, electric blue, hot pink)
+- Person in matching-color outfit + luxury car in SAME COLOR
+- Everything color-coordinated — monochromatic but vibrant
+- GIANT bold white or contrasting text overlaid
+- Mix of script + bold typography
+- Cherry blossoms, fabric waves, or themed elements matching the color
+- Reference: Mercedes G-Class in pink cherry blossom scene with giant text`,
     };
 
     const referenceInstruction = referenceImage
