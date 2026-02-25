@@ -3,6 +3,7 @@ import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
+import UserMenu from "@/components/UserMenu";
 
 const navLinks = [
   { label: "Início", href: "#inicio" },
@@ -95,16 +96,20 @@ export default function Header() {
           >
             Contratar
           </motion.a>
+          <UserMenu />
         </nav>
 
-        {/* Mobile toggle */}
-        <button
-          className={`md:hidden absolute right-6 p-2 ${useTransparent ? 'text-white' : 'text-white'}`}
-          onClick={() => setOpen(!open)}
-          aria-label="Menu"
-        >
-          {open ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        {/* Mobile: avatar + toggle */}
+        <div className="md:hidden absolute right-6 flex items-center gap-2">
+          <UserMenu />
+          <button
+            className={`p-2 ${useTransparent ? 'text-white' : 'text-white'}`}
+            onClick={() => setOpen(!open)}
+            aria-label="Menu"
+          >
+            {open ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}

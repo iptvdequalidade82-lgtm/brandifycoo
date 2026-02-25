@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import logo from "@/assets/logo.jpg";
+import UserMenu from "@/components/UserMenu";
 
 // ── Types ──
 type Msg = { role: "user" | "assistant"; content: string; image_urls?: string[]; model_used?: string };
@@ -1150,29 +1151,19 @@ export default function IAs() {
               IA Studio
             </span>
           </div>
-          <Link to="/">
-            <Button variant="ghost" size="sm" className="text-white/30 hover:text-white hover:bg-white/[0.05] text-xs h-8">
-              <ArrowLeft className="w-3.5 h-3.5 mr-1" /> Voltar
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link to="/">
+              <Button variant="ghost" size="sm" className="text-white/30 hover:text-white hover:bg-white/[0.05] text-xs h-8">
+                <ArrowLeft className="w-3.5 h-3.5 mr-1" /> Voltar
+              </Button>
+            </Link>
+            <UserMenu />
+          </div>
         </div>
       </header>
 
-      {/* Pro banner + login/logout */}
+      {/* Pro banner */}
       <ProBanner user={user} remaining={remaining} />
-      <div className="flex items-center justify-end gap-2 px-4 md:px-6 py-1.5">
-        {user ? (
-          <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-white/30 hover:text-white hover:bg-white/[0.05] text-xs h-7 px-3">
-            <LogOut className="w-3.5 h-3.5 mr-1" /> Sair
-          </Button>
-        ) : (
-          <Link to="/login?redirect=/ias">
-            <Button size="sm" className="h-7 px-4 bg-white/[0.08] hover:bg-white/[0.12] text-white border border-white/[0.1] text-xs font-medium gap-1.5">
-              <UserIcon className="w-3.5 h-3.5" /> Entrar
-            </Button>
-          </Link>
-        )}
-      </div>
 
       {/* Tabs */}
       <Tabs defaultValue="posts" className="flex-1 flex flex-col overflow-hidden">
