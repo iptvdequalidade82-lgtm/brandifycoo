@@ -364,61 +364,57 @@ The user has uploaded a reference image (could be a logo, photo, or design idea)
       nicheInstruction = `\n\n🏪 AUTO-DETECT NICHE:\nAnalyze the topic/headline below and automatically determine the business niche. Then include ONLY visual elements that are directly related to that specific business. For example: if the topic mentions a bakery, show bread and ovens, NOT cars or animals. Every prop, background, and visual element must reinforce the client's business sector.`;
     }
 
-    const imagePrompt = `Create a clean, high-end, professional social media ${type === "story" ? "story (9:16 vertical, 1080x1920px)" : "feed post (1:1 square, 1080x1080px)"} for BRANDIFY, a premium Brazilian creative agency.
+    const imagePrompt = `Create a MINIMALIST, high-end, professional social media ${type === "story" ? "story (9:16 vertical, 1080x1920px)" : "feed post (1:1 square, 1080x1080px)"} for BRANDIFY, a premium Brazilian creative agency.
 
 The image must look 100% realistic, like a real brand campaign — NOT AI-generated.
 
-⚠️ CRITICAL INSTRUCTION — NICHE ADAPTATION:
-The VISUAL MODEL below is ONLY a reference for LAYOUT, TYPOGRAPHY STYLE, FONT WEIGHT, and COMPOSITION.
-You MUST completely REPLACE the subject matter, objects, scenery, and props to match the CLIENT'S BUSINESS NICHE described in the topic below.
-- If the model shows a car → but client is a churrascaria → replace with a grill, meat, fire
-- If the model shows snowboarding → but client is a dentist → replace with dental elements, bright smiles
-- If the model shows a lion → but client is a salon → replace with salon elements, scissors, styled hair
-- KEEP the same layout structure, text placement, font style, color grading approach
-- CHANGE everything else to be 100% relevant to the client's niche
-- The final image should look like the same designer made it, but for a COMPLETELY DIFFERENT business
+🏆 #1 PRIORITY — FOLLOW THE VISUAL MODEL REFERENCES:
+The visual model below is your PRIMARY guide. Study its EXACT layout, composition, typography placement, font style, color grading, and overall vibe. Replicate that SAME level of quality and style.
+ONLY adapt the subject matter/props to match the client's business niche (described in the topic below).
 
-🎯 VISUAL MODEL (USE ONLY AS LAYOUT/STYLE TEMPLATE): ${selectedModel}
+⚠️ NICHE ADAPTATION:
+- KEEP the same layout structure, text placement, font style, color grading from the visual model
+- REPLACE subject matter, objects, scenery to match the CLIENT'S BUSINESS NICHE
+- The final image should look like the same designer made it, but for a different business
+
+🎯 VISUAL MODEL (PRIMARY REFERENCE — REPLICATE THIS STYLE): ${selectedModel}
 ${modelInstructions[selectedModel]}
 ${referenceInstruction}
 ${nicheInstruction}
 
 📸 STYLE & MOOD:
-- Style: bold, impactful, cinematic, premium — adapted to the client's niche
-- Mood: powerful, aspirational, professional — matching what the niche demands
+- MINIMALIST and CLEAN — less is more
 - Camera feel: real photography, DSLR/cinema camera, shallow depth of field
-- Lighting: dramatic — golden hour, moody night, cinematic contrast, studio rim lighting
-- Colors: high contrast palette that fits the client's business sector
-- Finish: ultra-polished, viral-worthy, looks like a top Brazilian Instagram page post
+- Lighting: dramatic but simple — golden hour, moody, cinematic
+- Colors: RESTRAINED palette — 2-3 colors maximum. Avoid gray text, avoid too many accent colors
+- Finish: ultra-polished, editorial, premium
 
-✍️ TYPOGRAPHY:
-- MASSIVE bold sans-serif headlines — text should be a DOMINANT visual element (40-60% of frame)
-- Use creative typography effects: CLIPPING MASKS, PATTERN FILLS, MOTION BLUR on text
-- Mix font weights dramatically: giant bold keyword + smaller elegant secondary text
-- Creative line breaks for visual rhythm and impact
-- Can use script/handwritten fonts for secondary accents
-- WATERMARK: Place a small, subtle "BRANDIFY" or "@brandifycoo" text in the BOTTOM-RIGHT corner — semi-transparent, minimal. Do NOT use the Gemini star logo.
-- Text must feel INTEGRATED into the composition, not floating on top
+✍️ TYPOGRAPHY — KEEP IT SIMPLE:
+- Use FEW words — short headline only (3-6 words MAX). No long phrases or paragraphs
+- Bold sans-serif or elegant serif — one font style, clean
+- Text should be impactful but NOT overwhelming — 20-35% of frame at most
+- NO excessive text layers, NO multiple captions, NO bullet points
+- WATERMARK: Small subtle "@brandifycoo" in bottom-right corner — semi-transparent
+- Text must feel INTEGRATED into the composition
 
-📐 COMPOSITION:
-- Main subject should be RELEVANT to the client's business (a chef for restaurant, barber for barbershop, etc.)
-- Backgrounds should match the niche environment
-- Text and subject share the same visual space — neither fights the other
-- Think top viral Brazilian Instagram pages adapted to the specific business sector
+📐 COMPOSITION — MINIMALIST:
+- GENEROUS negative space — let the image BREATHE
+- One clear focal point, not cluttered
+- Simple, elegant, modern — like a high-end magazine ad
+- Main subject relevant to the client's business niche
 
 🚫 ABSOLUTELY FORBIDDEN:
 - AI artifacts, fake lighting, plastic skin
-- Surreal visuals, cartoon style, low-quality design
+- TOO MUCH TEXT — if there are more than 6-8 words in the headline, it's WRONG
+- Too many colors, gray colored text, overly busy compositions
 - Stock-photo look, generic marketing layout, Canva templates
-- Futuristic UI, cyberpunk aesthetics
-- Flat design, vector art, clipart
-- Small, weak typography — text MUST be bold and impactful
-- USING THE VISUAL MODEL SUBJECT LITERALLY — if model says "car" but client is a bakery, do NOT show a car
+- Futuristic UI, cyberpunk aesthetics, flat design, vector art
+- USING THE VISUAL MODEL SUBJECT LITERALLY when niche differs
 - Visual elements that DON'T MATCH the business niche
 - Gemini star watermark or any AI branding
-- If it looks AI-generated or like a basic template → WRONG. Regenerate.
+- Cluttered, busy, or text-heavy designs — KEEP IT MINIMAL
 
-🧠 QUALITY CHECK: The final result must look like a REAL post made by a premium agency FOR THE CLIENT'S SPECIFIC BUSINESS. The layout/style comes from the visual model, but every visual element must be replaced to match the niche perfectly.
+🧠 QUALITY CHECK: The result must be SIMPLE, CLEAN, MINIMAL, and PREMIUM. Follow the visual model reference as closely as possible. Few words, few colors, maximum impact. If the design has too much text or feels busy → WRONG.
 
 CONTENT/TOPIC for the headline: ${prompt}`;
 
