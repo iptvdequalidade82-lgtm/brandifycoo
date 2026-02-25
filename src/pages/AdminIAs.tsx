@@ -85,7 +85,9 @@ type UserWithSub = {
   email: string;
   name: string | null;
   created_at: string;
+  last_sign_in?: string | null;
   subscription?: {
+    id: string;
     plan: string;
     status: string;
     amount_cents: number;
@@ -93,12 +95,21 @@ type UserWithSub = {
     paid_at: string | null;
     expires_at: string | null;
     created_at: string;
-  };
+  } | null;
+};
+
+const PLAN_LABELS: Record<string, string> = { basico: "Básico", pro: "Pro", premium: "Premium" };
+const PLAN_COLORS: Record<string, string> = {
+  basico: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  pro: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+  premium: "bg-purple-500/10 text-purple-400 border-purple-500/20",
 };
 
 function SubscribersPanel() {
   const [users, setUsers] = useState<UserWithSub[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<"all" | "active" | "pending" | "free">("all");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     loadUsers();
@@ -106,71 +117,45 @@ function SubscribersPanel() {
 
   const loadUsers = async () => {
     setLoading(true);
-    // Get all subscriptions
-    const { data: subs } = await supabase
-      .from("subscriptions")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    // Get profiles for user info
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("*");
-
-    // Build combined list
-    const userMap = new Map<string, UserWithSub>();
-
-    // Add profiles
-    profiles?.forEach((p: any) => {
-      userMap.set(p.user_id, {
-        id: p.user_id,
-        email: "",
-        name: p.full_name || null,
-        created_at: p.created_at,
+    try {
+      const session = (await supabase.auth.getSession()).data.session;
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-users`, {
+        headers: {
+          "Content-Type": "application/json",
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${session?.access_token}`,
+        },
       });
-    });
-
-    // Attach subscriptions
-    subs?.forEach((s: any) => {
-      const existing = userMap.get(s.user_id);
-      if (existing) {
-        existing.subscription = {
-          plan: s.plan,
-          status: s.status,
-          amount_cents: s.amount_cents,
-          payment_method: s.payment_method,
-          paid_at: s.paid_at,
-          expires_at: s.expires_at,
-          created_at: s.created_at,
-        };
-      } else {
-        userMap.set(s.user_id, {
-          id: s.user_id,
-          email: "",
-          name: null,
-          created_at: s.created_at,
-          subscription: {
-            plan: s.plan,
-            status: s.status,
-            amount_cents: s.amount_cents,
-            payment_method: s.payment_method,
-            paid_at: s.paid_at,
-            expires_at: s.expires_at,
-            created_at: s.created_at,
-          },
-        });
-      }
-    });
-
-    setUsers(Array.from(userMap.values()).sort((a, b) =>
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    ));
+      if (!res.ok) throw new Error("Erro ao carregar");
+      const data = await res.json();
+      setUsers(data.users || []);
+    } catch (e) {
+      console.error("Failed to load users:", e);
+    }
     setLoading(false);
   };
+
+  const filtered = users
+    .filter((u) => {
+      if (filter === "active") return u.subscription?.status === "active";
+      if (filter === "pending") return u.subscription?.status === "pending";
+      if (filter === "free") return !u.subscription || (u.subscription.status !== "active" && u.subscription.status !== "pending");
+      return true;
+    })
+    .filter((u) => {
+      if (!search.trim()) return true;
+      const q = search.toLowerCase();
+      return u.email.toLowerCase().includes(q) || (u.name?.toLowerCase().includes(q));
+    });
 
   const activeCount = users.filter(u => u.subscription?.status === "active").length;
   const pendingCount = users.filter(u => u.subscription?.status === "pending").length;
   const totalRevenue = users.reduce((sum, u) => sum + (u.subscription?.status === "active" ? (u.subscription.amount_cents || 0) : 0), 0);
+
+  const isExpired = (expiresAt: string | null) => {
+    if (!expiresAt) return false;
+    return new Date(expiresAt) < new Date();
+  };
 
   if (loading) {
     return (
@@ -187,12 +172,12 @@ function SubscribersPanel() {
         <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
           <Users className="w-4 h-4 text-blue-400 mb-2" />
           <p className="text-2xl font-bold text-white">{users.length}</p>
-          <p className="text-xs text-white/40">Usuários</p>
+          <p className="text-xs text-white/40">Usuários Total</p>
         </div>
         <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
           <Crown className="w-4 h-4 text-amber-400 mb-2" />
           <p className="text-2xl font-bold text-white">{activeCount}</p>
-          <p className="text-xs text-white/40">Assinantes Pro</p>
+          <p className="text-xs text-white/40">Assinantes Ativos</p>
         </div>
         <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
           <Clock className="w-4 h-4 text-orange-400 mb-2" />
@@ -202,18 +187,48 @@ function SubscribersPanel() {
         <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
           <CreditCard className="w-4 h-4 text-green-400 mb-2" />
           <p className="text-2xl font-bold text-white">R$ {(totalRevenue / 100).toFixed(2).replace(".", ",")}</p>
-          <p className="text-xs text-white/40">Receita Ativa</p>
+          <p className="text-xs text-white/40">Receita Mensal</p>
+        </div>
+      </div>
+
+      {/* Filters & search */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="flex gap-1">
+          {[
+            { key: "all" as const, label: "Todos", count: users.length },
+            { key: "active" as const, label: "Ativos", count: activeCount },
+            { key: "pending" as const, label: "Pendentes", count: pendingCount },
+            { key: "free" as const, label: "Grátis", count: users.length - activeCount - pendingCount },
+          ].map((f) => (
+            <button
+              key={f.key}
+              onClick={() => setFilter(f.key)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                filter === f.key ? "bg-white/[0.08] text-white" : "text-white/30 hover:text-white/50"
+              }`}
+            >
+              {f.label} ({f.count})
+            </button>
+          ))}
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <Mail className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-white/30" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar email ou nome..."
+              className="pl-8 pr-3 py-1.5 rounded-lg text-xs bg-white/[0.04] border border-white/[0.08] text-white placeholder:text-white/20 w-[200px] focus:outline-none focus:border-white/20"
+            />
+          </div>
+          <Button onClick={loadUsers} variant="ghost" size="sm" className="text-white/40 hover:text-white h-7 text-xs">
+            <Loader2 className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} /> Atualizar
+          </Button>
         </div>
       </div>
 
       {/* Users table */}
       <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden">
-        <div className="px-4 py-3 border-b border-white/[0.06] flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-white">Usuários & Assinaturas</h3>
-          <Button onClick={loadUsers} variant="ghost" size="sm" className="text-white/40 hover:text-white h-7 text-xs">
-            Atualizar
-          </Button>
-        </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -221,24 +236,25 @@ function SubscribersPanel() {
                 <th className="text-left text-white/40 font-medium px-4 py-2.5 text-xs">Usuário</th>
                 <th className="text-left text-white/40 font-medium px-4 py-2.5 text-xs">Plano</th>
                 <th className="text-left text-white/40 font-medium px-4 py-2.5 text-xs">Status</th>
-                <th className="text-left text-white/40 font-medium px-4 py-2.5 text-xs">Valor</th>
-                <th className="text-left text-white/40 font-medium px-4 py-2.5 text-xs">Pagamento</th>
-                <th className="text-left text-white/40 font-medium px-4 py-2.5 text-xs">Data</th>
+                <th className="text-left text-white/40 font-medium px-4 py-2.5 text-xs hidden md:table-cell">Valor</th>
+                <th className="text-left text-white/40 font-medium px-4 py-2.5 text-xs hidden md:table-cell">Expira em</th>
+                <th className="text-left text-white/40 font-medium px-4 py-2.5 text-xs hidden lg:table-cell">Último login</th>
+                <th className="text-left text-white/40 font-medium px-4 py-2.5 text-xs">Cadastro</th>
               </tr>
             </thead>
             <tbody>
-              {users.map((u) => (
+              {filtered.map((u) => (
                 <tr key={u.id} className="border-b border-white/[0.04] hover:bg-white/[0.02]">
                   <td className="px-4 py-3">
                     <div>
                       <p className="text-white text-sm font-medium">{u.name || "Sem nome"}</p>
-                      <p className="text-white/30 text-xs">{u.id.slice(0, 8)}...</p>
+                      <p className="text-white/40 text-xs">{u.email || u.id.slice(0, 12) + "..."}</p>
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    {u.subscription ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                        <Crown className="w-3 h-3" /> {u.subscription.plan.toUpperCase()}
+                    {u.subscription && u.subscription.status !== "cancelled" ? (
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${PLAN_COLORS[u.subscription.plan] || PLAN_COLORS.basico}`}>
+                        <Crown className="w-3 h-3" /> {PLAN_LABELS[u.subscription.plan] || u.subscription.plan}
                       </span>
                     ) : (
                       <span className="text-white/20 text-xs">Grátis</span>
@@ -246,9 +262,15 @@ function SubscribersPanel() {
                   </td>
                   <td className="px-4 py-3">
                     {u.subscription?.status === "active" ? (
-                      <span className="inline-flex items-center gap-1 text-green-400 text-xs">
-                        <CheckCircle className="w-3 h-3" /> Ativo
-                      </span>
+                      isExpired(u.subscription.expires_at) ? (
+                        <span className="inline-flex items-center gap-1 text-red-400 text-xs">
+                          <XCircle className="w-3 h-3" /> Expirado
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-green-400 text-xs">
+                          <CheckCircle className="w-3 h-3" /> Ativo
+                        </span>
+                      )
                     ) : u.subscription?.status === "pending" ? (
                       <span className="inline-flex items-center gap-1 text-orange-400 text-xs">
                         <Clock className="w-3 h-3" /> Pendente
@@ -257,21 +279,28 @@ function SubscribersPanel() {
                       <span className="text-white/20 text-xs">—</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-white/60 text-xs">
+                  <td className="px-4 py-3 text-white/60 text-xs hidden md:table-cell">
                     {u.subscription ? `R$ ${(u.subscription.amount_cents / 100).toFixed(2).replace(".", ",")}` : "—"}
                   </td>
-                  <td className="px-4 py-3 text-white/40 text-xs capitalize">
-                    {u.subscription?.payment_method || "—"}
+                  <td className="px-4 py-3 text-xs hidden md:table-cell">
+                    {u.subscription?.expires_at ? (
+                      <span className={isExpired(u.subscription.expires_at) ? "text-red-400" : "text-white/40"}>
+                        {new Date(u.subscription.expires_at).toLocaleDateString("pt-BR")}
+                      </span>
+                    ) : "—"}
+                  </td>
+                  <td className="px-4 py-3 text-white/30 text-xs hidden lg:table-cell">
+                    {u.last_sign_in ? new Date(u.last_sign_in).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "—"}
                   </td>
                   <td className="px-4 py-3 text-white/30 text-xs">
                     {new Date(u.created_at).toLocaleDateString("pt-BR")}
                   </td>
                 </tr>
               ))}
-              {users.length === 0 && (
+              {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="text-center py-12 text-white/20 text-sm">
-                    Nenhum usuário cadastrado ainda
+                  <td colSpan={7} className="text-center py-12 text-white/20 text-sm">
+                    {search ? "Nenhum resultado para a busca" : "Nenhum usuário cadastrado ainda"}
                   </td>
                 </tr>
               )}

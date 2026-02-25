@@ -359,6 +359,11 @@ The user has uploaded a reference image (could be a logo, photo, or design idea)
       }
     }
 
+    // Fallback: even if no niche keyword matched, instruct the AI to auto-detect and adapt
+    if (!nicheInstruction) {
+      nicheInstruction = `\n\n🏪 AUTO-DETECT NICHE:\nAnalyze the topic/headline below and automatically determine the business niche. Then include ONLY visual elements that are directly related to that specific business. For example: if the topic mentions a bakery, show bread and ovens, NOT cars or animals. Every prop, background, and visual element must reinforce the client's business sector.`;
+    }
+
     const imagePrompt = `Create a clean, high-end, professional social media ${type === "story" ? "story (9:16 vertical, 1080x1920px)" : "feed post (1:1 square, 1080x1080px)"} for BRANDIFY, a premium Brazilian creative agency.
 
 The image must look 100% realistic, like a real brand campaign — NOT AI-generated.
