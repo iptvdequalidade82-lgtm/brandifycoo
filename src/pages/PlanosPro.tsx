@@ -199,7 +199,7 @@ export default function PlanosPro() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 mb-12">
           {PLANS.map((plan, i) => {
             const isActive = currentPlan === plan.key;
-            const isPopular = plan.key === "basico";
+            const isHighlighted = plan.key === "basico" || plan.key === "premium";
 
             return (
               <motion.div
@@ -207,7 +207,7 @@ export default function PlanosPro() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className={`relative rounded-2xl bg-gradient-to-b ${plan.gradientBg} to-transparent border ${plan.borderColor} p-6 flex flex-col ${isPopular ? "md:-mt-4 md:pb-8 ring-1 ring-amber-500/30" : ""}`}
+                className={`relative rounded-2xl bg-gradient-to-b ${plan.gradientBg} to-transparent border ${plan.borderColor} p-6 flex flex-col ${isHighlighted ? "md:-mt-4 md:pb-8 ring-1 ring-amber-500/30" : ""}`}
               >
                 {plan.badge && (
                   <div className={`absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r ${plan.gradient} text-xs font-bold text-black`}>
