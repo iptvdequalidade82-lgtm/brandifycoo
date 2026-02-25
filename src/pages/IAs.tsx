@@ -113,7 +113,7 @@ function ProBanner({ user, remaining }: { user: User | null; remaining: number }
           <div className="min-w-0">
             <p className="text-white/80 text-xs font-medium truncate">
               {remaining > 0
-                ? `${remaining} criação${remaining !== 1 ? "ões" : ""} grátis restante${remaining !== 1 ? "s" : ""} esta semana`
+                ? `${remaining} ${remaining === 1 ? "criação grátis restante" : "criações grátis restantes"} esta semana`
                 : "Limite semanal atingido"
               }
             </p>
