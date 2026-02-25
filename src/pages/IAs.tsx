@@ -10,7 +10,7 @@ import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles, MessageSquare, ImagePlus, LogOut, ArrowLeft, Zap, Send,
-  Download, Loader2, Plus, Trash2, X, PenTool, Lightbulb, LayoutGrid,
+  Download, Loader2, Plus, Trash2, X, PenTool, Lightbulb, LayoutGrid, Upload, Image,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import logo from "@/assets/logo.jpg";
@@ -53,6 +53,9 @@ function PostGenerator({ user }: { user: User }) {
   const [step, setStep] = useState<"describe" | "copy" | "generating">("describe");
   const [generatedCopy, setGeneratedCopy] = useState("");
   const [isGeneratingCopy, setIsGeneratingCopy] = useState(false);
+  const [referenceImage, setReferenceImage] = useState<string | null>(null);
+  const [referencePreview, setReferencePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const MAX_WEEKLY = 5;
 
   useEffect(() => {
@@ -72,6 +75,28 @@ function PostGenerator({ user }: { user: User }) {
     const filtered = data.filter((d: string) => new Date(d) > weekAgo);
     localStorage.setItem(`post_gen_${user.id}`, JSON.stringify(filtered));
     setWeeklyCount(filtered.length);
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 4 * 1024 * 1024) {
+      toast({ title: "Arquivo muito grande", description: "Máximo 4MB", variant: "destructive" });
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      setReferenceImage(result);
+      setReferencePreview(result);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
+  const removeReference = () => {
+    setReferenceImage(null);
+    setReferencePreview(null);
   };
 
   const handleGenerateCopy = async (customPrompt?: string) => {
@@ -125,7 +150,7 @@ function PostGenerator({ user }: { user: User }) {
           apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
           Authorization: `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ prompt: imagePrompt, type: postType }),
+        body: JSON.stringify({ prompt: imagePrompt, type: postType, referenceImage }),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: "Erro desconhecido" }));
@@ -134,6 +159,12 @@ function PostGenerator({ user }: { user: User }) {
       const data = await res.json();
       if (!data.imageUrl) throw new Error("Nenhuma imagem gerada");
       setGeneratedImages((prev) => [{ url: data.imageUrl, prompt, type: postType, copy: generatedCopy }, ...prev]);
+      trackUsage();
+      toast({ title: "Post criado com sucesso! 🎨" });
+      setStep("describe");
+      setPrompt("");
+      setGeneratedCopy("");
+      removeReference();
       trackUsage();
       toast({ title: "Post criado com sucesso! 🎨" });
       setStep("describe");
@@ -164,7 +195,7 @@ function PostGenerator({ user }: { user: User }) {
           apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
           Authorization: `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ prompt: customPrompt, type: postType }),
+        body: JSON.stringify({ prompt: customPrompt, type: postType, referenceImage }),
       });
       if (!res.ok) throw new Error("Erro ao gerar");
       const data = await res.json();
@@ -355,6 +386,25 @@ function PostGenerator({ user }: { user: User }) {
       {step === "describe" && (
         <div className="shrink-0 border-t border-white/[0.06] bg-[#0a0a0f]/80 backdrop-blur-xl">
           <div className="max-w-4xl mx-auto px-4 md:px-8 py-4">
+            {/* Reference image preview */}
+            {referencePreview && (
+              <div className="flex items-center gap-3 mb-3">
+                <div className="relative group">
+                  <img src={referencePreview} alt="Referência" className="w-14 h-14 rounded-lg object-cover border border-white/10" />
+                  <button
+                    onClick={removeReference}
+                    className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500/80 hover:bg-red-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X className="w-3 h-3 text-white" />
+                  </button>
+                </div>
+                <div>
+                  <p className="text-white/50 text-xs font-medium">Imagem de referência</p>
+                  <p className="text-white/25 text-[11px]">A IA vai usar como base para o post</p>
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center gap-2 mb-3">
               <span className="text-white/30 text-xs font-medium mr-1">Formato:</span>
               {[
@@ -367,18 +417,33 @@ function PostGenerator({ user }: { user: User }) {
               ))}
             </div>
             <div className="relative">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
               <Textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder="Ex: Estou abrindo uma churrascaria e quero um post pra divulgar a inauguração..."
-                className="min-h-[56px] max-h-[120px] bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/25 resize-none rounded-xl pr-14 text-sm focus:border-violet-500/40 focus:ring-1 focus:ring-violet-500/20"
+                className="min-h-[56px] max-h-[120px] bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/25 resize-none rounded-xl pl-12 pr-14 text-sm focus:border-violet-500/40 focus:ring-1 focus:ring-violet-500/20"
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleGenerateCopy(); } }}
               />
+              {/* Upload button */}
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute bottom-2.5 left-2.5 h-9 w-9 rounded-lg flex items-center justify-center text-white/30 hover:text-white/60 hover:bg-white/[0.06] transition-all"
+                title="Enviar logo ou imagem de referência"
+              >
+                <ImagePlus className="w-4.5 h-4.5" />
+              </button>
               <Button onClick={() => handleGenerateCopy()} disabled={isGeneratingCopy || !prompt.trim() || weeklyCount >= MAX_WEEKLY} className="absolute bottom-2.5 right-2.5 h-9 w-9 p-0 rounded-lg bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 border-0 shadow-lg shadow-violet-500/20 disabled:shadow-none">
                 {isGeneratingCopy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
               </Button>
             </div>
-            <p className="text-white/15 text-[11px] mt-2 text-center">A IA cria a copy primeiro, depois gera o visual do post</p>
+            <p className="text-white/15 text-[11px] mt-2 text-center">📎 Envie uma logo ou foto de referência • A IA cria a copy e depois o visual</p>
           </div>
         </div>
       )}
