@@ -229,48 +229,57 @@ The user has uploaded a reference image (could be a logo, photo, or design idea)
 
 The image must look 100% realistic, like a real brand campaign — NOT AI-generated.
 
-🎯 VISUAL MODEL: ${selectedModel}
+⚠️ CRITICAL INSTRUCTION — NICHE ADAPTATION:
+The VISUAL MODEL below is ONLY a reference for LAYOUT, TYPOGRAPHY STYLE, FONT WEIGHT, and COMPOSITION.
+You MUST completely REPLACE the subject matter, objects, scenery, and props to match the CLIENT'S BUSINESS NICHE described in the topic below.
+- If the model shows a car → but client is a churrascaria → replace with a grill, meat, fire
+- If the model shows snowboarding → but client is a dentist → replace with dental elements, bright smiles
+- If the model shows a lion → but client is a salon → replace with salon elements, scissors, styled hair
+- KEEP the same layout structure, text placement, font style, color grading approach
+- CHANGE everything else to be 100% relevant to the client's niche
+- The final image should look like the same designer made it, but for a COMPLETELY DIFFERENT business
+
+🎯 VISUAL MODEL (USE ONLY AS LAYOUT/STYLE TEMPLATE): ${selectedModel}
 ${modelInstructions[selectedModel]}
 ${referenceInstruction}
 ${nicheInstruction}
 
 📸 STYLE & MOOD:
-- Style: bold, impactful, cinematic, premium street-culture meets high-end design
-- Mood: powerful, aspirational, motivational, ambitious, unstoppable
-- Camera feel: real photography, DSLR/cinema camera, shallow depth of field, motion blur when appropriate
+- Style: bold, impactful, cinematic, premium — adapted to the client's niche
+- Mood: powerful, aspirational, professional — matching what the niche demands
+- Camera feel: real photography, DSLR/cinema camera, shallow depth of field
 - Lighting: dramatic — golden hour, moody night, cinematic contrast, studio rim lighting
-- Colors: high contrast — deep blacks, bright whites, golden tones, or sport-specific palettes
+- Colors: high contrast palette that fits the client's business sector
 - Finish: ultra-polished, viral-worthy, looks like a top Brazilian Instagram page post
 
 ✍️ TYPOGRAPHY:
 - MASSIVE bold sans-serif headlines — text should be a DOMINANT visual element (40-60% of frame)
-- Use creative typography effects: CLIPPING MASKS (landscape visible through letters), PATTERN FILLS, MOTION BLUR on text
+- Use creative typography effects: CLIPPING MASKS, PATTERN FILLS, MOTION BLUR on text
 - Mix font weights dramatically: giant bold keyword + smaller elegant secondary text
 - Creative line breaks for visual rhythm and impact
 - Can use script/handwritten fonts for secondary accents
-- WATERMARK: Place a small, subtle "BRANDIFY" or "@brandifycoo" text in the BOTTOM-RIGHT corner — semi-transparent, minimal, like a professional agency watermark. Do NOT use the Gemini star logo.
+- WATERMARK: Place a small, subtle "BRANDIFY" or "@brandifycoo" text in the BOTTOM-RIGHT corner — semi-transparent, minimal. Do NOT use the Gemini star logo.
 - Text must feel INTEGRATED into the composition, not floating on top
 
 📐 COMPOSITION:
-- Person as central figure (face often hidden, back turned, or in shadow) — wearing streetwear/dark clothes
-- Dramatic backgrounds: landscapes, night cities, extreme sports venues, luxury settings
+- Main subject should be RELEVANT to the client's business (a chef for restaurant, barber for barbershop, etc.)
+- Backgrounds should match the niche environment
 - Text and subject share the same visual space — neither fights the other
-- Think top viral Brazilian Instagram pages: motivational, powerful, visually stunning
-- Similar to @mentemilionaria, @agenciatenks, luxury streetwear brands
+- Think top viral Brazilian Instagram pages adapted to the specific business sector
 
-🚫 ABSOLUTELY FORBIDDEN (NEGATIVE PROMPT):
-- AI artifacts, fake lighting, plastic skin, exaggerated realism
+🚫 ABSOLUTELY FORBIDDEN:
+- AI artifacts, fake lighting, plastic skin
 - Surreal visuals, cartoon style, low-quality design
 - Stock-photo look, generic marketing layout, Canva templates
 - Futuristic UI, cyberpunk aesthetics
 - Flat design, vector art, clipart
 - Small, weak typography — text MUST be bold and impactful
-- Generic motivational quote layouts with plain backgrounds
-- Visual elements that DON'T MATCH the business niche — no random animals for a restaurant, no food for a gym
-- Gemini star watermark or any AI branding — do NOT include the Gemini star logo anywhere
+- USING THE VISUAL MODEL SUBJECT LITERALLY — if model says "car" but client is a bakery, do NOT show a car
+- Visual elements that DON'T MATCH the business niche
+- Gemini star watermark or any AI branding
 - If it looks AI-generated or like a basic template → WRONG. Regenerate.
 
-🧠 QUALITY CHECK: This must look like a REAL post from a top Brazilian creative agency or viral motivational Instagram page. Think luxury streetwear brands, premium agencies, or pages with 1M+ followers. If it looks simple, generic, or AI-made → regenerate.
+🧠 QUALITY CHECK: The final result must look like a REAL post made by a premium agency FOR THE CLIENT'S SPECIFIC BUSINESS. The layout/style comes from the visual model, but every visual element must be replaced to match the niche perfectly.
 
 CONTENT/TOPIC for the headline: ${prompt}`;
 
