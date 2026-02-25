@@ -21,7 +21,7 @@ const tools = [
   {
     id: "chat",
     name: "Chat com IA",
-    description: "Assistente inteligente para tirar dúvidas, gerar textos, estratégias e muito mais.",
+    description: "Assistente inteligente para tirar dúvidas, gerar textos, estratégias e muito mais. Uso ilimitado.",
     icon: MessageSquare,
     color: "from-blue-500 to-cyan-500",
     bgGlow: "bg-blue-500/10",
@@ -31,22 +31,12 @@ const tools = [
   {
     id: "posts",
     name: "Gerador de Posts",
-    description: "Crie posts para Instagram, Twitter e stories com templates prontos e IA.",
-    icon: PenTool,
+    description: "Crie posts com imagens para Instagram e redes sociais usando IA. 5 posts grátis por semana.",
+    icon: ImagePlus,
     color: "from-violet-500 to-pink-500",
     bgGlow: "bg-violet-500/10",
     tier: "free",
     href: "/ias/posts",
-  },
-  {
-    id: "images",
-    name: "Criador de Imagens",
-    description: "Gere imagens únicas para seus posts, stories, banners e mais.",
-    icon: ImagePlus,
-    color: "from-orange-500 to-red-500",
-    bgGlow: "bg-orange-500/10",
-    tier: "pro",
-    href: "/ias/imagens",
   },
 ];
 
