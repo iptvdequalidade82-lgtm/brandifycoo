@@ -19,7 +19,7 @@ const PLANS = [
     gradient: "from-blue-400 to-cyan-500",
     gradientBg: "from-blue-500/10 to-cyan-500/10",
     borderColor: "border-blue-500/20",
-    badge: null,
+    badge: "Mais popular",
     features: [
       "Criações ilimitadas de posts",
       "Chat com IA ilimitado",
@@ -38,7 +38,7 @@ const PLANS = [
     gradient: "from-amber-400 to-orange-500",
     gradientBg: "from-amber-500/10 to-orange-500/10",
     borderColor: "border-amber-500/20",
-    badge: "Mais popular",
+    badge: "Melhor custo-benefício",
     features: [
       "Tudo do Básico +",
       "Histórico de conversas salvo",
@@ -199,7 +199,7 @@ export default function PlanosPro() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 mb-12">
           {PLANS.map((plan, i) => {
             const isActive = currentPlan === plan.key;
-            const isPopular = plan.key === "pro";
+            const isPopular = plan.key === "basico";
 
             return (
               <motion.div
