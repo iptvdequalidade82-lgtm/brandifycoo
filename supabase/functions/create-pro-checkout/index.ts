@@ -7,60 +7,29 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const CAKTO_API_BASE = "https://api.cakto.com.br";
-const PRO_PRICE_REAIS = 49.90;
-const PRO_PLAN_NAME = "Plano IA Brandify";
+// Fixed Cakto checkout URLs (managed in Cakto dashboard)
+const PLANS = {
+  basico: {
+    name: "Básico",
+    price_cents: 4990,
+    checkout_url: "https://pay.cakto.com.br/xyg6djs_784476",
+    offer_id: "xyg6djs_784476",
+  },
+  pro: {
+    name: "Pro",
+    price_cents: 6990,
+    checkout_url: "https://pay.cakto.com.br/3bbk9vi",
+    offer_id: "3bbk9vi",
+  },
+  premium: {
+    name: "Premium",
+    price_cents: 12990,
+    checkout_url: "https://pay.cakto.com.br/yxdhikx",
+    offer_id: "yxdhikx",
+  },
+} as const;
 
-async function getCaktoToken(): Promise<string> {
-  const clientId = Deno.env.get("CAKTO_CLIENT_ID");
-  const clientSecret = Deno.env.get("CAKTO_CLIENT_SECRET");
-  if (!clientId || !clientSecret) throw new Error("Cakto credentials not configured");
-
-  const response = await fetch(`${CAKTO_API_BASE}/public_api/token/`, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ client_id: clientId, client_secret: clientSecret }),
-  });
-
-  if (!response.ok) throw new Error("Failed to authenticate with Cakto");
-  const data = await response.json();
-  return data.access_token;
-}
-
-async function createCaktoOffer(
-  token: string,
-  productId: string,
-  name: string,
-  priceReais: number
-): Promise<{ id: string; checkoutUrl: string }> {
-  const response = await fetch(`${CAKTO_API_BASE}/public_api/offers/`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name: name.substring(0, 255),
-      price: priceReais,
-      product: productId,
-      status: "active",
-      type: "recurring",
-      period: "monthly",
-    }),
-  });
-
-  if (!response.ok) {
-    const text = await response.text();
-    console.error("Cakto create offer error:", text);
-    throw new Error(`Cakto: ${text}`);
-  }
-
-  const offer = await response.json();
-  return {
-    id: offer.id,
-    checkoutUrl: `https://pay.cakto.com.br/${offer.id}`,
-  };
-}
+type PlanKey = keyof typeof PLANS;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -68,14 +37,23 @@ serve(async (req) => {
   }
 
   try {
-    // Require authenticated user (not admin)
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
-      return new Response(JSON.stringify({ error: "Faça login para assinar o plano Pro" }), {
+      return new Response(JSON.stringify({ error: "Faça login para assinar um plano" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const { plan: planKey } = await req.json() as { plan?: string };
+    if (!planKey || !(planKey in PLANS)) {
+      return new Response(JSON.stringify({ error: "Plano inválido. Use: basico, pro ou premium" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const plan = PLANS[planKey as PlanKey];
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseAnon = Deno.env.get("SUPABASE_ANON_KEY")!;
@@ -84,7 +62,7 @@ serve(async (req) => {
     const anonClient = createClient(supabaseUrl, supabaseAnon);
     const token = authHeader.replace("Bearer ", "");
     const { data: { user }, error: userError } = await anonClient.auth.getUser(token);
-    
+
     if (userError || !user) {
       return new Response(JSON.stringify({ error: "Sessão inválida. Faça login novamente." }), {
         status: 401,
@@ -94,41 +72,29 @@ serve(async (req) => {
 
     const serviceClient = createClient(supabaseUrl, supabaseService, { auth: { persistSession: false } });
 
-    // Check if user already has an active subscription
+    // Check if user already has an active subscription for this plan or higher
     const { data: existing } = await serviceClient
       .from("subscriptions")
-      .select("id, status, cakto_checkout_url")
+      .select("id, status, plan, cakto_checkout_url")
       .eq("user_id", user.id)
-      .eq("plan", "pro")
+      .eq("status", "active")
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
 
-    if (existing?.status === "active") {
-      return new Response(JSON.stringify({ error: "Você já possui o plano Pro ativo!", already_pro: true }), {
+    if (existing) {
+      return new Response(JSON.stringify({
+        error: `Você já possui o plano ${existing.plan} ativo!`,
+        already_subscribed: true,
+        current_plan: existing.plan,
+      }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // If there's a pending subscription with checkout URL, return it
-    if (existing?.status === "pending" && existing?.cakto_checkout_url) {
-      return new Response(JSON.stringify({ url: existing.cakto_checkout_url, subscription_id: existing.id }), {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // Create Cakto offer
-    const caktoToken = await getCaktoToken();
-    const productId = Deno.env.get("CAKTO_PRODUCT_ID");
-    if (!productId) throw new Error("CAKTO_PRODUCT_ID not configured");
-
-    const offerName = `${PRO_PLAN_NAME} - ${user.email || user.id.slice(0, 8)}`;
-    const offer = await createCaktoOffer(caktoToken, productId, offerName, PRO_PRICE_REAIS);
-
     // Build checkout URL with pre-filled data
-    let checkoutUrl = offer.checkoutUrl;
+    let checkoutUrl = plan.checkout_url;
     const params = new URLSearchParams();
     if (user.email) params.set("email", user.email);
     const fullName = user.user_metadata?.full_name;
@@ -140,10 +106,10 @@ serve(async (req) => {
       .from("subscriptions")
       .insert({
         user_id: user.id,
-        plan: "pro",
+        plan: planKey,
         status: "pending",
-        amount_cents: Math.round(PRO_PRICE_REAIS * 100),
-        cakto_offer_id: offer.id,
+        amount_cents: plan.price_cents,
+        cakto_offer_id: plan.offer_id,
         cakto_checkout_url: checkoutUrl,
         payment_method: "cakto",
       })
