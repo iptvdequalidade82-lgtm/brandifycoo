@@ -455,10 +455,10 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
                   <Button onClick={handleGenerateImage} className="flex-1 bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 border-0 text-white font-medium h-11">
                     <Sparkles className="w-4 h-4 mr-2" />Gerar post visual agora
                   </Button>
-                  <Button onClick={() => handleGenerateCopy()} variant="outline" className="border-white/10 text-white/50 hover:text-white hover:bg-white/[0.05] h-11">
+                  <Button onClick={() => handleGenerateCopy()} variant="ghost" className="border border-white/10 text-white/50 hover:text-white hover:bg-white/[0.08] bg-white/[0.04] h-11">
                     <Zap className="w-4 h-4 mr-2" />Refazer copy
                   </Button>
-                  <Button onClick={() => { navigator.clipboard.writeText(generatedCopy); toast({ title: "Copy copiada! 📋" }); }} variant="outline" className="border-white/10 text-white/50 hover:text-white hover:bg-white/[0.05] h-11">
+                  <Button onClick={() => { navigator.clipboard.writeText(generatedCopy); toast({ title: "Copy copiada! 📋" }); }} variant="ghost" className="border border-white/10 text-white/50 hover:text-white hover:bg-white/[0.08] bg-white/[0.04] h-11">
                     📋 Copiar
                   </Button>
                 </div>
