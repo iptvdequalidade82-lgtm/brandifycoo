@@ -18,8 +18,8 @@ serve(async (req) => {
     const aspectRatio = type === "story" ? "9:16" : "1:1";
     const dimensions = type === "story" ? "1080x1920" : "1080x1080";
 
-    // Rotate between 6 visual models trained from real reference posts
-    const visualModels = ["A", "B", "C", "D", "E", "F"];
+    // Rotate between 10 visual models trained from real reference posts
+    const visualModels = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
     const selectedModel = visualModels[Math.floor(Math.random() * visualModels.length)];
 
     const modelInstructions: Record<string, string> = {
@@ -30,7 +30,6 @@ serve(async (req) => {
 - Text uses CLIPPING MASK effect: the letters are filled with a different landscape/sky texture visible THROUGH the text
 - Cinematic color grading: golden hour, blue tones, dramatic clouds
 - Motivational/aspirational Portuguese text in the headline
-- Think Instagram viral motivational pages with premium design quality
 - Reference: "O PLANO DE DEUS NUNCA INCLUIU DESISTIR, SÓ VENCER" style with landscape-filled giant text`,
 
       B: `MODEL B — DARK LUXURY NIGHT SCENE:
@@ -39,7 +38,6 @@ serve(async (req) => {
 - Person in dark clothing, face obscured or in shadow — mysterious, powerful vibe
 - GIANT white bold typography with BRAND PATTERN FILL (like Louis Vuitton monogram inside letters)
 - High contrast: deep blacks, bright whites, subtle red accents from car lights
-- Text occupies upper 40% of image, car/person in lower 60%
 - Mood: power, ambition, luxury, street culture meets high fashion
 - Reference: "A ÚNICA OPÇÃO É VENCER" with LV-pattern filled letters over night car scene`,
 
@@ -50,7 +48,6 @@ serve(async (req) => {
 - Clean, elegant typography — mix of italic script and bold sans-serif
 - Soft or dramatic colors matching the sport: pink/purple for snow, blue for ocean, warm for desert
 - Text positioned to complement the action, not block it
-- Smaller, refined text — "faça acontecer, surpreenda a todos" style
 - Reference: snowboarder with clean white text and generous negative space`,
 
       D: `MODEL D — CINEMATIC SPEED & MOTION:
@@ -58,8 +55,6 @@ serve(async (req) => {
 - Dark/moody atmosphere with dramatic lighting (headlights, speed streaks)
 - Object in sharp focus against blurred background (helmet, car detail, face)
 - Bold white/silver typography with MOTION BLUR EFFECT on the text itself
-- Text feels like it's MOVING with the subject
-- Strong motivational message in Portuguese
 - Red and black color palette, cinematic grain
 - Reference: Ferrari helmet with "NÃO TENHA MEDO DE IR DEVAGAR, SÓ EM PARAR" in motion-blurred text`,
 
@@ -69,8 +64,7 @@ serve(async (req) => {
 - Overlay of subtle design elements: grids, brackets, technical marks, UI hints
 - Multi-weight typography: large headline + smaller body text + brand credits
 - Key words highlighted in ACCENT COLOR (orange, red, or brand color)
-- Agency branding visible: "AGÊNCIA" or brand name at top
-- Think Nike campaign or premium agency case study post
+- Agency branding visible at top
 - Reference: Nike editorial with "Como a Nike descobriu um novo pote de ouro" style dark layout`,
 
       F: `MODEL F — ASPIRATIONAL LIFESTYLE WITH GIANT NUMBERS/TEXT:
@@ -78,10 +72,50 @@ serve(async (req) => {
 - Person reaching out toward camera (POV perspective) or standing at dramatic location
 - ENORMOUS numbers or single word that FILLS the entire frame
 - Numbers/text use CLIPPING MASK showing the sky/landscape THROUGH the characters
-- Smaller secondary text above or below the giant text
-- Inspirational/seasonal theme: new year, new chapter, fresh start
 - Warm golden tones, ocean rocks, dramatic clouds
 - Reference: "SEJA BEM VINDO 2026" with sunset-filled numbers over ocean rocks`,
+
+      G: `MODEL G — SURREAL ENVIRONMENT WITH PRODUCT/LAPTOP:
+- Creative surreal-but-grounded scene: underwater, jungle, space, fantasy setting
+- Real product (laptop, phone, tablet) floating or placed in the surreal environment
+- Laptop screen showing a real website or social media feed
+- GIANT stylized text with CLIPPING MASK or transparency — text filled with environment texture
+- Bubbles, particles, organic elements (rope, plants, rocks) adding depth
+- Agency branding at bottom with elegant small text
+- Think "tech product in magical world" — premium and creative
+- Reference: Laptop underwater with "4 EXTENSÕES ESCONDIDAS QUE VÃO SALVAR A SUA VIDA!" style`,
+
+      H: `MODEL H — BOLD AGENCY SOCIAL MEDIA STYLE (Orange/Dark):
+- Strong brand colors: ORANGE and BLACK as dominant palette, or vibrant accent + dark background
+- 3D rendered characters, mascots, or stylized portraits as hero elements
+- Character can be: funny/expressive person, animal with human traits, superhero-styled figure
+- Bold, chunky typography — mix of different weights and sizes for visual hierarchy
+- Agency header bar at top: "AGÊNCIA [NAME]" with logo
+- Multiple text elements: headline + subheadline + CTA + small body text
+- Energetic, fun, attention-grabbing — designed to STOP THE SCROLL
+- Social media UI elements visible (save icon, share icon) as design accents
+- Reference: Agência Tenks grid with orange/dark posts, 3D characters, bold headlines`,
+
+      I: `MODEL I — ROYAL/PREMIUM PORTRAIT:
+- Rich, deep color background (burgundy, royal red, deep purple, dark gold)
+- Person facing camera with CROWN, luxury accessories, or royal elements
+- Premium editorial portrait — dramatic lighting on face, dark vignette
+- Overlay of faded text (lorem ipsum style) as texture behind the person
+- GIANT headline at bottom using GRADIENT TEXT (gold to orange) or mixed serif/sans-serif
+- "Parental Advisory" style badges or stamp-like design elements as accents
+- Mood: royalty, authority, confidence, premium content
+- Reference: Man with crown, red background, "Copie o meu Prompt" with gradient gold text`,
+
+      J: `MODEL J — DARK TECH/LAUNCH ANNOUNCEMENT:
+- Deep black/dark background with subtle grid or particle effects
+- Hyper-detailed 3D rendered animal or creature as hero (cat, wolf, lion, eagle)
+- Creature has GLOWING EYES (red, orange, or electric blue) — dramatic and intense
+- Brand logo and name prominently at top
+- GIANT bold colored text (orange, red) as main headline — product or event name
+- "SAVE THE DATE" or launch-style urgency elements
+- Design tool icons (Photoshop toolbar, pen tool icons) floating as subtle background elements
+- Mood: powerful, tech-forward, aggressive launch energy
+- Reference: Black cat with red glowing eyes, "MIAL - Método IA Lucrativa" dark launch post`,
     };
 
     const referenceInstruction = referenceImage
