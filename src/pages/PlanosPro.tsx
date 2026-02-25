@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Crown, Check, ArrowLeft, Zap, Sparkles } from "lucide-react";
+import { Crown, Check, ArrowLeft, Zap, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.jpg";
 
 const features = [
@@ -15,18 +18,61 @@ const features = [
   "Novos modelos visuais todo mês",
 ];
 
+const CHECKOUT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-pro-checkout`;
+
 export default function PlanosPro() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
 
-  const handleBuy = () => {
+  const handleBuy = async () => {
     if (!user) {
       navigate("/login?redirect=/planos-pro&upgrade=pro");
       return;
     }
-    // TODO: integrate payment (Cakto/Pix)
-    // For now, just show coming soon via toast or navigate
-    navigate("/planos-pro");
+
+    setLoading(true);
+    try {
+      const session = (await supabase.auth.getSession()).data.session;
+      if (!session) {
+        navigate("/login?redirect=/planos-pro");
+        return;
+      }
+
+      const res = await fetch(CHECKOUT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({}),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (data.already_pro) {
+          toast({ title: "Você já é Pro! 🎉", description: "Seu plano já está ativo." });
+          navigate("/ias");
+          return;
+        }
+        throw new Error(data.error || "Erro ao processar pagamento");
+      }
+
+      if (data.url) {
+        window.open(data.url, "_blank");
+        toast({
+          title: "Checkout aberto! 💳",
+          description: "Complete o pagamento na nova aba. Seu plano será ativado automaticamente.",
+        });
+      }
+    } catch (e: any) {
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -103,14 +149,19 @@ export default function PlanosPro() {
 
           <Button
             onClick={handleBuy}
-            className="w-full h-12 bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-black font-bold text-base border-0 shadow-xl shadow-amber-500/20 rounded-xl"
+            disabled={loading}
+            className="w-full h-12 bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-black font-bold text-base border-0 shadow-xl shadow-amber-500/20 rounded-xl disabled:opacity-70"
           >
-            <Zap className="w-5 h-5 mr-2" />
-            {user ? "Assinar Pro" : "Fazer login e assinar"}
+            {loading ? (
+              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+            ) : (
+              <Zap className="w-5 h-5 mr-2" />
+            )}
+            {loading ? "Processando..." : user ? "Assinar Pro" : "Fazer login e assinar"}
           </Button>
 
           <p className="text-white/20 text-xs text-center mt-3">
-            Cancele a qualquer momento • Sem fidelidade
+            Pagamento seguro via PIX • Ativação instantânea
           </p>
         </motion.div>
 
@@ -125,7 +176,7 @@ export default function PlanosPro() {
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4">
               <p className="text-white/30 text-xs font-medium mb-2 uppercase tracking-wider">Grátis</p>
-              <p className="text-white/60 text-sm">5 criações/semana</p>
+              <p className="text-white/60 text-sm">5 criações/dia</p>
               <p className="text-white/30 text-xs mt-1">Histórico temporário</p>
             </div>
             <div className="rounded-xl bg-amber-500/10 border border-amber-500/20 p-4">
