@@ -61,7 +61,6 @@ export default function Footer() {
             <span className="text-xs text-white/30">
               © {new Date().getFullYear()} Brandify. Todos os direitos reservados.
             </span>
-            <Link to="/admin/login" className="text-xs text-white/10 hover:text-white/30 gentle-animation">·</Link>
           </div>
           <div className="flex gap-3">
             <a href="https://www.instagram.com/brandifycoo" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-lg border border-white/10 bg-white/[0.04] flex items-center justify-center text-white/40 hover:text-white hover:border-white/20 hover:bg-white/[0.08] gentle-animation" aria-label="Instagram">
