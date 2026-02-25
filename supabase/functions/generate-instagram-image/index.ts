@@ -9,7 +9,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { prompt, type } = await req.json(); // type: "feed" | "story"
+    const { prompt, type, referenceImage } = await req.json(); // referenceImage: optional base64 data URL
 
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -56,12 +56,24 @@ serve(async (req) => {
 - Warm, natural lighting on physical objects with real shadows and reflections`,
     };
 
+    const referenceInstruction = referenceImage
+      ? `\n\n📎 REFERENCE IMAGE PROVIDED:
+The user has uploaded a reference image (could be a logo, photo, or design idea).
+- Analyze the reference image carefully: extract colors, style, mood, branding elements, logos, and visual identity.
+- INCORPORATE elements from the reference into the final post design.
+- If it's a LOGO: integrate it prominently into the post design as the brand identity.
+- If it's a PHOTO: use it as visual inspiration for the composition, colors, and mood.
+- If it's a DESIGN: absorb the style and recreate something similar but elevated and professional.
+- The final result should feel like a natural evolution of the reference, not a copy.`
+      : "";
+
     const imagePrompt = `Create a clean, high-end, professional social media ${type === "story" ? "story (9:16 vertical, 1080x1920px)" : "feed post (1:1 square, 1080x1080px)"} for BRANDIFY, a premium Brazilian creative agency.
 
 The image must look 100% realistic, like a real brand campaign — NOT AI-generated.
 
 🎯 VISUAL MODEL: ${selectedModel}
 ${modelInstructions[selectedModel]}
+${referenceInstruction}
 
 📸 STYLE & MOOD:
 - Style: minimal, editorial, premium, corporate-modern
@@ -106,7 +118,20 @@ CONTENT/TOPIC for the headline: ${prompt}`;
 
     let imageUrl: string | undefined;
 
-    // Provider 1: Lovable AI Gateway (primary — no billing needed)
+    // Build message content parts (text + optional reference image)
+    const buildMessageContent = () => {
+      const parts: any[] = [{ type: "text", text: imagePrompt }];
+      if (referenceImage) {
+        // referenceImage is a base64 data URL like "data:image/png;base64,..."
+        parts.push({
+          type: "image_url",
+          image_url: { url: referenceImage },
+        });
+      }
+      return parts;
+    };
+
+    // Provider 1: Lovable AI Gateway (primary)
     if (LOVABLE_API_KEY && !imageUrl) {
       const gatewayModels = ["google/gemini-3-pro-image-preview", "google/gemini-2.5-flash-image"];
       for (const model of gatewayModels) {
@@ -121,7 +146,7 @@ CONTENT/TOPIC for the headline: ${prompt}`;
             },
             body: JSON.stringify({
               model,
-              messages: [{ role: "user", content: imagePrompt }],
+              messages: [{ role: "user", content: buildMessageContent() }],
               modalities: ["image", "text"],
             }),
           });
@@ -150,7 +175,7 @@ CONTENT/TOPIC for the headline: ${prompt}`;
       }
     }
 
-    // Provider 2: Direct Gemini API (fallback — requires billing for image models)
+    // Provider 2: Direct Gemini API (fallback)
     if (GEMINI_API_KEY && !imageUrl) {
       const model = "gemini-2.5-flash-image";
       console.log(`Trying direct Gemini fallback: ${model}`);
@@ -158,12 +183,25 @@ CONTENT/TOPIC for the headline: ${prompt}`;
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 45000);
         const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+
+        // Build parts for Gemini native format
+        const geminiParts: any[] = [{ text: imagePrompt }];
+        if (referenceImage) {
+          // Extract mime type and base64 data from data URL
+          const match = referenceImage.match(/^data:(image\/\w+);base64,(.+)$/);
+          if (match) {
+            geminiParts.push({
+              inlineData: { mimeType: match[1], data: match[2] },
+            });
+          }
+        }
+
         const res = await fetch(geminiUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           signal: controller.signal,
           body: JSON.stringify({
-            contents: [{ parts: [{ text: imagePrompt }] }],
+            contents: [{ parts: geminiParts }],
             generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
           }),
         });
