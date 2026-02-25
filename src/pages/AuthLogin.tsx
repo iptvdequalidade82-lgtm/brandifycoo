@@ -23,17 +23,32 @@ const AuthLogin = () => {
   const searchParams = new URLSearchParams(window.location.search);
   const redirectTo = searchParams.get("redirect") || "/ias";
 
+  const checkAdminAndRedirect = async (userId: string) => {
+    const { data } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+    
+    if (data) {
+      navigate("/admin");
+    } else {
+      navigate(redirectTo);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error, data } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       setError("Email ou senha incorretos. Verifique e tente novamente.");
     } else {
       toast.success("Login realizado com sucesso!");
-      navigate(redirectTo);
+      await checkAdminAndRedirect(data.user.id);
     }
     setLoading(false);
   };
