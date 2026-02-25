@@ -476,6 +476,10 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
                 {generatedImages.map((img, i) => (
                   <motion.div key={`${img.prompt}-${i}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="group relative rounded-2xl overflow-hidden border border-white/[0.08] bg-white/[0.02] hover:border-white/[0.15] transition-all duration-300">
                     <img src={img.url} alt={img.prompt} className="w-full object-cover" loading="lazy" />
+                    {/* Brandify logo watermark */}
+                    <div className="absolute bottom-2 right-2 z-10 pointer-events-none">
+                      <img src={logo} alt="" className="w-5 h-5 rounded-[4px] object-cover opacity-60 shadow-sm shadow-black/40" />
+                    </div>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-5">
                       <div className="space-y-3">
                         <span className="text-[10px] uppercase tracking-wider text-white/40 font-medium px-2 py-0.5 rounded-md bg-white/10">

@@ -199,6 +199,32 @@ The user has uploaded a reference image (could be a logo, photo, or design idea)
 - The final result should feel like a natural evolution of the reference, not a copy.`
       : "";
 
+    // ── Niche detection: add contextually relevant visual elements ──
+    const nicheMap: Record<string, string> = {
+      "churrascaria|churrasco|grelha|churrasqueira|açougue|carnes": `🥩 NICHE — CHURRASCARIA/BBQ: Include smoking grill, charcoal flames, sizzling picanha, espeto/skewers, rustic wood cutting boards. Warm fire orange, ember red, smoky atmosphere. Environment: rustic steakhouse, outdoor BBQ pit, churrasqueira de tijolos.`,
+      "salão|salao|cabeleireiro|cabelo|beleza|beauty|estética|estetica|manicure|unhas": `💇 NICHE — BEAUTY SALON: Include scissors, hair styling, mirrors, salon chairs. Rose gold, soft pink, champagne tones. Environment: modern salon interior.`,
+      "academia|fitness|gym|treino|musculação|crossfit|personal": `🏋️ NICHE — FITNESS: Include dumbbells, barbells, weight plates, gym floor. Dark blacks, neon accents, steel grays. Environment: modern gym interior.`,
+      "restaurante|comida|food|gastronomia|pizza|hambúrguer|hamburgueria|sushi|padaria|confeitaria|bolo|café|cafeteria": `🍽️ NICHE — FOOD: Include beautifully plated dishes, chef hands, fresh ingredients, steam. Warm golden, rich browns, fresh greens. Environment: restaurant/kitchen.`,
+      "advocacia|advogado|jurídico|juridico|direito|escritório": `⚖️ NICHE — LAW: Include gavel, law books, scales of justice. Navy blue, dark wood, gold. Environment: elegant office.`,
+      "dentista|odontologia|clareamento|sorriso": `🦷 NICHE — DENTAL: Include bright smiles, clean clinical elements. Whites, light blues, mint green. Environment: modern dental office.`,
+      "imobiliária|imobiliaria|imóvel|casa|apartamento|corretor": `🏠 NICHE — REAL ESTATE: Include luxury property, keys, modern architecture. Warm whites, golden hour. Environment: luxury apartment.`,
+      "loja|roupa|moda|fashion|boutique|streetwear|tênis|sneaker": `👗 NICHE — FASHION: Include clothing racks, fashion accessories, styled outfits. Trendy colors. Environment: boutique interior.`,
+      "pet|veterinário|veterinario|cachorro|gato|banho e tosa": `🐾 NICHE — PET: Include cute dogs/cats, paw prints, grooming tools. Warm pastels. Environment: pet shop/vet clinic.`,
+      "barbearia|barbeiro|barba|corte masculino": `💈 NICHE — BARBERSHOP: Include straight razor, barber chair, pomade. Deep blacks, gold, chrome. Environment: modern barbershop.`,
+      "oficina|mecânica|mecanica|carro|auto|funilaria": `🔧 NICHE — AUTO: Include car parts, tools, lifted vehicle. Metallic grays, chrome. Environment: professional garage.`,
+      "escola|educação|educacao|curso|aula|professor": `📚 NICHE — EDUCATION: Include books, classroom, notebooks. Navy blue, warm wood. Environment: modern classroom.`,
+      "farmácia|farmacia|médico|medico|hospital|clínica médica": `🏥 NICHE — HEALTH: Include stethoscope, clean clinical elements. Whites, light blues. Environment: modern clinic.`,
+    };
+
+    let nicheInstruction = "";
+    const promptLower = prompt.toLowerCase();
+    for (const [keywords, instruction] of Object.entries(nicheMap)) {
+      if (keywords.split("|").some((kw) => promptLower.includes(kw))) {
+        nicheInstruction = `\n\n🏪 NICHE-SPECIFIC VISUALS:\n${instruction}\nCRITICAL: Visual elements MUST match the business niche. Do NOT use random animals or unrelated objects. Every element should reinforce the niche.`;
+        break;
+      }
+    }
+
     const imagePrompt = `Create a clean, high-end, professional social media ${type === "story" ? "story (9:16 vertical, 1080x1920px)" : "feed post (1:1 square, 1080x1080px)"} for BRANDIFY, a premium Brazilian creative agency.
 
 The image must look 100% realistic, like a real brand campaign — NOT AI-generated.
@@ -206,6 +232,7 @@ The image must look 100% realistic, like a real brand campaign — NOT AI-genera
 🎯 VISUAL MODEL: ${selectedModel}
 ${modelInstructions[selectedModel]}
 ${referenceInstruction}
+${nicheInstruction}
 
 📸 STYLE & MOOD:
 - Style: bold, impactful, cinematic, premium street-culture meets high-end design
@@ -221,7 +248,7 @@ ${referenceInstruction}
 - Mix font weights dramatically: giant bold keyword + smaller elegant secondary text
 - Creative line breaks for visual rhythm and impact
 - Can use script/handwritten fonts for secondary accents
-- WATERMARK: "@brandifycoo" or "POR BRANDIFY" small and subtle in a corner
+- WATERMARK: Place a small, subtle "BRANDIFY" or "@brandifycoo" text in the BOTTOM-RIGHT corner — semi-transparent, minimal, like a professional agency watermark. Do NOT use the Gemini star logo.
 - Text must feel INTEGRATED into the composition, not floating on top
 
 📐 COMPOSITION:
@@ -239,6 +266,8 @@ ${referenceInstruction}
 - Flat design, vector art, clipart
 - Small, weak typography — text MUST be bold and impactful
 - Generic motivational quote layouts with plain backgrounds
+- Visual elements that DON'T MATCH the business niche — no random animals for a restaurant, no food for a gym
+- Gemini star watermark or any AI branding — do NOT include the Gemini star logo anywhere
 - If it looks AI-generated or like a basic template → WRONG. Regenerate.
 
 🧠 QUALITY CHECK: This must look like a REAL post from a top Brazilian creative agency or viral motivational Instagram page. Think luxury streetwear brands, premium agencies, or pages with 1M+ followers. If it looks simple, generic, or AI-made → regenerate.
