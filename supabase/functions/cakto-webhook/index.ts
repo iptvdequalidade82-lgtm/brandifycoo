@@ -66,45 +66,55 @@ serve(async (req) => {
     const customerEmail = body?.customer?.email || body?.email || "";
     const customerName = body?.customer?.name || body?.name || "";
 
-    // ── Check if this is a Pro subscription payment ──
+    // ── Known subscription offer IDs ──
+    const SUBSCRIPTION_OFFER_IDS = ["xyg6djs_784476", "3bbk9vi", "yxdhikx"];
+
+    // ── Check if this is a subscription payment ──
     let subscription = null;
+    const isSubscriptionOffer = SUBSCRIPTION_OFFER_IDS.includes(offerId);
+
     if (offerId) {
+      // First try exact match by offer ID
       const { data } = await supabaseAdmin
         .from("subscriptions")
         .select("*")
         .eq("cakto_offer_id", offerId)
         .eq("status", "pending")
+        .order("created_at", { ascending: false })
         .maybeSingle();
       subscription = data;
     }
-    if (!subscription && customerEmail) {
-      const { data } = await supabaseAdmin
-        .from("subscriptions")
-        .select("*")
-        .eq("status", "pending")
-        .order("created_at", { ascending: false })
-        .limit(10);
-      // Match by user email
-      if (data && data.length > 0) {
-        // We need to check user email - get users via auth
-        // For now, just match the most recent pending subscription
-        // The offer_id match above should handle most cases
+
+    // If offer ID matches a known subscription but no pending record, try by email
+    if (!subscription && isSubscriptionOffer && customerEmail) {
+      // Find user by email and their most recent pending subscription
+      const { data: users } = await supabaseAdmin.auth.admin.listUsers();
+      const matchedUser = users?.users?.find(u => u.email === customerEmail);
+      if (matchedUser) {
+        const { data } = await supabaseAdmin
+          .from("subscriptions")
+          .select("*")
+          .eq("user_id", matchedUser.id)
+          .eq("status", "pending")
+          .order("created_at", { ascending: false })
+          .maybeSingle();
+        subscription = data;
       }
     }
 
     if (subscription) {
-      // Activate Pro subscription
+      // Activate subscription
       await supabaseAdmin
         .from("subscriptions")
         .update({
           status: "active",
           paid_at: new Date().toISOString(),
-          expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days
+          expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         })
         .eq("id", subscription.id);
 
-      console.log(`Pro subscription ${subscription.id} activated for user ${subscription.user_id}`);
-      return new Response(JSON.stringify({ received: true, matched: true, type: "pro_subscription" }), {
+      console.log(`Subscription ${subscription.id} (plan: ${subscription.plan}) activated for user ${subscription.user_id}`);
+      return new Response(JSON.stringify({ received: true, matched: true, type: "subscription", plan: subscription.plan }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
       });

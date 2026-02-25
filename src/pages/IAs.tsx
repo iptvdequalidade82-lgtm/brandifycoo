@@ -84,28 +84,47 @@ const CHAT_SUGGESTIONS = [
 ];
 
 const MAX_FREE_WEEKLY = 5;
+const PLAN_LABELS: Record<string, string> = { basico: "Básico", pro: "Pro", premium: "Premium" };
 
 // ══════════════════════════════════════════════════
 // ██  PRO CTA BANNER
 // ══════════════════════════════════════════════════
-function ProBanner({ user, remaining }: { user: User | null; remaining: number }) {
+function ProBanner({ user, remaining, userPlan }: { user: User | null; remaining: number; userPlan: string | null }) {
   const navigate = useNavigate();
 
   const handleUpgrade = () => {
     if (!user) {
-      // Redirect to login first, then back to /ias
       navigate("/login?redirect=/ias&upgrade=pro");
       return;
     }
     navigate("/planos-pro");
   };
 
+  // If user has any active plan, show plan badge instead of CTA
+  if (userPlan) {
+    return (
+      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mx-3 md:mx-6 mt-2 mb-0">
+        <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-yellow-500/10 border border-amber-500/20">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shrink-0">
+              <Crown className="w-3.5 h-3.5 text-white" />
+            </div>
+            <p className="text-white/80 text-xs font-medium">
+              Plano {PLAN_LABELS[userPlan] || userPlan} ativo • Uso ilimitado
+            </p>
+          </div>
+          {userPlan !== "premium" && (
+            <button onClick={handleUpgrade} className="text-amber-400/70 hover:text-amber-300 text-xs font-medium transition-colors">
+              Fazer upgrade →
+            </button>
+          )}
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="mx-3 md:mx-6 mt-2 mb-0"
-    >
+    <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mx-3 md:mx-6 mt-2 mb-0">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-3 py-2.5 rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-yellow-500/10 border border-amber-500/20">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shrink-0">
@@ -114,12 +133,12 @@ function ProBanner({ user, remaining }: { user: User | null; remaining: number }
           <div>
             <p className="text-white/80 text-xs font-medium">
               {remaining > 0
-               ? `${remaining} ${remaining === 1 ? "criação grátis restante" : "criações grátis restantes"} hoje`
+               ? `${remaining} ${remaining === 1 ? "criação grátis restante" : "criações grátis restantes"} esta semana`
                 : "Limite atingido"
               }
             </p>
             <p className="text-white/30 text-[10px] hidden sm:block">
-              Desbloqueie uso ilimitado e recursos Pro
+              Assine um plano para uso ilimitado
             </p>
           </div>
         </div>
@@ -128,7 +147,7 @@ function ProBanner({ user, remaining }: { user: User | null; remaining: number }
           className="shrink-0 flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-gradient-to-r from-amber-400 to-orange-500 text-black text-xs font-bold hover:from-amber-300 hover:to-orange-400 transition-all shadow-lg shadow-amber-500/20 w-full sm:w-auto"
         >
           <Crown className="w-3.5 h-3.5" />
-          <span>Pro R$39,90</span>
+          <span>Ver planos</span>
         </button>
       </div>
     </motion.div>
@@ -138,7 +157,7 @@ function ProBanner({ user, remaining }: { user: User | null; remaining: number }
 // ══════════════════════════════════════════════════
 // ██  POST GENERATOR TAB
 // ══════════════════════════════════════════════════
-function PostGenerator({ user }: { user: User | null }) {
+function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string | null }) {
   const { toast } = useToast();
   const [prompt, setPrompt] = useState("");
   const [postType, setPostType] = useState<"feed" | "story">("feed");
@@ -151,9 +170,8 @@ function PostGenerator({ user }: { user: User | null }) {
   const [referenceImage, setReferenceImage] = useState<string | null>(null);
   const [referencePreview, setReferencePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  // TODO: Pro users get unlimited
-  const isPro = false;
-  const MAX_WEEKLY = isPro ? Infinity : MAX_FREE_WEEKLY;
+  const hasActivePlan = !!userPlan;
+  const MAX_WEEKLY = hasActivePlan ? Infinity : MAX_FREE_WEEKLY;
 
   useEffect(() => {
     setWeeklyCount(getWeeklyUsage(user?.id));
@@ -1102,6 +1120,7 @@ export default function IAs() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [weeklyCount, setWeeklyCount] = useState(0);
+  const [userPlan, setUserPlan] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -1115,6 +1134,20 @@ export default function IAs() {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Fetch active subscription plan
+  useEffect(() => {
+    if (!user) { setUserPlan(null); return; }
+    supabase
+      .from("subscriptions")
+      .select("plan")
+      .eq("user_id", user.id)
+      .eq("status", "active")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => setUserPlan(data?.plan || null));
+  }, [user]);
+
   useEffect(() => {
     setWeeklyCount(getWeeklyUsage(user?.id));
   }, [user?.id]);
@@ -1124,7 +1157,7 @@ export default function IAs() {
     navigate("/ias");
   };
 
-  const remaining = Math.max(0, MAX_FREE_WEEKLY - weeklyCount);
+  const remaining = userPlan ? Infinity : Math.max(0, MAX_FREE_WEEKLY - weeklyCount);
 
   if (loading) {
     return (
@@ -1163,7 +1196,7 @@ export default function IAs() {
       </header>
 
       {/* Pro banner */}
-      <ProBanner user={user} remaining={remaining} />
+      <ProBanner user={user} remaining={remaining === Infinity ? 999 : remaining} userPlan={userPlan} />
 
       {/* Tabs */}
       <Tabs defaultValue="posts" className="flex-1 flex flex-col overflow-hidden">
@@ -1187,7 +1220,7 @@ export default function IAs() {
         </div>
 
         <TabsContent value="posts" className="flex-1 overflow-hidden m-0 data-[state=inactive]:hidden">
-          <PostGenerator user={user} />
+          <PostGenerator user={user} userPlan={userPlan} />
         </TabsContent>
         <TabsContent value="chat" className="flex-1 overflow-hidden m-0 data-[state=inactive]:hidden">
           <ChatTab user={user} />
