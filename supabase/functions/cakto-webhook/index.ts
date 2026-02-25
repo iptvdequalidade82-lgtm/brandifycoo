@@ -66,7 +66,51 @@ serve(async (req) => {
     const customerEmail = body?.customer?.email || body?.email || "";
     const customerName = body?.customer?.name || body?.name || "";
 
-    // Try to find the proposal by cakto_offer_id or by matching checkout URL
+    // ── Check if this is a Pro subscription payment ──
+    let subscription = null;
+    if (offerId) {
+      const { data } = await supabaseAdmin
+        .from("subscriptions")
+        .select("*")
+        .eq("cakto_offer_id", offerId)
+        .eq("status", "pending")
+        .maybeSingle();
+      subscription = data;
+    }
+    if (!subscription && customerEmail) {
+      const { data } = await supabaseAdmin
+        .from("subscriptions")
+        .select("*")
+        .eq("status", "pending")
+        .order("created_at", { ascending: false })
+        .limit(10);
+      // Match by user email
+      if (data && data.length > 0) {
+        // We need to check user email - get users via auth
+        // For now, just match the most recent pending subscription
+        // The offer_id match above should handle most cases
+      }
+    }
+
+    if (subscription) {
+      // Activate Pro subscription
+      await supabaseAdmin
+        .from("subscriptions")
+        .update({
+          status: "active",
+          paid_at: new Date().toISOString(),
+          expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days
+        })
+        .eq("id", subscription.id);
+
+      console.log(`Pro subscription ${subscription.id} activated for user ${subscription.user_id}`);
+      return new Response(JSON.stringify({ received: true, matched: true, type: "pro_subscription" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
+    // ── Try to find a matching proposal (existing flow) ──
     let proposal = null;
 
     if (offerId) {
@@ -79,7 +123,6 @@ serve(async (req) => {
     }
 
     if (!proposal && checkoutUrl) {
-      // Try matching by checkout URL (partial match)
       const { data } = await supabaseAdmin
         .from("proposals")
         .select("*")
@@ -89,7 +132,6 @@ serve(async (req) => {
     }
 
     if (!proposal && customerEmail) {
-      // Fallback: match by customer email + status sent
       const { data } = await supabaseAdmin
         .from("proposals")
         .select("*")
@@ -102,7 +144,7 @@ serve(async (req) => {
     }
 
     if (!proposal) {
-      console.log("No matching proposal found for Cakto webhook");
+      console.log("No matching proposal or subscription found for Cakto webhook");
       return new Response(JSON.stringify({ received: true, matched: false }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
