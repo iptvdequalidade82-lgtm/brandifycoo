@@ -18,42 +18,70 @@ serve(async (req) => {
     const aspectRatio = type === "story" ? "9:16" : "1:1";
     const dimensions = type === "story" ? "1080x1920" : "1080x1080";
 
-    // Rotate between 4 visual models to avoid repetition
-    const visualModels = ["A", "B", "C", "D"];
+    // Rotate between 6 visual models trained from real reference posts
+    const visualModels = ["A", "B", "C", "D", "E", "F"];
     const selectedModel = visualModels[Math.floor(Math.random() * visualModels.length)];
 
     const modelInstructions: Record<string, string> = {
-      A: `MODEL A — HUMAN BACKSTAGE (real life):
-- Real photograph of a creative workspace: desk with monitor/laptop, keyboard, coffee cup, human hands working, pen holders, notebooks
-- Natural warm window light, soft shadows, slight grain — candid and unstaged
-- Muted warm tones (gray, beige, soft brown) — like someone snapped it during a normal workday
-- The monitor may show a real-looking work tool (project board, analytics, website editor)
-- Imperfections welcome: slightly messy desk, real textures, natural grain`,
+      A: `MODEL A — IMPACTFUL TYPOGRAPHY WITH SCENIC BACKGROUND:
+- Dramatic real photograph as full background (ocean cliffs, mountains, sunsets, city skylines, epic landscapes)
+- Person (back turned or face hidden) as central figure — wearing streetwear, hoodie, or dark clothes
+- MASSIVE bold typography that DOMINATES the image — words so big they fill 40-60% of the frame
+- Text uses CLIPPING MASK effect: the letters are filled with a different landscape/sky texture visible THROUGH the text
+- Cinematic color grading: golden hour, blue tones, dramatic clouds
+- Motivational/aspirational Portuguese text in the headline
+- Think Instagram viral motivational pages with premium design quality
+- Reference: "O PLANO DE DEUS NUNCA INCLUIU DESISTIR, SÓ VENCER" style with landscape-filled giant text`,
 
-      B: `MODEL B — EDITORIAL CLEAN (Pinterest / magazine style):
-- Minimalist editorial composition with strong central imagery
-- Large breathing negative space — elegant and sophisticated
-- Think high-end magazine cover or Pinterest editorial board
-- Clean, structured layout with deliberate asymmetry
-- Soft neutral backdrop (off-white, light gray, warm beige) with one strong focal element
-- The focal element can be: a single object (book, phone, plant), an architectural detail, a texture close-up, or a lifestyle moment
-- Must feel curated but not artificial`,
+      B: `MODEL B — DARK LUXURY NIGHT SCENE:
+- Night urban setting: gas station, parking lot, city street at night — low-key dramatic lighting
+- Luxury/sport car (BMW, Mercedes, Porsche) as main element with person leaning on it
+- Person in dark clothing, face obscured or in shadow — mysterious, powerful vibe
+- GIANT white bold typography with BRAND PATTERN FILL (like Louis Vuitton monogram inside letters)
+- High contrast: deep blacks, bright whites, subtle red accents from car lights
+- Text occupies upper 40% of image, car/person in lower 60%
+- Mood: power, ambition, luxury, street culture meets high fashion
+- Reference: "A ÚNICA OPÇÃO É VENCER" with LV-pattern filled letters over night car scene`,
 
-      C: `MODEL C — CONCEPTUAL PROFESSIONAL (high-end design studio):
-- Creative, artistic, well-designed visual composition
-- Think premium design studio portfolio piece or art direction showcase
-- Can use collage elements, creative photography, surreal-but-grounded compositions
-- Strong visual concept tied to the content topic
-- Artistic but NEVER futuristic, cyberpunk, or neon
-- Must look intentional and human-made, like a designer crafted it by hand
-- Premium aesthetic: think Kinfolk, Cereal Magazine, or Monocle visual style`,
+      C: `MODEL C — EXTREME SPORTS ACTION:
+- Real action photography: snowboarding, surfing, skateboarding, mountain biking, motorsport
+- Dynamic composition with motion blur or powder/spray effects
+- Person in the middle of action — full body, dramatic pose
+- Clean, elegant typography — mix of italic script and bold sans-serif
+- Soft or dramatic colors matching the sport: pink/purple for snow, blue for ocean, warm for desert
+- Text positioned to complement the action, not block it
+- Smaller, refined text — "faça acontecer, surpreenda a todos" style
+- Reference: snowboarder with clean white text and generous negative space`,
 
-      D: `MODEL D — PRODUCT/THEME IN REAL CONTEXT:
-- Real objects in realistic settings: phones showing interfaces, websites on screens, printed materials on desks, business cards, branded items
-- Integrated into believable real-world scenes (on a table, held by a hand, on a shelf)
-- NO floating objects, NO fake 3D mockups, NO artificial renders
-- Must feel like something you could photograph in the real world
-- Warm, natural lighting on physical objects with real shadows and reflections`,
+      D: `MODEL D — CINEMATIC SPEED & MOTION:
+- Motion blur background suggesting high speed — racing, driving, running
+- Dark/moody atmosphere with dramatic lighting (headlights, speed streaks)
+- Object in sharp focus against blurred background (helmet, car detail, face)
+- Bold white/silver typography with MOTION BLUR EFFECT on the text itself
+- Text feels like it's MOVING with the subject
+- Strong motivational message in Portuguese
+- Red and black color palette, cinematic grain
+- Reference: Ferrari helmet with "NÃO TENHA MEDO DE IR DEVAGAR, SÓ EM PARAR" in motion-blurred text`,
+
+      E: `MODEL E — EDITORIAL BRAND STORYTELLING:
+- Dark, sophisticated editorial layout — magazine-quality composition
+- Large hero portrait (profile shot, close-up) with dramatic side lighting
+- Overlay of subtle design elements: grids, brackets, technical marks, UI hints
+- Multi-weight typography: large headline + smaller body text + brand credits
+- Key words highlighted in ACCENT COLOR (orange, red, or brand color)
+- Agency branding visible: "AGÊNCIA" or brand name at top
+- Think Nike campaign or premium agency case study post
+- Reference: Nike editorial with "Como a Nike descobriu um novo pote de ouro" style dark layout`,
+
+      F: `MODEL F — ASPIRATIONAL LIFESTYLE WITH GIANT NUMBERS/TEXT:
+- Golden hour or dramatic sunset/sunrise as background
+- Person reaching out toward camera (POV perspective) or standing at dramatic location
+- ENORMOUS numbers or single word that FILLS the entire frame
+- Numbers/text use CLIPPING MASK showing the sky/landscape THROUGH the characters
+- Smaller secondary text above or below the giant text
+- Inspirational/seasonal theme: new year, new chapter, fresh start
+- Warm golden tones, ocean rocks, dramatic clouds
+- Reference: "SEJA BEM VINDO 2026" with sunset-filled numbers over ocean rocks`,
     };
 
     const referenceInstruction = referenceImage
@@ -76,43 +104,40 @@ ${modelInstructions[selectedModel]}
 ${referenceInstruction}
 
 📸 STYLE & MOOD:
-- Style: minimal, editorial, premium, corporate-modern
-- Mood: confident, aspirational, elegant, professional
-- Camera feel: real photography, DSLR look, shallow depth of field when needed
-- Lighting: natural soft light, studio-quality, realistic shadows
-- Colors: neutral palette (white, black, gray, soft beige), subtle accent colors only if necessary
-- Finish: ultra-polished, realistic, timeless, premium brand aesthetic
+- Style: bold, impactful, cinematic, premium street-culture meets high-end design
+- Mood: powerful, aspirational, motivational, ambitious, unstoppable
+- Camera feel: real photography, DSLR/cinema camera, shallow depth of field, motion blur when appropriate
+- Lighting: dramatic — golden hour, moody night, cinematic contrast, studio rim lighting
+- Colors: high contrast — deep blacks, bright whites, golden tones, or sport-specific palettes
+- Finish: ultra-polished, viral-worthy, looks like a top Brazilian Instagram page post
 
 ✍️ TYPOGRAPHY:
-- Modern sans-serif OR elegant serif font — clean kerning, perfect alignment
-- MAIN HEADLINE: Large, bold, high-contrast text — SHORT (3-7 words), punchy, editorial
-  - Can be WHITE on dark backgrounds or BLACK/DARK on light backgrounds
-  - Must be a DOMINANT visual element commanding attention
-  - Use creative line breaks for visual rhythm
-- SECONDARY LINE: Smaller, lighter weight text — a provocative question or subheadline
-- CREDIT: "POR BRANDIFY" in elegant small-caps spaced-out text
-- WATERMARK: "@brandifycoo" small and subtle in a corner
-- No exaggerated text effects, no outlines, no glows — clean and editorial only
+- MASSIVE bold sans-serif headlines — text should be a DOMINANT visual element (40-60% of frame)
+- Use creative typography effects: CLIPPING MASKS (landscape visible through letters), PATTERN FILLS, MOTION BLUR on text
+- Mix font weights dramatically: giant bold keyword + smaller elegant secondary text
+- Creative line breaks for visual rhythm and impact
+- Can use script/handwritten fonts for secondary accents
+- WATERMARK: "@brandifycoo" or "POR BRANDIFY" small and subtle in a corner
+- Text must feel INTEGRATED into the composition, not floating on top
 
 📐 COMPOSITION:
-- Balanced, spacious, strong negative space, rule of thirds
-- The subject/photo should be the hero — typography complements, never fights
-- Think luxury brand Instagram or LinkedIn campaign
-- Similar to Ferrari, Apple, Nike, or high-end marketing agencies
+- Person as central figure (face often hidden, back turned, or in shadow) — wearing streetwear/dark clothes
+- Dramatic backgrounds: landscapes, night cities, extreme sports venues, luxury settings
+- Text and subject share the same visual space — neither fights the other
+- Think top viral Brazilian Instagram pages: motivational, powerful, visually stunning
+- Similar to @mentemilionaria, @agenciatenks, luxury streetwear brands
 
 🚫 ABSOLUTELY FORBIDDEN (NEGATIVE PROMPT):
 - AI artifacts, fake lighting, plastic skin, exaggerated realism
 - Surreal visuals, cartoon style, low-quality design
-- Stock-photo look, generic marketing layout
-- Futuristic UI, neon colors, cyberpunk aesthetics
-- Artificial textures, over-saturated colors
-- Exaggerated depth or surreal elements
-- "AI look" faces or objects
-- Random icons or generic illustrations
-- Flat design, vector art, clipart, Canva template look
-- If it looks AI-generated → WRONG. Regenerate.
+- Stock-photo look, generic marketing layout, Canva templates
+- Futuristic UI, cyberpunk aesthetics
+- Flat design, vector art, clipart
+- Small, weak typography — text MUST be bold and impactful
+- Generic motivational quote layouts with plain backgrounds
+- If it looks AI-generated or like a basic template → WRONG. Regenerate.
 
-🧠 QUALITY CHECK: This must look like a REAL brand created it for Instagram or LinkedIn. Think luxury brands, tech companies, or professional marketing agencies. If it looks simple, generic, or AI-made → regenerate.
+🧠 QUALITY CHECK: This must look like a REAL post from a top Brazilian creative agency or viral motivational Instagram page. Think luxury streetwear brands, premium agencies, or pages with 1M+ followers. If it looks simple, generic, or AI-made → regenerate.
 
 CONTENT/TOPIC for the headline: ${prompt}`;
 
