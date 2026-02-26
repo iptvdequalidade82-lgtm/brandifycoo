@@ -30,3 +30,9 @@ verify_jwt = false
 [functions.ai-chat]
 verify_jwt = false
 
+[functions.support-chat]
+verify_jwt = false
+
+[functions.admin-users]
+verify_jwt = false
+
