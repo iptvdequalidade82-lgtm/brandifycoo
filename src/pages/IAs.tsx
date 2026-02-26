@@ -10,11 +10,12 @@ import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles, MessageSquare, ImagePlus, ArrowLeft, Zap, Send, Download, Loader2,
-  Plus, Trash2, X, PenTool, Crown, Lock, Check, RotateCcw, HelpCircle,
+  Plus, Trash2, X, PenTool, Crown, Lock, Check, RotateCcw,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import logo from "@/assets/logo.jpg";
 import UserMenu from "@/components/UserMenu";
+import SupportWidget from "@/components/SupportWidget";
 
 // ── Types ──
 type Msg = { role: "user" | "assistant"; content: string; image_urls?: string[]; model_used?: string };
@@ -939,16 +940,7 @@ export default function IAs() {
         </TabsContent>
       </Tabs>
 
-      {/* Floating Support Button */}
-      <a
-        href="https://wa.me/5543991065129?text=Oi%2C%20preciso%20de%20suporte%20com%20o%20IA%20Studio%20da%20Brandify"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-primary-foreground shadow-lg hover:scale-105 transition-transform"
-      >
-        <HelpCircle className="w-5 h-5" />
-        <span className="text-sm font-medium hidden sm:inline">Suporte</span>
-      </a>
+      <SupportWidget user={user} />
     </div>
   );
 }
