@@ -15,8 +15,9 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!GEMINI_API_KEY && !LOVABLE_API_KEY) throw new Error("No API key configured");
 
-    const aspectRatio = type === "story" ? "9:16" : "1:1";
-    const dimensions = type === "story" ? "1080x1920" : "1080x1080";
+    const isStory = type === "story" || type === "stories";
+    const aspectRatio = isStory ? "9:16" : "1:1";
+    const dimensions = isStory ? "1080x1920" : "1080x1080";
 
     // Rotate between 18 visual models trained from real reference posts
     const visualModels = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R"];

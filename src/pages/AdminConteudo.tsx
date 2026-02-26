@@ -242,6 +242,7 @@ export default function AdminConteudo() {
   const [quickPostImageLoading, setQuickPostImageLoading] = useState(false);
   const [quickPostError, setQuickPostError] = useState<string | null>(null);
   const [quickPostRefImage, setQuickPostRefImage] = useState<string | null>(null);
+  const [quickPostFormat, setQuickPostFormat] = useState<"feed" | "stories">("feed");
   const refImageInputRef = useRef<HTMLInputElement>(null);
 
   const months = useMemo(() => {
@@ -595,7 +596,7 @@ export default function AdminConteudo() {
         },
       body: JSON.stringify({
           prompt: quickPostResult.imageDescription,
-          type: "feed",
+          type: quickPostFormat,
           ...(quickPostRefImage ? { referenceImage: quickPostRefImage } : {}),
         }),
         signal: controller.signal,
@@ -652,6 +653,7 @@ export default function AdminConteudo() {
                   setQuickPostImageUrl(null);
                   setQuickPostError(null);
                   setQuickPostRefImage(null);
+                  setQuickPostFormat("feed");
                   setQuickPostOpen(true);
                 }}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.15] text-white/60 hover:text-white text-xs font-medium transition-all"
@@ -1084,17 +1086,52 @@ export default function AdminConteudo() {
             </Button>
 
             {quickPostResult && (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <>
+                {/* Format selector */}
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-white/30 mb-1.5">Formato</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setQuickPostFormat("feed")}
+                      className={`flex flex-col items-center gap-1 px-3 py-2.5 rounded-lg border text-xs font-medium transition-all ${
+                        quickPostFormat === "feed"
+                          ? "bg-primary/15 border-primary/40 text-primary"
+                          : "bg-white/[0.03] border-white/[0.08] text-white/50 hover:bg-white/[0.06] hover:text-white/70"
+                      }`}
+                    >
+                      <span className="text-lg">📐</span>
+                      <span>Feed</span>
+                      <span className="text-[9px] text-white/30">1080 × 1080</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setQuickPostFormat("stories")}
+                      className={`flex flex-col items-center gap-1 px-3 py-2.5 rounded-lg border text-xs font-medium transition-all ${
+                        quickPostFormat === "stories"
+                          ? "bg-primary/15 border-primary/40 text-primary"
+                          : "bg-white/[0.03] border-white/[0.08] text-white/50 hover:bg-white/[0.06] hover:text-white/70"
+                      }`}
+                    >
+                      <span className="text-lg">📱</span>
+                      <span>Stories</span>
+                      <span className="text-[9px] text-white/30">1080 × 1920</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <Button type="button" variant="outline" onClick={() => void handleQuickPost()} disabled={quickPostLoading} className="border-white/10 text-white/80 hover:bg-white/10 hover:text-white">
                   <RefreshCw className="w-4 h-4 mr-2" /> Refazer copy
                 </Button>
                 <Button type="button" onClick={() => void handleQuickPostImage()} disabled={quickPostImageLoading} className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:opacity-90">
-                  {quickPostImageLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Gerando imagem...</> : <><ImageIcon className="w-4 h-4 mr-2" /> Gerar imagem</>}
+                  {quickPostImageLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Gerando imagem...</> : <><ImageIcon className="w-4 h-4 mr-2" /> Gerar imagem ({quickPostFormat === "feed" ? "Feed" : "Stories"})</>}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => { navigator.clipboard.writeText(quickPostResult.caption); toast({ title: "Legenda copiada! 📋" }); }} className="border-white/10 text-white/80 hover:bg-white/10 hover:text-white">
                   <Copy className="w-4 h-4 mr-2" /> Copiar legenda
                 </Button>
               </div>
+              </>
             )}
 
             {quickPostError && (
