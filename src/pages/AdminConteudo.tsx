@@ -238,6 +238,8 @@ export default function AdminConteudo() {
   const [quickPostInput, setQuickPostInput] = useState("");
   const [quickPostLoading, setQuickPostLoading] = useState(false);
   const [quickPostResult, setQuickPostResult] = useState<{ title: string; caption: string; imageDescription: string; marketingTip: string } | null>(null);
+  const [quickPostImageUrl, setQuickPostImageUrl] = useState<string | null>(null);
+  const [quickPostImageLoading, setQuickPostImageLoading] = useState(false);
   const [quickPostError, setQuickPostError] = useState<string | null>(null);
 
   const months = useMemo(() => {
@@ -504,10 +506,9 @@ export default function AdminConteudo() {
 
     setQuickPostLoading(true);
     setQuickPostError(null);
+    setQuickPostImageUrl(null);
 
     try {
-      console.log("[quick-post] start", { template: quickPostTemplate, hasInput: Boolean(quickPostInput.trim()) });
-
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
       const session = (await supabase.auth.getSession()).data.session;
@@ -537,8 +538,6 @@ export default function AdminConteudo() {
       if (!res.ok) throw new Error((data as any)?.error || `Erro ${res.status}`);
       if ((data as any)?.error) throw new Error((data as any).error);
 
-      console.log("[quick-post] done", { status: res.status, hasMonthPlan: Boolean((data as any)?.monthPlan) });
-
       const plan = (data as any)?.monthPlan || data;
       const post =
         (plan as any)?.weeks?.flatMap((week: any) => week?.feedPosts || [])?.[0] ||
@@ -556,7 +555,6 @@ export default function AdminConteudo() {
         marketingTip: post.marketingTip || "",
       });
     } catch (e: any) {
-      console.error("[quick-post] error", e);
       const message = e?.name === "AbortError"
         ? "A geração demorou demais. Tente novamente."
         : (e?.message || "Falha ao gerar o post.");
@@ -564,6 +562,59 @@ export default function AdminConteudo() {
       toast({ title: "Erro ao gerar post", description: message, variant: "destructive" });
     } finally {
       setQuickPostLoading(false);
+    }
+  };
+
+  const handleQuickPostImage = async () => {
+    if (!quickPostResult?.imageDescription) {
+      toast({ title: "Gere a copy primeiro", variant: "destructive" });
+      return;
+    }
+
+    if (quickPostImageLoading) return;
+
+    setQuickPostImageLoading(true);
+    setQuickPostError(null);
+
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      const session = (await supabase.auth.getSession()).data.session;
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 120000);
+
+      const res = await fetch(`${supabaseUrl}/functions/v1/generate-instagram-image`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: supabaseKey,
+          Authorization: `Bearer ${session?.access_token || supabaseKey}`,
+        },
+        body: JSON.stringify({
+          prompt: quickPostResult.imageDescription,
+          type: "feed",
+        }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeout);
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error((data as any)?.error || `Erro ${res.status}`);
+      if ((data as any)?.error) throw new Error((data as any).error);
+      if (!(data as any)?.imageUrl) throw new Error("A imagem não foi retornada pela IA.");
+
+      setQuickPostImageUrl((data as any).imageUrl);
+      toast({ title: "Imagem gerada! 🎨" });
+    } catch (e: any) {
+      const message = e?.name === "AbortError"
+        ? "A geração da imagem demorou demais. Tente novamente."
+        : (e?.message || "Falha ao gerar imagem.");
+      setQuickPostError(message);
+      toast({ title: "Erro ao gerar imagem", description: message, variant: "destructive" });
+    } finally {
+      setQuickPostImageLoading(false);
     }
   };
 
@@ -592,10 +643,10 @@ export default function AdminConteudo() {
                 key={tpl.label}
                 type="button"
                 onClick={() => {
-                  console.log("[quick-post] template-click", { template: tpl.label });
                   setQuickPostTemplate(tpl.label);
                   setQuickPostInput("");
                   setQuickPostResult(null);
+                  setQuickPostImageUrl(null);
                   setQuickPostError(null);
                   setQuickPostOpen(true);
                 }}
@@ -991,8 +1042,8 @@ export default function AdminConteudo() {
       </div>
 
       {/* Quick Post Generator Dialog */}
-      <Dialog open={quickPostOpen} onOpenChange={(open) => { console.log("[quick-post] onOpenChange", { open, quickPostLoading }); if (!quickPostLoading) setQuickPostOpen(open); }}>
-        <DialogContent className="bg-[#111] border-white/10 text-white max-w-lg max-h-[85vh] overflow-y-auto" onPointerDownOutside={(e) => e.preventDefault()} onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => { if (quickPostLoading) e.preventDefault(); }}>
+      <Dialog open={quickPostOpen} onOpenChange={(open) => { if (!quickPostLoading && !quickPostImageLoading) setQuickPostOpen(open); }}>
+        <DialogContent className="bg-[#111] border-white/10 text-white max-w-lg max-h-[85vh] overflow-y-auto" onPointerDownOutside={(e) => e.preventDefault()} onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => { if (quickPostLoading || quickPostImageLoading) e.preventDefault(); }}>
           <DialogHeader>
             <DialogTitle className="text-white flex items-center gap-2">
               <Wand2 className="w-5 h-5 text-purple-400" />
@@ -1024,9 +1075,23 @@ export default function AdminConteudo() {
               {quickPostLoading ? (
                 <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Gerando post...</>
               ) : (
-                <><Sparkles className="w-4 h-4 mr-2" /> {quickPostResult ? "Gerar novo post" : "Gerar Post"}</>
+                <><Sparkles className="w-4 h-4 mr-2" /> Gerar copy do post</>
               )}
             </Button>
+
+            {quickPostResult && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <Button type="button" variant="outline" onClick={() => void handleQuickPost()} disabled={quickPostLoading} className="border-white/10 text-white/80 hover:bg-white/10 hover:text-white">
+                  <RefreshCw className="w-4 h-4 mr-2" /> Refazer copy
+                </Button>
+                <Button type="button" onClick={() => void handleQuickPostImage()} disabled={quickPostImageLoading} className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:opacity-90">
+                  {quickPostImageLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Gerando imagem...</> : <><ImageIcon className="w-4 h-4 mr-2" /> Gerar imagem</>}
+                </Button>
+                <Button type="button" variant="outline" onClick={() => { navigator.clipboard.writeText(quickPostResult.caption); toast({ title: "Legenda copiada! 📋" }); }} className="border-white/10 text-white/80 hover:bg-white/10 hover:text-white">
+                  <Copy className="w-4 h-4 mr-2" /> Copiar legenda
+                </Button>
+              </div>
+            )}
 
             {quickPostError && (
               <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-2.5 text-xs text-destructive">
@@ -1067,6 +1132,18 @@ export default function AdminConteudo() {
                     {quickPostResult.imageDescription}
                   </p>
                 </div>
+
+                {quickPostImageUrl && (
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wider text-white/30 mb-1">Prévia da imagem</p>
+                    <img
+                      src={quickPostImageUrl}
+                      alt="Prévia do post avulso gerado"
+                      loading="lazy"
+                      className="w-full rounded-lg border border-white/[0.08]"
+                    />
+                  </div>
+                )}
 
                 {/* Marketing Tip */}
                 {quickPostResult.marketingTip && (
