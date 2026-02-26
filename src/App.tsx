@@ -31,6 +31,7 @@ import AuthLogin from "./pages/AuthLogin";
 import AuthSignup from "./pages/AuthSignup";
 import IAs from "./pages/IAs";
 import PlanosPro from "./pages/PlanosPro";
+import Editor from "./pages/Editor";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ const App = () => (
             <Route path="/cadastro" element={<AuthSignup />} />
             <Route path="/ias" element={<IAs />} />
             <Route path="/planos-pro" element={<PlanosPro />} />
+            <Route path="/editor" element={<Editor />} />
             <Route path="/projetos" element={<Projetos />} />
             <Route path="/preview-site" element={<PreviewSite />} />
             <Route path="/preview-loja" element={<PreviewLoja />} />
