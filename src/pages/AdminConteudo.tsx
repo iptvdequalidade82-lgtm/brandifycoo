@@ -592,6 +592,7 @@ export default function AdminConteudo() {
                 key={tpl.label}
                 type="button"
                 onClick={() => {
+                  console.log("[quick-post] template-click", { template: tpl.label });
                   setQuickPostTemplate(tpl.label);
                   setQuickPostInput("");
                   setQuickPostResult(null);
@@ -990,7 +991,7 @@ export default function AdminConteudo() {
       </div>
 
       {/* Quick Post Generator Dialog */}
-      <Dialog open={quickPostOpen} onOpenChange={(open) => { if (!quickPostLoading) setQuickPostOpen(open); }}>
+      <Dialog open={quickPostOpen} onOpenChange={(open) => { console.log("[quick-post] onOpenChange", { open, quickPostLoading }); if (!quickPostLoading) setQuickPostOpen(open); }}>
         <DialogContent className="bg-[#111] border-white/10 text-white max-w-lg max-h-[85vh] overflow-y-auto" onPointerDownOutside={(e) => e.preventDefault()} onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => { if (quickPostLoading) e.preventDefault(); }}>
           <DialogHeader>
             <DialogTitle className="text-white flex items-center gap-2">
