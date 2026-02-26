@@ -42,7 +42,7 @@ export default function Planos() {
           <p className="text-white/50 text-lg max-w-lg mx-auto mb-8">
             Escolha um plano abaixo e gere uma prévia gratuita do seu site ou loja virtual em segundos.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center flex-wrap">
             <Link to="/preview-site">
               <motion.div
                 whileHover={{ scale: 1.05 }}
@@ -61,6 +61,15 @@ export default function Planos() {
               >
                 <Sparkles size={16} />
                 🛒 Prévia de Loja Grátis
+              </motion.div>
+            </Link>
+            <Link to="/editor">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-black text-sm uppercase tracking-wider bg-white/10 border border-white/20 text-white hover:bg-white/15 transition-all"
+              >
+                ✏️ Montar Meu Site
               </motion.div>
             </Link>
           </div>
