@@ -11,19 +11,19 @@ const corsHeaders = {
 const PLANS = {
   basico: {
     name: "Básico",
-    price_cents: 4990,
+    price_cents: 3990,
     checkout_url: "https://pay.cakto.com.br/xyg6djs_784476",
     offer_id: "xyg6djs_784476",
   },
   pro: {
     name: "Pro",
-    price_cents: 6990,
+    price_cents: 5990,
     checkout_url: "https://pay.cakto.com.br/3bbk9vi",
     offer_id: "3bbk9vi",
   },
   premium: {
     name: "Premium",
-    price_cents: 12990,
+    price_cents: 9990,
     checkout_url: "https://pay.cakto.com.br/yxdhikx",
     offer_id: "yxdhikx",
   },
