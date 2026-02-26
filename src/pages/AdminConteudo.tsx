@@ -506,23 +506,44 @@ export default function AdminConteudo() {
     setQuickPostError(null);
 
     try {
-      const { data, error } = await supabase.functions.invoke("generate-instagram-content", {
-        body: {
+      console.log("[quick-post] start", { template: quickPostTemplate, hasInput: Boolean(quickPostInput.trim()) });
+
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      const session = (await supabase.auth.getSession()).data.session;
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 90000);
+
+      const res = await fetch(`${supabaseUrl}/functions/v1/generate-instagram-content`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: supabaseKey,
+          Authorization: `Bearer ${session?.access_token || supabaseKey}`,
+        },
+        body: JSON.stringify({
           niches: [quickPostInput],
           brandContext: `MODO POST AVULSO — Tipo: ${quickPostTemplate}. Gere APENAS 1 post de feed (NÃO gere stories, NÃO gere planejamento semanal). Retorne JSON com monthPlan.weeks contendo 1 semana com 1 feedPost e stories vazio.`,
           monthLabel: "Post avulso",
           weeksConfig: [{ label: "Post", range: "", days: ["Hoje"] }],
-        },
+        }),
+        signal: controller.signal,
       });
 
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
+      clearTimeout(timeout);
 
-      const plan = data?.monthPlan || data;
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error((data as any)?.error || `Erro ${res.status}`);
+      if ((data as any)?.error) throw new Error((data as any).error);
+
+      console.log("[quick-post] done", { status: res.status, hasMonthPlan: Boolean((data as any)?.monthPlan) });
+
+      const plan = (data as any)?.monthPlan || data;
       const post =
-        plan?.weeks?.flatMap((week: any) => week?.feedPosts || [])?.[0] ||
-        plan?.feedPosts?.[0] ||
-        data?.post;
+        (plan as any)?.weeks?.flatMap((week: any) => week?.feedPosts || [])?.[0] ||
+        (plan as any)?.feedPosts?.[0] ||
+        (data as any)?.post;
 
       if (!post) {
         throw new Error("Não consegui extrair o post da resposta da IA.");
@@ -535,8 +556,10 @@ export default function AdminConteudo() {
         marketingTip: post.marketingTip || "",
       });
     } catch (e: any) {
-      console.error(e);
-      const message = e?.message || "Falha ao gerar o post.";
+      console.error("[quick-post] error", e);
+      const message = e?.name === "AbortError"
+        ? "A geração demorou demais. Tente novamente."
+        : (e?.message || "Falha ao gerar o post.");
       setQuickPostError(message);
       toast({ title: "Erro ao gerar post", description: message, variant: "destructive" });
     } finally {
@@ -968,7 +991,7 @@ export default function AdminConteudo() {
 
       {/* Quick Post Generator Dialog */}
       <Dialog open={quickPostOpen} onOpenChange={(open) => { if (!quickPostLoading) setQuickPostOpen(open); }}>
-        <DialogContent className="bg-[#111] border-white/10 text-white max-w-lg max-h-[85vh] overflow-y-auto" onPointerDownOutside={(e) => { if (quickPostLoading) e.preventDefault(); }} onInteractOutside={(e) => { if (quickPostLoading) e.preventDefault(); }} onEscapeKeyDown={(e) => { if (quickPostLoading) e.preventDefault(); }}>
+        <DialogContent className="bg-[#111] border-white/10 text-white max-w-lg max-h-[85vh] overflow-y-auto" onPointerDownOutside={(e) => e.preventDefault()} onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => { if (quickPostLoading) e.preventDefault(); }}>
           <DialogHeader>
             <DialogTitle className="text-white flex items-center gap-2">
               <Wand2 className="w-5 h-5 text-purple-400" />
@@ -1000,7 +1023,7 @@ export default function AdminConteudo() {
               {quickPostLoading ? (
                 <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Gerando post...</>
               ) : (
-                <><Sparkles className="w-4 h-4 mr-2" /> {quickPostResult ? "Gerar nova versão" : "Gerar Post"}</>
+                <><Sparkles className="w-4 h-4 mr-2" /> {quickPostResult ? "Gerar novo post" : "Gerar Post"}</>
               )}
             </Button>
 
