@@ -10,10 +10,11 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   Instagram, Sparkles, Calendar, Copy, Download, RefreshCw, ImageIcon,
   Clock, Lightbulb, MessageSquare, Pencil, CheckCircle2, Circle,
-  Lock, CalendarDays, Check, AlertTriangle,
+  Lock, CalendarDays, Check, AlertTriangle, Loader2, Wand2, X,
 } from "lucide-react";
 
 // ── Types ──
@@ -230,6 +231,13 @@ export default function AdminConteudo() {
   const [feedbackItemId, setFeedbackItemId] = useState<string | null>(null);
   const [imageHint, setImageHint] = useState("");
   const [isLoadingPlans, setIsLoadingPlans] = useState(true);
+
+  // Quick Post Generator state
+  const [quickPostOpen, setQuickPostOpen] = useState(false);
+  const [quickPostTemplate, setQuickPostTemplate] = useState("");
+  const [quickPostInput, setQuickPostInput] = useState("");
+  const [quickPostLoading, setQuickPostLoading] = useState(false);
+  const [quickPostResult, setQuickPostResult] = useState<{ title: string; caption: string; imageDescription: string; marketingTip: string } | null>(null);
 
   const months = useMemo(() => {
     void refreshKey;
@@ -474,6 +482,55 @@ export default function AdminConteudo() {
     });
   };
 
+  const QUICK_TEMPLATES = [
+    { emoji: "📢", label: "Anúncio", placeholder: "Ex: Anunciar nosso novo serviço de criação de landing pages com 30% de desconto" },
+    { emoji: "🔥", label: "Promoção", placeholder: "Ex: Promoção relâmpago — sites profissionais por R$497 até sexta" },
+    { emoji: "📖", label: "Storytelling", placeholder: "Ex: Contar como ajudamos a clínica XYZ a triplicar os agendamentos online" },
+    { emoji: "🎓", label: "Educativo", placeholder: "Ex: 5 erros que donos de restaurante cometem no Instagram" },
+    { emoji: "⭐", label: "Prova social", placeholder: "Ex: Depoimento do cliente João sobre o resultado do novo site" },
+    { emoji: "🚀", label: "Lançamento", placeholder: "Ex: Lançar o pacote premium de e-commerce com catálogo inteligente" },
+    { emoji: "📅", label: "Data comemorativa", placeholder: "Ex: Post especial para o Dia do Empreendedor" },
+    { emoji: "💬", label: "Engajamento", placeholder: "Ex: Enquete sobre qual tipo de site os seguidores mais precisam" },
+  ];
+
+  const handleQuickPost = async () => {
+    if (!quickPostInput.trim()) {
+      toast({ title: "Descreva o que deseja criar", variant: "destructive" });
+      return;
+    }
+    setQuickPostLoading(true);
+    setQuickPostResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-instagram-content", {
+        body: {
+          niches: [quickPostInput],
+          brandContext: `MODO POST AVULSO — Tipo: ${quickPostTemplate}. Gere APENAS 1 post de feed (NÃO gere stories, NÃO gere planejamento semanal). Retorne JSON com monthPlan.weeks contendo 1 semana com 1 feedPost e stories vazio.`,
+          monthLabel: "Post avulso",
+          weeksConfig: [{ label: "Post", range: "", days: ["Hoje"] }],
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      const plan = data?.monthPlan || data;
+      const post = plan?.weeks?.[0]?.feedPosts?.[0];
+      if (post) {
+        setQuickPostResult({
+          title: post.title,
+          caption: post.caption,
+          imageDescription: post.imageDescription,
+          marketingTip: post.marketingTip,
+        });
+      } else {
+        throw new Error("Formato inesperado na resposta");
+      }
+    } catch (e: any) {
+      console.error(e);
+      toast({ title: "Erro ao gerar post", description: e.message, variant: "destructive" });
+    } finally {
+      setQuickPostLoading(false);
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -488,27 +545,20 @@ export default function AdminConteudo() {
           </div>
         </div>
 
-        {/* Quick Action Templates */}
+        {/* Quick Action Templates — Gerar Post Avulso */}
         <div className="space-y-2">
           <p className="text-xs font-semibold text-white/40 uppercase tracking-wider flex items-center gap-1.5">
-            <Lightbulb className="w-3.5 h-3.5" /> Atalhos rápidos
+            <Wand2 className="w-3.5 h-3.5" /> Criar post avulso
           </p>
           <div className="flex flex-wrap gap-2">
-            {[
-              { emoji: "📢", label: "Anúncio de produto", prompt: "Crie um anúncio persuasivo para um produto/serviço, destacando benefícios únicos, com CTA forte e visual impactante" },
-              { emoji: "🔥", label: "Promoção relâmpago", prompt: "Crie um post de promoção relâmpago/oferta por tempo limitado, com senso de urgência, preço com desconto e CTA de compra imediata" },
-              { emoji: "📖", label: "Storytelling", prompt: "Crie um post de storytelling/bastidores da marca, humanizando o negócio, mostrando processos ou a equipe por trás do produto" },
-              { emoji: "🎓", label: "Post educativo", prompt: "Crie um post educativo com dicas, tutorial ou informação de valor para o público, posicionando a marca como autoridade no segmento" },
-              { emoji: "⭐", label: "Prova social", prompt: "Crie um post de depoimento/prova social de cliente satisfeito, com resultado real, antes e depois ou avaliação positiva" },
-              { emoji: "🚀", label: "Lançamento", prompt: "Crie um post de lançamento de novo produto/serviço, gerando expectativa, mostrando diferenciais e com contagem regressiva" },
-              { emoji: "📅", label: "Data comemorativa", prompt: "Crie um post para data comemorativa ou sazonal, conectando a celebração ao posicionamento da marca de forma criativa" },
-              { emoji: "💬", label: "Engajamento", prompt: "Crie um post de engajamento (enquete, pergunta, desafio) para aumentar interação, comentários e compartilhamentos" },
-            ].map((tpl) => (
+            {QUICK_TEMPLATES.map((tpl) => (
               <button
                 key={tpl.label}
                 onClick={() => {
-                  setBrandContext(tpl.prompt);
-                  toast({ title: `Modelo "${tpl.label}" aplicado ✅`, description: "Agora selecione os nichos e gere o planejamento." });
+                  setQuickPostTemplate(tpl.label);
+                  setQuickPostInput("");
+                  setQuickPostResult(null);
+                  setQuickPostOpen(true);
                 }}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.15] text-white/60 hover:text-white text-xs font-medium transition-all"
               >
@@ -900,6 +950,86 @@ export default function AdminConteudo() {
           )}
         </Card>
       </div>
+
+      {/* Quick Post Generator Dialog */}
+      <Dialog open={quickPostOpen} onOpenChange={setQuickPostOpen}>
+        <DialogContent className="bg-[#111] border-white/10 text-white max-w-lg max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-white flex items-center gap-2">
+              <Wand2 className="w-5 h-5 text-purple-400" />
+              Criar post: {quickPostTemplate}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 pt-2">
+            <div>
+              <p className="text-xs text-white/40 mb-2">Descreva o que você quer postar:</p>
+              <Textarea
+                value={quickPostInput}
+                onChange={(e) => setQuickPostInput(e.target.value)}
+                placeholder={QUICK_TEMPLATES.find(t => t.label === quickPostTemplate)?.placeholder || "Descreva o post que deseja criar..."}
+                className="bg-white/[0.04] border-white/10 text-white placeholder:text-white/20 min-h-[80px] resize-none"
+              />
+            </div>
+
+            <Button
+              onClick={handleQuickPost}
+              disabled={quickPostLoading || !quickPostInput.trim()}
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold"
+            >
+              {quickPostLoading ? (
+                <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Gerando post...</>
+              ) : (
+                <><Sparkles className="w-4 h-4 mr-2" /> Gerar Post</>
+              )}
+            </Button>
+
+            {quickPostResult && (
+              <div className="space-y-4 pt-2 border-t border-white/[0.06]">
+                {/* Title */}
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-white/30 mb-1">Título</p>
+                  <p className="text-sm font-semibold text-white">{quickPostResult.title}</p>
+                </div>
+
+                {/* Caption */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-[10px] uppercase tracking-wider text-white/30">Legenda</p>
+                    <button onClick={() => { navigator.clipboard.writeText(quickPostResult.caption); toast({ title: "Legenda copiada! 📋" }); }} className="text-white/30 hover:text-white transition-colors">
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <p className="text-xs text-white/70 whitespace-pre-wrap leading-relaxed bg-white/[0.03] rounded-lg p-3 border border-white/[0.06]">
+                    {quickPostResult.caption}
+                  </p>
+                </div>
+
+                {/* Image Description */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-[10px] uppercase tracking-wider text-white/30">Descrição da arte</p>
+                    <button onClick={() => { navigator.clipboard.writeText(quickPostResult.imageDescription); toast({ title: "Descrição copiada! 📋" }); }} className="text-white/30 hover:text-white transition-colors">
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <p className="text-xs text-white/50 italic bg-white/[0.02] rounded-lg p-3 border border-white/[0.04]">
+                    {quickPostResult.imageDescription}
+                  </p>
+                </div>
+
+                {/* Marketing Tip */}
+                {quickPostResult.marketingTip && (
+                  <div className="flex items-start gap-2 bg-amber-500/5 border border-amber-500/10 rounded-lg p-3">
+                    <Lightbulb className="w-3.5 h-3.5 text-amber-400 mt-0.5 shrink-0" />
+                    <p className="text-xs text-amber-300/70">{quickPostResult.marketingTip}</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }
