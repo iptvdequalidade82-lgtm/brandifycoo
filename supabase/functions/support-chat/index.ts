@@ -26,8 +26,8 @@ INFORMAÇÕES DA BRANDIFY:
 **IA Studio (ferramenta de posts para Instagram) — Planos mensais:**
 - Gratuito: 5 criações por dia (copy + imagem)
 - Básico: R$39,90/mês (criações ilimitadas, 2 IAs)
-- Pro: R$69,90/mês (criações ilimitadas, 4 IAs, melhor custo-benefício)
-- Premium: R$129,90/mês (criações ilimitadas, todas as IAs, completo)
+- Pro: R$59,90/mês (criações ilimitadas, 4 IAs, melhor custo-benefício)
+- Premium: R$99,90/mês (criações ilimitadas, todas as IAs, completo)
 - O IA Studio gera textos e imagens profissionais para Instagram usando inteligência artificial
 
 **Dúvidas Frequentes:**

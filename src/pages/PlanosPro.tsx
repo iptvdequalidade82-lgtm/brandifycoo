@@ -13,8 +13,8 @@ const PLANS = [
   {
     key: "basico",
     name: "Básico",
-    price: 49.9,
-    priceInt: "49",
+    price: 39.9,
+    priceInt: "39",
     priceDec: ",90",
     color: "blue",
     gradient: "from-blue-400 to-cyan-500",
@@ -32,8 +32,8 @@ const PLANS = [
   {
     key: "pro",
     name: "Pro",
-    price: 69.9,
-    priceInt: "69",
+    price: 59.9,
+    priceInt: "59",
     priceDec: ",90",
     color: "amber",
     gradient: "from-amber-400 to-orange-500",
@@ -51,8 +51,8 @@ const PLANS = [
   {
     key: "premium",
     name: "Premium",
-    price: 129.9,
-    priceInt: "129",
+    price: 99.9,
+    priceInt: "99",
     priceDec: ",90",
     color: "violet",
     gradient: "from-violet-400 to-purple-500",
