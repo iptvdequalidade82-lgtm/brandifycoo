@@ -683,6 +683,8 @@ function AdminChat() {
 
         if (!resp.ok) {
           const err = await resp.json().catch(() => ({ error: "Erro desconhecido" }));
+          if (resp.status === 429) throw new Error("Limite de requisições excedido. Aguarde um momento e tente novamente.");
+          if (resp.status === 402) throw new Error("Créditos de IA insuficientes. Verifique seu plano.");
           throw new Error(err.error || `Erro ${resp.status}`);
         }
 
@@ -705,6 +707,8 @@ function AdminChat() {
 
         if (!resp.ok) {
           const err = await resp.json().catch(() => ({ error: "Erro desconhecido" }));
+          if (resp.status === 429) throw new Error("Limite de requisições excedido. Aguarde um momento e tente novamente.");
+          if (resp.status === 402) throw new Error("Créditos de IA insuficientes. Verifique seu plano.");
           throw new Error(err.error || `Erro ${resp.status}`);
         }
 
@@ -778,7 +782,8 @@ function AdminChat() {
       console.error(e);
       setStreamingContent("");
       setStreamingModel("");
-      toast({ title: "Erro", description: e.message, variant: "destructive" });
+      const msg = e?.name === "AbortError" ? "A geração demorou demais. Tente novamente." : (e?.message || "Erro desconhecido");
+      toast({ title: "Erro", description: msg, variant: "destructive" });
     } finally {
       setIsLoading(false);
       setIsGeneratingImage(false);

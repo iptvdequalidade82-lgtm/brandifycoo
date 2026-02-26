@@ -193,21 +193,32 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
     if (!text) return;
     if (dailyCount >= MAX_LIMIT) { toast({ title: "Limite diário atingido", variant: "destructive" }); return; }
     if (customPrompt) setPrompt(customPrompt);
+    const previousCopy = generatedCopy;
     setIsGeneratingCopy(true);
     setStep("copy");
     try {
       const headers = await getAuthHeaders();
+
+      // Build anti-repetition instruction when regenerating
+      const antiRepetition = previousCopy
+        ? `\n\nIMPORTANTE: O cliente pediu para REFAZER. A versão anterior foi:\n"""${previousCopy}"""\n\nCrie uma versão COMPLETAMENTE DIFERENTE. Use outro tom de voz, outro ângulo criativo, outras palavras-chave e outra estrutura. NÃO repita frases ou ideias da versão anterior.`
+        : "";
+
       const res = await fetch(CHAT_URL, {
         method: "POST", headers,
         body: JSON.stringify({
           messages: [
-            { role: "system", content: "Você é um copywriter especialista em redes sociais da agência Brandify. Receba a ideia bruta do cliente e aprimore em um prompt detalhado e profissional para gerar um post de Instagram. Mantenha a essência da ideia original mas adicione detalhes visuais e de copywriting. Responda APENAS com a copy (legenda) aprimorada, sem explicações. Use emojis estrategicamente. Máximo 3 parágrafos curtos." },
+            { role: "system", content: `Você é um copywriter especialista em redes sociais da agência Brandify. Receba a ideia bruta do cliente e aprimore em um prompt detalhado e profissional para gerar um post de Instagram. Mantenha a essência da ideia original mas adicione detalhes visuais e de copywriting. Responda APENAS com a copy (legenda) aprimorada, sem explicações. Use emojis estrategicamente. Máximo 3 parágrafos curtos.${antiRepetition}` },
             { role: "user", content: text }
           ],
           model: "google/gemini-2.5-flash",
         }),
       });
-      if (!res.ok) throw new Error("Erro ao gerar copy");
+      if (!res.ok) {
+        if (res.status === 429) throw new Error("Limite de requisições excedido. Aguarde um momento e tente novamente.");
+        if (res.status === 402) throw new Error("Créditos de IA insuficientes. Verifique seu plano.");
+        throw new Error("Erro ao gerar copy");
+      }
       const reader = res.body?.getReader();
       if (!reader) throw new Error("Sem resposta");
       const decoder = new TextDecoder();
@@ -236,11 +247,20 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
     setStep("generating");
     try {
       const headers = await getAuthHeaders();
+      const controller = new AbortController();
+      const imgTimeout = setTimeout(() => controller.abort(), 120000);
       const res = await fetch(IMAGE_URL, {
         method: "POST", headers,
         body: JSON.stringify({ prompt: `Post profissional para Instagram: ${prompt}. Copy: ${generatedCopy}`, type: postType, referenceImage }),
+        signal: controller.signal,
       });
-      if (!res.ok) { const err = await res.json().catch(() => ({ error: "Erro" })); throw new Error(err.error || `Erro ${res.status}`); }
+      clearTimeout(imgTimeout);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Erro" }));
+        if (res.status === 429) throw new Error("Limite de requisições excedido. Aguarde um momento.");
+        if (res.status === 402) throw new Error("Créditos de IA insuficientes.");
+        throw new Error(err.error || `Erro ${res.status}`);
+      }
       const data = await res.json();
       if (!data.imageUrl) throw new Error("Nenhuma imagem gerada");
       setGeneratedImages((prev) => [{ url: data.imageUrl, prompt, type: postType, copy: generatedCopy }, ...prev]);
@@ -261,8 +281,16 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
     setIsEditing(true);
     try {
       const headers = await getAuthHeaders();
-      const res = await fetch(IMAGE_URL, { method: "POST", headers, body: JSON.stringify({ prompt: `${img.prompt}. INSTRUÇÃO DE EDIÇÃO: ${instruction}`, type: img.type, referenceImage: img.url }) });
-      if (!res.ok) throw new Error("Erro ao editar");
+      const controller = new AbortController();
+      const editTimeout = setTimeout(() => controller.abort(), 120000);
+      const res = await fetch(IMAGE_URL, { method: "POST", headers, body: JSON.stringify({ prompt: `${img.prompt}. INSTRUÇÃO DE EDIÇÃO: ${instruction}`, type: img.type, referenceImage: img.url }), signal: controller.signal });
+      clearTimeout(editTimeout);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Erro" }));
+        if (res.status === 429) throw new Error("Limite de requisições excedido. Aguarde um momento.");
+        if (res.status === 402) throw new Error("Créditos de IA insuficientes.");
+        throw new Error(err.error || "Erro ao editar");
+      }
       const data = await res.json();
       if (!data.imageUrl) throw new Error("Nenhuma imagem gerada");
       setGeneratedImages((prev) => [{ url: data.imageUrl, prompt: `${img.prompt} (editado: ${instruction})`, type: img.type, copy: img.copy }, ...prev]);
@@ -662,8 +690,16 @@ function ChatTab({ user }: { user: User | null }) {
         setIsGeneratingImage(true);
         setMessages((prev) => [...prev, { role: "assistant", content: "🎨 Gerando imagem...", image_urls: [] }]);
         try {
-          const resp = await fetch(CHAT_URL, { method: "POST", headers, body: JSON.stringify({ messages: apiMessages, model: "auto", conversationId: convId, generateImage: true }) });
-          if (!resp.ok) { const err = await resp.json().catch(() => ({ error: "Erro" })); throw new Error(err.error || `Erro ${resp.status}`); }
+          const imgController = new AbortController();
+          const imgTimeout = setTimeout(() => imgController.abort(), 120000);
+          const resp = await fetch(CHAT_URL, { method: "POST", headers, body: JSON.stringify({ messages: apiMessages, model: "auto", conversationId: convId, generateImage: true }), signal: imgController.signal });
+          clearTimeout(imgTimeout);
+          if (!resp.ok) {
+            const err = await resp.json().catch(() => ({ error: "Erro" }));
+            if (resp.status === 429) throw new Error("Limite de requisições excedido. Aguarde um momento.");
+            if (resp.status === 402) throw new Error("Créditos de IA insuficientes.");
+            throw new Error(err.error || `Erro ${resp.status}`);
+          }
           const data = await resp.json();
           const assistantMsg: Msg = { role: "assistant", content: data.content || "Aqui está! 🎨", image_urls: data.imageUrl ? [data.imageUrl] : [], model_used: data.model };
           setMessages((prev) => [...prev.slice(0, -1), assistantMsg]);
@@ -671,7 +707,12 @@ function ChatTab({ user }: { user: User | null }) {
         } finally { setIsGeneratingImage(false); }
       } else {
         const resp = await fetch(CHAT_URL, { method: "POST", headers, body: JSON.stringify({ messages: apiMessages, model: "auto", conversationId: convId }) });
-        if (!resp.ok) { const err = await resp.json().catch(() => ({ error: "Erro" })); throw new Error(err.error || `Erro ${resp.status}`); }
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({ error: "Erro" }));
+          if (resp.status === 429) throw new Error("Limite de requisições excedido. Aguarde um momento.");
+          if (resp.status === 402) throw new Error("Créditos de IA insuficientes.");
+          throw new Error(err.error || `Erro ${resp.status}`);
+        }
         const reader = resp.body!.getReader();
         const decoder = new TextDecoder();
         let buffer = "";
@@ -700,7 +741,8 @@ function ChatTab({ user }: { user: User | null }) {
       if (convId && user) { supabase.from("ai_conversations").update({ updated_at: new Date().toISOString() }).eq("id", convId); }
     } catch (e: any) {
       setStreamingContent("");
-      toast({ title: "Erro", description: e.message, variant: "destructive" });
+      const msg = e?.name === "AbortError" ? "A geração demorou demais. Tente novamente." : (e?.message || "Erro desconhecido");
+      toast({ title: "Erro", description: msg, variant: "destructive" });
     } finally { setIsLoading(false); }
   }, [input, isLoading, activeConvId, messages, user, toast, chatAttachment]);
 
