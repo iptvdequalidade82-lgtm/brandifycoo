@@ -952,8 +952,8 @@ export default function AdminConteudo() {
       </div>
 
       {/* Quick Post Generator Dialog */}
-      <Dialog open={quickPostOpen} onOpenChange={setQuickPostOpen}>
-        <DialogContent className="bg-[#111] border-white/10 text-white max-w-lg max-h-[85vh] overflow-y-auto">
+      <Dialog open={quickPostOpen} onOpenChange={(open) => { if (!quickPostLoading) setQuickPostOpen(open); }}>
+        <DialogContent className="bg-[#111] border-white/10 text-white max-w-lg max-h-[85vh] overflow-y-auto" onPointerDownOutside={(e) => { if (quickPostLoading) e.preventDefault(); }}>
           <DialogHeader>
             <DialogTitle className="text-white flex items-center gap-2">
               <Wand2 className="w-5 h-5 text-purple-400" />
