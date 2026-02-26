@@ -507,6 +507,7 @@ export default function AdminConteudo() {
 
     if (quickPostLoading) return;
 
+    const previousResult = quickPostResult;
     setQuickPostLoading(true);
     setQuickPostError(null);
     setQuickPostImageUrl(null);
@@ -519,6 +520,11 @@ export default function AdminConteudo() {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 90000);
 
+      // Anti-repetition: if regenerating, include previous content as negative reference
+      const antiRepetition = previousResult?.caption
+        ? `\n\nIMPORTANTE — REFAZENDO: O conteúdo anterior foi:\nTítulo: "${previousResult.title}"\nLegenda: "${previousResult.caption.slice(0, 300)}"\n\nCrie uma versão COMPLETAMENTE DIFERENTE com outro tom, ângulo e estrutura. NÃO repita frases anteriores.`
+        : "";
+
       const res = await fetch(`${supabaseUrl}/functions/v1/generate-instagram-content`, {
         method: "POST",
         headers: {
@@ -528,7 +534,7 @@ export default function AdminConteudo() {
         },
         body: JSON.stringify({
           niches: [quickPostInput],
-          brandContext: `MODO POST AVULSO — Tipo: ${quickPostTemplate}. Gere APENAS 1 post de feed (NÃO gere stories, NÃO gere planejamento semanal). Retorne JSON com monthPlan.weeks contendo 1 semana com 1 feedPost e stories vazio.`,
+          brandContext: `MODO POST AVULSO — Tipo: ${quickPostTemplate}. Gere APENAS 1 post de feed (NÃO gere stories, NÃO gere planejamento semanal). Retorne JSON com monthPlan.weeks contendo 1 semana com 1 feedPost e stories vazio.${antiRepetition}`,
           monthLabel: "Post avulso",
           weeksConfig: [{ label: "Post", range: "", days: ["Hoje"] }],
         }),
@@ -538,7 +544,11 @@ export default function AdminConteudo() {
       clearTimeout(timeout);
 
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error((data as any)?.error || `Erro ${res.status}`);
+      if (!res.ok) {
+        if (res.status === 429) throw new Error("Limite de requisições excedido. Aguarde um momento.");
+        if (res.status === 402) throw new Error("Créditos de IA insuficientes.");
+        throw new Error((data as any)?.error || `Erro ${res.status}`);
+      }
       if ((data as any)?.error) throw new Error((data as any).error);
 
       const plan = (data as any)?.monthPlan || data;
@@ -594,7 +604,7 @@ export default function AdminConteudo() {
           apikey: supabaseKey,
           Authorization: `Bearer ${session?.access_token || supabaseKey}`,
         },
-      body: JSON.stringify({
+        body: JSON.stringify({
           prompt: quickPostResult.imageDescription,
           type: quickPostFormat,
           ...(quickPostRefImage ? { referenceImage: quickPostRefImage } : {}),
@@ -605,7 +615,11 @@ export default function AdminConteudo() {
       clearTimeout(timeout);
 
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error((data as any)?.error || `Erro ${res.status}`);
+      if (!res.ok) {
+        if (res.status === 429) throw new Error("Limite de requisições excedido. Aguarde um momento.");
+        if (res.status === 402) throw new Error("Créditos de IA insuficientes.");
+        throw new Error((data as any)?.error || `Erro ${res.status}`);
+      }
       if ((data as any)?.error) throw new Error((data as any).error);
       if (!(data as any)?.imageUrl) throw new Error("A imagem não foi retornada pela IA.");
 
