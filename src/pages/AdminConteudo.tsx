@@ -238,6 +238,7 @@ export default function AdminConteudo() {
   const [quickPostInput, setQuickPostInput] = useState("");
   const [quickPostLoading, setQuickPostLoading] = useState(false);
   const [quickPostResult, setQuickPostResult] = useState<{ title: string; caption: string; imageDescription: string; marketingTip: string } | null>(null);
+  const [quickPostError, setQuickPostError] = useState<string | null>(null);
 
   const months = useMemo(() => {
     void refreshKey;
@@ -498,8 +499,12 @@ export default function AdminConteudo() {
       toast({ title: "Descreva o que deseja criar", variant: "destructive" });
       return;
     }
+
+    if (quickPostLoading) return;
+
     setQuickPostLoading(true);
-    setQuickPostResult(null);
+    setQuickPostError(null);
+
     try {
       const { data, error } = await supabase.functions.invoke("generate-instagram-content", {
         body: {
@@ -509,23 +514,31 @@ export default function AdminConteudo() {
           weeksConfig: [{ label: "Post", range: "", days: ["Hoje"] }],
         },
       });
+
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
+
       const plan = data?.monthPlan || data;
-      const post = plan?.weeks?.[0]?.feedPosts?.[0];
-      if (post) {
-        setQuickPostResult({
-          title: post.title,
-          caption: post.caption,
-          imageDescription: post.imageDescription,
-          marketingTip: post.marketingTip,
-        });
-      } else {
-        throw new Error("Formato inesperado na resposta");
+      const post =
+        plan?.weeks?.flatMap((week: any) => week?.feedPosts || [])?.[0] ||
+        plan?.feedPosts?.[0] ||
+        data?.post;
+
+      if (!post) {
+        throw new Error("Não consegui extrair o post da resposta da IA.");
       }
+
+      setQuickPostResult({
+        title: post.title || "",
+        caption: post.caption || "",
+        imageDescription: post.imageDescription || "",
+        marketingTip: post.marketingTip || "",
+      });
     } catch (e: any) {
       console.error(e);
-      toast({ title: "Erro ao gerar post", description: e.message, variant: "destructive" });
+      const message = e?.message || "Falha ao gerar o post.";
+      setQuickPostError(message);
+      toast({ title: "Erro ao gerar post", description: message, variant: "destructive" });
     } finally {
       setQuickPostLoading(false);
     }
@@ -554,10 +567,12 @@ export default function AdminConteudo() {
             {QUICK_TEMPLATES.map((tpl) => (
               <button
                 key={tpl.label}
+                type="button"
                 onClick={() => {
                   setQuickPostTemplate(tpl.label);
                   setQuickPostInput("");
                   setQuickPostResult(null);
+                  setQuickPostError(null);
                   setQuickPostOpen(true);
                 }}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.15] text-white/60 hover:text-white text-xs font-medium transition-all"
@@ -953,7 +968,7 @@ export default function AdminConteudo() {
 
       {/* Quick Post Generator Dialog */}
       <Dialog open={quickPostOpen} onOpenChange={(open) => { if (!quickPostLoading) setQuickPostOpen(open); }}>
-        <DialogContent className="bg-[#111] border-white/10 text-white max-w-lg max-h-[85vh] overflow-y-auto" onPointerDownOutside={(e) => { if (quickPostLoading) e.preventDefault(); }}>
+        <DialogContent className="bg-[#111] border-white/10 text-white max-w-lg max-h-[85vh] overflow-y-auto" onPointerDownOutside={(e) => { if (quickPostLoading) e.preventDefault(); }} onInteractOutside={(e) => { if (quickPostLoading) e.preventDefault(); }} onEscapeKeyDown={(e) => { if (quickPostLoading) e.preventDefault(); }}>
           <DialogHeader>
             <DialogTitle className="text-white flex items-center gap-2">
               <Wand2 className="w-5 h-5 text-purple-400" />
@@ -973,16 +988,27 @@ export default function AdminConteudo() {
             </div>
 
             <Button
-              onClick={handleQuickPost}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                void handleQuickPost();
+              }}
               disabled={quickPostLoading || !quickPostInput.trim()}
               className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold"
             >
               {quickPostLoading ? (
                 <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Gerando post...</>
               ) : (
-                <><Sparkles className="w-4 h-4 mr-2" /> Gerar Post</>
+                <><Sparkles className="w-4 h-4 mr-2" /> {quickPostResult ? "Gerar nova versão" : "Gerar Post"}</>
               )}
             </Button>
+
+            {quickPostError && (
+              <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-2.5 text-xs text-destructive">
+                {quickPostError}
+              </div>
+            )}
 
             {quickPostResult && (
               <div className="space-y-4 pt-2 border-t border-white/[0.06]">
@@ -996,7 +1022,7 @@ export default function AdminConteudo() {
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <p className="text-[10px] uppercase tracking-wider text-white/30">Legenda</p>
-                    <button onClick={() => { navigator.clipboard.writeText(quickPostResult.caption); toast({ title: "Legenda copiada! 📋" }); }} className="text-white/30 hover:text-white transition-colors">
+                    <button type="button" onClick={() => { navigator.clipboard.writeText(quickPostResult.caption); toast({ title: "Legenda copiada! 📋" }); }} className="text-white/30 hover:text-white transition-colors">
                       <Copy className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -1009,7 +1035,7 @@ export default function AdminConteudo() {
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <p className="text-[10px] uppercase tracking-wider text-white/30">Descrição da arte</p>
-                    <button onClick={() => { navigator.clipboard.writeText(quickPostResult.imageDescription); toast({ title: "Descrição copiada! 📋" }); }} className="text-white/30 hover:text-white transition-colors">
+                    <button type="button" onClick={() => { navigator.clipboard.writeText(quickPostResult.imageDescription); toast({ title: "Descrição copiada! 📋" }); }} className="text-white/30 hover:text-white transition-colors">
                       <Copy className="w-3.5 h-3.5" />
                     </button>
                   </div>
