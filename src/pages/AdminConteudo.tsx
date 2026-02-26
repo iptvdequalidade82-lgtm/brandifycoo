@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import {
   Instagram, Sparkles, Calendar, Copy, Download, RefreshCw, ImageIcon,
   Clock, Lightbulb, MessageSquare, Pencil, CheckCircle2, Circle,
-  Lock, CalendarDays, Check, AlertTriangle, Loader2, Wand2, X,
+  Lock, CalendarDays, Check, AlertTriangle, Loader2, Wand2, X, Upload,
 } from "lucide-react";
 
 // ── Types ──
@@ -241,6 +241,8 @@ export default function AdminConteudo() {
   const [quickPostImageUrl, setQuickPostImageUrl] = useState<string | null>(null);
   const [quickPostImageLoading, setQuickPostImageLoading] = useState(false);
   const [quickPostError, setQuickPostError] = useState<string | null>(null);
+  const [quickPostRefImage, setQuickPostRefImage] = useState<string | null>(null);
+  const refImageInputRef = useRef<HTMLInputElement>(null);
 
   const months = useMemo(() => {
     void refreshKey;
@@ -591,9 +593,10 @@ export default function AdminConteudo() {
           apikey: supabaseKey,
           Authorization: `Bearer ${session?.access_token || supabaseKey}`,
         },
-        body: JSON.stringify({
+      body: JSON.stringify({
           prompt: quickPostResult.imageDescription,
           type: "feed",
+          ...(quickPostRefImage ? { referenceImage: quickPostRefImage } : {}),
         }),
         signal: controller.signal,
       });
@@ -648,6 +651,7 @@ export default function AdminConteudo() {
                   setQuickPostResult(null);
                   setQuickPostImageUrl(null);
                   setQuickPostError(null);
+                  setQuickPostRefImage(null);
                   setQuickPostOpen(true);
                 }}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.15] text-white/60 hover:text-white text-xs font-medium transition-all"
@@ -1142,6 +1146,49 @@ export default function AdminConteudo() {
                     rows={3}
                     className="w-full text-xs text-white/50 italic bg-white/[0.02] rounded-lg p-3 border border-white/[0.04] focus:outline-none focus:border-white/20 resize-y"
                   />
+                </div>
+
+                {/* Reference image upload */}
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-white/30 mb-1">Imagem de referência (opcional)</p>
+                  <input
+                    ref={refImageInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      if (file.size > 10 * 1024 * 1024) {
+                        toast({ title: "Imagem muito grande (max 10MB)", variant: "destructive" });
+                        return;
+                      }
+                      const reader = new FileReader();
+                      reader.onload = () => setQuickPostRefImage(reader.result as string);
+                      reader.readAsDataURL(file);
+                    }}
+                  />
+                  {quickPostRefImage ? (
+                    <div className="relative">
+                      <img src={quickPostRefImage} alt="Referência" className="w-full max-h-40 object-contain rounded-lg border border-white/[0.08]" />
+                      <button
+                        type="button"
+                        onClick={() => { setQuickPostRefImage(null); if (refImageInputRef.current) refImageInputRef.current.value = ""; }}
+                        className="absolute top-1.5 right-1.5 bg-black/60 hover:bg-black/80 text-white rounded-full p-1 transition-colors"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => refImageInputRef.current?.click()}
+                      className="w-full flex items-center justify-center gap-2 text-xs text-white/40 hover:text-white/70 bg-white/[0.02] hover:bg-white/[0.06] border border-dashed border-white/[0.08] hover:border-white/20 rounded-lg py-3 transition-colors"
+                    >
+                      <Upload className="w-4 h-4" /> Enviar imagem como referência para a IA
+                    </button>
+                  )}
+                  <p className="text-[9px] text-white/20 mt-1">A IA usará essa imagem como base visual para criar o post.</p>
                 </div>
 
                 {quickPostImageUrl && (
