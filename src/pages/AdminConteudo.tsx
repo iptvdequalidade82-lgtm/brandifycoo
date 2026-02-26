@@ -488,6 +488,37 @@ export default function AdminConteudo() {
           </div>
         </div>
 
+        {/* Quick Action Templates */}
+        <div className="space-y-2">
+          <p className="text-xs font-semibold text-white/40 uppercase tracking-wider flex items-center gap-1.5">
+            <Lightbulb className="w-3.5 h-3.5" /> Atalhos rápidos
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { emoji: "📢", label: "Anúncio de produto", prompt: "Crie um anúncio persuasivo para um produto/serviço, destacando benefícios únicos, com CTA forte e visual impactante" },
+              { emoji: "🔥", label: "Promoção relâmpago", prompt: "Crie um post de promoção relâmpago/oferta por tempo limitado, com senso de urgência, preço com desconto e CTA de compra imediata" },
+              { emoji: "📖", label: "Storytelling", prompt: "Crie um post de storytelling/bastidores da marca, humanizando o negócio, mostrando processos ou a equipe por trás do produto" },
+              { emoji: "🎓", label: "Post educativo", prompt: "Crie um post educativo com dicas, tutorial ou informação de valor para o público, posicionando a marca como autoridade no segmento" },
+              { emoji: "⭐", label: "Prova social", prompt: "Crie um post de depoimento/prova social de cliente satisfeito, com resultado real, antes e depois ou avaliação positiva" },
+              { emoji: "🚀", label: "Lançamento", prompt: "Crie um post de lançamento de novo produto/serviço, gerando expectativa, mostrando diferenciais e com contagem regressiva" },
+              { emoji: "📅", label: "Data comemorativa", prompt: "Crie um post para data comemorativa ou sazonal, conectando a celebração ao posicionamento da marca de forma criativa" },
+              { emoji: "💬", label: "Engajamento", prompt: "Crie um post de engajamento (enquete, pergunta, desafio) para aumentar interação, comentários e compartilhamentos" },
+            ].map((tpl) => (
+              <button
+                key={tpl.label}
+                onClick={() => {
+                  setBrandContext(tpl.prompt);
+                  toast({ title: `Modelo "${tpl.label}" aplicado ✅`, description: "Agora selecione os nichos e gere o planejamento." });
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.15] text-white/60 hover:text-white text-xs font-medium transition-all"
+              >
+                <span>{tpl.emoji}</span>
+                {tpl.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Monthly Navigation */}
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-1.5 md:gap-2">
           {months.map((month) => {
