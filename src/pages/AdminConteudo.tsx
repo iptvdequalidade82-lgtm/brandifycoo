@@ -1101,13 +1101,18 @@ export default function AdminConteudo() {
 
             {quickPostResult && (
               <div className="space-y-4 pt-2 border-t border-white/[0.06]">
-                {/* Title */}
+                {/* Title - editable */}
                 <div>
                   <p className="text-[10px] uppercase tracking-wider text-white/30 mb-1">Título</p>
-                  <p className="text-sm font-semibold text-white">{quickPostResult.title}</p>
+                  <input
+                    type="text"
+                    value={quickPostResult.title}
+                    onChange={(e) => setQuickPostResult({ ...quickPostResult, title: e.target.value })}
+                    className="w-full text-sm font-semibold text-white bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 focus:outline-none focus:border-white/20"
+                  />
                 </div>
 
-                {/* Caption */}
+                {/* Caption - editable */}
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <p className="text-[10px] uppercase tracking-wider text-white/30">Legenda</p>
@@ -1115,12 +1120,15 @@ export default function AdminConteudo() {
                       <Copy className="w-3.5 h-3.5" />
                     </button>
                   </div>
-                  <p className="text-xs text-white/70 whitespace-pre-wrap leading-relaxed bg-white/[0.03] rounded-lg p-3 border border-white/[0.06]">
-                    {quickPostResult.caption}
-                  </p>
+                  <textarea
+                    value={quickPostResult.caption}
+                    onChange={(e) => setQuickPostResult({ ...quickPostResult, caption: e.target.value })}
+                    rows={5}
+                    className="w-full text-xs text-white/70 whitespace-pre-wrap leading-relaxed bg-white/[0.03] rounded-lg p-3 border border-white/[0.06] focus:outline-none focus:border-white/20 resize-y"
+                  />
                 </div>
 
-                {/* Image Description */}
+                {/* Image Description - editable */}
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <p className="text-[10px] uppercase tracking-wider text-white/30">Descrição da arte</p>
@@ -1128,14 +1136,26 @@ export default function AdminConteudo() {
                       <Copy className="w-3.5 h-3.5" />
                     </button>
                   </div>
-                  <p className="text-xs text-white/50 italic bg-white/[0.02] rounded-lg p-3 border border-white/[0.04]">
-                    {quickPostResult.imageDescription}
-                  </p>
+                  <textarea
+                    value={quickPostResult.imageDescription}
+                    onChange={(e) => setQuickPostResult({ ...quickPostResult, imageDescription: e.target.value })}
+                    rows={3}
+                    className="w-full text-xs text-white/50 italic bg-white/[0.02] rounded-lg p-3 border border-white/[0.04] focus:outline-none focus:border-white/20 resize-y"
+                  />
                 </div>
 
                 {quickPostImageUrl && (
                   <div>
-                    <p className="text-[10px] uppercase tracking-wider text-white/30 mb-1">Prévia da imagem</p>
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-[10px] uppercase tracking-wider text-white/30">Prévia da imagem</p>
+                      <a
+                        href={quickPostImageUrl}
+                        download={`post-${quickPostResult.title?.replace(/\s+/g, '-').toLowerCase() || 'avulso'}.png`}
+                        className="flex items-center gap-1.5 text-xs text-white/50 hover:text-white transition-colors bg-white/[0.06] hover:bg-white/[0.12] px-2.5 py-1 rounded-md"
+                      >
+                        <Download className="w-3.5 h-3.5" /> Baixar
+                      </a>
+                    </div>
                     <img
                       src={quickPostImageUrl}
                       alt="Prévia do post avulso gerado"
