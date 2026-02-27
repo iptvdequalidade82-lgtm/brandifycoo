@@ -57,8 +57,26 @@ function trackUsageLocal(userId?: string): number {
   return filtered.filter((d: string) => new Date(d).toDateString() === today).length;
 }
 
-const MAX_FREE_DAILY = 5;
+const MAX_FREE_DAILY = 3;
 const PLAN_LABELS: Record<string, string> = { basico: "Básico", pro: "Pro", premium: "Premium" };
+const PLAN_MONTHLY_CREDITS: Record<string, number> = { basico: 15, pro: 20, premium: Infinity };
+
+function getMonthlyUsageKey(userId?: string): string {
+  const month = new Date().toISOString().slice(0, 7); // YYYY-MM
+  return `post_gen_monthly_${userId || getDeviceId()}_${month}`;
+}
+
+function getMonthlyUsage(userId?: string): number {
+  const stored = localStorage.getItem(getMonthlyUsageKey(userId));
+  return stored ? parseInt(stored, 10) || 0 : 0;
+}
+
+function trackMonthlyUsage(userId?: string): number {
+  const key = getMonthlyUsageKey(userId);
+  const current = getMonthlyUsage(userId) + 1;
+  localStorage.setItem(key, String(current));
+  return current;
+}
 
 const SUGGESTIONS = [
   { icon: "🍕", label: "Restaurante delivery", prompt: "Anúncio de restaurante delivery com entrega grátis na cidade inteira" },
@@ -101,6 +119,8 @@ function ProBanner({ user, remaining, userPlan }: { user: User | null; remaining
   };
 
   if (userPlan) {
+    const monthlyCredits = PLAN_MONTHLY_CREDITS[userPlan] ?? Infinity;
+    const isUnlimited = monthlyCredits === Infinity;
     return (
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mx-3 md:mx-6 mt-2 mb-0">
         <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-yellow-500/10 border border-amber-500/20">
@@ -108,7 +128,9 @@ function ProBanner({ user, remaining, userPlan }: { user: User | null; remaining
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shrink-0">
               <Crown className="w-3.5 h-3.5 text-white" />
             </div>
-            <p className="text-white/80 text-xs font-medium">Plano {PLAN_LABELS[userPlan] || userPlan} ativo • Uso ilimitado</p>
+            <p className="text-white/80 text-xs font-medium">
+              Plano {PLAN_LABELS[userPlan] || userPlan} ativo • {isUnlimited ? "Uso ilimitado" : `${remaining > 999 ? "∞" : remaining} crédito${remaining !== 1 ? "s" : ""} disponíve${remaining !== 1 ? "is" : "l"}`}
+            </p>
           </div>
           {userPlan !== "premium" && (
             <button onClick={handleUpgrade} className="text-amber-400/70 hover:text-amber-300 text-xs font-medium transition-colors">Fazer upgrade →</button>
@@ -127,9 +149,9 @@ function ProBanner({ user, remaining, userPlan }: { user: User | null; remaining
           </div>
           <div>
             <p className="text-white/80 text-xs font-medium">
-              {remaining > 0 ? `${remaining} ${remaining === 1 ? "criação restante" : "criações restantes"} hoje` : "Limite diário atingido"}
+              {remaining > 0 ? `${remaining} crédito${remaining === 1 ? "" : "s"} grátis restante${remaining === 1 ? "" : "s"} hoje` : "Créditos grátis esgotados hoje"}
             </p>
-            <p className="text-white/30 text-[10px] hidden sm:block">Assine um plano para uso ilimitado</p>
+            <p className="text-white/30 text-[10px] hidden sm:block">Assine um plano para mais créditos mensais</p>
           </div>
         </div>
         <button onClick={handleUpgrade} className="shrink-0 flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-gradient-to-r from-amber-400 to-orange-500 text-black text-xs font-bold hover:from-amber-300 hover:to-orange-400 transition-all shadow-lg shadow-amber-500/20 w-full sm:w-auto">
@@ -161,12 +183,32 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
   const [isEditing, setIsEditing] = useState(false);
 
   const hasActivePlan = !!userPlan;
-  const MAX_LIMIT = hasActivePlan ? Infinity : MAX_FREE_DAILY;
+  const [monthlyCount, setMonthlyCount] = useState(0);
 
-  useEffect(() => { setDailyCount(getDailyUsage(user?.id)); }, [user?.id]);
+  useEffect(() => { setDailyCount(getDailyUsage(user?.id)); setMonthlyCount(getMonthlyUsage(user?.id)); }, [user?.id]);
 
-  const remaining = userPlan ? Infinity : Math.max(0, MAX_FREE_DAILY - dailyCount);
-  const trackUsage = () => { setDailyCount(trackUsageLocal(user?.id)); };
+  const monthlyCredits = userPlan ? (PLAN_MONTHLY_CREDITS[userPlan] ?? Infinity) : 0;
+  const monthlyRemaining = monthlyCredits === Infinity ? Infinity : Math.max(0, monthlyCredits - monthlyCount);
+  const dailyRemaining = Math.max(0, MAX_FREE_DAILY - dailyCount);
+  // Total available = daily free + monthly plan credits remaining
+  const remaining = hasActivePlan
+    ? (monthlyCredits === Infinity ? Infinity : dailyRemaining + monthlyRemaining)
+    : dailyRemaining;
+  const MAX_LIMIT = remaining;
+
+  const trackUsage = () => {
+    // Always consume daily free first, then monthly
+    if (dailyCount < MAX_FREE_DAILY) {
+      setDailyCount(trackUsageLocal(user?.id));
+    } else if (hasActivePlan && monthlyCredits !== Infinity) {
+      setMonthlyCount(trackMonthlyUsage(user?.id));
+    } else if (hasActivePlan && monthlyCredits === Infinity) {
+      // Premium: just track daily for stats
+      setDailyCount(trackUsageLocal(user?.id));
+    } else {
+      setDailyCount(trackUsageLocal(user?.id));
+    }
+  };
 
   const getAuthHeaders = async () => {
     const session = (await supabase.auth.getSession()).data.session;
@@ -192,7 +234,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
   const handleGenerateCopy = async (customPrompt?: string) => {
     const text = (customPrompt || prompt).trim();
     if (!text) return;
-    if (dailyCount >= MAX_LIMIT) { toast({ title: "Limite diário atingido", variant: "destructive" }); return; }
+    if (remaining <= 0) { toast({ title: hasActivePlan ? "Créditos do mês esgotados" : "Limite diário atingido", description: hasActivePlan ? "Aguarde o próximo mês ou faça upgrade." : "Assine um plano para mais créditos.", variant: "destructive" }); return; }
     if (customPrompt) setPrompt(customPrompt);
     const previousCopy = generatedCopy;
     setIsGeneratingCopy(true);
@@ -278,7 +320,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
 
   const handleEditImage = async (img: { url: string; prompt: string; type: string; copy?: string }, instruction: string) => {
     if (!instruction.trim()) return;
-    if (dailyCount >= MAX_LIMIT) { toast({ title: "Limite diário atingido", variant: "destructive" }); return; }
+    if (remaining <= 0) { toast({ title: hasActivePlan ? "Créditos do mês esgotados" : "Limite diário atingido", variant: "destructive" }); return; }
     setIsEditing(true);
     try {
       const headers = await getAuthHeaders();
@@ -347,7 +389,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
                   ))}
                 </div>
               </div>
-              <p className="text-white/15 text-xs text-center">{remaining === Infinity ? "∞" : remaining} de {MAX_FREE_DAILY} criações disponíveis hoje</p>
+              <p className="text-white/15 text-xs text-center">{remaining === Infinity ? "∞ criações ilimitadas" : `${remaining} crédito${remaining !== 1 ? "s" : ""} disponíve${remaining !== 1 ? "is" : "l"}`}{hasActivePlan && monthlyCredits !== Infinity ? ` (${dailyRemaining} grátis hoje + ${monthlyRemaining} do plano)` : hasActivePlan ? "" : ` hoje`}</p>
             </motion.div>
           )}
 
@@ -357,7 +399,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h3 className="text-white font-semibold text-lg" style={{ fontFamily: "'Sora', sans-serif" }}>Seus posts</h3>
-                  <p className="text-white/30 text-sm">{remaining === Infinity ? "Ilimitado" : `${remaining} criações restantes hoje`}</p>
+                  <p className="text-white/30 text-sm">{remaining === Infinity ? "Ilimitado" : `${remaining} crédito${remaining !== 1 ? "s" : ""} restante${remaining !== 1 ? "s" : ""}`}</p>
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -499,7 +541,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
               <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
               <Textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="Ex: Restaurante delivery com entrega grátis na cidade inteira..." className="min-h-[56px] max-h-[120px] bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/25 resize-none rounded-xl pl-12 pr-14 text-sm focus:border-violet-500/40 focus:ring-1 focus:ring-violet-500/20" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleGenerateCopy(); } }} />
               <button onClick={() => fileInputRef.current?.click()} className="absolute bottom-2.5 left-2.5 h-9 w-9 rounded-lg flex items-center justify-center text-white/30 hover:text-white/60 hover:bg-white/[0.06] transition-all" title="Enviar logo ou referência"><ImagePlus className="w-4 h-4" /></button>
-              <Button onClick={() => handleGenerateCopy()} disabled={isGeneratingCopy || !prompt.trim() || dailyCount >= MAX_LIMIT} className="absolute bottom-2.5 right-2.5 h-9 w-9 p-0 rounded-lg bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 border-0 shadow-lg shadow-violet-500/20 disabled:shadow-none">
+              <Button onClick={() => handleGenerateCopy()} disabled={isGeneratingCopy || !prompt.trim() || remaining <= 0} className="absolute bottom-2.5 right-2.5 h-9 w-9 p-0 rounded-lg bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 border-0 shadow-lg shadow-violet-500/20 disabled:shadow-none">
                 {isGeneratingCopy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
               </Button>
             </div>
@@ -896,7 +938,12 @@ export default function IAs() {
 
   useEffect(() => { setDailyCount(getDailyUsage(user?.id)); }, [user?.id]);
 
-  const remaining = userPlan ? Infinity : Math.max(0, MAX_FREE_DAILY - dailyCount);
+  const monthlyCredits = userPlan ? (PLAN_MONTHLY_CREDITS[userPlan] ?? Infinity) : 0;
+  const monthlyRemaining = monthlyCredits === Infinity ? Infinity : Math.max(0, monthlyCredits - getMonthlyUsage(user?.id));
+  const dailyRemaining = Math.max(0, MAX_FREE_DAILY - dailyCount);
+  const remaining = userPlan
+    ? (monthlyCredits === Infinity ? Infinity : dailyRemaining + monthlyRemaining)
+    : dailyRemaining;
 
   if (loading) {
     return <div className="min-h-screen bg-[#050508] flex items-center justify-center"><div className="w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" /></div>;
