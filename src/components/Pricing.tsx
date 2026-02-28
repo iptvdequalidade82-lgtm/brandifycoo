@@ -179,7 +179,7 @@ export default function Pricing() {
 
       <div className="container mx-auto max-w-6xl relative">
         <div className="text-center mb-16">
-          <div className="relative inline-block overflow-hidden">
+          <div className="relative inline-block">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -190,14 +190,14 @@ export default function Pricing() {
               Invista no seu{" "}
               <span className="italic bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">negócio</span>
             </motion.h2>
-            {/* Frosted glass blur sweep */}
+            {/* Subtle frosted glass sweep */}
             <div
-              className="absolute inset-y-0 w-[120px] md:w-[180px] rounded-[2rem] pointer-events-none animate-blur-sweep"
+              className="absolute -inset-y-2 w-[140px] md:w-[200px] rounded-[2.5rem] pointer-events-none animate-blur-sweep"
               style={{
-                backdropFilter: "blur(12px)",
-                WebkitBackdropFilter: "blur(12px)",
-                background: "rgba(255,255,255,0.06)",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.15), inset 0 0 0 0.5px rgba(255,255,255,0.08)",
+                backdropFilter: "blur(3px) brightness(1.15)",
+                WebkitBackdropFilter: "blur(3px) brightness(1.15)",
+                background: "rgba(255,255,255,0.04)",
+                boxShadow: "0 4px 40px rgba(255,255,255,0.03), inset 0 0 0 0.5px rgba(255,255,255,0.06)",
                 willChange: "transform",
               }}
             />
