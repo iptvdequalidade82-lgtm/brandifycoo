@@ -179,16 +179,29 @@ export default function Pricing() {
 
       <div className="container mx-auto max-w-6xl relative">
         <div className="text-center mb-16">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6 }}
-            className="font-display text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-4"
-          >
-            Invista no seu{" "}
-            <span className="italic bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">negócio</span>
-          </motion.h2>
+          <div className="relative inline-block overflow-hidden">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.6 }}
+              className="font-display text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-4"
+            >
+              Invista no seu{" "}
+              <span className="italic bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">negócio</span>
+            </motion.h2>
+            {/* Frosted glass blur sweep */}
+            <div
+              className="absolute inset-y-0 w-[120px] md:w-[180px] rounded-[2rem] pointer-events-none animate-blur-sweep"
+              style={{
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                background: "rgba(255,255,255,0.06)",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.15), inset 0 0 0 0.5px rgba(255,255,255,0.08)",
+                willChange: "transform",
+              }}
+            />
+          </div>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
