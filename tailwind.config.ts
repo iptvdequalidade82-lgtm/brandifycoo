@@ -112,6 +112,13 @@ export default {
         "shimmer": {
           "100%": { transform: "translateX(100%)" },
         },
+        "blur-sweep": {
+          "0%": { transform: "translateX(-100%) rotateY(0deg)" },
+          "45%": { transform: "translateX(calc(100% + 100cqw)) rotateY(5deg)" },
+          "50%": { transform: "translateX(calc(100% + 100cqw)) rotateY(5deg)" },
+          "95%": { transform: "translateX(-100%) rotateY(-5deg)" },
+          "100%": { transform: "translateX(-100%) rotateY(0deg)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -123,6 +130,7 @@ export default {
         "pulse-glow": "pulse-glow 4s ease-in-out infinite",
         "grid-move": "grid-move 20s linear infinite",
         "shimmer": "shimmer 2s infinite",
+        "blur-sweep": "blur-sweep 5s ease-in-out infinite",
       },
     },
   },
