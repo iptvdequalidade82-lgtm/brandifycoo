@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import TiltCard from "@/components/TiltCard";
 import StaggeredReveal from "@/components/StaggeredReveal";
+import { CardSpotlight } from "@/components/ui/card-spotlight";
 import lunarMountainBg from "@/assets/lunar-mountain-bg.jpg";
 import { Lightbulb, Palette, Code2, Rocket } from "lucide-react";
 
@@ -76,12 +77,13 @@ export default function Process() {
             return (
               <motion.div key={step.title} variants={item}>
                 <TiltCard className="h-full" tiltAmount={12}>
+                  <CardSpotlight className="h-full border-0 bg-transparent">
                   <motion.div
                     whileInView={{ opacity: 1, x: 0 }}
                     initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
                     viewport={{ once: true, margin: "-50px" }}
                     transition={{ duration: 0.5, delay: i * 0.1 }}
-                    className="relative p-8 rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-sm h-full flex flex-col transition-all duration-500 hover:border-white/[0.15] hover:bg-white/[0.06] active:bg-white/[0.08] active:border-brand-accent/30 group"
+                    className="relative p-8 h-full flex flex-col"
                   >
                     <span className="font-display text-6xl font-black text-white/[0.07] leading-none mb-6">
                       {step.num}
@@ -114,6 +116,7 @@ export default function Process() {
                     </div>
                     <p className="text-sm text-white/40 leading-relaxed">{step.desc}</p>
                   </motion.div>
+                  </CardSpotlight>
                 </TiltCard>
               </motion.div>
             );

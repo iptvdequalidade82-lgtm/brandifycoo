@@ -4,6 +4,8 @@ import { useEffect } from "react";
 import AnimatedCounter from "@/components/AnimatedCounter";
 import MagneticButton from "@/components/MagneticButton";
 import StaggeredReveal from "@/components/StaggeredReveal";
+import { Spotlight } from "@/components/ui/spotlight";
+import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 
 export default function Hero() {
   useEffect(() => {
@@ -61,6 +63,7 @@ export default function Hero() {
       className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background pt-28 md:pt-0"
     >
       <div id="hero-video-container" className="absolute inset-0 z-0" />
+      <Spotlight />
       <div className="absolute inset-0 z-[1] bg-black/50 backdrop-blur-[2px] pointer-events-none" />
 
       <div className="relative z-10 container mx-auto text-center max-w-5xl px-6 text-white">
@@ -77,15 +80,11 @@ export default function Hero() {
           />
         </motion.h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-          className="text-white/70 text-lg md:text-xl mb-14 max-w-2xl mx-auto leading-relaxed font-light"
-        >
-          Modernos, rápidos e com design que impressiona. Tecnologia de ponta
-          aplicada ao seu negócio digital.
-        </motion.p>
+        <TextGenerateEffect
+          words="Modernos, rápidos e com design que impressiona. Tecnologia de ponta aplicada ao seu negócio digital."
+          className="text-lg md:text-xl mb-14 max-w-2xl mx-auto leading-relaxed"
+          duration={0.6}
+        />
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
