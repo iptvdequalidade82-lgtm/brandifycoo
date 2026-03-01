@@ -948,7 +948,7 @@ const TOOL_GROUPS: { label: string; badge?: string; badgeColor?: string; tools: 
       { key: "copy", label: "Gerador de Copy", icon: PenTool, color: "text-amber-400", minPlan: "pro" },
       { key: "landing", label: "Textos de Venda", icon: Layout, color: "text-emerald-400", minPlan: "pro" },
       { key: "atendedor", label: "Atendedor IA", icon: Headphones, color: "text-blue-400", minPlan: "pro" },
-      { key: "agendador", label: "Agendador", icon: Calendar, color: "text-pink-400", minPlan: "pro" },
+      { key: "agendador", label: "Agendador de Consultas", icon: Calendar, color: "text-pink-400", minPlan: "pro" },
     ],
   },
   {
@@ -957,8 +957,8 @@ const TOOL_GROUPS: { label: string; badge?: string; badgeColor?: string; tools: 
     badgeColor: "text-violet-400/60",
     tools: [
       { key: "diagnostico", label: "Diagnóstico IG", icon: Target, color: "text-violet-400", minPlan: "premium" },
-      { key: "planejamento", label: "Planejamento", icon: BarChart3, color: "text-cyan-400", minPlan: "premium" },
-      { key: "simulador", label: "Simulador", icon: TrendingUp, color: "text-green-400", minPlan: "premium" },
+      { key: "planejamento", label: "Plano Estratégico", icon: BarChart3, color: "text-cyan-400", minPlan: "premium" },
+      { key: "simulador", label: "Simulador de Faturamento", icon: TrendingUp, color: "text-green-400", minPlan: "premium" },
     ],
   },
 ];
