@@ -559,9 +559,9 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
               <button onClick={() => { setEditingImage(null); setEditInstruction(""); }} className="text-white/30 hover:text-white"><X className="w-5 h-5" /></button>
             </div>
             <div className="flex gap-3">
-              <img src={editingImage.url} alt="" className="w-24 h-24 rounded-xl object-cover border border-white/10 shrink-0" />
+              <img src={editingImage.url} alt="" className={`rounded-xl object-cover border border-white/10 shrink-0 ${editingImage.type === "story" ? "w-16 h-28" : "w-24 h-24"}`} />
               <div className="flex-1 space-y-1">
-                <p className="text-white/40 text-xs">Post original</p>
+                <p className="text-white/40 text-xs">Post original — <span className="text-violet-300/60">{editingImage.type === "story" ? "Story 9:16" : "Feed 1:1"}</span></p>
                 <p className="text-white/60 text-xs line-clamp-3">{editingImage.prompt}</p>
               </div>
             </div>
