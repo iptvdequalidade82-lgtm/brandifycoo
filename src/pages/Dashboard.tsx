@@ -3,10 +3,12 @@ import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Crown, Sparkles, Image, Globe, MessageSquare, FileText,
-  ArrowRight, Clock, Zap, User as UserIcon, Building2, ChevronRight
+  ArrowRight, Clock, Zap, User as UserIcon, Building2, ChevronRight,
+  Lock, PenTool, Layout, Headphones, Calendar, BarChart3, Target, TrendingUp
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserPlan } from "@/hooks/useUserPlan";
+import { useGating, type PlanTier } from "@/hooks/useGating";
 import logo from "@/assets/logo.jpg";
 
 const PLAN_COLORS: Record<string, { gradient: string; border: string; bg: string }> = {
@@ -23,12 +25,23 @@ const QUICK_ACTIONS = [
   { label: "Prévia de Loja", icon: FileText, href: "/preview-loja", color: "text-amber-400" },
 ];
 
+const TOOLS = [
+  { label: "Gerador de Copy", icon: PenTool, href: "/tools/copy", minPlan: "pro" as PlanTier, color: "text-amber-400", description: "Copys para WhatsApp, Ads e mais" },
+  { label: "Landing Automática", icon: Layout, href: "/tools/landing", minPlan: "pro" as PlanTier, color: "text-emerald-400", description: "Landing pages em minutos" },
+  { label: "Atendedor IA", icon: Headphones, href: "/tools/atendedor", minPlan: "pro" as PlanTier, color: "text-blue-400", description: "Respostas prontas para clientes" },
+  { label: "Agendador", icon: Calendar, href: "/tools/agendador", minPlan: "pro" as PlanTier, color: "text-pink-400", description: "Página de agendamento simples" },
+  { label: "Diagnóstico Instagram", icon: Target, href: "/tools/diagnostico", minPlan: "premium" as PlanTier, color: "text-violet-400", description: "Análise + melhorias do perfil" },
+  { label: "Planejamento Estratégico", icon: BarChart3, href: "/tools/planejamento", minPlan: "premium" as PlanTier, color: "text-cyan-400", description: "Posicionamento e funil 30 dias" },
+  { label: "Simulador de Faturamento", icon: TrendingUp, href: "/tools/simulador", minPlan: "premium" as PlanTier, color: "text-green-400", description: "Estimativa de receita mensal" },
+];
+
 const container = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } };
 const item = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
 
 export default function Dashboard() {
   const { user, isLoading } = useAuth();
   const { userPlan, loading: planLoading } = useUserPlan();
+  const { hasAccess } = useGating();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -182,26 +195,57 @@ export default function Dashboard() {
           </motion.div>
         </motion.div>
 
-        {/* Tools CTA */}
+        {/* Tools Grid */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.5 }}
-          className="mt-8 rounded-2xl border border-white/[0.06] bg-gradient-to-r from-violet-500/[0.04] to-blue-500/[0.04] p-6 sm:p-8 text-center"
+          className="mt-8"
         >
-          <h2 className="font-['Playfair_Display'] font-bold text-lg sm:text-xl mb-2">
-            Novas ferramentas em <span className="font-['Playfair_Display'] font-bold italic bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">breve</span>
-          </h2>
-          <p className="text-white/40 text-sm mb-5 max-w-md mx-auto">
-            Copy, Landing Pages, Atendedor e mais — tudo integrado ao seu plano.
-          </p>
-          <Link
-            to="/planos-pro"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] text-sm font-medium text-white/70 hover:text-white transition-all"
-          >
-            <Sparkles className="w-4 h-4" />
-            Ver planos
-          </Link>
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="font-['Playfair_Display'] font-bold text-lg">
+              Ferramentas
+            </h2>
+            <Link to="/planos-pro" className="text-xs text-white/30 hover:text-white/60 flex items-center gap-1 transition-colors">
+              Ver planos <ChevronRight className="w-3 h-3" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {TOOLS.map((tool) => {
+              const unlocked = hasAccess(tool.minPlan);
+              return (
+                <Link
+                  key={tool.label}
+                  to={unlocked ? tool.href : "/planos-pro"}
+                  className={`relative p-4 rounded-xl border transition-all group ${
+                    unlocked
+                      ? "border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/[0.12]"
+                      : "border-white/[0.04] bg-white/[0.01] opacity-60 hover:opacity-80"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`w-9 h-9 rounded-lg ${unlocked ? "bg-white/[0.05]" : "bg-white/[0.03]"} flex items-center justify-center shrink-0`}>
+                      <tool.icon className={`w-4 h-4 ${unlocked ? tool.color : "text-white/20"}`} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className={`text-sm font-medium ${unlocked ? "text-white/80 group-hover:text-white" : "text-white/40"} transition-colors`}>
+                          {tool.label}
+                        </span>
+                        {!unlocked && <Lock className="w-3 h-3 text-white/20 shrink-0" />}
+                      </div>
+                      <p className="text-[11px] text-white/30 leading-snug">{tool.description}</p>
+                    </div>
+                  </div>
+                  {!unlocked && (
+                    <span className="absolute top-3 right-3 text-[9px] uppercase tracking-wider font-semibold text-white/20">
+                      {tool.minPlan === "premium" ? "Premium" : "Pro"}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
         </motion.div>
       </main>
     </div>
