@@ -20,7 +20,7 @@ interface BusinessCtx {
   extra: string;
 }
 
-function AtendedorContent() {
+export function AtendedorContent() {
   const { toast } = useToast();
   const [showConfig, setShowConfig] = useState(true);
   const [ctx, setCtx] = useState<BusinessCtx>({ name: "", segment: "", services: "", hours: "", extra: "" });

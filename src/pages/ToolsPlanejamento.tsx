@@ -35,7 +35,7 @@ interface Plan {
 
 const STEPS = ["Negócio", "Metas", "Contexto"];
 
-function PlanejamentoContent() {
+export function PlanejamentoContent() {
   const { toast } = useToast();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
