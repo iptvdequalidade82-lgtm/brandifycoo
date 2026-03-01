@@ -19,8 +19,8 @@ serve(async (req) => {
     const aspectRatio = isStory ? "9:16" : "1:1";
     const dimensions = isStory ? "1080x1920" : "1080x1080";
 
-    // Rotate between 18 visual models trained from real reference posts
-    const visualModels = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R"];
+    // Rotate between 28 visual models trained from real reference posts
+    const visualModels = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "AB"];
     const selectedModel = visualModels[Math.floor(Math.random() * visualModels.length)];
 
     const modelInstructions: Record<string, string> = {
@@ -187,6 +187,129 @@ serve(async (req) => {
 - Mix of script + bold typography
 - Cherry blossoms, fabric waves, or themed elements matching the color
 - Reference: Mercedes G-Class in pink cherry blossom scene with giant text`,
+
+      S: `MODEL S — CLEAN TYPOGRAPHY WITH 3D TEXTURED ELEMENT:
+- Clean white/light gray background — minimal, editorial, no clutter
+- MASSIVE bold black condensed typography that DOMINATES the frame (60-70% of space)
+- ONE letter or element replaced by a hyper-realistic 3D TEXTURED OBJECT (grass, fur, metal, wood, fabric, food)
+- The 3D element casts a subtle real shadow on the white background
+- Small accent text in ORANGE or warm color (like a label/tag) between the large words
+- Handwritten or script-style subtitle at bottom
+- Clean folder/path breadcrumb at top-left corner (like "inspirações/cores")
+- Arrow icon at top-right
+- Think: Swiss poster design meets 3D rendering — ultra-clean but tactile
+- Reference: "CORES com VERDE" with grass-textured 3D "O" letter on white background`,
+
+      T: `MODEL T — WARM NATURE EDITORIAL WITH ANIMAL PROTAGONIST:
+- WARM dominant color palette: deep orange, amber, golden yellow — the entire image bathes in this warm tone
+- Hyper-detailed ANIMAL as hero — butterfly, bird, exotic insect — photorealistic with incredible detail
+- Animal positioned on natural element (flower, branch, rock) with macro-photography feel
+- GIANT mixed typography behind/around: massive serif word + elegant script accent word
+- Title structure: small intro text + MASSIVE main word + script accent (like "Aprenda o estilo: Animal art")
+- Agency branding at top-left corner with pipe separator
+- Numbered counter at top-right in rounded border (like "#041 / 365")
+- Warm bokeh particles floating, magical atmosphere, nature details in background
+- Glass/translucent text overlay cards with body text visible but subtle
+- Reference: Golden butterfly on flower with "Animal Art" giant text in warm orange atmosphere`,
+
+      U: `MODEL U — DARK UNDERWATER/DEEP SCENE WITH CREATURE:
+- DARK moody atmosphere: deep ocean, underwater, cave, or dark fantasy environment
+- Hyper-detailed 3D CREATURE as hero: octopus, dragon, sea monster, mythical beast
+- Creature wrapping around or interacting with objects (shipwreck, ruins, artifacts)
+- GIANT bold typography with GRADIENT FILL (white to orange/amber) — text overlapping creature
+- Small intro word in highlighted badge/label style above main text
+- Script or handwritten accent word after/below main text
+- Bioluminescent glows, bubbles, underwater particles, dramatic rim lighting
+- Agency branding at top-left, numbered counter at top-right
+- Dark blue, teal, deep black with orange/amber text accents
+- Reference: Giant octopus on shipwreck with "gerar imagens" gradient text, dark underwater scene`,
+
+      V: `MODEL V — ANIMAL PORTRAIT WITH GLASS CARD OVERLAY:
+- Hyper-detailed ANIMAL face as FULL background — lion, jaguar, wolf, eagle — staring directly at camera
+- Dark jungle/forest environment with magical light particles and foliage
+- FROSTED GLASS CARD at bottom of image — glassmorphism panel with rounded corners
+- Glass card contains: bold title text (mixed serif + script in ORANGE/accent) + body text in two columns
+- Glass card has subtle blur backdrop, thin white border, semi-transparent
+- Small green leaf or organic element breaking out of the glass card for depth
+- Text on glass mixes BOLD accent words in orange with regular white text
+- Moody, cinematic forest lighting — greens, teals, subtle golden particles
+- Reference: Jaguar face close-up with frosted glass "Animal Art" text card at bottom`,
+
+      W: `MODEL W — MONOCHROME STATUE WITH MASSIVE BOLD TYPOGRAPHY:
+- Single STRONG color dominates EVERYTHING: purple, electric blue, hot pink, or emerald
+- Greek/Roman 3D STATUE in dramatic action pose (warrior, hero, athlete) — same color tint
+- ENORMOUS condensed bold typography filling the ENTIRE background — text so big it goes edge-to-edge
+- Text REPEATED at multiple opacity levels creating depth (100%, 40%, 15% opacity stacked)
+- Italic accent labels in contrasting dark badges scattered around (like "BRiEFiNG" in tilted black tags)
+- 4-point star/sparkle decorative elements scattered across composition
+- Page counter at top center (like "01 02 03") with current page underlined
+- "Save This Post" and "Graphic Design" small accent labels in corners
+- "Arrasta para o lado" CTA bar at bottom
+- Reference: Purple warrior statue with massive "BRIEFING" text repeated at multiple opacities`,
+
+      X: `MODEL X — 3D CHARACTER RUNNING WITH MASSIVE TEXT BEHIND:
+- Dark dramatic background with fog, city silhouette, or fantasy environment
+- Hyper-detailed 3D ANIMATED CHARACTER running TOWARD camera — anthropomorphic animal (tiger, wolf, bear) in action pose
+- Character has dynamic clothing, expression, and motion — Pixar/DreamWorks quality rendering
+- Character PUNCHING or REACHING toward viewer — dynamic foreshortening
+- MASSIVE white/light typography BEHIND the character — character breaks through the text
+- Multiple small ACCENT LABELS in highlighted purple/blue badges floating around
+- Design software tool icons (pen, move, shape) as subtle background texture elements
+- Handwritten brand text at bottom in ghost/watermark opacity
+- Page counter at top, agency branding, "Arrasta para o lado" CTA bar at bottom
+- Strong color accent (purple, blue, or orange) throughout
+- Reference: Tiger character running through "PHOTOSHOP" text with purple accents`,
+
+      Y: `MODEL Y — NEON TRAIL ACTION POSE WITH STACKED TEXT:
+- DARK background (near black) with dramatic NEON LIGHT TRAILS
+- Person in dynamic action pose — dancing, jumping, martial arts — full body
+- GLOWING NEON TRAILS following the person's movement (pink, cyan, or electric purple)
+- Smoke/fog effects adding atmosphere — colored to match the neon
+- GIANT white bold typography STACKED VERTICALLY — one word per line, huge scale
+- Script/graffiti accent text at bottom in neon matching color
+- Geometric patterns (circles, tech grids, sacred geometry) subtly in background
+- Multi-language small text at bottom (English + Portuguese) as design element
+- Small icon flags and directional elements as accent details
+- "ARRASTA PRO LADO" CTA with arrow at bottom
+- Reference: Dancer with pink neon trails, stacked "CORES" text, graffiti "Rosa" accent`,
+
+      Z: `MODEL Z — NATURE ANIMAL DOCUMENTARY WITH GLASS TEXT PANEL:
+- Hyper-detailed ANIMAL walking toward camera in natural habitat — jungle, savanna, forest
+- Cinematic documentary photography style — dramatic lighting, shallow depth of field
+- Floating leaves, particles, insects adding life and motion to the scene
+- FROSTED GLASS PANEL in upper portion with TWO-COLUMN text layout
+- Glass panel text uses ORANGE/accent bold for key phrases, white for regular text
+- Italic/serif quote text above the glass panel — philosophical or poetic
+- Rich earth tones: deep greens, warm browns, golden highlights
+- Organic debris and elements in foreground for depth layering
+- Mood: National Geographic meets editorial design
+- Reference: Anteater walking in jungle with glass text panel about "Animal Art" style`,
+
+      AA: `MODEL AA — CLEAN CATALOG/GRID WITH MASKED FIGURE:
+- Clean WHITE/light background — editorial, organized, catalog-style layout
+- Central MASKED FIGURE (balaclava, hood, or face-obscured person) — streetwear, urban fashion
+- Figure wearing CROWN or luxury accessories — mysterious and powerful
+- GRID of colorful rectangular image thumbnails arranged around the figure
+- Thumbnails show abstract textures, fabrics, gradients — like a material library
+- MASSIVE bold condensed typography at top — "BACKGROUNDS" style catalog headline
+- Smaller subtitle text and "Swipe to discover" type CTA
+- Brand logo at top center, @ handle at top-left, page counter at top-right (like "1/7")
+- Script handwritten accent text (like "Part 5")
+- Very clean, organized, almost Swiss-poster aesthetic with urban edge
+- Reference: Masked figure with crown, grid of texture thumbnails, "BACKGROUNDS" catalog title`,
+
+      AB: `MODEL AB — DARK 3D SCULPTURE WITH BOLD COLORED TEXT:
+- Deep DARK background (near black) with subtle texture or grain
+- 3D rendered SCULPTURE or BUST as hero — marble, metallic, or obsidian material
+- Sculpture has ONE colored accent element (yellow blindfold, red lips, gold crown, blue tears)
+- Design software interface elements as subtle background: tool panels, selection marquee (dashed lines), cursor icons
+- GIANT bold colored typography in MATCHING accent color — wide-spaced letters or massive block text
+- Category labels in corners: "LEARN DESIGN" at top-left, "PART 02" at top-right
+- Small "LOREM IPSUM" text as design placeholder accent
+- User profile bar at bottom with play buttons and audio icon
+- 4-point selection handles (yellow/colored squares) around the sculpture
+- Mood: dark, powerful, design-education editorial
+- Reference: Dark marble head with yellow blindfold, "DESIGNERS WEBSITE" in yellow text`,
     };
 
     const referenceInstruction = referenceImage
