@@ -89,6 +89,13 @@ export default function UserMenu() {
             {/* Links */}
             <div className="py-1.5">
               <button
+                onClick={() => { setOpen(false); navigate("/dashboard"); }}
+                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/[0.05] transition-all text-left"
+              >
+                <UserIcon className="w-4 h-4" />
+                Meu Painel
+              </button>
+              <button
                 onClick={() => { setOpen(false); navigate("/planos-pro"); }}
                 className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-white/60 hover:text-white hover:bg-white/[0.05] transition-all text-left"
               >
