@@ -30,7 +30,7 @@ const TOOLS = [
   { label: "Landing Automática", icon: Layout, href: "/tools/landing", minPlan: "pro" as PlanTier, color: "text-emerald-400", description: "Landing pages em minutos" },
   { label: "Atendedor IA", icon: Headphones, href: "/tools/atendedor", minPlan: "pro" as PlanTier, color: "text-blue-400", description: "Respostas prontas para clientes" },
   { label: "Agendador", icon: Calendar, href: "/tools/agendador", minPlan: "pro" as PlanTier, color: "text-pink-400", description: "Página de agendamento simples" },
-  { label: "Diagnóstico Instagram", icon: Target, href: "/tools/diagnostico", minPlan: "premium" as PlanTier, color: "text-violet-400", description: "Análise + melhorias do perfil" },
+  { label: "Diagnóstico Instagram", icon: Target, href: "/tools/diagnostico-ig", minPlan: "premium" as PlanTier, color: "text-violet-400", description: "Análise + melhorias do perfil" },
   { label: "Planejamento Estratégico", icon: BarChart3, href: "/tools/planejamento", minPlan: "premium" as PlanTier, color: "text-cyan-400", description: "Posicionamento e funil 30 dias" },
   { label: "Simulador de Faturamento", icon: TrendingUp, href: "/tools/simulador", minPlan: "premium" as PlanTier, color: "text-green-400", description: "Estimativa de receita mensal" },
 ];
