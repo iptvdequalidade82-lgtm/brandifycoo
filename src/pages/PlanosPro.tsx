@@ -61,7 +61,7 @@ const PLANS = [
     badge: "Completo",
     features: [
       "Criações ilimitadas de posts",
-      "3 créditos diários grátis inclusos",
+      "Sem limite diário de criações",
       "Acesso a TODAS as IAs",
       "Suporte VIP dedicado",
       "Acesso antecipado a novidades",
