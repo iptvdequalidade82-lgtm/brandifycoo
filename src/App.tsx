@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,6 +7,14 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+
+const LazyPage = ({ children }: { children: React.ReactNode }) => (
+  <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center"><div className="w-8 h-8 border-2 border-white/20 border-t-white/80 rounded-full animate-spin" /></div>}>
+    {children}
+  </Suspense>
+);
 
 import TrabalheConosco from "./pages/TrabalheConosco";
 import QuemSomos from "./pages/QuemSomos";
@@ -49,6 +58,7 @@ const App = () => (
             <Route path="/ias" element={<IAs />} />
             <Route path="/planos-pro" element={<PlanosPro />} />
             <Route path="/editor" element={<Editor />} />
+            <Route path="/dashboard" element={<LazyPage><Dashboard /></LazyPage>} />
             <Route path="/projetos" element={<Projetos />} />
             <Route path="/preview-site" element={<PreviewSite />} />
             <Route path="/preview-loja" element={<PreviewLoja />} />
