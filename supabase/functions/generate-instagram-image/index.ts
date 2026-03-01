@@ -365,7 +365,7 @@ The user has uploaded a reference image (could be a logo, photo, or design idea)
       nicheInstruction = `\n\n🏪 AUTO-DETECT NICHE:\nAnalyze the topic/headline below and automatically determine the business niche. Then include ONLY visual elements that are directly related to that specific business. For example: if the topic mentions a bakery, show bread and ovens, NOT cars or animals. Every prop, background, and visual element must reinforce the client's business sector.`;
     }
 
-    const imagePrompt = `Create a MINIMALIST, high-end, professional social media ${type === "story" ? "story (9:16 vertical, 1080x1920px)" : "feed post (1:1 square, 1080x1080px)"} for BRANDIFY, a premium Brazilian creative agency.
+    const imagePrompt = `Create a MINIMALIST, high-end, professional social media ${isStory ? "STORY in VERTICAL 9:16 PORTRAIT format (1080x1920px — TALLER than wide, like a phone screen). THIS IS CRITICAL: the image MUST be vertical/portrait orientation, NOT square" : "feed post in SQUARE 1:1 format (1080x1080px — equal width and height)"} for BRANDIFY, a premium Brazilian creative agency.
 
 The image must look 100% realistic, like a real brand campaign — NOT AI-generated.
 
@@ -451,6 +451,9 @@ CONTENT/TOPIC for the headline: ${prompt}`;
               model,
               messages: [{ role: "user", content: buildMessageContent() }],
               modalities: ["image", "text"],
+              image_config: {
+                aspect_ratio: aspectRatio,
+              },
             }),
           });
           if (res.status === 429) {
