@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import html2canvas from "html2canvas";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Compass, ArrowRight, Loader2, Target, Calendar,
-  AlertTriangle, Zap, CheckCircle2, Users, BarChart3
+  AlertTriangle, Zap, CheckCircle2, Users, BarChart3, Download, Share2
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import PlanGate from "@/components/PlanGate";
@@ -38,8 +39,50 @@ function PlanejamentoContent() {
   const { toast } = useToast();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [plan, setPlan] = useState<Plan | null>(null);
   const [activePhase, setActivePhase] = useState(0);
+  const resultsRef = useRef<HTMLDivElement>(null);
+
+  const captureImage = useCallback(async (): Promise<Blob | null> => {
+    if (!resultsRef.current) return null;
+    const canvas = await html2canvas(resultsRef.current, { backgroundColor: "#000", scale: 2, useCORS: true });
+    return new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+  }, []);
+
+  const handleDownload = useCallback(async () => {
+    setExporting(true);
+    try {
+      const blob = await captureImage();
+      if (!blob) throw new Error("Erro ao gerar imagem");
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `planejamento-estrategico-${Date.now()}.png`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast({ title: "Imagem salva!" });
+    } catch (e: any) {
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+    } finally { setExporting(false); }
+  }, [captureImage, toast]);
+
+  const handleShare = useCallback(async () => {
+    setExporting(true);
+    try {
+      const blob = await captureImage();
+      if (!blob) throw new Error("Erro ao gerar imagem");
+      const file = new File([blob], "planejamento.png", { type: "image/png" });
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ title: "Planejamento Estratégico", text: plan?.vision || "", files: [file] });
+      } else {
+        await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+        toast({ title: "Imagem copiada!" });
+      }
+    } catch (e: any) {
+      if (e.name !== "AbortError") toast({ title: "Erro", description: e.message, variant: "destructive" });
+    } finally { setExporting(false); }
+  }, [captureImage, toast, plan]);
 
   const [form, setForm] = useState({
     businessName: "", segment: "", currentRevenue: "",
@@ -146,7 +189,7 @@ function PlanejamentoContent() {
 
           {step === 3 && plan && (
             <motion.div key="s3" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-              {/* Vision */}
+              <div ref={resultsRef} className="space-y-6 bg-black p-1">
               <div className="rounded-xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20 p-5 text-center">
                 <Compass className="w-8 h-8 text-blue-400 mx-auto mb-2" />
                 <p className="text-white/80 text-sm italic">"{plan.vision}"</p>
@@ -235,6 +278,17 @@ function PlanejamentoContent() {
                     </div>
                   ))}
                 </div>
+              </div>
+              </div>{/* close resultsRef wrapper */}
+
+              {/* Export buttons */}
+              <div className="flex gap-3">
+                <button onClick={handleDownload} disabled={exporting} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white/[0.05] border border-white/[0.08] text-white/60 hover:text-white hover:bg-white/[0.08] text-sm transition-all disabled:opacity-40">
+                  {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />} Salvar imagem
+                </button>
+                <button onClick={handleShare} disabled={exporting} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white/[0.05] border border-white/[0.08] text-white/60 hover:text-white hover:bg-white/[0.08] text-sm transition-all disabled:opacity-40">
+                  {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Share2 className="w-4 h-4" />} Compartilhar
+                </button>
               </div>
 
               <button onClick={() => { setStep(0); setPlan(null); setActivePhase(0); }} className="w-full py-3 rounded-xl border border-white/[0.08] text-white/40 text-sm hover:text-white transition-colors">

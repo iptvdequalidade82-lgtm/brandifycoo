@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import html2canvas from "html2canvas";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Instagram, Search, TrendingUp, AlertTriangle, CheckCircle2,
-  XCircle, Target, Zap, BarChart3, Loader2
+  XCircle, Target, Zap, BarChart3, Loader2, Download, Share2
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import PlanGate from "@/components/PlanGate";
@@ -37,7 +38,49 @@ function DiagnosticoContent() {
   const { toast } = useToast();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [diagnosis, setDiagnosis] = useState<Diagnosis | null>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
+
+  const captureImage = useCallback(async (): Promise<Blob | null> => {
+    if (!resultsRef.current) return null;
+    const canvas = await html2canvas(resultsRef.current, { backgroundColor: "#000", scale: 2, useCORS: true });
+    return new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+  }, []);
+
+  const handleDownload = useCallback(async () => {
+    setExporting(true);
+    try {
+      const blob = await captureImage();
+      if (!blob) throw new Error("Erro ao gerar imagem");
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `diagnostico-instagram-${Date.now()}.png`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast({ title: "Imagem salva!" });
+    } catch (e: any) {
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+    } finally { setExporting(false); }
+  }, [captureImage, toast]);
+
+  const handleShare = useCallback(async () => {
+    setExporting(true);
+    try {
+      const blob = await captureImage();
+      if (!blob) throw new Error("Erro ao gerar imagem");
+      const file = new File([blob], "diagnostico.png", { type: "image/png" });
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ title: "Diagnóstico Instagram", text: `Nota: ${diagnosis?.score}/100 — ${diagnosis?.scoreLabel}`, files: [file] });
+      } else {
+        await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+        toast({ title: "Imagem copiada!" });
+      }
+    } catch (e: any) {
+      if (e.name !== "AbortError") toast({ title: "Erro", description: e.message, variant: "destructive" });
+    } finally { setExporting(false); }
+  }, [captureImage, toast, diagnosis]);
 
   const [form, setForm] = useState({
     handle: "", followers: "", following: "", posts: "",
@@ -156,6 +199,7 @@ function DiagnosticoContent() {
           {/* Step 2: Results */}
           {step === 2 && diagnosis && (
             <motion.div key="s2" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+              <div ref={resultsRef} className="space-y-6 bg-black p-1">
               {/* Score */}
               <div className="text-center py-6">
                 <div className={`text-6xl font-bold font-['Playfair_Display'] ${scoreColor(diagnosis.score)}`}>{diagnosis.score}</div>
@@ -203,6 +247,17 @@ function DiagnosticoContent() {
                     </div>
                   ))}
                 </div>
+              </div>
+              </div>{/* close resultsRef wrapper */}
+
+              {/* Export buttons */}
+              <div className="flex gap-3">
+                <button onClick={handleDownload} disabled={exporting} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white/[0.05] border border-white/[0.08] text-white/60 hover:text-white hover:bg-white/[0.08] text-sm transition-all disabled:opacity-40">
+                  {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />} Salvar imagem
+                </button>
+                <button onClick={handleShare} disabled={exporting} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white/[0.05] border border-white/[0.08] text-white/60 hover:text-white hover:bg-white/[0.08] text-sm transition-all disabled:opacity-40">
+                  {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Share2 className="w-4 h-4" />} Compartilhar
+                </button>
               </div>
 
               <button onClick={() => { setStep(0); setDiagnosis(null); }} className="w-full py-3 rounded-xl border border-white/[0.08] text-white/40 text-sm hover:text-white transition-colors">
