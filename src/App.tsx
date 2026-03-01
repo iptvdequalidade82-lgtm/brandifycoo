@@ -10,6 +10,9 @@ import NotFound from "./pages/NotFound";
 
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const ToolsCopy = lazy(() => import("./pages/ToolsCopy"));
+const ToolsLanding = lazy(() => import("./pages/ToolsLanding"));
+const ToolsAtendedor = lazy(() => import("./pages/ToolsAtendedor"));
+const ToolsAgendador = lazy(() => import("./pages/ToolsAgendador"));
 
 const LazyPage = ({ children }: { children: React.ReactNode }) => (
   <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center"><div className="w-8 h-8 border-2 border-white/20 border-t-white/80 rounded-full animate-spin" /></div>}>
@@ -61,6 +64,9 @@ const App = () => (
             <Route path="/editor" element={<Editor />} />
             <Route path="/dashboard" element={<LazyPage><Dashboard /></LazyPage>} />
             <Route path="/tools/copy" element={<LazyPage><ToolsCopy /></LazyPage>} />
+            <Route path="/tools/landing" element={<LazyPage><ToolsLanding /></LazyPage>} />
+            <Route path="/tools/atendedor" element={<LazyPage><ToolsAtendedor /></LazyPage>} />
+            <Route path="/tools/agendador" element={<LazyPage><ToolsAgendador /></LazyPage>} />
             <Route path="/projetos" element={<Projetos />} />
             <Route path="/preview-site" element={<PreviewSite />} />
             <Route path="/preview-loja" element={<PreviewLoja />} />
