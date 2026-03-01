@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  ArrowLeft, Headphones, Send, Loader2, Settings, Bot, User as UserIcon, Trash2
+  ArrowLeft, Headphones, Send, Loader2, Settings, Bot, User as UserIcon, Trash2,
+  Globe, ExternalLink, Sparkles
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import PlanGate from "@/components/PlanGate";
@@ -227,6 +228,37 @@ export function AtendedorContent() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* CTA: Faça seu site */}
+      <div className="max-w-2xl mx-auto w-full px-4 sm:px-6 pb-2">
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1, duration: 0.5 }}
+          className="rounded-xl bg-gradient-to-r from-blue-500/10 via-cyan-500/10 to-emerald-500/10 border border-blue-500/15 p-4 flex items-start sm:items-center gap-3"
+        >
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center shrink-0">
+            <Globe className="w-4 h-4 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-white/80 text-sm font-semibold leading-snug">
+              Integre o Atendedor no seu site!
+            </p>
+            <p className="text-white/40 text-xs mt-0.5 leading-relaxed">
+              Com o plano Pro + um site Brandify, o atendedor IA fica disponível direto no seu site para atender seus clientes 24h.
+            </p>
+          </div>
+          <a
+            href="https://wa.me/5543991065129?text=Ol%C3%A1!%20Tenho%20o%20plano%20Pro%20e%20quero%20integrar%20o%20Atendedor%20IA%20no%20meu%20site.%20Podem%20me%20ajudar%3F"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gradient-to-r from-blue-400 to-cyan-500 text-white text-xs font-semibold hover:scale-[1.02] transition-all whitespace-nowrap"
+          >
+            <Sparkles className="w-3 h-3" />
+            Quero meu site
+          </a>
+        </motion.div>
       </div>
 
       {/* Input */}
