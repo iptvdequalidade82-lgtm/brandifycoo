@@ -13,6 +13,9 @@ const ToolsCopy = lazy(() => import("./pages/ToolsCopy"));
 const ToolsLanding = lazy(() => import("./pages/ToolsLanding"));
 const ToolsAtendedor = lazy(() => import("./pages/ToolsAtendedor"));
 const ToolsAgendador = lazy(() => import("./pages/ToolsAgendador"));
+const ToolsDiagnosticoIG = lazy(() => import("./pages/ToolsDiagnosticoIG"));
+const ToolsPlanejamento = lazy(() => import("./pages/ToolsPlanejamento"));
+const ToolsSimulador = lazy(() => import("./pages/ToolsSimulador"));
 
 const LazyPage = ({ children }: { children: React.ReactNode }) => (
   <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center"><div className="w-8 h-8 border-2 border-white/20 border-t-white/80 rounded-full animate-spin" /></div>}>
@@ -67,6 +70,9 @@ const App = () => (
             <Route path="/tools/landing" element={<LazyPage><ToolsLanding /></LazyPage>} />
             <Route path="/tools/atendedor" element={<LazyPage><ToolsAtendedor /></LazyPage>} />
             <Route path="/tools/agendador" element={<LazyPage><ToolsAgendador /></LazyPage>} />
+            <Route path="/tools/diagnostico-ig" element={<LazyPage><ToolsDiagnosticoIG /></LazyPage>} />
+            <Route path="/tools/planejamento" element={<LazyPage><ToolsPlanejamento /></LazyPage>} />
+            <Route path="/tools/simulador" element={<LazyPage><ToolsSimulador /></LazyPage>} />
             <Route path="/projetos" element={<Projetos />} />
             <Route path="/preview-site" element={<PreviewSite />} />
             <Route path="/preview-loja" element={<PreviewLoja />} />
