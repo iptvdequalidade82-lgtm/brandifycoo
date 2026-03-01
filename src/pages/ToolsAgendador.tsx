@@ -28,7 +28,7 @@ const DAYS_SHORT: Record<string, string> = {
   Segunda: "Seg", Terça: "Ter", Quarta: "Qua", Quinta: "Qui", Sexta: "Sex", Sábado: "Sáb", Domingo: "Dom",
 };
 
-function AgendadorContent() {
+export function AgendadorContent() {
   const { toast } = useToast();
   const [config, setConfig] = useState<SchedulerConfig>({
     businessName: "",

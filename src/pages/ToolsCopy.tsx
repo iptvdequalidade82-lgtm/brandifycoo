@@ -25,7 +25,7 @@ const TONES = [
 
 const GENERATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-copy`;
 
-function CopyGeneratorContent() {
+export function CopyGeneratorContent() {
   const { toast } = useToast();
   const [step, setStep] = useState(0);
   const [type, setType] = useState("");

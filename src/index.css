@@ -4,6 +4,10 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Tool embed: hide nested page headers */
+.tool-embed > div { min-height: 0 !important; }
+.tool-embed > div > header { display: none !important; }
+
 @layer base {
   :root {
     --background: 0 0% 100%;

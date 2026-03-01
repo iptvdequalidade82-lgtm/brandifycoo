@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback, memo } from "react";
+import { useEffect, useState, useRef, useCallback, memo, lazy, Suspense } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -11,11 +11,23 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles, MessageSquare, ImagePlus, ArrowLeft, Zap, Send, Download, Loader2,
   Plus, Trash2, X, PenTool, Crown, Lock, Check, RotateCcw,
+  Layout, Headphones, Calendar, Target, BarChart3, TrendingUp, Menu,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import logo from "@/assets/logo.jpg";
 import UserMenu from "@/components/UserMenu";
 import SupportWidget from "@/components/SupportWidget";
+import PlanGate from "@/components/PlanGate";
+import { useGating, type PlanTier } from "@/hooks/useGating";
+
+// Lazy-loaded tool content
+const LazyCopyContent = lazy(() => import("@/pages/ToolsCopy").then(m => ({ default: m.CopyGeneratorContent })));
+const LazyLandingContent = lazy(() => import("@/pages/ToolsLanding").then(m => ({ default: m.LandingContent })));
+const LazyAtendedorContent = lazy(() => import("@/pages/ToolsAtendedor").then(m => ({ default: m.AtendedorContent })));
+const LazyAgendadorContent = lazy(() => import("@/pages/ToolsAgendador").then(m => ({ default: m.AgendadorContent })));
+const LazyDiagnosticoContent = lazy(() => import("@/pages/ToolsDiagnosticoIG").then(m => ({ default: m.DiagnosticoContent })));
+const LazyPlanejamentoContent = lazy(() => import("@/pages/ToolsPlanejamento").then(m => ({ default: m.PlanejamentoContent })));
+const LazySimuladorContent = lazy(() => import("@/pages/ToolsSimulador").then(m => ({ default: m.SimuladorContent })));
 
 // ── Types ──
 type Msg = { role: "user" | "assistant"; content: string; image_urls?: string[]; model_used?: string };
@@ -916,6 +928,113 @@ function ChatTab({ user }: { user: User | null }) {
 }
 
 // ══════════════════════════════════════════════════
+// ██  TOOL DEFINITIONS & EMBED
+// ══════════════════════════════════════════════════
+type ToolKey = "posts" | "chat" | "copy" | "landing" | "atendedor" | "agendador" | "diagnostico" | "planejamento" | "simulador";
+
+const TOOL_GROUPS: { label: string; badge?: string; badgeColor?: string; tools: { key: ToolKey; label: string; icon: any; color: string; minPlan?: PlanTier }[] }[] = [
+  {
+    label: "Criação",
+    tools: [
+      { key: "posts", label: "Gerador de Posts", icon: ImagePlus, color: "text-violet-400" },
+      { key: "chat", label: "Chat com IA", icon: MessageSquare, color: "text-blue-400" },
+    ],
+  },
+  {
+    label: "Marketing",
+    badge: "Pro",
+    badgeColor: "text-amber-400/60",
+    tools: [
+      { key: "copy", label: "Gerador de Copy", icon: PenTool, color: "text-amber-400", minPlan: "pro" },
+      { key: "landing", label: "Landing Page", icon: Layout, color: "text-emerald-400", minPlan: "pro" },
+      { key: "atendedor", label: "Atendedor IA", icon: Headphones, color: "text-blue-400", minPlan: "pro" },
+      { key: "agendador", label: "Agendador", icon: Calendar, color: "text-pink-400", minPlan: "pro" },
+    ],
+  },
+  {
+    label: "Estratégia",
+    badge: "Premium",
+    badgeColor: "text-violet-400/60",
+    tools: [
+      { key: "diagnostico", label: "Diagnóstico IG", icon: Target, color: "text-violet-400", minPlan: "premium" },
+      { key: "planejamento", label: "Planejamento", icon: BarChart3, color: "text-cyan-400", minPlan: "premium" },
+      { key: "simulador", label: "Simulador", icon: TrendingUp, color: "text-green-400", minPlan: "premium" },
+    ],
+  },
+];
+
+const TOOL_GATE: Record<string, { minPlan: PlanTier; name: string; desc: string }> = {
+  copy: { minPlan: "pro", name: "Gerador de Copy", desc: "Copys persuasivas para WhatsApp, Ads e mais." },
+  landing: { minPlan: "pro", name: "Landing Automática", desc: "Landing pages profissionais em minutos." },
+  atendedor: { minPlan: "pro", name: "Atendedor IA", desc: "Respostas prontas para seus clientes." },
+  agendador: { minPlan: "pro", name: "Agendador", desc: "Página de agendamento simples." },
+  diagnostico: { minPlan: "premium", name: "Diagnóstico Instagram", desc: "Análise completa + melhorias do perfil." },
+  planejamento: { minPlan: "premium", name: "Planejamento Estratégico", desc: "Posicionamento e funil de 30 dias." },
+  simulador: { minPlan: "premium", name: "Simulador de Faturamento", desc: "Projeção de receita interativa." },
+};
+
+const LAZY_TOOLS: Record<string, React.LazyExoticComponent<React.ComponentType>> = {
+  copy: LazyCopyContent,
+  landing: LazyLandingContent,
+  atendedor: LazyAtendedorContent,
+  agendador: LazyAgendadorContent,
+  diagnostico: LazyDiagnosticoContent,
+  planejamento: LazyPlanejamentoContent,
+  simulador: LazySimuladorContent,
+};
+
+function ToolEmbed({ toolKey }: { toolKey: string }) {
+  const gate = TOOL_GATE[toolKey];
+  const LazyComponent = LAZY_TOOLS[toolKey];
+  if (!gate || !LazyComponent) return null;
+  return (
+    <PlanGate minPlan={gate.minPlan} featureName={gate.name} featureDescription={gate.desc}>
+      <div className="h-full overflow-y-auto tool-embed">
+        <Suspense fallback={<div className="flex items-center justify-center py-20"><div className="w-8 h-8 border-2 border-white/20 border-t-white/80 rounded-full animate-spin" /></div>}>
+          <LazyComponent />
+        </Suspense>
+      </div>
+    </PlanGate>
+  );
+}
+
+function SidebarNav({ activeTool, setActiveTool, hasAccess: checkAccess, onSelect }: { activeTool: ToolKey; setActiveTool: (t: ToolKey) => void; hasAccess: (p: PlanTier) => boolean; onSelect?: () => void }) {
+  return (
+    <nav className="p-3 space-y-5 flex-1">
+      {TOOL_GROUPS.map((group) => (
+        <div key={group.label}>
+          <p className="text-white/20 text-[10px] uppercase tracking-widest font-semibold px-3 mb-2 flex items-center gap-2">
+            {group.label}
+            {group.badge && <span className={group.badgeColor || "text-white/30"}>{group.badge}</span>}
+          </p>
+          <div className="space-y-0.5">
+            {group.tools.map((tool) => {
+              const isActive = activeTool === tool.key;
+              const locked = !!tool.minPlan && !checkAccess(tool.minPlan);
+              return (
+                <button
+                  key={tool.key}
+                  onClick={() => { setActiveTool(tool.key); onSelect?.(); }}
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all ${
+                    isActive
+                      ? "bg-white/[0.08] text-white"
+                      : "text-white/40 hover:bg-white/[0.04] hover:text-white/60"
+                  }`}
+                >
+                  <tool.icon className={`w-4 h-4 shrink-0 ${isActive ? tool.color : locked ? "text-white/15" : "text-white/25"}`} />
+                  <span className="truncate flex-1 text-left">{tool.label}</span>
+                  {locked && <Lock className="w-3 h-3 text-white/15 shrink-0" />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </nav>
+  );
+}
+
+// ══════════════════════════════════════════════════
 // ██  MAIN PAGE
 // ══════════════════════════════════════════════════
 export default function IAs() {
@@ -923,7 +1042,10 @@ export default function IAs() {
   const [loading, setLoading] = useState(true);
   const [userPlan, setUserPlan] = useState<string | null>(null);
   const [dailyCount, setDailyCount] = useState(0);
+  const [activeTool, setActiveTool] = useState<ToolKey>("posts");
+  const [mobileSidebar, setMobileSidebar] = useState(false);
   const navigate = useNavigate();
+  const { hasAccess } = useGating();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => { setUser(session?.user ?? null); setLoading(false); });
@@ -949,43 +1071,81 @@ export default function IAs() {
     return <div className="min-h-screen bg-[#050508] flex items-center justify-center"><div className="w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" /></div>;
   }
 
+  const activeToolLabel = TOOL_GROUPS.flatMap(g => g.tools).find(t => t.key === activeTool)?.label || "IA Studio";
+
   return (
     <div className="h-screen bg-[#050508] flex flex-col overflow-hidden">
+      {/* Header */}
       <header className="shrink-0 border-b border-white/[0.06] bg-[#050508]/90 backdrop-blur-xl">
         <div className="flex items-center justify-between h-14 px-4 md:px-6">
           <div className="flex items-center gap-3">
+            <button onClick={() => setMobileSidebar(true)} className="md:hidden p-2 -ml-2 rounded-lg text-white/30 hover:text-white/60 hover:bg-white/[0.06] transition-all">
+              <Menu className="w-5 h-5" />
+            </button>
             <Link to="/"><div className="w-8 h-8 rounded-lg overflow-hidden ring-1 ring-white/15"><img src={logo} alt="Brandify" className="w-full h-full object-cover" /></div></Link>
             <div className="h-5 w-px bg-white/[0.08]" />
-            <span className="text-white font-semibold text-sm flex items-center gap-1.5" style={{ fontFamily: "'Sora', sans-serif" }}><Sparkles className="w-3.5 h-3.5 text-violet-400" />IA Studio</span>
+            <span className="text-white font-semibold text-sm flex items-center gap-1.5" style={{ fontFamily: "'Sora', sans-serif" }}>
+              <Sparkles className="w-3.5 h-3.5 text-violet-400" />
+              <span className="hidden sm:inline">IA Studio</span>
+              <span className="sm:hidden text-white/60 truncate max-w-[140px]">{activeToolLabel}</span>
+            </span>
           </div>
           <div className="flex items-center gap-2">
-            <Link to="/"><Button variant="ghost" size="sm" className="text-white/30 hover:text-white hover:bg-white/[0.05] text-xs h-8"><ArrowLeft className="w-3.5 h-3.5 mr-1" /> Voltar</Button></Link>
+            <Link to="/dashboard"><Button variant="ghost" size="sm" className="text-white/30 hover:text-white hover:bg-white/[0.05] text-xs h-8"><ArrowLeft className="w-3.5 h-3.5 mr-1" /><span className="hidden sm:inline">Dashboard</span></Button></Link>
             <UserMenu />
           </div>
         </div>
       </header>
 
-      <ProBanner user={user} remaining={remaining === Infinity ? 999 : remaining} userPlan={userPlan} />
+      <div className="flex-1 flex overflow-hidden">
+        {/* Desktop Sidebar */}
+        <aside className="hidden md:flex w-56 shrink-0 border-r border-white/[0.06] flex-col bg-[#08080c] overflow-y-auto">
+          <SidebarNav activeTool={activeTool} setActiveTool={setActiveTool} hasAccess={hasAccess} />
+          {userPlan && (
+            <div className="p-3 border-t border-white/[0.06]">
+              <div className="flex items-center gap-2 px-3 py-2">
+                <Crown className="w-3.5 h-3.5 text-amber-400" />
+                <span className="text-white/40 text-xs">{PLAN_LABELS[userPlan] || userPlan}</span>
+              </div>
+            </div>
+          )}
+        </aside>
 
-      <Tabs defaultValue="posts" className="flex-1 flex flex-col overflow-hidden">
-        <div className="shrink-0 border-b border-white/[0.06] px-4 md:px-6">
-          <TabsList className="bg-transparent h-10 p-0 gap-6">
-            <TabsTrigger value="posts" className="bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-white data-[state=active]:shadow-none text-white/30 hover:text-white/50 rounded-none border-b-2 border-transparent data-[state=active]:border-violet-500 px-0 pb-2.5 pt-2 text-sm font-medium transition-all">
-              <ImagePlus className="w-4 h-4 mr-2" />Gerador de Posts
-            </TabsTrigger>
-            <TabsTrigger value="chat" className="bg-transparent data-[state=active]:bg-transparent data-[state=active]:text-white data-[state=active]:shadow-none text-white/30 hover:text-white/50 rounded-none border-b-2 border-transparent data-[state=active]:border-blue-500 px-0 pb-2.5 pt-2 text-sm font-medium transition-all">
-              <MessageSquare className="w-4 h-4 mr-2" />Chat com IA
-            </TabsTrigger>
-          </TabsList>
+        {/* Mobile Sidebar Overlay */}
+        <AnimatePresence>
+          {mobileSidebar && (
+            <>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/60 z-40 md:hidden" onClick={() => setMobileSidebar(false)} />
+              <motion.aside initial={{ x: -280 }} animate={{ x: 0 }} exit={{ x: -280 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} className="fixed left-0 top-0 bottom-0 w-64 z-50 bg-[#08080c] border-r border-white/[0.06] flex flex-col md:hidden">
+                <div className="p-4 border-b border-white/[0.06] flex items-center justify-between">
+                  <span className="text-white font-semibold text-sm flex items-center gap-2"><Sparkles className="w-3.5 h-3.5 text-violet-400" />IA Studio</span>
+                  <button onClick={() => setMobileSidebar(false)} className="text-white/30 hover:text-white p-1"><X className="w-5 h-5" /></button>
+                </div>
+                <SidebarNav activeTool={activeTool} setActiveTool={setActiveTool} hasAccess={hasAccess} onSelect={() => setMobileSidebar(false)} />
+                {userPlan && (
+                  <div className="p-3 border-t border-white/[0.06]">
+                    <div className="flex items-center gap-2 px-3 py-2">
+                      <Crown className="w-3.5 h-3.5 text-amber-400" />
+                      <span className="text-white/40 text-xs">Plano {PLAN_LABELS[userPlan] || userPlan}</span>
+                    </div>
+                  </div>
+                )}
+              </motion.aside>
+            </>
+          )}
+        </AnimatePresence>
+
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <ProBanner user={user} remaining={remaining === Infinity ? 999 : remaining} userPlan={userPlan} />
+
+          <div className="flex-1 overflow-hidden">
+            {activeTool === "posts" && <PostGenerator user={user} userPlan={userPlan} />}
+            {activeTool === "chat" && <ChatTab user={user} />}
+            {activeTool !== "posts" && activeTool !== "chat" && <ToolEmbed toolKey={activeTool} />}
+          </div>
         </div>
-
-        <TabsContent value="posts" className="flex-1 overflow-hidden m-0 data-[state=inactive]:hidden">
-          <PostGenerator user={user} userPlan={userPlan} />
-        </TabsContent>
-        <TabsContent value="chat" className="flex-1 overflow-hidden m-0 data-[state=inactive]:hidden">
-          <ChatTab user={user} />
-        </TabsContent>
-      </Tabs>
+      </div>
 
       <SupportWidget user={user} />
     </div>

@@ -34,7 +34,7 @@ interface Diagnosis {
   actionPlan: ActionItem[];
 }
 
-function DiagnosticoContent() {
+export function DiagnosticoContent() {
   const { toast } = useToast();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);

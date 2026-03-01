@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, CartesianGrid } from "recharts";
 import html2canvas from "html2canvas";
 
-function SimuladorContent() {
+export function SimuladorContent() {
   const { toast } = useToast();
   const resultsRef = useRef<HTMLDivElement>(null);
   const [exporting, setExporting] = useState(false);

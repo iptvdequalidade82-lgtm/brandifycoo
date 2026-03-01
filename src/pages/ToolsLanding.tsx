@@ -28,7 +28,7 @@ interface LandingData {
   finalCta: string;
 }
 
-function LandingContent() {
+export function LandingContent() {
   const { toast } = useToast();
   const [step, setStep] = useState(0);
   const [businessName, setBusinessName] = useState("");
