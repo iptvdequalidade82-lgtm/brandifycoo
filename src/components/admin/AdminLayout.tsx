@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import {
   LogOut, FileText, FolderKanban, CalendarDays, History, RefreshCw, Calculator, Eye, Instagram, Bot,
 } from "lucide-react";
@@ -21,6 +22,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { user, isAdmin, isLoading, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [serverVerified, setServerVerified] = useState<boolean | null>(null);
+
+  // Server-side admin verification via RPC — independent of client context
+  useEffect(() => {
+    if (!user) {
+      setServerVerified(null);
+      return;
+    }
+    const verify = async () => {
+      try {
+        const { data } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" as const });
+        setServerVerified(!!data);
+        if (!data) navigate("/admin/login");
+      } catch {
+        setServerVerified(false);
+        navigate("/admin/login");
+      }
+    };
+    verify();
+  }, [user, navigate]);
 
   useEffect(() => {
     if (!isLoading && (!user || !isAdmin)) {
@@ -28,7 +49,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
   }, [user, isAdmin, isLoading, navigate]);
 
-  if (isLoading) {
+  if (isLoading || serverVerified === null) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
         <RefreshCw className="w-6 h-6 text-brand-accent animate-spin" />
@@ -36,7 +57,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
-  if (!user || !isAdmin) return null;
+  if (!user || !isAdmin || !serverVerified) return null;
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white" style={{
