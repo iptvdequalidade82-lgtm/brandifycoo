@@ -20,7 +20,7 @@ serve(async (req) => {
     const dimensions = isStory ? "1080x1920" : "1080x1080";
 
     // Rotate between 28 visual models trained from real reference posts
-    const visualModels = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "AB"];
+    const visualModels = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AE"];
     const selectedModel = visualModels[Math.floor(Math.random() * visualModels.length)];
 
     const modelInstructions: Record<string, string> = {
@@ -310,6 +310,45 @@ serve(async (req) => {
 - 4-point selection handles (yellow/colored squares) around the sculpture
 - Mood: dark, powerful, design-education editorial
 - Reference: Dark marble head with yellow blindfold, "DESIGNERS WEBSITE" in yellow text`,
+
+      AC: `MODEL AC — 3D CHARACTER PEEK WITH ELEGANT SCRIPT TYPOGRAPHY:
+- DEEP BLACK or very dark cinematic background with soft bokeh lights
+- Hyper-realistic 3D ANIMATED CHARACTER peeking from the RIGHT edge of the frame — only half visible
+- Character is adorable/stylized (large expressive eyes, detailed fur/skin texture, Pixar-quality rendering)
+- LEFT side dominated by ELEGANT MIXED TYPOGRAPHY: cursive SCRIPT font for the main word + bold SANS-SERIF for the subtitle
+- Warm accent color (peach, gold, coral) for the script text contrasting against dark background
+- Small metadata labels: "@handle" top-left, "Year 2026" top-right, category label bottom-left
+- "Swipe →" CTA at bottom-right corner
+- Mood: premium editorial meets playful 3D art, dark and sophisticated
+- The 3D character and subject MUST be replaced to match the client's business niche
+- Reference: Cute rabbit character peeking with "Color Inspiration" in peach script on black`,
+
+      AD: `MODEL AD — VIBRANT 3D MASCOT WITH GIANT BACKGROUND TYPOGRAPHY:
+- LIGHT background (white, off-white, or very light gray) with subtle watermark text pattern
+- MASSIVE bold PURPLE/VIBRANT colored word as background element — so large it fills the entire frame
+- Hyper-realistic 3D CHARACTER/MASCOT centered and OVERLAPPING the giant text — wings spread, dynamic pose
+- Character is colorful, detailed, and energetic (feathers, fur, scales with multiple vivid colors)
+- Color palette swatches scattered around (small squares showing the palette)
+- Small decorative elements floating: butterflies, sparkles, petals matching the theme
+- Bottom CTA bar in accent color: "Arrasta para o lado" or similar
+- Corner labels: "@handle" rotated on left edge, "Design Graphic" bottom-right
+- Small disclaimer text at very bottom in light gray
+- Mood: explosive color, joyful, eye-catching, social-media-native
+- The 3D character and subject MUST be replaced to match the client's business niche
+- Reference: Colorful parrot with spread wings over giant purple "CORES" text on white`,
+
+      AE: `MODEL AE — RETRO PHOTOGRAPHY WITH BOLD EDITORIAL TYPOGRAPHY:
+- Real LANDSCAPE PHOTOGRAPH as full background — rolling hills, open fields, countryside, golden hour
+- Vintage/retro color grading: slightly desaturated, warm film grain, nostalgic feel
+- ONE retro object as focal point: vintage VW van, old bicycle, classic car, retro camera
+- GIANT bold editorial typography overlaid — mix of STRONG CONDENSED sans-serif and FLOWING SCRIPT
+- Text dominates upper 60% of frame with 3-4 lines of decreasing size
+- Handwritten annotation or speech bubble with casual text ("o meu passo a passo", "dica especial")
+- Photoshop-style toolbar mockup at top edge (subtle design meta-reference)
+- Small paper airplane or bookmark icon as accent
+- Mood: warm nostalgia, personal storytelling, career/lifestyle content
+- The retro object and landscape MUST be replaced to match the client's business niche
+- Reference: Yellow VW van on green hill with "De CLT a Designer freelancer" in bold editorial type`,
     };
 
     const referenceInstruction = referenceImage
