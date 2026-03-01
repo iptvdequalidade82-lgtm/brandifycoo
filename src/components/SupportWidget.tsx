@@ -15,12 +15,14 @@ const SUPPORT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/support-c
 type Msg = { role: "user" | "assistant"; content: string };
 
 const QUICK_QUESTIONS = [
-  { icon: "❓", label: "Limite gratuito", prompt: "Eu só tenho 5 chances grátis por dia?" },
-  { icon: "💰", label: "Preços e descontos", prompt: "O preço é esse mesmo, não tem como diminuir?" },
-  { icon: "🖼️", label: "Como funciona", prompt: "Como funciona a geração de imagem do IA Studio?" },
-  { icon: "🌐", label: "Prazo de site", prompt: "Quanto tempo leva pra fazer um site?" },
-  { icon: "💳", label: "Formas de pagamento", prompt: "Quais formas de pagamento vocês aceitam?" },
-  { icon: "🚀", label: "Plano Pro", prompt: "O que vem no Plano Pro do IA Studio?" },
+  { icon: "🤖", label: "O que é o IA Studio?", prompt: "O que é o IA Studio e o que eu consigo fazer nele?" },
+  { icon: "🆓", label: "Limite gratuito", prompt: "Quantos créditos gratuitos eu tenho por dia no IA Studio?" },
+  { icon: "💰", label: "Planos do IA Studio", prompt: "Quais são os planos do IA Studio e o que cada um inclui?" },
+  { icon: "🛠️", label: "Ferramentas de IA", prompt: "Quais ferramentas de IA estão disponíveis e em quais planos?" },
+  { icon: "🌐", label: "Sites e prévias", prompt: "Como funciona a prévia gratuita de site e quais planos de site vocês têm?" },
+  { icon: "📱", label: "Atendedor IA", prompt: "O que é o Atendedor IA e como integrar no meu site?" },
+  { icon: "💳", label: "Pagamento e cancelamento", prompt: "Quais formas de pagamento vocês aceitam? Posso cancelar a qualquer momento?" },
+  { icon: "🚀", label: "Montar meu site", prompt: "Quanto tempo leva pra fazer um site e como funciona o processo?" },
 ];
 
 export default function SupportWidget({ user }: { user: User | null }) {
