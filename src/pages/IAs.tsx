@@ -946,7 +946,7 @@ const TOOL_GROUPS: { label: string; badge?: string; badgeColor?: string; tools: 
     badgeColor: "text-amber-400/60",
     tools: [
       { key: "copy", label: "Gerador de Copy", icon: PenTool, color: "text-amber-400", minPlan: "pro" },
-      { key: "landing", label: "Landing Page", icon: Layout, color: "text-emerald-400", minPlan: "pro" },
+      { key: "landing", label: "Textos de Venda", icon: Layout, color: "text-emerald-400", minPlan: "pro" },
       { key: "atendedor", label: "Atendedor IA", icon: Headphones, color: "text-blue-400", minPlan: "pro" },
       { key: "agendador", label: "Agendador", icon: Calendar, color: "text-pink-400", minPlan: "pro" },
     ],
@@ -965,7 +965,7 @@ const TOOL_GROUPS: { label: string; badge?: string; badgeColor?: string; tools: 
 
 const TOOL_GATE: Record<string, { minPlan: PlanTier; name: string; desc: string }> = {
   copy: { minPlan: "pro", name: "Gerador de Copy", desc: "Copys persuasivas para WhatsApp, Ads e mais." },
-  landing: { minPlan: "pro", name: "Landing Automática", desc: "Landing pages profissionais em minutos." },
+  landing: { minPlan: "pro", name: "Textos de Venda", desc: "Gere headlines, benefícios e CTAs prontos para sua página de vendas." },
   atendedor: { minPlan: "pro", name: "Atendedor IA", desc: "Respostas prontas para seus clientes." },
   agendador: { minPlan: "pro", name: "Agendador", desc: "Página de agendamento simples." },
   diagnostico: { minPlan: "premium", name: "Diagnóstico Instagram", desc: "Análise completa + melhorias do perfil." },
