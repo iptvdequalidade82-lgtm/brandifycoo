@@ -1091,7 +1091,7 @@ export default function IAs() {
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <Link to="/dashboard"><Button variant="ghost" size="sm" className="text-white/30 hover:text-white hover:bg-white/[0.05] text-xs h-8"><ArrowLeft className="w-3.5 h-3.5 mr-1" /><span className="hidden sm:inline">Dashboard</span></Button></Link>
+            <Link to="/"><Button variant="ghost" size="sm" className="text-white/30 hover:text-white hover:bg-white/[0.05] text-xs h-8"><ArrowLeft className="w-3.5 h-3.5 mr-1" /><span className="hidden sm:inline">Início</span></Button></Link>
             <UserMenu />
           </div>
         </div>
