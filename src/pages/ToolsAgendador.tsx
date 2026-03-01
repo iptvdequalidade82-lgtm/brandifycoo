@@ -24,6 +24,9 @@ interface SchedulerConfig {
 }
 
 const DAYS = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
+const DAYS_SHORT: Record<string, string> = {
+  Segunda: "Seg", Terça: "Ter", Quarta: "Qua", Quinta: "Qui", Sexta: "Sex", Sábado: "Sáb", Domingo: "Dom",
+};
 
 function AgendadorContent() {
   const { toast } = useToast();
@@ -140,8 +143,8 @@ function AgendadorContent() {
               </div>
               {config.slots.map((slot) => (
                 <div key={slot.id} className="flex gap-2 items-center">
-                  <select value={slot.day} onChange={e => updateSlot(slot.id, "day", e.target.value)} className="rounded-xl bg-white/[0.03] border border-white/[0.08] px-3 py-2.5 text-sm text-white outline-none appearance-none flex-1">
-                    {DAYS.map(d => <option key={d} value={d} className="bg-black">{d}</option>)}
+                  <select value={slot.day} onChange={e => updateSlot(slot.id, "day", e.target.value)} className="rounded-xl bg-white/[0.03] border border-white/[0.08] px-3 py-2.5 text-sm text-white outline-none appearance-none flex-1 min-w-0">
+                    {DAYS.map(d => <option key={d} value={d} className="bg-black">{DAYS_SHORT[d] || d}</option>)}
                   </select>
                   <input type="time" value={slot.start} onChange={e => updateSlot(slot.id, "start", e.target.value)} className="rounded-xl bg-white/[0.03] border border-white/[0.08] px-3 py-2.5 text-sm text-white outline-none" />
                   <span className="text-white/20 text-xs">até</span>
