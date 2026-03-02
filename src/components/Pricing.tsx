@@ -7,24 +7,19 @@ import earthMoonBg from "@/assets/earth-moon-bg.jpg";
 
 const plans = [
   {
-    name: "Landing Page", price: "R$ 800", pricePrefix: "a partir de", desc: "Página estratégica de vendas — ideal para infoprodutos, lançamentos e captação de leads.",
+    name: "Landing Page", desc: "Página estratégica de vendas — ideal para infoprodutos, lançamentos e captação de leads.",
     features: ["Página essencial de vendas", "Seção de vídeo + chamada para ação", "Apresentação do produto/serviço", "Design responsivo", "Certificado SSL", "Entrega rápida"],
     featured: false,
   },
   {
-    name: "Essencial", price: "R$ 1.200", pricePrefix: "a partir de", desc: "Ideal para quem está começando e precisa de presença online.",
+    name: "Essencial", desc: "Ideal para quem está começando e precisa de presença online.",
     features: ["Site de até 6 páginas", "Design responsivo", "Certificado SSL", "Auxílio no registro de domínio", "1h de manutenção mensal gratuita"],
     featured: false,
   },
   {
-    name: "Profissional", price: "R$ 2.500", pricePrefix: "a partir de", desc: "Para negócios que querem se destacar com mais recursos.",
-    features: ["Site de até 10 páginas", "Design personalizado premium", "SEO avançado", "Certificado SSL", "Auxílio no registro de domínio", "1h de manutenção mensal gratuita"],
-    featured: true,
-  },
-  {
-    name: "Premium", price: "R$ 4.500", pricePrefix: "a partir de", desc: "Solução completa para empresas que exigem o melhor.",
+    name: "Premium", desc: "Solução completa para empresas que exigem o melhor.",
     features: ["Páginas ilimitadas", "Design exclusivo do zero", "SEO avançado + Blog", "Certificado SSL", "Auxílio no registro de domínio", "Painel administrativo", "Integrações personalizadas", "1h de manutenção mensal gratuita"],
-    featured: false,
+    featured: true,
   },
 ];
 
@@ -218,7 +213,7 @@ export default function Pricing() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-80px" }}
-          className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
           {plans.map((plan) => (
             <motion.div
@@ -246,11 +241,7 @@ export default function Pricing() {
                 )}
                 <h3 className="font-display text-lg font-black">{plan.name}</h3>
                 <p className={`text-xs mt-1 mb-4 ${plan.featured ? "text-white/70" : "text-white/40"}`}>{plan.desc}</p>
-                <p className={`text-[10px] uppercase tracking-wider mb-2 ${plan.featured ? "text-white/50" : "text-white/30"}`}>{plan.pricePrefix}</p>
-                <div className="flex items-baseline justify-center gap-1">
-                  <span className="font-display text-4xl font-black">{plan.price}</span>
-                </div>
-                <p className={`text-xs mt-1 ${plan.featured ? "text-white/50" : "text-white/30"}`}>Pagamento único · Consulte parcelamento</p>
+                <p className={`text-xs mt-2 ${plan.featured ? "text-white/50" : "text-white/30"}`}>Consulte valores sob medida</p>
               </div>
 
               <div className="p-7 flex-1">
@@ -340,9 +331,7 @@ export default function Pricing() {
                 <p className="text-white/50 mt-2 max-w-lg">Loja online completa, configurada e pronta para vender. Ideal para quem quer entrar no e-commerce com estrutura profissional.</p>
               </div>
               <div className="text-left md:text-right flex-shrink-0">
-                <p className="text-[10px] uppercase tracking-wider text-white/30 mb-1">a partir de</p>
-                <span className="font-display text-4xl font-black">R$ 2.500</span>
-                <p className="text-xs text-white/30 mt-1">Pagamento facilitado · Consulte parcelamento</p>
+                <p className="text-xs text-white/30 mt-1">Consulte valores sob medida</p>
               </div>
             </div>
           </div>
