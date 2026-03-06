@@ -955,7 +955,7 @@ function ChatTab({ user }: { user: User | null }) {
                         <span className="text-white/70 group-hover:text-white text-sm font-medium block">{s.label}</span>
                         <span className="text-white/25 text-xs line-clamp-1 mt-0.5">{s.prompt.slice(0, 50)}...</span>
                       </div>
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
                 {!user && <p className="text-white/20 text-xs mt-6"><Lock className="w-3 h-3 inline mr-1" />Faça login para salvar seu histórico</p>}
