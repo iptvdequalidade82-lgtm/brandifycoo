@@ -1154,16 +1154,48 @@ export default function IAs() {
 
   const activeToolLabel = TOOL_GROUPS.flatMap(g => g.tools).find(t => t.key === activeTool)?.label || "IA Studio";
 
+  const ambient = TOOL_AMBIENTS[activeTool] || TOOL_AMBIENTS.posts;
+
   return (
-    <div className="h-screen bg-[#050508] flex flex-col overflow-hidden">
-      {/* Header */}
-      <header className="shrink-0 border-b border-white/[0.06] bg-[#050508]/90 backdrop-blur-xl">
+    <div className="h-screen bg-[#030306] flex flex-col overflow-hidden relative">
+      {/* Dynamic ambient background */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTool}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8 }}
+          className="absolute inset-0 z-0"
+        >
+          <AmbientOrbs color1={ambient.orbColor1} color2={ambient.orbColor2} />
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Subtle space texture overlay */}
+      <div
+        className="fixed inset-0 pointer-events-none z-0"
+        style={{
+          backgroundImage: `url(${spaceNebulaBg})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          opacity: 0.04,
+          mixBlendMode: "lighten",
+        }}
+      />
+
+      {/* Header — glassmorphism */}
+      <header className="shrink-0 border-b border-white/[0.06] bg-[#030306]/70 backdrop-blur-2xl relative z-20">
         <div className="flex items-center justify-between h-14 px-4 md:px-6">
           <div className="flex items-center gap-3">
             <button onClick={() => setMobileSidebar(true)} className="md:hidden p-2 -ml-2 rounded-lg text-white/30 hover:text-white/60 hover:bg-white/[0.06] transition-all">
               <Menu className="w-5 h-5" />
             </button>
-            <Link to="/"><div className="w-8 h-8 rounded-lg overflow-hidden ring-1 ring-white/15"><img src={logo} alt="Brandify" className="w-full h-full object-cover" /></div></Link>
+            <Link to="/">
+              <motion.div whileHover={{ scale: 1.05 }} className="w-9 h-9 rounded-xl overflow-hidden ring-1 ring-white/15 shadow-lg shadow-violet-500/10">
+                <img src={logo} alt="Brandify" className="w-full h-full object-cover" />
+              </motion.div>
+            </Link>
             <div className="h-5 w-px bg-white/[0.08]" />
             <span className="text-white font-semibold text-sm flex items-center gap-1.5" style={{ fontFamily: "'Sora', sans-serif" }}>
               <Sparkles className="w-3.5 h-3.5 text-violet-400" />
@@ -1178,15 +1210,27 @@ export default function IAs() {
         </div>
       </header>
 
-      <div className="flex-1 flex overflow-hidden">
-        {/* Desktop Sidebar */}
-        <aside className="hidden md:flex w-56 shrink-0 border-r border-white/[0.06] flex-col bg-[#08080c] overflow-y-auto">
+      <div className="flex-1 flex overflow-hidden relative z-10">
+        {/* Desktop Sidebar — glassmorphism */}
+        <aside className="hidden md:flex w-60 shrink-0 border-r border-white/[0.05] flex-col bg-[#030306]/60 backdrop-blur-xl overflow-y-auto">
+          {/* Sidebar header */}
+          <div className="p-4 border-b border-white/[0.05]">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500/20 to-pink-500/20 border border-violet-400/10 flex items-center justify-center">
+                <Zap className="w-4 h-4 text-violet-400" />
+              </div>
+              <div>
+                <p className="text-white text-xs font-bold tracking-wide">Ferramentas</p>
+                <p className="text-white/25 text-[10px]">Escolha uma ferramenta</p>
+              </div>
+            </div>
+          </div>
           <SidebarNav activeTool={activeTool} setActiveTool={setActiveTool} hasAccess={hasAccess} />
           {userPlan && (
-            <div className="p-3 border-t border-white/[0.06]">
-              <div className="flex items-center gap-2 px-3 py-2">
+            <div className="p-3 border-t border-white/[0.05]">
+              <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/10">
                 <Crown className="w-3.5 h-3.5 text-amber-400" />
-                <span className="text-white/40 text-xs">{PLAN_LABELS[userPlan] || userPlan}</span>
+                <span className="text-amber-300/60 text-xs font-medium">{PLAN_LABELS[userPlan] || userPlan}</span>
               </div>
             </div>
           )}
@@ -1196,8 +1240,8 @@ export default function IAs() {
         <AnimatePresence>
           {mobileSidebar && (
             <>
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/60 z-40 md:hidden" onClick={() => setMobileSidebar(false)} />
-              <motion.aside initial={{ x: -280 }} animate={{ x: 0 }} exit={{ x: -280 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} className="fixed left-0 top-0 bottom-0 w-64 z-50 bg-[#08080c] border-r border-white/[0.06] flex flex-col md:hidden">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 md:hidden" onClick={() => setMobileSidebar(false)} />
+              <motion.aside initial={{ x: -280 }} animate={{ x: 0 }} exit={{ x: -280 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} className="fixed left-0 top-0 bottom-0 w-64 z-50 bg-[#08080c]/95 backdrop-blur-xl border-r border-white/[0.06] flex flex-col md:hidden">
                 <div className="p-4 border-b border-white/[0.06] flex items-center justify-between">
                   <span className="text-white font-semibold text-sm flex items-center gap-2"><Sparkles className="w-3.5 h-3.5 text-violet-400" />IA Studio</span>
                   <button onClick={() => setMobileSidebar(false)} className="text-white/30 hover:text-white p-1"><X className="w-5 h-5" /></button>
