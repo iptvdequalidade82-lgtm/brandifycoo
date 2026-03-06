@@ -17,16 +17,19 @@ serve(async (req) => {
     const supabaseAnon = Deno.env.get("SUPABASE_ANON_KEY")!;
     const supabaseService = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    // Verify the user is admin
-    const anonClient = createClient(supabaseUrl, supabaseAnon);
+    // Verify the user via JWT claims
+    const anonClient = createClient(supabaseUrl, supabaseAnon, {
+      global: { headers: { Authorization: authHeader } },
+    });
     const token = authHeader.replace("Bearer ", "");
-    const { data: { user } } = await anonClient.auth.getUser(token);
-    if (!user) throw new Error("Sessão inválida");
+    const { data: claimsData, error: claimsError } = await anonClient.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims?.sub) throw new Error("Sessão inválida");
+    const userId = claimsData.claims.sub as string;
 
     const serviceClient = createClient(supabaseUrl, supabaseService, { auth: { persistSession: false } });
 
     // Check admin role
-    const { data: isAdmin } = await serviceClient.rpc("has_role", { _user_id: user.id, _role: "admin" });
+    const { data: isAdmin } = await serviceClient.rpc("has_role", { _user_id: userId, _role: "admin" });
     if (!isAdmin) throw new Error("Acesso negado");
 
     // Get all auth users
@@ -76,8 +79,11 @@ serve(async (req) => {
     });
   } catch (e: any) {
     console.error("admin-users error:", e);
+    const status = e.message === "Acesso negado" ? 403 
+      : (e.message === "Sessão inválida" || e.message === "Não autorizado") ? 401 
+      : 500;
     return new Response(JSON.stringify({ error: e.message || "Erro" }), {
-      status: e.message === "Acesso negado" ? 403 : 500,
+      status,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
