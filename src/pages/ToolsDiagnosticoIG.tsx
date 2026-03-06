@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import html2canvas from "html2canvas";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Reorder } from "framer-motion";
 import {
   ArrowLeft, Instagram, TrendingUp, AlertTriangle, CheckCircle2,
-  XCircle, Target, Zap, BarChart3, Loader2, Download, Share2, Sparkles
+  XCircle, Target, Zap, BarChart3, Loader2, Download, Share2, Sparkles,
+  GripVertical, Plus, Trash2, Edit3, Users, Eye, Heart, MessageCircle,
+  ShoppingCart, MousePointer, Percent
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import PlanGate from "@/components/PlanGate";
@@ -32,7 +34,40 @@ interface Diagnosis {
   strengths: string[];
   weaknesses: string[];
   actionPlan: ActionItem[];
+  _dataSource?: string;
 }
+
+interface CustomMetric {
+  id: string;
+  label: string;
+  value: string;
+  icon: string;
+}
+
+const METRIC_ICONS: Record<string, React.ReactNode> = {
+  users: <Users className="w-4 h-4" />,
+  eye: <Eye className="w-4 h-4" />,
+  heart: <Heart className="w-4 h-4" />,
+  message: <MessageCircle className="w-4 h-4" />,
+  cart: <ShoppingCart className="w-4 h-4" />,
+  click: <MousePointer className="w-4 h-4" />,
+  percent: <Percent className="w-4 h-4" />,
+  chart: <BarChart3 className="w-4 h-4" />,
+  trending: <TrendingUp className="w-4 h-4" />,
+};
+
+const PRESET_METRICS = [
+  { label: "Seguidores", icon: "users", placeholder: "Ex: 5.200" },
+  { label: "Alcance médio", icon: "eye", placeholder: "Ex: 1.500" },
+  { label: "Curtidas por post", icon: "heart", placeholder: "Ex: 120" },
+  { label: "Comentários por post", icon: "message", placeholder: "Ex: 15" },
+  { label: "Taxa de conversão", icon: "percent", placeholder: "Ex: 3.5%" },
+  { label: "Leads gerados/mês", icon: "users", placeholder: "Ex: 45" },
+  { label: "Cliques no link da bio", icon: "click", placeholder: "Ex: 200" },
+  { label: "Vendas via Instagram", icon: "cart", placeholder: "Ex: 12" },
+  { label: "Engajamento (%)", icon: "trending", placeholder: "Ex: 4.2%" },
+  { label: "Visualizações de Reels", icon: "eye", placeholder: "Ex: 8.000" },
+];
 
 export function DiagnosticoContent() {
   const { toast } = useToast();
@@ -40,7 +75,66 @@ export function DiagnosticoContent() {
   const [exporting, setExporting] = useState(false);
   const [diagnosis, setDiagnosis] = useState<Diagnosis | null>(null);
   const [handle, setHandle] = useState("");
+  const [customMetrics, setCustomMetrics] = useState<CustomMetric[]>([]);
+  const [showPresets, setShowPresets] = useState(false);
+  const [editingMetric, setEditingMetric] = useState<string | null>(null);
+  const [editingSummary, setEditingSummary] = useState(false);
+  const [editedSummary, setEditedSummary] = useState("");
   const resultsRef = useRef<HTMLDivElement>(null);
+
+  // Editable states for diagnosis results
+  const [editableMetrics, setEditableMetrics] = useState<Metric[]>([]);
+  const [editableStrengths, setEditableStrengths] = useState<string[]>([]);
+  const [editableWeaknesses, setEditableWeaknesses] = useState<string[]>([]);
+  const [editableActions, setEditableActions] = useState<ActionItem[]>([]);
+  const [editableScore, setEditableScore] = useState(0);
+
+  useEffect(() => {
+    if (diagnosis) {
+      setEditableMetrics(diagnosis.metrics || []);
+      setEditableStrengths(diagnosis.strengths || []);
+      setEditableWeaknesses(diagnosis.weaknesses || []);
+      setEditableActions(diagnosis.actionPlan || []);
+      setEditableScore(diagnosis.score);
+      setEditedSummary(diagnosis.summary);
+    }
+  }, [diagnosis]);
+
+  const addCustomMetric = (preset?: typeof PRESET_METRICS[0]) => {
+    const newMetric: CustomMetric = {
+      id: crypto.randomUUID(),
+      label: preset?.label || "Nova métrica",
+      value: "",
+      icon: preset?.icon || "chart",
+    };
+    setCustomMetrics(prev => [...prev, newMetric]);
+    setShowPresets(false);
+    setEditingMetric(newMetric.id);
+  };
+
+  const updateCustomMetric = (id: string, field: keyof CustomMetric, value: string) => {
+    setCustomMetrics(prev => prev.map(m => m.id === id ? { ...m, [field]: value } : m));
+  };
+
+  const removeCustomMetric = (id: string) => {
+    setCustomMetrics(prev => prev.filter(m => m.id !== id));
+  };
+
+  const updateEditableMetricValue = (index: number, value: string) => {
+    setEditableMetrics(prev => prev.map((m, i) => i === index ? { ...m, value } : m));
+  };
+
+  const updateEditableStrength = (index: number, value: string) => {
+    setEditableStrengths(prev => prev.map((s, i) => i === index ? value : s));
+  };
+
+  const updateEditableWeakness = (index: number, value: string) => {
+    setEditableWeaknesses(prev => prev.map((w, i) => i === index ? value : w));
+  };
+
+  const updateEditableAction = (index: number, field: keyof ActionItem, value: string) => {
+    setEditableActions(prev => prev.map((a, i) => i === index ? { ...a, [field]: value } : a));
+  };
 
   const captureImage = useCallback(async (): Promise<Blob | null> => {
     if (!resultsRef.current) return null;
@@ -72,7 +166,7 @@ export function DiagnosticoContent() {
       if (!blob) throw new Error("Erro ao gerar imagem");
       const file = new File([blob], "diagnostico.png", { type: "image/png" });
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ title: "Diagnóstico Instagram", text: `Nota: ${diagnosis?.score}/100 — ${diagnosis?.scoreLabel}`, files: [file] });
+        await navigator.share({ title: "Diagnóstico Instagram", text: `Nota: ${editableScore}/100`, files: [file] });
       } else {
         await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
         toast({ title: "Imagem copiada!" });
@@ -80,7 +174,7 @@ export function DiagnosticoContent() {
     } catch (e: any) {
       if (e.name !== "AbortError") toast({ title: "Erro", description: e.message, variant: "destructive" });
     } finally { setExporting(false); }
-  }, [captureImage, toast, diagnosis]);
+  }, [captureImage, toast, editableScore]);
 
   const analyze = async () => {
     if (!handle.trim()) return;
@@ -88,8 +182,14 @@ export function DiagnosticoContent() {
     setDiagnosis(null);
     try {
       const cleanHandle = handle.trim().replace(/^@/, "").replace(/^https?:\/\/(www\.)?instagram\.com\//, "").replace(/\/$/, "");
+      
+      // Include custom metrics in the analysis
+      const extraContext = customMetrics.filter(m => m.value.trim()).length > 0
+        ? customMetrics.filter(m => m.value.trim()).map(m => `${m.label}: ${m.value}`).join(", ")
+        : undefined;
+
       const { data, error } = await supabase.functions.invoke("diagnose-instagram", {
-        body: { handle: cleanHandle },
+        body: { handle: cleanHandle, extraMetrics: extraContext },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -107,6 +207,15 @@ export function DiagnosticoContent() {
     return <XCircle className="w-4 h-4 text-red-400" />;
   };
 
+  const cycleStatus = (index: number) => {
+    const order: Metric["status"][] = ["good", "warning", "critical"];
+    setEditableMetrics(prev => prev.map((m, i) => {
+      if (i !== index) return m;
+      const next = order[(order.indexOf(m.status) + 1) % 3];
+      return { ...m, status: next };
+    }));
+  };
+
   const scoreColor = (score: number) => {
     if (score >= 80) return "text-emerald-400";
     if (score >= 60) return "text-amber-400";
@@ -115,23 +224,12 @@ export function DiagnosticoContent() {
   };
 
   const inputCls = "w-full rounded-xl bg-white/[0.03] border border-white/[0.08] focus:border-pink-500/30 px-4 py-3 text-sm text-white placeholder:text-white/20 outline-none transition-colors";
+  const editInputCls = "bg-transparent border-b border-white/10 focus:border-pink-400/50 outline-none text-white w-full transition-colors";
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <header className="sticky top-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/[0.06]">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <Link to="/dashboard" className="flex items-center gap-2 text-white/50 hover:text-white transition-colors">
-            <ArrowLeft className="w-4 h-4" /><span className="text-sm">Dashboard</span>
-          </Link>
-          <div className="flex items-center gap-2">
-            <Instagram className="w-4 h-4 text-pink-400" />
-            <span className="font-['Playfair_Display'] font-bold text-sm">Diagnóstico Instagram</span>
-          </div>
-        </div>
-      </header>
-
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
-        {/* Input area - always visible */}
+        {/* Input area */}
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 mb-8">
           <div className="text-center mb-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-500/10 border border-pink-500/20 mb-4">
@@ -162,6 +260,103 @@ export function DiagnosticoContent() {
               {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Analisando...</> : <><BarChart3 className="w-4 h-4" /> Analisar</>}
             </button>
           </div>
+
+          {/* Custom metrics section */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-white/40 uppercase font-semibold tracking-wider">Suas métricas (opcional)</span>
+              <button
+                onClick={() => setShowPresets(!showPresets)}
+                className="flex items-center gap-1.5 text-xs text-pink-400 hover:text-pink-300 transition-colors"
+              >
+                <Plus className="w-3.5 h-3.5" /> Adicionar métrica
+              </button>
+            </div>
+
+            {/* Preset picker */}
+            <AnimatePresence>
+              {showPresets && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                    {PRESET_METRICS.map((preset, i) => (
+                      <button
+                        key={i}
+                        onClick={() => addCustomMetric(preset)}
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.06] text-xs text-white/60 hover:text-white hover:bg-white/[0.06] transition-all text-left"
+                      >
+                        <span className="text-pink-400">{METRIC_ICONS[preset.icon]}</span>
+                        {preset.label}
+                      </button>
+                    ))}
+                    <button
+                      onClick={() => addCustomMetric()}
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg border border-dashed border-white/10 text-xs text-white/30 hover:text-white/60 hover:border-white/20 transition-all"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" /> Personalizada
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Custom metrics list - draggable */}
+            {customMetrics.length > 0 && (
+              <Reorder.Group
+                axis="y"
+                values={customMetrics}
+                onReorder={setCustomMetrics}
+                className="space-y-2"
+              >
+                {customMetrics.map(metric => (
+                  <Reorder.Item
+                    key={metric.id}
+                    value={metric}
+                    className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] cursor-grab active:cursor-grabbing group"
+                  >
+                    <GripVertical className="w-4 h-4 text-white/15 group-hover:text-white/30 flex-shrink-0" />
+                    <span className="text-pink-400/60 flex-shrink-0">{METRIC_ICONS[metric.icon] || METRIC_ICONS.chart}</span>
+                    
+                    {editingMetric === metric.id ? (
+                      <input
+                        autoFocus
+                        value={metric.label}
+                        onChange={e => updateCustomMetric(metric.id, "label", e.target.value)}
+                        onBlur={() => setEditingMetric(null)}
+                        onKeyDown={e => e.key === "Enter" && setEditingMetric(null)}
+                        className="bg-transparent border-b border-pink-400/30 outline-none text-xs text-white w-24 flex-shrink-0"
+                      />
+                    ) : (
+                      <span
+                        onClick={() => setEditingMetric(metric.id)}
+                        className="text-xs text-white/50 cursor-text hover:text-white/70 flex-shrink-0 min-w-[80px]"
+                      >
+                        {metric.label}
+                      </span>
+                    )}
+
+                    <input
+                      value={metric.value}
+                      onChange={e => updateCustomMetric(metric.id, "value", e.target.value)}
+                      placeholder={PRESET_METRICS.find(p => p.label === metric.label)?.placeholder || "Digite o valor"}
+                      className="flex-1 bg-transparent border-b border-white/[0.06] focus:border-pink-400/30 outline-none text-sm text-white placeholder:text-white/15 transition-colors"
+                    />
+
+                    <button
+                      onClick={() => removeCustomMetric(metric.id)}
+                      className="text-white/15 hover:text-red-400 transition-colors flex-shrink-0"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </Reorder.Item>
+                ))}
+              </Reorder.Group>
+            )}
+          </div>
         </motion.div>
 
         {/* Loading state */}
@@ -175,64 +370,194 @@ export function DiagnosticoContent() {
               </div>
               <div>
                 <p className="text-white/60 text-sm font-medium">Analisando @{handle.replace(/^@/, "")}...</p>
-                <p className="text-white/30 text-xs mt-1">A IA está avaliando bio, conteúdo, engajamento e estratégia</p>
+                <p className="text-white/30 text-xs mt-1">A IA está coletando dados reais e avaliando o perfil</p>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Results */}
+        {/* Results - fully editable */}
         <AnimatePresence>
           {diagnosis && !loading && (
             <motion.div key="results" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+              {diagnosis._dataSource === "general" && (
+                <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                  <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                  <span className="text-xs text-amber-300">Análise baseada em recomendações gerais. Adicione suas métricas acima para um diagnóstico mais preciso.</span>
+                </div>
+              )}
+
               <div ref={resultsRef} className="space-y-6 bg-black p-1">
-                {/* Score */}
+                {/* Score - editable */}
                 <div className="text-center py-6">
-                  <div className={`text-6xl font-bold font-['Playfair_Display'] ${scoreColor(diagnosis.score)}`}>{diagnosis.score}</div>
-                  <div className="text-white/40 text-sm mt-1">{diagnosis.scoreLabel}</div>
-                  <p className="text-white/60 text-sm mt-3 max-w-md mx-auto">{diagnosis.summary}</p>
+                  <div className="flex items-center justify-center gap-2">
+                    <input
+                      type="number"
+                      min={0}
+                      max={100}
+                      value={editableScore}
+                      onChange={e => setEditableScore(Math.min(100, Math.max(0, Number(e.target.value))))}
+                      className={`text-6xl font-bold font-['Playfair_Display'] ${scoreColor(editableScore)} bg-transparent text-center w-28 outline-none border-b-2 border-transparent hover:border-white/10 focus:border-pink-400/30 transition-colors`}
+                    />
+                  </div>
+                  <div className="text-white/40 text-sm mt-1">{
+                    editableScore >= 80 ? "Excelente" :
+                    editableScore >= 60 ? "Bom" :
+                    editableScore >= 40 ? "Regular" :
+                    editableScore >= 20 ? "Fraco" : "Crítico"
+                  }</div>
+                  
+                  {editingSummary ? (
+                    <textarea
+                      autoFocus
+                      value={editedSummary}
+                      onChange={e => setEditedSummary(e.target.value)}
+                      onBlur={() => setEditingSummary(false)}
+                      rows={3}
+                      className="text-white/60 text-sm mt-3 max-w-md mx-auto bg-transparent border border-white/10 rounded-lg p-2 w-full outline-none focus:border-pink-400/30 resize-none"
+                    />
+                  ) : (
+                    <p
+                      onClick={() => setEditingSummary(true)}
+                      className="text-white/60 text-sm mt-3 max-w-md mx-auto cursor-text hover:text-white/80 transition-colors border-b border-transparent hover:border-white/10"
+                    >
+                      {editedSummary}
+                    </p>
+                  )}
                 </div>
 
-                {/* Metrics */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {diagnosis.metrics.map((m, i) => (
-                    <div key={i} className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4">
+                {/* Metrics - editable values + clickable status */}
+                <Reorder.Group
+                  axis="y"
+                  values={editableMetrics}
+                  onReorder={setEditableMetrics}
+                  className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+                  as="div"
+                >
+                  {editableMetrics.map((m, i) => (
+                    <Reorder.Item
+                      key={m.name}
+                      value={m}
+                      className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4 cursor-grab active:cursor-grabbing group"
+                      as="div"
+                    >
                       <div className="flex items-center gap-2 mb-2">
-                        {statusIcon(m.status)}
+                        <GripVertical className="w-3 h-3 text-white/10 group-hover:text-white/25" />
+                        <button onClick={() => cycleStatus(i)} className="hover:scale-110 transition-transform" title="Clique para mudar status">
+                          {statusIcon(m.status)}
+                        </button>
                         <span className="text-xs text-white/50">{m.name}</span>
                       </div>
-                      <div className="text-lg font-semibold text-white mb-1">{m.value}</div>
-                      <p className="text-[11px] text-white/30">{m.tip}</p>
-                    </div>
+                      <input
+                        value={m.value}
+                        onChange={e => updateEditableMetricValue(i, e.target.value)}
+                        className={`${editInputCls} text-lg font-semibold mb-1`}
+                        placeholder="Editar avaliação..."
+                      />
+                      <p className="text-[11px] text-white/30 mt-1">{m.tip}</p>
+                    </Reorder.Item>
                   ))}
-                </div>
+                </Reorder.Group>
 
-                {/* Strengths & Weaknesses */}
+                {/* Custom metrics display */}
+                {customMetrics.filter(m => m.value.trim()).length > 0 && (
+                  <div>
+                    <span className="text-xs text-white/30 uppercase font-semibold tracking-wider mb-3 block">Métricas do cliente</span>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {customMetrics.filter(m => m.value.trim()).map(m => (
+                        <div key={m.id} className="rounded-xl bg-pink-500/[0.04] border border-pink-500/10 p-4">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-pink-400/60">{METRIC_ICONS[m.icon]}</span>
+                            <span className="text-xs text-white/40">{m.label}</span>
+                          </div>
+                          <div className="text-lg font-semibold text-white">{m.value}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Strengths & Weaknesses - editable */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="rounded-xl bg-emerald-500/[0.06] border border-emerald-500/20 p-4">
-                    <div className="flex items-center gap-2 mb-3"><CheckCircle2 className="w-4 h-4 text-emerald-400" /><span className="text-xs font-semibold text-emerald-400 uppercase">Pontos fortes</span></div>
-                    <ul className="space-y-2">{diagnosis.strengths.map((s, i) => <li key={i} className="text-sm text-white/60">• {s}</li>)}</ul>
+                    <div className="flex items-center gap-2 mb-3">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      <span className="text-xs font-semibold text-emerald-400 uppercase">Pontos fortes</span>
+                    </div>
+                    <ul className="space-y-2">
+                      {editableStrengths.map((s, i) => (
+                        <li key={i} className="flex items-start gap-1">
+                          <span className="text-white/40 mt-0.5">•</span>
+                          <input
+                            value={s}
+                            onChange={e => updateEditableStrength(i, e.target.value)}
+                            className={`${editInputCls} text-sm text-white/60 focus:text-white`}
+                          />
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                   <div className="rounded-xl bg-red-500/[0.06] border border-red-500/20 p-4">
-                    <div className="flex items-center gap-2 mb-3"><AlertTriangle className="w-4 h-4 text-red-400" /><span className="text-xs font-semibold text-red-400 uppercase">Pontos fracos</span></div>
-                    <ul className="space-y-2">{diagnosis.weaknesses.map((w, i) => <li key={i} className="text-sm text-white/60">• {w}</li>)}</ul>
+                    <div className="flex items-center gap-2 mb-3">
+                      <AlertTriangle className="w-4 h-4 text-red-400" />
+                      <span className="text-xs font-semibold text-red-400 uppercase">Pontos fracos</span>
+                    </div>
+                    <ul className="space-y-2">
+                      {editableWeaknesses.map((w, i) => (
+                        <li key={i} className="flex items-start gap-1">
+                          <span className="text-white/40 mt-0.5">•</span>
+                          <input
+                            value={w}
+                            onChange={e => updateEditableWeakness(i, e.target.value)}
+                            className={`${editInputCls} text-sm text-white/60 focus:text-white`}
+                          />
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
 
-                {/* Action Plan */}
+                {/* Action Plan - editable */}
                 <div>
-                  <div className="flex items-center gap-2 mb-3"><Target className="w-4 h-4 text-pink-400" /><span className="text-xs font-semibold text-white/40 uppercase">Plano de ação</span></div>
-                  <div className="space-y-2">
-                    {diagnosis.actionPlan.map((a, i) => (
-                      <div key={i} className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${a.priority === "alta" ? "bg-red-500/20 text-red-400" : a.priority === "media" ? "bg-amber-500/20 text-amber-400" : "bg-blue-500/20 text-blue-400"}`}>{a.priority}</span>
-                        </div>
-                        <p className="text-sm text-white/80 font-medium">{a.action}</p>
-                        <p className="text-[11px] text-white/30 mt-1"><Zap className="w-3 h-3 inline mr-1" />{a.expectedImpact}</p>
-                      </div>
-                    ))}
+                  <div className="flex items-center gap-2 mb-3">
+                    <Target className="w-4 h-4 text-pink-400" />
+                    <span className="text-xs font-semibold text-white/40 uppercase">Plano de ação</span>
                   </div>
+                  <Reorder.Group axis="y" values={editableActions} onReorder={setEditableActions} className="space-y-2">
+                    {editableActions.map((a, i) => (
+                      <Reorder.Item key={`action-${i}`} value={a} className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4 cursor-grab active:cursor-grabbing group">
+                        <div className="flex items-center gap-2 mb-2">
+                          <GripVertical className="w-3 h-3 text-white/10 group-hover:text-white/25" />
+                          <select
+                            value={a.priority}
+                            onChange={e => updateEditableAction(i, "priority", e.target.value)}
+                            className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full cursor-pointer outline-none ${
+                              a.priority === "alta" ? "bg-red-500/20 text-red-400" :
+                              a.priority === "media" ? "bg-amber-500/20 text-amber-400" :
+                              "bg-blue-500/20 text-blue-400"
+                            }`}
+                          >
+                            <option value="alta">Alta</option>
+                            <option value="media">Média</option>
+                            <option value="baixa">Baixa</option>
+                          </select>
+                        </div>
+                        <input
+                          value={a.action}
+                          onChange={e => updateEditableAction(i, "action", e.target.value)}
+                          className={`${editInputCls} text-sm font-medium text-white/80 focus:text-white mb-1`}
+                        />
+                        <div className="flex items-center gap-1 mt-1">
+                          <Zap className="w-3 h-3 text-white/20 flex-shrink-0" />
+                          <input
+                            value={a.expectedImpact}
+                            onChange={e => updateEditableAction(i, "expectedImpact", e.target.value)}
+                            className={`${editInputCls} text-[11px] text-white/30 focus:text-white/50`}
+                          />
+                        </div>
+                      </Reorder.Item>
+                    ))}
+                  </Reorder.Group>
                 </div>
               </div>
 
@@ -246,7 +571,7 @@ export function DiagnosticoContent() {
                 </button>
               </div>
 
-              <button onClick={() => { setDiagnosis(null); setHandle(""); }} className="w-full py-3 rounded-xl border border-white/[0.08] text-white/40 text-sm hover:text-white transition-colors">
+              <button onClick={() => { setDiagnosis(null); setHandle(""); setCustomMetrics([]); }} className="w-full py-3 rounded-xl border border-white/[0.08] text-white/40 text-sm hover:text-white transition-colors">
                 Nova análise
               </button>
             </motion.div>

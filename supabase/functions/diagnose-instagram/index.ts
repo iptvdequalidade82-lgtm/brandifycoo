@@ -9,7 +9,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { handle } = await req.json();
+    const { handle, extraMetrics } = await req.json();
     if (!handle) throw new Error("Handle é obrigatório");
 
     const cleanHandle = handle.replace(/^@/, "").trim();
@@ -98,8 +98,8 @@ Abaixo estão dados REAIS coletados da internet sobre o perfil @${cleanHandle} n
 === DADOS REAIS COLETADOS ===
 ${searchResults.substring(0, 10000)}
 === FIM DOS DADOS ===
-
-Com base nos dados acima, faça um diagnóstico honesto. Se há pouco conteúdo visível, reflita isso no score. Não invente posts, reels ou métricas que não estão nos dados.
+${extraMetrics ? `\n=== MÉTRICAS INFORMADAS PELO CLIENTE ===\n${extraMetrics}\n=== FIM DAS MÉTRICAS ===\n` : ""}
+Com base nos dados acima${extraMetrics ? " e nas métricas do cliente" : ""}, faça um diagnóstico honesto. Se há pouco conteúdo visível, reflita isso no score. Não invente posts, reels ou métricas que não estão nos dados. ${extraMetrics ? "Use as métricas fornecidas pelo cliente para enriquecer a análise." : ""}
 
 Responda APENAS com JSON válido (sem markdown, sem \`\`\`):
 {
