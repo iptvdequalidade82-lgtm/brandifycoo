@@ -15,10 +15,50 @@ import {
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import logo from "@/assets/logo.jpg";
+import spaceNebulaBg from "@/assets/space-nebula-bg.jpg";
 import UserMenu from "@/components/UserMenu";
 import SupportWidget from "@/components/SupportWidget";
 import PlanGate from "@/components/PlanGate";
 import { useGating, type PlanTier } from "@/hooks/useGating";
+
+// ── Ambient background config per tool ──
+const TOOL_AMBIENTS: Record<string, { gradient: string; orbColor1: string; orbColor2: string }> = {
+  posts: { gradient: "from-violet-900/30 via-purple-900/10 to-pink-900/20", orbColor1: "rgba(139,92,246,0.15)", orbColor2: "rgba(236,72,153,0.1)" },
+  chat: { gradient: "from-blue-900/30 via-cyan-900/10 to-indigo-900/20", orbColor1: "rgba(59,130,246,0.15)", orbColor2: "rgba(6,182,212,0.1)" },
+  copy: { gradient: "from-amber-900/30 via-orange-900/10 to-yellow-900/20", orbColor1: "rgba(245,158,11,0.15)", orbColor2: "rgba(249,115,22,0.1)" },
+  landing: { gradient: "from-emerald-900/30 via-teal-900/10 to-green-900/20", orbColor1: "rgba(16,185,129,0.15)", orbColor2: "rgba(20,184,166,0.1)" },
+  atendedor: { gradient: "from-blue-900/30 via-indigo-900/10 to-violet-900/20", orbColor1: "rgba(99,102,241,0.15)", orbColor2: "rgba(79,70,229,0.1)" },
+  agendador: { gradient: "from-pink-900/30 via-rose-900/10 to-red-900/20", orbColor1: "rgba(236,72,153,0.15)", orbColor2: "rgba(244,63,94,0.1)" },
+  diagnostico: { gradient: "from-violet-900/30 via-purple-900/10 to-fuchsia-900/20", orbColor1: "rgba(168,85,247,0.15)", orbColor2: "rgba(192,38,211,0.1)" },
+  planejamento: { gradient: "from-cyan-900/30 via-sky-900/10 to-blue-900/20", orbColor1: "rgba(6,182,212,0.15)", orbColor2: "rgba(14,165,233,0.1)" },
+  simulador: { gradient: "from-green-900/30 via-emerald-900/10 to-teal-900/20", orbColor1: "rgba(34,197,94,0.15)", orbColor2: "rgba(16,185,129,0.1)" },
+};
+
+// ── Floating orbs component ──
+function AmbientOrbs({ color1, color2 }: { color1: string; color2: string }) {
+  return (
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+      <motion.div
+        className="absolute rounded-full blur-[120px]"
+        style={{ width: 500, height: 500, background: color1, top: "-10%", left: "-5%" }}
+        animate={{ x: [0, 80, 0], y: [0, 40, 0], scale: [1, 1.15, 1] }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="absolute rounded-full blur-[140px]"
+        style={{ width: 400, height: 400, background: color2, bottom: "5%", right: "-5%" }}
+        animate={{ x: [0, -60, 0], y: [0, -50, 0], scale: [1, 1.2, 1] }}
+        transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+      />
+      <motion.div
+        className="absolute rounded-full blur-[100px]"
+        style={{ width: 250, height: 250, background: color1, top: "50%", left: "50%", transform: "translate(-50%,-50%)" }}
+        animate={{ x: [0, 40, -30, 0], y: [0, -30, 40, 0], opacity: [0.3, 0.6, 0.3] }}
+        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 4 }}
+      />
+    </div>
+  );
+}
 
 // Lazy-loaded tool content
 const LazyCopyContent = lazy(() => import("@/pages/ToolsCopy").then(m => ({ default: m.CopyGeneratorContent })));
