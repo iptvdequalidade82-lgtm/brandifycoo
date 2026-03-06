@@ -1149,7 +1149,25 @@ export default function IAs() {
     : dailyRemaining;
 
   if (loading) {
-    return <div className="min-h-screen bg-[#050508] flex items-center justify-center"><div className="w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" /></div>;
+    return (
+      <div className="min-h-screen bg-[#030306] flex items-center justify-center relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-violet-600/10 blur-[120px]" />
+          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-pink-600/10 blur-[100px]" />
+        </div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex flex-col items-center gap-4 relative z-10"
+        >
+          <div className="w-14 h-14 rounded-2xl overflow-hidden ring-2 ring-violet-500/20 shadow-2xl shadow-violet-500/20">
+            <img src={logo} alt="Brandify" className="w-full h-full object-cover" />
+          </div>
+          <div className="w-8 h-8 border-2 border-violet-500/40 border-t-violet-400 rounded-full animate-spin" />
+          <p className="text-white/20 text-xs font-medium">Carregando IA Studio...</p>
+        </motion.div>
+      </div>
+    );
   }
 
   const activeToolLabel = TOOL_GROUPS.flatMap(g => g.tools).find(t => t.key === activeTool)?.label || "IA Studio";
