@@ -3,6 +3,23 @@ import { useSearchParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Sparkles, Loader2, Monitor, Smartphone, RotateCcw, Check, Upload, X, Image, Building2, ThumbsUp, ThumbsDown, Wand2, PenLine } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import lightningBg from "@/assets/lightning-bg.jpg";
+import constellationBg from "@/assets/constellation-bg.jpg";
+import galaxyBg from "@/assets/galaxy-bg.jpg";
+
+const planBgs: Record<string, string> = {
+  "landing page": lightningBg,
+  essencial: constellationBg,
+  profissional: constellationBg,
+  premium: galaxyBg,
+};
+
+const planAccents: Record<string, { from: string; to: string; glow: string }> = {
+  "landing page": { from: "#f97316", to: "#ef4444", glow: "rgba(249,115,22,0.15)" },
+  essencial: { from: "#3b82f6", to: "#8b5cf6", glow: "rgba(59,130,246,0.15)" },
+  profissional: { from: "#06b6d4", to: "#3b82f6", glow: "rgba(6,182,212,0.15)" },
+  premium: { from: "#a855f7", to: "#ec4899", glow: "rgba(168,85,247,0.15)" },
+};
 
 const planLabels: Record<string, string> = {
   "landing page": "Landing Page — página de vendas",
@@ -287,8 +304,29 @@ export default function PreviewSite() {
 
   const canGenerate = mode === "ia" ? (!!segment.trim() && !!businessName.trim() && !!phone.trim()) : !!businessName.trim();
 
+  const accent = planAccents[plan] || planAccents.essencial;
+  const bgImage = planBgs[plan] || constellationBg;
+
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white relative overflow-hidden">
+      {/* Plan-specific background */}
+      <div
+        className="fixed inset-0 pointer-events-none z-0"
+        style={{
+          backgroundImage: `url(${bgImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          opacity: 0.12,
+          maskImage: "linear-gradient(to bottom, black 0%, black 60%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 60%, transparent 100%)",
+        }}
+      />
+      {/* Accent glow */}
+      <div
+        className="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] rounded-full pointer-events-none z-0 blur-[150px]"
+        style={{ background: accent.glow }}
+      />
+
       {/* Header */}
       <header className="sticky top-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/10">
         <div className="container mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
@@ -296,14 +334,14 @@ export default function PreviewSite() {
             <ArrowLeft size={16} /> Voltar aos planos
           </Link>
           <div className="flex items-center gap-2 text-sm">
-            <Sparkles size={14} className="text-brand-accent" />
+            <div className="w-2 h-2 rounded-full" style={{ background: `linear-gradient(135deg, ${accent.from}, ${accent.to})` }} />
             <span className="text-white/60">Prévia</span>
             <span className="text-white font-bold capitalize">{plan}</span>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto max-w-7xl px-4 py-8">
+      <div className="container mx-auto max-w-7xl px-4 py-8 relative z-10">
         <AnimatePresence mode="wait">
           {!htmlContent && !generating ? (
             <motion.div

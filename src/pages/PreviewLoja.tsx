@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Sparkles, Loader2, Monitor, Smartphone, RotateCcw, Wand2, PenLine, Plus, X, Store, ThumbsUp, ThumbsDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import auroraBg from "@/assets/aurora-bg.jpg";
 
 const colorSchemes = [
   { id: "modern", label: "Moderno", colors: ["#0ea5e9", "#06b6d4", "#f0fdfa"] },
@@ -196,20 +197,35 @@ export default function PreviewLoja() {
 
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white relative overflow-hidden">
+      {/* Unique aurora background */}
+      <div
+        className="fixed inset-0 pointer-events-none z-0"
+        style={{
+          backgroundImage: `url(${auroraBg})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          opacity: 0.1,
+          maskImage: "linear-gradient(to bottom, black 0%, black 50%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 50%, transparent 100%)",
+        }}
+      />
+      {/* Teal glow */}
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[700px] h-[500px] rounded-full pointer-events-none z-0 blur-[140px]" style={{ background: "rgba(6,182,212,0.12)" }} />
+
       <header className="sticky top-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/10">
         <div className="container mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
           <Link to="/#investimento" className="flex items-center gap-2 text-sm text-white/60 hover:text-white transition-colors">
             <ArrowLeft size={16} /> Voltar
           </Link>
           <div className="flex items-center gap-2 text-sm">
-            <Store size={14} className="text-brand-accent" />
+            <Store size={14} className="text-cyan-400" />
             <span className="text-white font-bold">Prévia Loja Virtual</span>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto max-w-7xl px-4 py-8">
+      <div className="container mx-auto max-w-7xl px-4 py-8 relative z-10">
         <AnimatePresence mode="wait">
           {!htmlContent && !generating ? (
             <motion.div

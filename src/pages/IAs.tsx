@@ -932,12 +932,12 @@ function ChatTab({ user }: { user: User | null }) {
 // ══════════════════════════════════════════════════
 type ToolKey = "posts" | "chat" | "copy" | "landing" | "atendedor" | "agendador" | "diagnostico" | "planejamento" | "simulador";
 
-const TOOL_GROUPS: { label: string; badge?: string; badgeColor?: string; tools: { key: ToolKey; label: string; icon: any; color: string; minPlan?: PlanTier }[] }[] = [
+const TOOL_GROUPS: { label: string; badge?: string; badgeColor?: string; tools: { key: ToolKey; label: string; icon: any; color: string; gradient?: string; minPlan?: PlanTier }[] }[] = [
   {
     label: "Criação",
     tools: [
-      { key: "posts", label: "Gerador de Posts", icon: ImagePlus, color: "text-violet-400" },
-      { key: "chat", label: "Chat com IA", icon: MessageSquare, color: "text-blue-400" },
+      { key: "posts", label: "Gerador de Posts", icon: ImagePlus, color: "text-violet-400", gradient: "from-violet-600/20 to-pink-600/20" },
+      { key: "chat", label: "Chat com IA", icon: MessageSquare, color: "text-blue-400", gradient: "from-blue-600/20 to-cyan-600/20" },
     ],
   },
   {
@@ -945,10 +945,10 @@ const TOOL_GROUPS: { label: string; badge?: string; badgeColor?: string; tools: 
     badge: "Pro",
     badgeColor: "text-amber-400/60",
     tools: [
-      { key: "copy", label: "Gerador de Copy", icon: PenTool, color: "text-amber-400", minPlan: "pro" },
-      { key: "landing", label: "Textos de Venda", icon: Layout, color: "text-emerald-400", minPlan: "pro" },
-      { key: "atendedor", label: "Atendedor IA", icon: Headphones, color: "text-blue-400", minPlan: "pro" },
-      { key: "agendador", label: "Agendador de Consultas", icon: Calendar, color: "text-pink-400", minPlan: "pro" },
+      { key: "copy", label: "Gerador de Copy", icon: PenTool, color: "text-amber-400", gradient: "from-amber-600/20 to-orange-600/20", minPlan: "pro" },
+      { key: "landing", label: "Textos de Venda", icon: Layout, color: "text-emerald-400", gradient: "from-emerald-600/20 to-teal-600/20", minPlan: "pro" },
+      { key: "atendedor", label: "Atendedor IA", icon: Headphones, color: "text-blue-400", gradient: "from-blue-600/20 to-indigo-600/20", minPlan: "pro" },
+      { key: "agendador", label: "Agendador de Consultas", icon: Calendar, color: "text-pink-400", gradient: "from-pink-600/20 to-rose-600/20", minPlan: "pro" },
     ],
   },
   {
@@ -956,9 +956,9 @@ const TOOL_GROUPS: { label: string; badge?: string; badgeColor?: string; tools: 
     badge: "Premium",
     badgeColor: "text-violet-400/60",
     tools: [
-      { key: "diagnostico", label: "Diagnóstico IG", icon: Target, color: "text-violet-400", minPlan: "premium" },
-      { key: "planejamento", label: "Plano Estratégico", icon: BarChart3, color: "text-cyan-400", minPlan: "premium" },
-      { key: "simulador", label: "Simulador de Faturamento", icon: TrendingUp, color: "text-green-400", minPlan: "premium" },
+      { key: "diagnostico", label: "Diagnóstico IG", icon: Target, color: "text-violet-400", gradient: "from-violet-600/20 to-purple-600/20", minPlan: "premium" },
+      { key: "planejamento", label: "Plano Estratégico", icon: BarChart3, color: "text-cyan-400", gradient: "from-cyan-600/20 to-sky-600/20", minPlan: "premium" },
+      { key: "simulador", label: "Simulador de Faturamento", icon: TrendingUp, color: "text-green-400", gradient: "from-green-600/20 to-emerald-600/20", minPlan: "premium" },
     ],
   },
 ];
@@ -1005,7 +1005,7 @@ function SidebarNav({ activeTool, setActiveTool, hasAccess: checkAccess, onSelec
         <div key={group.label}>
           <p className="text-white/20 text-[10px] uppercase tracking-widest font-semibold px-3 mb-2 flex items-center gap-2">
             {group.label}
-            {group.badge && <span className={group.badgeColor || "text-white/30"}>{group.badge}</span>}
+            {group.badge && <span className={`text-[9px] px-1.5 py-0.5 rounded-full border border-current/20 ${group.badgeColor || "text-white/30"}`}>{group.badge}</span>}
           </p>
           <div className="space-y-0.5">
             {group.tools.map((tool) => {
@@ -1015,15 +1015,20 @@ function SidebarNav({ activeTool, setActiveTool, hasAccess: checkAccess, onSelec
                 <button
                   key={tool.key}
                   onClick={() => { setActiveTool(tool.key); onSelect?.(); }}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all ${
+                  className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 ${
                     isActive
-                      ? "bg-white/[0.08] text-white"
+                      ? `bg-gradient-to-r ${tool.gradient || "from-white/[0.08] to-white/[0.04]"} text-white border border-white/[0.08] shadow-sm`
                       : "text-white/40 hover:bg-white/[0.04] hover:text-white/60"
                   }`}
                 >
-                  <tool.icon className={`w-4 h-4 shrink-0 ${isActive ? tool.color : locked ? "text-white/15" : "text-white/25"}`} />
-                  <span className="truncate flex-1 text-left">{tool.label}</span>
+                  <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-all ${
+                    isActive ? "bg-white/10" : "bg-transparent"
+                  }`}>
+                    <tool.icon className={`w-4 h-4 ${isActive ? tool.color : locked ? "text-white/15" : "text-white/25"}`} />
+                  </div>
+                  <span className="truncate flex-1 text-left font-medium">{tool.label}</span>
                   {locked && <Lock className="w-3 h-3 text-white/15 shrink-0" />}
+                  {isActive && <div className="w-1.5 h-1.5 rounded-full bg-current shrink-0 opacity-60" />}
                 </button>
               );
             })}
