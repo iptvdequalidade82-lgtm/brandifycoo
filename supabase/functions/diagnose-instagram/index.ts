@@ -9,7 +9,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { handle } = await req.json();
+    const { handle, extraMetrics } = await req.json();
     if (!handle) throw new Error("Handle é obrigatório");
 
     const cleanHandle = handle.replace(/^@/, "").trim();
