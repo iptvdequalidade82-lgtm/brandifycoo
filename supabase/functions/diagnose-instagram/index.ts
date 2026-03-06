@@ -13,81 +13,144 @@ serve(async (req) => {
     if (!handle) throw new Error("Handle é obrigatório");
 
     const cleanHandle = handle.replace(/^@/, "").trim();
-    const profileUrl = `https://www.instagram.com/${cleanHandle}/`;
 
-    // Step 1: Scrape the real Instagram profile using Firecrawl
+    // Step 1: Use Firecrawl search to find real info about the Instagram profile
     const FIRECRAWL_API_KEY = Deno.env.get("FIRECRAWL_API_KEY");
     if (!FIRECRAWL_API_KEY) throw new Error("Firecrawl não configurado");
 
-    console.log("Scraping Instagram profile:", profileUrl);
+    console.log("Searching for Instagram profile:", cleanHandle);
 
-    const scrapeRes = await fetch("https://api.firecrawl.dev/v1/scrape", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${FIRECRAWL_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        url: profileUrl,
-        formats: ["markdown", "screenshot"],
-        waitFor: 3000,
-      }),
-    });
+    // Search for the profile info from multiple angles
+    const searchQueries = [
+      `site:instagram.com "${cleanHandle}" bio followers`,
+      `"@${cleanHandle}" instagram perfil`,
+    ];
 
-    const scrapeData = await scrapeRes.json();
+    let searchResults = "";
 
-    if (!scrapeRes.ok) {
-      console.error("Firecrawl error:", JSON.stringify(scrapeData));
-      throw new Error("Não foi possível acessar o perfil do Instagram");
+    for (const query of searchQueries) {
+      try {
+        const searchRes = await fetch("https://api.firecrawl.dev/v1/search", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${FIRECRAWL_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            query,
+            limit: 5,
+            scrapeOptions: { formats: ["markdown"] },
+          }),
+        });
+
+        const searchData = await searchRes.json();
+        if (searchRes.ok && searchData?.data) {
+          for (const result of searchData.data) {
+            searchResults += `\n--- Fonte: ${result.url || "N/A"} ---\n`;
+            searchResults += `Título: ${result.title || "N/A"}\n`;
+            searchResults += `Descrição: ${result.description || "N/A"}\n`;
+            if (result.markdown) {
+              searchResults += result.markdown.substring(0, 2000) + "\n";
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Search query failed:", query, e);
+      }
     }
 
-    const pageMarkdown = scrapeData?.data?.markdown || scrapeData?.markdown || "";
-    const screenshotBase64 = scrapeData?.data?.screenshot || scrapeData?.screenshot || "";
-    const pageMetadata = scrapeData?.data?.metadata || scrapeData?.metadata || {};
+    // Also try scraping a third-party Instagram viewer
+    try {
+      const viewerRes = await fetch("https://api.firecrawl.dev/v1/scrape", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${FIRECRAWL_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          url: `https://imginn.com/${cleanHandle}/`,
+          formats: ["markdown"],
+          waitFor: 2000,
+        }),
+      });
 
-    console.log("Scraped content length:", pageMarkdown.length);
-    console.log("Has screenshot:", !!screenshotBase64);
-
-    if (!pageMarkdown && !screenshotBase64) {
-      throw new Error("Não foi possível extrair dados do perfil. Verifique se o @ está correto.");
+      const viewerData = await viewerRes.json();
+      if (viewerRes.ok) {
+        const md = viewerData?.data?.markdown || viewerData?.markdown || "";
+        if (md) {
+          searchResults += `\n--- Dados do perfil (viewer) ---\n${md.substring(0, 4000)}\n`;
+        }
+      }
+    } catch (e) {
+      console.error("Viewer scrape failed:", e);
     }
 
-    // Step 2: Send the REAL scraped data to AI for analysis
-    const prompt = `Você é um especialista em marketing digital e Instagram com anos de experiência.
+    console.log("Total search results length:", searchResults.length);
 
-Abaixo está o conteúdo REAL extraído do perfil @${cleanHandle} no Instagram. Analise APENAS o que você consegue ver nos dados abaixo. NÃO INVENTE informações. Se algo não está visível nos dados, diga "Não foi possível avaliar" para aquele item.
+    // Step 2: Send real data to AI
+    const hasRealData = searchResults.length > 100;
 
-=== DADOS REAIS DO PERFIL ===
-Título da página: ${pageMetadata.title || "N/A"}
-Descrição: ${pageMetadata.description || "N/A"}
+    const prompt = hasRealData
+      ? `Você é um especialista em marketing digital e Instagram com anos de experiência.
 
-Conteúdo extraído da página:
-${pageMarkdown.substring(0, 8000)}
+Abaixo estão dados REAIS coletados da internet sobre o perfil @${cleanHandle} no Instagram. Analise APENAS o que você consegue ver nos dados. NÃO INVENTE informações. Se algo não está nos dados, diga "Não foi possível avaliar com os dados disponíveis".
+
+=== DADOS REAIS COLETADOS ===
+${searchResults.substring(0, 10000)}
 === FIM DOS DADOS ===
 
-Com base EXCLUSIVAMENTE nos dados acima, faça o diagnóstico. Seja honesto — se o perfil tem poucos posts ou nenhum reels, DIGA ISSO. Se a bio não tem link, DIGA ISSO. Não invente conteúdo que não existe.
+Com base nos dados acima, faça um diagnóstico honesto. Se há pouco conteúdo visível, reflita isso no score. Não invente posts, reels ou métricas que não estão nos dados.
 
-Responda APENAS com JSON válido nesta estrutura exata (sem markdown, sem \`\`\`):
+Responda APENAS com JSON válido (sem markdown, sem \`\`\`):
 {
   "score": (número de 0 a 100),
   "scoreLabel": "(Crítico / Fraco / Regular / Bom / Excelente)",
-  "summary": "(resumo honesto de 2-3 frases baseado nos dados reais)",
+  "summary": "(resumo honesto baseado nos dados reais encontrados)",
   "metrics": [
-    { "name": "Bio e Apresentação", "value": "(o que você VIU nos dados)", "status": "good|warning|critical", "tip": "(dica específica)" },
-    { "name": "Identidade Visual", "value": "(o que você VIU)", "status": "good|warning|critical", "tip": "(dica)" },
-    { "name": "Estratégia de Conteúdo", "value": "(baseado nos posts REAIS visíveis)", "status": "good|warning|critical", "tip": "(dica)" },
-    { "name": "Uso de Reels", "value": "(baseado no que é VISÍVEL)", "status": "good|warning|critical", "tip": "(dica)" },
-    { "name": "Engajamento", "value": "(baseado nos números REAIS se visíveis)", "status": "good|warning|critical", "tip": "(dica)" },
-    { "name": "Frequência de Posts", "value": "(baseado nas datas REAIS se visíveis)", "status": "good|warning|critical", "tip": "(dica)" }
+    { "name": "Bio e Apresentação", "value": "(baseado nos dados reais)", "status": "good|warning|critical", "tip": "(dica específica)" },
+    { "name": "Identidade Visual", "value": "(baseado nos dados reais)", "status": "good|warning|critical", "tip": "(dica)" },
+    { "name": "Estratégia de Conteúdo", "value": "(baseado nos dados reais)", "status": "good|warning|critical", "tip": "(dica)" },
+    { "name": "Uso de Reels", "value": "(baseado nos dados reais)", "status": "good|warning|critical", "tip": "(dica)" },
+    { "name": "Engajamento", "value": "(baseado nos dados reais)", "status": "good|warning|critical", "tip": "(dica)" },
+    { "name": "Frequência de Posts", "value": "(baseado nos dados reais)", "status": "good|warning|critical", "tip": "(dica)" }
   ],
   "strengths": ["(ponto forte real)", "(ponto forte real)", "(ponto forte real)"],
   "weaknesses": ["(fraqueza real)", "(fraqueza real)", "(fraqueza real)"],
   "actionPlan": [
-    { "priority": "alta", "action": "(ação baseada nos problemas REAIS)", "expectedImpact": "(resultado esperado)" },
+    { "priority": "alta", "action": "(ação concreta)", "expectedImpact": "(resultado)" },
     { "priority": "alta", "action": "(ação concreta)", "expectedImpact": "(resultado)" },
     { "priority": "media", "action": "(ação concreta)", "expectedImpact": "(resultado)" },
     { "priority": "media", "action": "(ação concreta)", "expectedImpact": "(resultado)" },
     { "priority": "baixa", "action": "(ação concreta)", "expectedImpact": "(resultado)" }
+  ]
+}`
+      : `Você é um especialista em marketing digital e Instagram.
+
+O usuário quer um diagnóstico do perfil @${cleanHandle} no Instagram. Não foi possível coletar dados detalhados automaticamente, mas como especialista, use seu conhecimento geral para dar recomendações baseadas em boas práticas de Instagram para perfis comerciais/pessoais.
+
+IMPORTANTE: Seja transparente e diga que a análise é baseada em recomendações gerais, já que não foi possível acessar os dados completos do perfil. Dê dicas práticas e acionáveis.
+
+Responda APENAS com JSON válido (sem markdown, sem \`\`\`):
+{
+  "score": 50,
+  "scoreLabel": "Análise Geral",
+  "summary": "(explique que não foi possível acessar dados completos do perfil @${cleanHandle}, mas aqui estão recomendações baseadas em boas práticas)",
+  "metrics": [
+    { "name": "Bio e Apresentação", "value": "Verificação necessária", "status": "warning", "tip": "(dica de boas práticas)" },
+    { "name": "Identidade Visual", "value": "Verificação necessária", "status": "warning", "tip": "(dica)" },
+    { "name": "Estratégia de Conteúdo", "value": "Verificação necessária", "status": "warning", "tip": "(dica)" },
+    { "name": "Uso de Reels", "value": "Verificação necessária", "status": "warning", "tip": "(dica)" },
+    { "name": "Engajamento", "value": "Verificação necessária", "status": "warning", "tip": "(dica)" },
+    { "name": "Frequência de Posts", "value": "Verificação necessária", "status": "warning", "tip": "(dica)" }
+  ],
+  "strengths": ["(recomendação 1)", "(recomendação 2)", "(recomendação 3)"],
+  "weaknesses": ["(erro comum 1)", "(erro comum 2)", "(erro comum 3)"],
+  "actionPlan": [
+    { "priority": "alta", "action": "(ação)", "expectedImpact": "(resultado)" },
+    { "priority": "alta", "action": "(ação)", "expectedImpact": "(resultado)" },
+    { "priority": "media", "action": "(ação)", "expectedImpact": "(resultado)" },
+    { "priority": "media", "action": "(ação)", "expectedImpact": "(resultado)" },
+    { "priority": "baixa", "action": "(ação)", "expectedImpact": "(resultado)" }
   ]
 }`;
 
@@ -96,38 +159,7 @@ Responda APENAS com JSON válido nesta estrutura exata (sem markdown, sem \`\`\`
 
     let responseText = "";
 
-    // Use screenshot + text for multimodal analysis if available
-    if (LOVABLE_API_KEY && screenshotBase64) {
-      // Multimodal: send screenshot + text to Gemini Pro for visual analysis
-      const messages = [
-        {
-          role: "user",
-          content: [
-            { type: "text", text: prompt },
-            { type: "image_url", image_url: { url: `data:image/png;base64,${screenshotBase64}` } },
-          ],
-        },
-      ];
-
-      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
-          messages,
-        }),
-      });
-
-      if (!res.ok) {
-        const errText = await res.text();
-        console.error("AI gateway error:", res.status, errText);
-        if (res.status === 429) throw new Error("Limite de requisições atingido. Tente novamente em alguns segundos.");
-        throw new Error("Erro ao consultar IA");
-      }
-      const data = await res.json();
-      responseText = data?.choices?.[0]?.message?.content || "";
-    } else if (LOVABLE_API_KEY) {
-      // Text-only fallback
+    if (LOVABLE_API_KEY) {
       const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
         headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
@@ -136,7 +168,13 @@ Responda APENAS com JSON válido nesta estrutura exata (sem markdown, sem \`\`\`
           messages: [{ role: "user", content: prompt }],
         }),
       });
-      if (!res.ok) throw new Error("Erro ao consultar IA");
+      if (!res.ok) {
+        const status = res.status;
+        const errText = await res.text();
+        console.error("AI gateway error:", status, errText);
+        if (status === 429) throw new Error("Limite de requisições atingido. Tente novamente em alguns segundos.");
+        throw new Error("Erro ao consultar IA");
+      }
       const data = await res.json();
       responseText = data?.choices?.[0]?.message?.content || "";
     } else if (GEMINI_API_KEY) {
@@ -154,12 +192,12 @@ Responda APENAS com JSON válido nesta estrutura exata (sem markdown, sem \`\`\`
 
     if (!responseText) throw new Error("IA não retornou resposta");
 
-    // Clean and parse JSON
     let cleaned = responseText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
     cleaned = cleaned.replace(/[\x00-\x1F\x7F]/g, (c: string) => c === "\n" || c === "\r" || c === "\t" ? c : "");
     cleaned = cleaned.replace(/,\s*([}\]])/g, "$1");
 
     const diagnosis = JSON.parse(cleaned);
+    diagnosis._dataSource = hasRealData ? "real" : "general";
 
     return new Response(JSON.stringify(diagnosis), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
