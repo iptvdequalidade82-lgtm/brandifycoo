@@ -79,8 +79,11 @@ serve(async (req) => {
     });
   } catch (e: any) {
     console.error("admin-users error:", e);
+    const status = e.message === "Acesso negado" ? 403 
+      : (e.message === "Sessão inválida" || e.message === "Não autorizado") ? 401 
+      : 500;
     return new Response(JSON.stringify({ error: e.message || "Erro" }), {
-      status: e.message === "Acesso negado" ? 403 : 500,
+      status,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
