@@ -918,16 +918,39 @@ function ChatTab({ user }: { user: User | null }) {
           <div className="max-w-3xl mx-auto px-4 md:px-8 py-6">
             {messages.length === 0 && !streamingContent ? (
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center pt-12 md:pt-20">
-                <div className="relative mb-6">
-                  <div className="w-20 h-20 rounded-2xl overflow-hidden ring-2 ring-white/10 shadow-2xl"><img src={logo} alt="Brandify" className="w-full h-full object-cover" /></div>
-                  <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center ring-2 ring-[#050508]"><Sparkles className="w-3.5 h-3.5 text-white" /></div>
+                {/* Premium avatar with glow */}
+                <div className="relative mb-8">
+                  <motion.div
+                    animate={{ boxShadow: ["0 0 30px rgba(59,130,246,0.15)", "0 0 60px rgba(59,130,246,0.25)", "0 0 30px rgba(59,130,246,0.15)"] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                    className="w-20 h-20 rounded-2xl overflow-hidden ring-2 ring-blue-500/20"
+                  >
+                    <img src={logo} alt="Brandify" className="w-full h-full object-cover" />
+                  </motion.div>
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+                    className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center ring-2 ring-[#030306]"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-white" />
+                  </motion.div>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-bold text-white mb-3" style={{ fontFamily: "'Sora', sans-serif" }}>Como posso ajudar?</h2>
+                <h2 className="text-2xl md:text-3xl font-bold text-white mb-3" style={{ fontFamily: "'Sora', sans-serif" }}>
+                  Como posso <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">ajudar</span>?
+                </h2>
                 <p className="text-white/35 text-sm text-center max-w-md mb-10">Sou o assistente da Brandify. Posso criar textos, legendas, estratégias de marketing e responder qualquer dúvida.</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
-                  {CHAT_SUGGESTIONS.map((s) => (
-                    <button key={s.label} onClick={() => handleSend(s.prompt)} className="group flex items-start gap-3 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.07] hover:border-white/[0.15] text-left transition-all duration-200">
-                      <span className="text-xl mt-0.5">{s.icon}</span>
+                  {CHAT_SUGGESTIONS.map((s, i) => (
+                    <motion.button
+                      key={s.label}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 + i * 0.1 }}
+                      onClick={() => handleSend(s.prompt)}
+                      className="group flex items-start gap-3 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-blue-500/[0.06] hover:border-blue-500/20 text-left transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/5"
+                    >
+                      <span className="text-xl mt-0.5 group-hover:scale-110 transition-transform">{s.icon}</span>
                       <div>
                         <span className="text-white/70 group-hover:text-white text-sm font-medium block">{s.label}</span>
                         <span className="text-white/25 text-xs line-clamp-1 mt-0.5">{s.prompt.slice(0, 50)}...</span>
