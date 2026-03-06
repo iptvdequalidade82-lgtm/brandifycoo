@@ -402,42 +402,78 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
         <div className="max-w-3xl mx-auto px-4 md:px-8 py-8">
           {/* WELCOME */}
           {step === "describe" && generatedImages.length === 0 && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="pt-6 md:pt-12">
-              {/* Hero Card — Gerador de Posts */}
-              <div className="relative rounded-3xl border border-white/[0.08] bg-gradient-to-br from-violet-500/[0.06] via-transparent to-pink-500/[0.04] p-8 md:p-12 text-center mb-8 overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(139,92,246,0.08),transparent_60%)] pointer-events-none" />
+             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="pt-6 md:pt-12">
+              {/* Hero Card — Gerador de Posts — 3D Glass Style */}
+              <div className="relative rounded-3xl border border-white/[0.08] p-8 md:p-12 text-center mb-8 overflow-hidden group">
+                {/* Multi-layer background */}
+                <div className="absolute inset-0 bg-gradient-to-br from-violet-600/[0.08] via-transparent to-pink-600/[0.06]" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(139,92,246,0.12),transparent_60%)] pointer-events-none" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(236,72,153,0.08),transparent_50%)] pointer-events-none" />
+                {/* Animated border glow */}
+                <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" style={{ boxShadow: "inset 0 0 60px rgba(139,92,246,0.1), 0 0 80px rgba(139,92,246,0.05)" }} />
+                {/* Floating 3D orbs */}
+                <motion.div className="absolute top-6 right-8 w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500/20 to-pink-500/20 border border-violet-400/10 backdrop-blur-sm" animate={{ y: [0, -8, 0], rotate: [0, 5, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }} style={{ transform: "perspective(600px) rotateY(-15deg)" }} />
+                <motion.div className="absolute bottom-8 left-6 w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500/15 to-orange-500/15 border border-pink-400/10 backdrop-blur-sm" animate={{ y: [0, 6, 0], rotate: [0, -8, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }} style={{ transform: "perspective(600px) rotateX(10deg)" }} />
+                <motion.div className="absolute top-1/2 left-[10%] w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500/10 to-violet-500/10 border border-white/5" animate={{ y: [0, -12, 0], x: [0, 5, 0] }} transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 2 }} />
+                
                 <div className="relative z-10">
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 mb-5">
-                    <ImagePlus className="w-3.5 h-3.5 text-violet-400" />
-                    <span className="text-violet-300/80 text-xs font-medium">Gerador de Posts</span>
-                  </div>
+                  <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/10 border border-violet-500/20 mb-6 backdrop-blur-sm"
+                  >
+                    <div className="w-2 h-2 rounded-full bg-violet-400 animate-pulse" />
+                    <span className="text-violet-300/90 text-xs font-semibold tracking-wide">Gerador de Posts IA</span>
+                  </motion.div>
                   <h2 className="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight" style={{ fontFamily: "'Sora', sans-serif" }}>
                     Crie posts<br />
-                    <span className="bg-gradient-to-r from-violet-400 via-pink-400 to-orange-400 bg-clip-text text-transparent">profissionais com IA</span>
+                    <span className="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-orange-400 bg-clip-text text-transparent">profissionais com IA</span>
                   </h2>
-                  <p className="text-white/35 text-sm md:text-base max-w-md mx-auto mb-8">Descreva → IA aprimora → Post pronto</p>
-                  <div className="flex items-center justify-center gap-3 md:gap-4 mb-2">
-                    {[{ num: "1", label: "Descreva", icon: "✍️" }, { num: "2", label: "IA aprimora", icon: "✨" }, { num: "3", label: "Post pronto", icon: "🎨" }].map((s, i) => (
+                  <p className="text-white/40 text-sm md:text-base max-w-md mx-auto mb-8">Descreva sua ideia e a IA transforma em arte profissional</p>
+                  
+                  {/* 3D Step cards */}
+                  <div className="flex items-center justify-center gap-3 md:gap-5 mb-4">
+                    {[
+                      { num: "1", label: "Descreva", icon: "✍️", color: "from-violet-500/20 to-violet-600/10" },
+                      { num: "2", label: "IA aprimora", icon: "✨", color: "from-fuchsia-500/20 to-pink-600/10" },
+                      { num: "3", label: "Post pronto", icon: "🎨", color: "from-orange-500/20 to-amber-600/10" },
+                    ].map((s, i) => (
                       <div key={s.num} className="flex items-center gap-3">
-                        {i > 0 && <div className="w-6 md:w-10 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />}
-                        <div className="flex flex-col items-center gap-1">
+                        {i > 0 && <div className="w-6 md:w-10 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />}
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.4 + i * 0.15 }}
+                          className={`flex flex-col items-center gap-1.5 px-3 md:px-4 py-2.5 md:py-3 rounded-xl bg-gradient-to-b ${s.color} border border-white/[0.06] backdrop-blur-sm`}
+                          style={{ transform: "perspective(400px) rotateX(2deg)" }}
+                          whileHover={{ y: -3, transition: { duration: 0.2 } }}
+                        >
                           <span className="text-xl md:text-2xl">{s.icon}</span>
-                          <span className="text-white/30 text-[10px] md:text-xs">{s.label}</span>
-                        </div>
+                          <span className="text-white/40 text-[10px] md:text-xs font-medium">{s.label}</span>
+                        </motion.div>
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
 
-              {/* Exemplos rápidos */}
+              {/* Exemplos rápidos — Glass cards */}
               <div className="mb-6">
-                <p className="text-white/20 text-xs font-medium uppercase tracking-wider mb-3 text-center">Exemplos rápidos</p>
-                <div className="flex flex-wrap justify-center gap-2">
-                  {SUGGESTIONS.map((s) => (
-                    <button key={s.label} onClick={() => { setPrompt(s.prompt); handleGenerateCopy(s.prompt); }} className="group flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.08] hover:border-white/[0.15] text-white/60 hover:text-white text-sm transition-all duration-200">
-                      <span className="text-base">{s.icon}</span><span>{s.label}</span>
-                    </button>
+                <p className="text-white/25 text-xs font-semibold uppercase tracking-widest mb-4 text-center">Comece com um exemplo</p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                  {SUGGESTIONS.map((s, i) => (
+                    <motion.button
+                      key={s.label}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 + i * 0.05 }}
+                      onClick={() => { setPrompt(s.prompt); handleGenerateCopy(s.prompt); }}
+                      className="group flex items-center gap-2.5 px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.08] hover:border-violet-500/20 text-white/60 hover:text-white text-sm transition-all duration-300 hover:shadow-lg hover:shadow-violet-500/5"
+                    >
+                      <span className="text-lg group-hover:scale-110 transition-transform">{s.icon}</span>
+                      <span className="text-left text-xs font-medium">{s.label}</span>
+                    </motion.button>
                   ))}
                 </div>
               </div>
