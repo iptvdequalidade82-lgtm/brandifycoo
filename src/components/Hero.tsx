@@ -81,7 +81,7 @@ export default function Hero() {
         </motion.h1>
 
         <TextGenerateEffect
-          words="Modernos, rápidos e com design que impressiona. Tecnologia de ponta aplicada ao seu negócio digital."
+          words="Cansado de sites ultrapassados que espantam seus clientes? Nós criamos experiências digitais que vendem por você."
           className="text-lg md:text-xl mb-14 max-w-2xl mx-auto leading-relaxed"
           duration={0.6}
         />
