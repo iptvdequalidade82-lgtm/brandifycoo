@@ -23,7 +23,7 @@ const Index = () => {
       <Process />
       <Pricing />
       <FAQ />
-      
+
       <Gallery />
       <CTAFinal />
       <Footer />
