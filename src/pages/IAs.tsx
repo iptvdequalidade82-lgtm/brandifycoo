@@ -563,9 +563,9 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
             <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center py-16">
               <StepIndicator current={3} />
               <div className="relative mb-6 mt-6">
-                <div className="w-24 h-24 rounded-2xl overflow-hidden border border-violet-500/20 flex items-center justify-center">
-                  <img src={logo} alt="Brandify" className="w-full h-full object-cover opacity-30" />
-                  <Loader2 className="w-10 h-10 text-violet-400 animate-spin absolute" />
+              <div className="w-24 h-24 rounded-2xl overflow-hidden border border-white/10 flex items-center justify-center">
+                  <img src={logo} alt="Lovibook" className="w-full h-full object-cover opacity-30" />
+                  <Loader2 className="w-10 h-10 text-white/60 animate-spin absolute" />
                 </div>
               </div>
               <h3 className="text-white font-medium text-lg mb-2" style={{ fontFamily: "'Sora', sans-serif" }}>Criando seu post...</h3>
