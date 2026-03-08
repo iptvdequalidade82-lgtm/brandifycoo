@@ -43,8 +43,14 @@ export default function UserMenu() {
 
   const handleSignOut = async () => {
     setOpen(false);
-    await signOut();
+    try {
+      await signOut();
+    } catch {
+      // Force sign out even if API fails
+      await supabase.auth.signOut({ scope: 'local' });
+    }
     navigate("/");
+    window.location.reload();
   };
 
   return (
