@@ -87,9 +87,9 @@ Responda APENAS em JSON válido com esta estrutura:
             "id": "w1-feed-1",
             "day": "Quinta",
             "time": "19:00",
-            "title": "string",
-            "caption": "string (legenda completa com emojis e hashtags)",
-            "imageDescription": "string (descrição DETALHADA da arte)",
+            "title": "string (OBRIGATÓRIO: o título DEVE ser autoexplicativo sobre o que a Brandify faz para aquele nicho. Exemplo CORRETO: 'Seu site odontológico vendendo 24h' ou 'Loja virtual para sua clínica'. Exemplo ERRADO: 'Café autêntico' ou 'Sorrisos perfeitos'. O título da imagem precisa explicar sozinho do que se trata o post, sem depender da legenda.)",
+            "caption": "string (legenda completa com emojis e hashtags — complementa o título, não repete)",
+            "imageDescription": "string (descrição DETALHADA da arte. A arte DEVE conter texto que conecte a Brandify ao nicho do cliente, ex: 'Brandify cria sites para dentistas' visível na imagem. NUNCA descrever uma imagem genérica do nicho sem mencionar criação de sites/lojas virtuais.)",
             "contentType": "carrossel|imagem|reels",
             "marketingTip": "string"
           }
