@@ -242,7 +242,7 @@ const AdminDashboard = () => {
           { label: "Em Aberto", value: formatCurrency(projects.filter(p => p.payment_status === "pending" || p.payment_status === "partial").reduce((s, p) => s + (p.total_amount_cents - p.amount_received_cents), 0)), icon: DollarSign },
         ].map((stat, i) => (
           <div key={i} className="rounded-2xl p-4 border border-white/[0.06] bg-white/[0.02]">
-            <stat.icon className={`w-5 h-5 mb-2 ${i === 4 ? "text-amber-400" : "text-brand-accent"}`} />
+            <stat.icon className={`w-5 h-5 mb-2 ${i === 4 ? "text-white/50" : "text-white/60"}`} />
             <p className="text-2xl font-bold text-white">{stat.value}</p>
             <p className="text-xs text-white/40">{stat.label}</p>
           </div>
