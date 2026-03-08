@@ -499,7 +499,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
                         <div className="space-y-3">
                           <span className="text-[10px] uppercase tracking-wider text-white/40 font-medium px-2 py-0.5 rounded-md bg-white/10">{img.type === "feed" ? "Feed 1:1" : "Story 9:16"}</span>
                           <p className="text-white/70 text-xs line-clamp-2">{img.prompt}</p>
-                          {img.copy && <button onClick={() => { navigator.clipboard.writeText(img.copy!); toast({ title: "Copy copiada! 📋" }); }} className="text-violet-300/80 text-xs hover:text-violet-200 transition-colors text-left">📋 Copiar legenda</button>}
+                          {img.copy && <button onClick={() => { navigator.clipboard.writeText(img.copy!); toast({ title: "Copy copiada! 📋" }); }} className="text-white/50 text-xs hover:text-white transition-colors text-left">📋 Copiar legenda</button>}
                           <div className="flex gap-2">
                             <Button onClick={() => { const a = document.createElement("a"); a.href = img.url; a.download = `brandify-post-${i + 1}.png`; a.click(); }} size="sm" className="bg-white text-black hover:bg-white/90 border-0 text-xs font-medium h-8 px-4"><Download className="w-3.5 h-3.5 mr-1.5" />Baixar</Button>
                             <Button onClick={() => { setEditingImage(img); setEditInstruction(""); }} size="sm" variant="outline" className="border-violet-500/30 text-violet-300 hover:bg-violet-500/20 hover:text-violet-200 text-xs font-medium h-8 px-4"><PenTool className="w-3.5 h-3.5 mr-1.5" />Editar</Button>
