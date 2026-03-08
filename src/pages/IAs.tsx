@@ -532,7 +532,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-6 h-6 rounded-md overflow-hidden"><img src={logo} alt="" className="w-full h-full object-cover" /></div>
                   <span className="text-white/40 text-xs font-medium">Brandify IA</span>
-                  {isGeneratingCopy && <Loader2 className="w-3 h-3 text-violet-400 animate-spin" />}
+                  {isGeneratingCopy && <Loader2 className="w-3 h-3 text-white/50 animate-spin" />}
                 </div>
                 {isGeneratingCopy ? (
                   <div className="space-y-2">
