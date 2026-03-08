@@ -943,7 +943,7 @@ export default function AdminConteudo() {
                                                       <p className="text-[10px] text-white/40 uppercase tracking-wider font-semibold flex items-center gap-1 mt-1"><ImageIcon className="w-3 h-3" /> Refazer imagem</p>
                                                       <div className="flex gap-2">
                                                         <Input placeholder="Ex: mais colorido, fundo azul..." value={imageHint} onChange={(e) => setImageHint(e.target.value)} className="bg-white/[0.05] border-white/10 text-white text-xs flex-1 h-9" />
-                                                        <Button size="sm" onClick={() => handleGenerateImage(weekIdx, post.id, post.imageDescription, "feed", imageHint || undefined)} disabled={post.isGeneratingImage} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white h-9 px-3 shrink-0 text-xs gap-1.5">
+                                                        <Button size="sm" onClick={() => handleGenerateImage(weekIdx, post.id, post.imageDescription, "feed", imageHint || undefined)} disabled={post.isGeneratingImage} className="bg-white text-black hover:bg-white/90 h-9 px-3 shrink-0 text-xs gap-1.5">
                                                           {post.isGeneratingImage ? <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Gerando...</> : <><RefreshCw className="w-3.5 h-3.5" /> Refazer</>}
                                                         </Button>
                                                       </div>
