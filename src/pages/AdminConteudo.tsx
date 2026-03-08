@@ -57,9 +57,9 @@ const MONTH_NAMES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
 const MONTH_SHORT = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
 const STATUS_CONFIG: Record<MonthStatus, { label: string; color: string; icon: React.ReactNode }> = {
-  concluido: { label: "Concluído", color: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30", icon: <Check className="w-3 h-3" /> },
-  em_andamento: { label: "Em andamento", color: "bg-amber-500/20 text-amber-300 border-amber-500/30", icon: <RefreshCw className="w-3 h-3" /> },
-  aberto: { label: "Em aberto", color: "bg-white/10 text-white/40 border-white/10", icon: <Lock className="w-3 h-3" /> },
+  concluido: { label: "Concluído", color: "bg-white/15 text-white/80 border-white/20", icon: <Check className="w-3 h-3" /> },
+  em_andamento: { label: "Em andamento", color: "bg-white/10 text-white/60 border-white/15", icon: <RefreshCw className="w-3 h-3" /> },
+  aberto: { label: "Em aberto", color: "bg-white/5 text-white/30 border-white/10", icon: <Lock className="w-3 h-3" /> },
 };
 
 // ── Date Helpers ──
