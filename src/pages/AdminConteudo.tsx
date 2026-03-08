@@ -877,7 +877,7 @@ export default function AdminConteudo() {
                                   <AccordionContent>
                                     <div className="space-y-3 pb-1">
                                       {dayPosts.map((post) => (
-                                        <Card key={post.id} className={`border-white/[0.06] overflow-hidden transition-colors ${post.checked ? "bg-emerald-500/[0.06] border-emerald-500/20" : "bg-white/[0.03]"}`}>
+                                        <Card key={post.id} className={`border-white/[0.06] overflow-hidden transition-colors ${post.checked ? "bg-white/[0.06] border-white/[0.15]" : "bg-white/[0.03]"}`}>
                                           <div className="flex flex-col sm:flex-row">
                                             <div className="sm:w-44 md:w-56 shrink-0 bg-white/[0.02] flex items-center justify-center relative min-h-[140px] md:min-h-[180px]">
                                               {post.generatedImage ? (
