@@ -1265,8 +1265,8 @@ export default function AdminConteudo() {
 
                 {/* Marketing Tip */}
                 {quickPostResult.marketingTip && (
-                  <div className="flex items-start gap-2 bg-amber-500/5 border border-amber-500/10 rounded-lg p-3">
-                    <Lightbulb className="w-3.5 h-3.5 text-amber-400 mt-0.5 shrink-0" />
+                 <div className="flex items-start gap-2 bg-white/[0.04] border border-white/[0.08] rounded-lg p-3">
+                    <Lightbulb className="w-3.5 h-3.5 text-white/50 mt-0.5 shrink-0" />
                     <p className="text-xs text-amber-300/70">{quickPostResult.marketingTip}</p>
                   </div>
                 )}
