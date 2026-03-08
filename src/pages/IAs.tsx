@@ -924,7 +924,7 @@ function ChatTab({ user }: { user: User | null }) {
                     transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                     className="w-20 h-20 rounded-2xl overflow-hidden ring-2 ring-white/10"
                   >
-                    <img src={logo} alt="Brandify" className="w-full h-full object-cover" />
+                    <img src={logo} alt="Lovibook" className="w-full h-full object-cover" />
                   </motion.div>
                   <motion.div
                     initial={{ scale: 0 }}
