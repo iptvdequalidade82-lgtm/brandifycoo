@@ -23,15 +23,15 @@ import { useGating, type PlanTier } from "@/hooks/useGating";
 
 // ── Ambient background config per tool ──
 const TOOL_AMBIENTS: Record<string, { gradient: string; orbColor1: string; orbColor2: string }> = {
-  posts: { gradient: "from-violet-900/30 via-purple-900/10 to-pink-900/20", orbColor1: "rgba(139,92,246,0.15)", orbColor2: "rgba(236,72,153,0.1)" },
-  chat: { gradient: "from-blue-900/30 via-cyan-900/10 to-indigo-900/20", orbColor1: "rgba(59,130,246,0.15)", orbColor2: "rgba(6,182,212,0.1)" },
-  copy: { gradient: "from-amber-900/30 via-orange-900/10 to-yellow-900/20", orbColor1: "rgba(245,158,11,0.15)", orbColor2: "rgba(249,115,22,0.1)" },
-  landing: { gradient: "from-emerald-900/30 via-teal-900/10 to-green-900/20", orbColor1: "rgba(16,185,129,0.15)", orbColor2: "rgba(20,184,166,0.1)" },
-  atendedor: { gradient: "from-blue-900/30 via-indigo-900/10 to-violet-900/20", orbColor1: "rgba(99,102,241,0.15)", orbColor2: "rgba(79,70,229,0.1)" },
-  agendador: { gradient: "from-pink-900/30 via-rose-900/10 to-red-900/20", orbColor1: "rgba(236,72,153,0.15)", orbColor2: "rgba(244,63,94,0.1)" },
-  diagnostico: { gradient: "from-violet-900/30 via-purple-900/10 to-fuchsia-900/20", orbColor1: "rgba(168,85,247,0.15)", orbColor2: "rgba(192,38,211,0.1)" },
-  planejamento: { gradient: "from-cyan-900/30 via-sky-900/10 to-blue-900/20", orbColor1: "rgba(6,182,212,0.15)", orbColor2: "rgba(14,165,233,0.1)" },
-  simulador: { gradient: "from-green-900/30 via-emerald-900/10 to-teal-900/20", orbColor1: "rgba(34,197,94,0.15)", orbColor2: "rgba(16,185,129,0.1)" },
+  posts: { gradient: "from-white/5 via-white/[0.02] to-white/5", orbColor1: "rgba(255,255,255,0.04)", orbColor2: "rgba(255,255,255,0.03)" },
+  chat: { gradient: "from-white/5 via-white/[0.02] to-white/5", orbColor1: "rgba(255,255,255,0.04)", orbColor2: "rgba(255,255,255,0.03)" },
+  copy: { gradient: "from-white/5 via-white/[0.02] to-white/5", orbColor1: "rgba(255,255,255,0.04)", orbColor2: "rgba(255,255,255,0.03)" },
+  landing: { gradient: "from-white/5 via-white/[0.02] to-white/5", orbColor1: "rgba(255,255,255,0.04)", orbColor2: "rgba(255,255,255,0.03)" },
+  atendedor: { gradient: "from-white/5 via-white/[0.02] to-white/5", orbColor1: "rgba(255,255,255,0.04)", orbColor2: "rgba(255,255,255,0.03)" },
+  agendador: { gradient: "from-white/5 via-white/[0.02] to-white/5", orbColor1: "rgba(255,255,255,0.04)", orbColor2: "rgba(255,255,255,0.03)" },
+  diagnostico: { gradient: "from-white/5 via-white/[0.02] to-white/5", orbColor1: "rgba(255,255,255,0.04)", orbColor2: "rgba(255,255,255,0.03)" },
+  planejamento: { gradient: "from-white/5 via-white/[0.02] to-white/5", orbColor1: "rgba(255,255,255,0.04)", orbColor2: "rgba(255,255,255,0.03)" },
+  simulador: { gradient: "from-white/5 via-white/[0.02] to-white/5", orbColor1: "rgba(255,255,255,0.04)", orbColor2: "rgba(255,255,255,0.03)" },
 };
 
 // ── Floating orbs component ──
