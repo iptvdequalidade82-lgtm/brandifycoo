@@ -707,7 +707,7 @@ export default function AdminConteudo() {
         <Card className="p-3 md:p-5 bg-white/[0.02] border-white/[0.06]">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
             <div className="flex items-center gap-3">
-              <CalendarDays className="w-5 h-5 text-purple-400" />
+              <CalendarDays className="w-5 h-5 text-white/60" />
               <h2 className="text-lg font-bold text-white">{currentMonthConfig.label} 2026</h2>
               <Badge variant="outline" className={STATUS_CONFIG[currentMonthConfig.status].color}>
                 {STATUS_CONFIG[currentMonthConfig.status].label}
