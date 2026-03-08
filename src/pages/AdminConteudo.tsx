@@ -1090,7 +1090,7 @@ export default function AdminConteudo() {
                 void handleQuickPost();
               }}
               disabled={quickPostLoading || !quickPostInput.trim()}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold"
+              className="w-full bg-white text-black hover:bg-white/90 font-semibold"
             >
               {quickPostLoading ? (
                 <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Gerando post...</>
