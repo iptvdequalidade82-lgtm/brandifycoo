@@ -641,7 +641,7 @@ export default function AdminConteudo() {
       <div className="space-y-6">
         {/* Header */}
           <div className="flex items-center gap-3 md:gap-4">
-          <div className="p-2.5 md:p-3 rounded-xl bg-gradient-to-br from-pink-500 via-purple-500 to-orange-500">
+          <div className="p-2.5 md:p-3 rounded-xl bg-white/10 border border-white/20">
             <Instagram className="w-5 h-5 md:w-7 md:h-7 text-white" />
           </div>
           <div>
