@@ -177,11 +177,11 @@ function buildMonthConfigs(today: Date, existingPlans?: Record<string, MonthPlan
 
 /** Determine status of a day item: "atrasado" (past), "pendente" (today/future), "conferido" (checked) */
 function getDayItemStatus(dateStr: string, time: string, checked: boolean, monthIndex: number, year: number): { label: string; color: string } {
-  if (checked) return { label: "Conferido", color: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30" };
+  if (checked) return { label: "Conferido", color: "bg-white/15 text-white/80 border-white/20" };
 
   // Parse dateStr "DD/MM" into a Date
   const parts = dateStr.split("/");
-  if (parts.length !== 2) return { label: "Pendente", color: "bg-blue-500/20 text-blue-300 border-blue-500/30" };
+  if (parts.length !== 2) return { label: "Pendente", color: "bg-white/10 text-white/50 border-white/15" };
   const day = parseInt(parts[0], 10);
   const month = parseInt(parts[1], 10) - 1;
   const itemDate = new Date(year, month, day);
