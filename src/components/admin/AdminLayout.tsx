@@ -84,7 +84,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <header className="border-b border-white/[0.06] px-6 py-3 flex items-center justify-between bg-[#0a0a0a]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="flex items-center gap-6">
           <div>
-            <h1 className="text-base font-bold text-white tracking-tight">Brandify</h1>
+            <h1 className="text-base font-bold text-white tracking-tight">Lovibook</h1>
             <p className="text-[11px] text-white/30">{user.email}</p>
           </div>
           <nav className="hidden md:flex items-center gap-1 ml-4">
