@@ -175,9 +175,9 @@ function ProBanner({ user, remaining, userPlan }: { user: User | null; remaining
     const isUnlimited = monthlyCredits === Infinity;
     return (
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mx-3 md:mx-6 mt-2 mb-0">
-        <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-yellow-500/10 border border-amber-500/20">
+        <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08]">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shrink-0">
+            <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
               <Crown className="w-3.5 h-3.5 text-white" />
             </div>
             <p className="text-white/80 text-xs font-medium">
@@ -185,7 +185,7 @@ function ProBanner({ user, remaining, userPlan }: { user: User | null; remaining
             </p>
           </div>
           {userPlan !== "premium" && (
-            <button onClick={handleUpgrade} className="text-amber-400/70 hover:text-amber-300 text-xs font-medium transition-colors">Fazer upgrade →</button>
+            <button onClick={handleUpgrade} className="text-white/50 hover:text-white text-xs font-medium transition-colors">Fazer upgrade →</button>
           )}
         </div>
       </motion.div>
@@ -194,9 +194,9 @@ function ProBanner({ user, remaining, userPlan }: { user: User | null; remaining
 
   return (
     <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mx-3 md:mx-6 mt-2 mb-0">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-3 py-2.5 rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-yellow-500/10 border border-amber-500/20">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.08]">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shrink-0">
+          <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
             <Crown className="w-3.5 h-3.5 text-white" />
           </div>
           <div>
@@ -206,7 +206,7 @@ function ProBanner({ user, remaining, userPlan }: { user: User | null; remaining
             <p className="text-white/30 text-[10px] hidden sm:block">Assine um plano para mais créditos mensais</p>
           </div>
         </div>
-        <button onClick={handleUpgrade} className="shrink-0 flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-gradient-to-r from-amber-400 to-orange-500 text-black text-xs font-bold hover:from-amber-300 hover:to-orange-400 transition-all shadow-lg shadow-amber-500/20 w-full sm:w-auto">
+        <button onClick={handleUpgrade} className="shrink-0 flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-white text-black text-xs font-bold hover:bg-white/90 transition-all w-full sm:w-auto">
           <Crown className="w-3.5 h-3.5" /><span>Ver planos</span>
         </button>
       </div>
