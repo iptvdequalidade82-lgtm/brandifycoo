@@ -119,7 +119,14 @@ ${calendarInstructions ? `CALENDÁRIO — SIGA RIGOROSAMENTE:\n${calendarInstruc
 
 IMPORTANTE: Use weekNumber sequencial (1, 2, 3...) e os IDs devem ser w1-feed-1, w1-story-1, w2-feed-1, etc.
 Cada semana deve focar 100% no nicho indicado, mostrando como a Brandify pode ajudar aquele tipo de cliente.
-Total: ${totalFeed} posts no feed + ${totalStories} stories.`;
+Total: ${totalFeed} posts no feed + ${totalStories} stories.
+
+⚠️ REGRA CRÍTICA PARA TÍTULOS E DESCRIÇÕES DE IMAGEM:
+- O TÍTULO do post DEVE ser autoexplicativo — quem vê SÓ a imagem precisa entender que se trata de criação de sites/lojas virtuais para aquele nicho.
+- Exemplos CORRETOS: "Seu site de advocacia que vende sozinho", "Loja virtual para pet shop", "Site profissional para dentistas"
+- Exemplos ERRADOS: "Café autêntico", "Sorrisos perfeitos", "O sabor da qualidade" — esses NÃO explicam o que a Brandify faz.
+- A imageDescription deve descrever uma arte onde o TEXTO NA IMAGEM já conecta Brandify + nicho (ex: "Site para [nicho]").
+- A legenda (caption) apenas COMPLEMENTA o que a imagem já comunica visualmente.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
