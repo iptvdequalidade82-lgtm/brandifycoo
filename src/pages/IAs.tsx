@@ -1035,29 +1035,29 @@ const TOOL_GROUPS: { label: string; badge?: string; badgeColor?: string; tools: 
   {
     label: "Criação",
     tools: [
-      { key: "posts", label: "Gerador de Posts", icon: ImagePlus, color: "text-violet-400", gradient: "from-violet-600/20 to-pink-600/20" },
-      { key: "chat", label: "Chat com IA", icon: MessageSquare, color: "text-blue-400", gradient: "from-blue-600/20 to-cyan-600/20" },
+      { key: "posts", label: "Gerador de Posts", icon: ImagePlus, color: "text-white", gradient: "from-white/[0.08] to-white/[0.04]" },
+      { key: "chat", label: "Chat com IA", icon: MessageSquare, color: "text-white", gradient: "from-white/[0.08] to-white/[0.04]" },
     ],
   },
   {
     label: "Marketing",
     badge: "Pro",
-    badgeColor: "text-amber-400/60",
+    badgeColor: "text-white/40",
     tools: [
-      { key: "copy", label: "Gerador de Copy", icon: PenTool, color: "text-amber-400", gradient: "from-amber-600/20 to-orange-600/20", minPlan: "pro" },
-      { key: "landing", label: "Textos de Venda", icon: Layout, color: "text-emerald-400", gradient: "from-emerald-600/20 to-teal-600/20", minPlan: "pro" },
-      { key: "atendedor", label: "Atendedor IA", icon: Headphones, color: "text-blue-400", gradient: "from-blue-600/20 to-indigo-600/20", minPlan: "pro" },
-      { key: "agendador", label: "Agendador de Consultas", icon: Calendar, color: "text-pink-400", gradient: "from-pink-600/20 to-rose-600/20", minPlan: "pro" },
+      { key: "copy", label: "Gerador de Copy", icon: PenTool, color: "text-white", gradient: "from-white/[0.08] to-white/[0.04]", minPlan: "pro" },
+      { key: "landing", label: "Textos de Venda", icon: Layout, color: "text-white", gradient: "from-white/[0.08] to-white/[0.04]", minPlan: "pro" },
+      { key: "atendedor", label: "Atendedor IA", icon: Headphones, color: "text-white", gradient: "from-white/[0.08] to-white/[0.04]", minPlan: "pro" },
+      { key: "agendador", label: "Agendador de Consultas", icon: Calendar, color: "text-white", gradient: "from-white/[0.08] to-white/[0.04]", minPlan: "pro" },
     ],
   },
   {
     label: "Estratégia",
     badge: "Premium",
-    badgeColor: "text-violet-400/60",
+    badgeColor: "text-white/40",
     tools: [
-      { key: "diagnostico", label: "Diagnóstico IG", icon: Target, color: "text-violet-400", gradient: "from-violet-600/20 to-purple-600/20", minPlan: "premium" },
-      { key: "planejamento", label: "Plano Estratégico", icon: BarChart3, color: "text-cyan-400", gradient: "from-cyan-600/20 to-sky-600/20", minPlan: "premium" },
-      { key: "simulador", label: "Simulador de Faturamento", icon: TrendingUp, color: "text-green-400", gradient: "from-green-600/20 to-emerald-600/20", minPlan: "premium" },
+      { key: "diagnostico", label: "Diagnóstico IG", icon: Target, color: "text-white", gradient: "from-white/[0.08] to-white/[0.04]", minPlan: "premium" },
+      { key: "planejamento", label: "Plano Estratégico", icon: BarChart3, color: "text-white", gradient: "from-white/[0.08] to-white/[0.04]", minPlan: "premium" },
+      { key: "simulador", label: "Simulador de Faturamento", icon: TrendingUp, color: "text-white", gradient: "from-white/[0.08] to-white/[0.04]", minPlan: "premium" },
     ],
   },
 ];
