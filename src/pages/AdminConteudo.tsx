@@ -1000,7 +1000,7 @@ export default function AdminConteudo() {
                                             ) : (
                                               <div className="flex flex-col items-center gap-2">
                                                 <ImageIcon className="w-6 h-6 text-white/15" />
-                                                <Button size="sm" onClick={() => handleGenerateImage(weekIdx, story.id, story.visualDescription, "story")} disabled={story.isGeneratingImage} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white text-[10px] h-7 px-2">
+                                                <Button size="sm" onClick={() => handleGenerateImage(weekIdx, story.id, story.visualDescription, "story")} disabled={story.isGeneratingImage} className="bg-white text-black hover:bg-white/90 text-[10px] h-7 px-2">
                                                   {story.isGeneratingImage ? <><RefreshCw className="w-3 h-3 animate-spin mr-1" /> Gerando...</> : <><ImageIcon className="w-3 h-3 mr-1" /> Gerar</>}
                                                 </Button>
                                               </div>
