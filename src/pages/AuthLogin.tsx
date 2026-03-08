@@ -53,14 +53,38 @@ const AuthLogin = () => {
     setError("");
     setLoading(true);
 
-    const { error, data } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      setError("Email ou senha incorretos. Verifique e tente novamente.");
-    } else {
+    try {
+      // Wrap signIn in a timeout to prevent infinite hang
+      const signInPromise = supabase.auth.signInWithPassword({ email, password });
+      const signInTimeout = new Promise<{ error: { message: string }; data: null }>((resolve) =>
+        setTimeout(() => resolve({ error: { message: "timeout" }, data: null }), 8000)
+      );
+
+      const { error, data } = await Promise.race([signInPromise, signInTimeout]) as any;
+
+      if (error) {
+        if (error.message === "timeout") {
+          setError("Servidor lento. Tente novamente em alguns segundos.");
+        } else {
+          setError("Email ou senha incorretos. Verifique e tente novamente.");
+        }
+        setLoading(false);
+        return;
+      }
+
       toast.success("Login realizado com sucesso!");
-      await checkAdminAndRedirect(data.user.id);
+      
+      // Try admin check but don't let it block navigation
+      try {
+        await checkAdminAndRedirect(data.user.id);
+      } catch {
+        navigate(redirectTo);
+      }
+    } catch {
+      setError("Erro de conexão. Tente novamente.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleGoogleLogin = async () => {

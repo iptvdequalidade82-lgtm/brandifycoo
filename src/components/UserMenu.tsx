@@ -44,13 +44,16 @@ export default function UserMenu() {
   const handleSignOut = async () => {
     setOpen(false);
     try {
-      await signOut();
+      // Try normal signout with timeout
+      const signOutPromise = supabase.auth.signOut();
+      const timeout = new Promise((resolve) => setTimeout(resolve, 3000));
+      await Promise.race([signOutPromise, timeout]);
     } catch {
-      // Force sign out even if API fails
-      await supabase.auth.signOut({ scope: 'local' });
+      // Ignore errors
     }
-    navigate("/");
-    window.location.reload();
+    // Always force local cleanup and reload
+    localStorage.removeItem('sb-oqkdeoxevxuizynifjjj-auth-token');
+    window.location.href = "/";
   };
 
   return (
