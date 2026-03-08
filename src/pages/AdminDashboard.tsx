@@ -276,7 +276,7 @@ const AdminDashboard = () => {
               key={tab.key}
               onClick={() => setActiveFilter(tab.key)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-                activeFilter === tab.key ? "bg-brand-accent text-white" : "text-white/40 hover:bg-white/[0.04] hover:text-white/60"
+                activeFilter === tab.key ? "bg-white text-black" : "text-white/40 hover:bg-white/[0.04] hover:text-white/60"
               }`}
             >
               {tab.label} ({count})
