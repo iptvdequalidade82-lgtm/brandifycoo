@@ -1283,7 +1283,7 @@ export default function IAs() {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 md:hidden" onClick={() => setMobileSidebar(false)} />
               <motion.aside initial={{ x: -280 }} animate={{ x: 0 }} exit={{ x: -280 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} className="fixed left-0 top-0 bottom-0 w-64 z-50 bg-[#08080c]/95 backdrop-blur-xl border-r border-white/[0.06] flex flex-col md:hidden">
                 <div className="p-4 border-b border-white/[0.06] flex items-center justify-between">
-                  <span className="text-white font-semibold text-sm flex items-center gap-2"><Sparkles className="w-3.5 h-3.5 text-violet-400" />IA Studio</span>
+                  <span className="text-white font-semibold text-sm flex items-center gap-2"><Sparkles className="w-3.5 h-3.5 text-white/50" />IA Studio</span>
                   <button onClick={() => setMobileSidebar(false)} className="text-white/30 hover:text-white p-1"><X className="w-5 h-5" /></button>
                 </div>
                 <SidebarNav activeTool={activeTool} setActiveTool={setActiveTool} hasAccess={hasAccess} onSelect={() => setMobileSidebar(false)} />
