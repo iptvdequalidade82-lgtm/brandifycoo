@@ -571,7 +571,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
               <h3 className="text-white font-medium text-lg mb-2" style={{ fontFamily: "'Sora', sans-serif" }}>Criando seu post...</h3>
               <p className="text-white/30 text-sm">Nossa IA está trabalhando na arte</p>
               <div className="mt-4 w-48 h-1 rounded-full bg-white/[0.06] overflow-hidden">
-                <motion.div className="h-full rounded-full bg-gradient-to-r from-violet-500 to-pink-500" initial={{ width: "0%" }} animate={{ width: "90%" }} transition={{ duration: 25, ease: "easeOut" }} />
+                <motion.div className="h-full rounded-full bg-white" initial={{ width: "0%" }} animate={{ width: "90%" }} transition={{ duration: 25, ease: "easeOut" }} />
               </div>
             </motion.div>
           )}
