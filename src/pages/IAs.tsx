@@ -1257,7 +1257,7 @@ export default function IAs() {
           <div className="p-4 border-b border-white/[0.05]">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-white/[0.06] border border-white/[0.08] flex items-center justify-center">
-                <Zap className="w-4 h-4 text-violet-400" />
+                <Zap className="w-4 h-4 text-white/50" />
               </div>
               <div>
                 <p className="text-white text-xs font-bold tracking-wide">Ferramentas</p>
