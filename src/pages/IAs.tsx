@@ -930,7 +930,7 @@ function ChatTab({ user }: { user: User | null }) {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
-                    className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center ring-2 ring-[#030306]"
+                    className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-full bg-white flex items-center justify-center ring-2 ring-[#030306]"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-white" />
                   </motion.div>
