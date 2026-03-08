@@ -1185,7 +1185,7 @@ export default function IAs() {
           <div className="w-14 h-14 rounded-2xl overflow-hidden ring-2 ring-white/10 shadow-2xl">
             <img src={logo} alt="Lovibook" className="w-full h-full object-cover" />
           </div>
-          <div className="w-8 h-8 border-2 border-violet-500/40 border-t-violet-400 rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
           <p className="text-white/20 text-xs font-medium">Carregando IA Studio...</p>
         </motion.div>
       </div>
