@@ -990,7 +990,7 @@ export default function AdminConteudo() {
                                   <AccordionContent>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pb-1">
                                       {dayStories.map((story) => (
-                                        <Card key={story.id} className={`border-white/[0.06] overflow-hidden flex flex-col transition-colors ${story.checked ? "bg-emerald-500/[0.06] border-emerald-500/20" : "bg-white/[0.03]"}`}>
+                                        <Card key={story.id} className={`border-white/[0.06] overflow-hidden flex flex-col transition-colors ${story.checked ? "bg-white/[0.06] border-white/[0.15]" : "bg-white/[0.03]"}`}>
                                           <div className="aspect-[9/16] max-h-52 bg-white/[0.02] flex items-center justify-center relative">
                                             {story.generatedImage ? (
                                               <>
