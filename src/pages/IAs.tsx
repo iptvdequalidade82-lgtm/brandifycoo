@@ -1014,7 +1014,7 @@ function ChatTab({ user }: { user: User | null }) {
             <div className="relative">
               <Textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder={chatAttachment ? "O que quer fazer com a imagem..." : "Digite sua mensagem..."} className="min-h-[52px] max-h-[150px] bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/25 resize-none rounded-xl pl-12 pr-14 text-sm focus:border-white/20 focus:ring-1 focus:ring-white/10" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }} />
               <button onClick={() => chatFileRef.current?.click()} className="absolute bottom-2.5 left-2.5 h-9 w-9 rounded-lg flex items-center justify-center text-white/30 hover:text-white/60 hover:bg-white/[0.06] transition-all" title="Anexar imagem"><ImagePlus className="w-4 h-4" /></button>
-              <Button onClick={() => handleSend()} disabled={isLoading || (!input.trim() && !chatAttachment)} className="absolute bottom-2.5 right-2.5 h-9 w-9 p-0 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 border-0 shadow-lg shadow-blue-500/20 disabled:shadow-none">
+              <Button onClick={() => handleSend()} disabled={isLoading || (!input.trim() && !chatAttachment)} className="absolute bottom-2.5 right-2.5 h-9 w-9 p-0 rounded-lg bg-white text-black hover:bg-white/90 border-0 disabled:opacity-30">
                 {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               </Button>
             </div>
