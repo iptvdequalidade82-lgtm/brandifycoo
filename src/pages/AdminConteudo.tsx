@@ -927,7 +927,7 @@ export default function AdminConteudo() {
                                                 </div>
                                               )}
                                               <div className="flex items-center gap-1 md:gap-2 pt-1 flex-wrap">
-                                                <Button variant="ghost" size="sm" onClick={() => toggleChecked(weekIdx, post.id, "feed")} className={`h-7 text-[11px] md:text-xs ${post.checked ? "text-emerald-400 hover:text-emerald-300" : "text-white/40 hover:text-white"}`}>
+                                                <Button variant="ghost" size="sm" onClick={() => toggleChecked(weekIdx, post.id, "feed")} className={`h-7 text-[11px] md:text-xs ${post.checked ? "text-white/80 hover:text-white" : "text-white/40 hover:text-white"}`}>
                                                   {post.checked ? <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> : <Circle className="w-3.5 h-3.5 mr-1" />}{post.checked ? "Conferido ✓" : "Conferir"}
                                                 </Button>
                                                 <Button variant="ghost" size="sm" onClick={() => copyToClipboard(post.caption)} className="text-white/40 hover:text-white h-7 text-[11px] md:text-xs"><Copy className="w-3 h-3 mr-1" /> Copiar</Button>
