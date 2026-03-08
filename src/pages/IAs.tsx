@@ -468,7 +468,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.5 + i * 0.05 }}
                       onClick={() => { setPrompt(s.prompt); handleGenerateCopy(s.prompt); }}
-                      className="group flex items-center gap-2.5 px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.08] hover:border-violet-500/20 text-white/60 hover:text-white text-sm transition-all duration-300 hover:shadow-lg hover:shadow-violet-500/5"
+                      className="group flex items-center gap-2.5 px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.08] hover:border-white/[0.12] text-white/60 hover:text-white text-sm transition-all duration-300"
                     >
                       <span className="text-lg group-hover:scale-110 transition-transform">{s.icon}</span>
                       <span className="text-left text-xs font-medium">{s.label}</span>
