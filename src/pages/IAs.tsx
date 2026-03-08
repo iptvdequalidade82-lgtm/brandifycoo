@@ -621,7 +621,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
             <div className="flex items-center gap-2 mb-3">
               <span className="text-white/30 text-xs font-medium mr-1">Formato:</span>
               {[{ value: "feed" as const, label: "Feed (1:1)", icon: "📐" }, { value: "story" as const, label: "Story (9:16)", icon: "📱" }].map((opt) => (
-                <button key={opt.value} onClick={() => setPostType(opt.value)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${postType === opt.value ? "bg-violet-500/20 text-violet-300 border border-violet-500/30" : "text-white/30 hover:text-white/50 border border-transparent hover:bg-white/[0.04]"}`}>{opt.icon} {opt.label}</button>
+                <button key={opt.value} onClick={() => setPostType(opt.value)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${postType === opt.value ? "bg-white/10 text-white border border-white/20" : "text-white/30 hover:text-white/50 border border-transparent hover:bg-white/[0.04]"}`}>{opt.icon} {opt.label}</button>
               ))}
             </div>
             <div className="relative">
