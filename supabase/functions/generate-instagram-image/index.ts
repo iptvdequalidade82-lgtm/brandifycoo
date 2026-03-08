@@ -559,6 +559,7 @@ ${nicheInstruction}
 - NO excessive text layers, NO multiple captions, NO bullet points
 - WATERMARK: Small subtle "@brandifycoo" in bottom-right corner — semi-transparent
 - Text must feel INTEGRATED into the composition
+- CRITICAL: The headline text on the image MUST be self-explanatory about what Brandify does for the client's niche. Example: "Seu site que vende 24h" or "Loja virtual para [niche]". NEVER use generic niche phrases like "Café autêntico" or "Sorrisos perfeitos" that don't mention websites/digital services.
 
 📐 COMPOSITION — MINIMALIST:
 - GENEROUS negative space — let the image BREATHE

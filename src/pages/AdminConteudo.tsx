@@ -57,9 +57,9 @@ const MONTH_NAMES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
 const MONTH_SHORT = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
 const STATUS_CONFIG: Record<MonthStatus, { label: string; color: string; icon: React.ReactNode }> = {
-  concluido: { label: "Concluído", color: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30", icon: <Check className="w-3 h-3" /> },
-  em_andamento: { label: "Em andamento", color: "bg-amber-500/20 text-amber-300 border-amber-500/30", icon: <RefreshCw className="w-3 h-3" /> },
-  aberto: { label: "Em aberto", color: "bg-white/10 text-white/40 border-white/10", icon: <Lock className="w-3 h-3" /> },
+  concluido: { label: "Concluído", color: "bg-white/15 text-white/80 border-white/20", icon: <Check className="w-3 h-3" /> },
+  em_andamento: { label: "Em andamento", color: "bg-white/10 text-white/60 border-white/15", icon: <RefreshCw className="w-3 h-3" /> },
+  aberto: { label: "Em aberto", color: "bg-white/5 text-white/30 border-white/10", icon: <Lock className="w-3 h-3" /> },
 };
 
 // ── Date Helpers ──
@@ -177,11 +177,11 @@ function buildMonthConfigs(today: Date, existingPlans?: Record<string, MonthPlan
 
 /** Determine status of a day item: "atrasado" (past), "pendente" (today/future), "conferido" (checked) */
 function getDayItemStatus(dateStr: string, time: string, checked: boolean, monthIndex: number, year: number): { label: string; color: string } {
-  if (checked) return { label: "Conferido", color: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30" };
+  if (checked) return { label: "Conferido", color: "bg-white/15 text-white/80 border-white/20" };
 
   // Parse dateStr "DD/MM" into a Date
   const parts = dateStr.split("/");
-  if (parts.length !== 2) return { label: "Pendente", color: "bg-blue-500/20 text-blue-300 border-blue-500/30" };
+  if (parts.length !== 2) return { label: "Pendente", color: "bg-white/10 text-white/50 border-white/15" };
   const day = parseInt(parts[0], 10);
   const month = parseInt(parts[1], 10) - 1;
   const itemDate = new Date(year, month, day);
@@ -193,15 +193,15 @@ function getDayItemStatus(dateStr: string, time: string, checked: boolean, month
   itemDate.setHours(itemHour, itemMin, 0, 0);
 
   const now = new Date();
-  if (itemDate < now) return { label: "Atrasado", color: "bg-red-500/20 text-red-300 border-red-500/30" };
-  return { label: "Pendente", color: "bg-blue-500/20 text-blue-300 border-blue-500/30" };
+  if (itemDate < now) return { label: "Atrasado", color: "bg-white/20 text-white/90 border-white/30" };
+  return { label: "Pendente", color: "bg-white/10 text-white/50 border-white/15" };
 }
 
 /** Get overall day status from items */
 function getDayStatus(dateStr: string, items: { time?: string; checked?: boolean }[], monthIndex: number, year: number): { label: string; color: string } {
   if (items.length === 0) return { label: "", color: "" };
   const allChecked = items.every((i) => i.checked);
-  if (allChecked) return { label: "Conferido", color: "text-emerald-400" };
+  if (allChecked) return { label: "Conferido", color: "text-white/80" };
 
   const parts = dateStr.split("/");
   if (parts.length !== 2) return { label: "", color: "" };
@@ -213,7 +213,7 @@ function getDayStatus(dateStr: string, items: { time?: string; checked?: boolean
   const dayStart = new Date(dayDate);
   dayStart.setHours(0, 0, 0, 0);
 
-  if (dayStart < today) return { label: "Atrasado", color: "text-red-400" };
+  if (dayStart < today) return { label: "Atrasado", color: "text-white/60" };
   return { label: "", color: "" };
 }
 
@@ -641,7 +641,7 @@ export default function AdminConteudo() {
       <div className="space-y-6">
         {/* Header */}
           <div className="flex items-center gap-3 md:gap-4">
-          <div className="p-2.5 md:p-3 rounded-xl bg-gradient-to-br from-pink-500 via-purple-500 to-orange-500">
+          <div className="p-2.5 md:p-3 rounded-xl bg-white/10 border border-white/20">
             <Instagram className="w-5 h-5 md:w-7 md:h-7 text-white" />
           </div>
           <div>
@@ -707,7 +707,7 @@ export default function AdminConteudo() {
         <Card className="p-3 md:p-5 bg-white/[0.02] border-white/[0.06]">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
             <div className="flex items-center gap-3">
-              <CalendarDays className="w-5 h-5 text-purple-400" />
+              <CalendarDays className="w-5 h-5 text-white/60" />
               <h2 className="text-lg font-bold text-white">{currentMonthConfig.label} 2026</h2>
               <Badge variant="outline" className={STATUS_CONFIG[currentMonthConfig.status].color}>
                 {STATUS_CONFIG[currentMonthConfig.status].label}
@@ -722,8 +722,8 @@ export default function AdminConteudo() {
 
           {/* Info about date range */}
           {weeksCount > 0 && (
-            <div className="mb-4 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
-              <p className="text-xs text-blue-300/80 flex items-center gap-2">
+            <div className="mb-4 p-3 rounded-lg bg-white/[0.04] border border-white/[0.08]">
+              <p className="text-xs text-white/50 flex items-center gap-2">
                 <Calendar className="w-3.5 h-3.5 shrink-0" />
                 {currentMonthConfig.weekLabels.length} semana{currentMonthConfig.weekLabels.length > 1 ? "s" : ""} · {currentMonthConfig.weekLabels[0]?.range.split(" – ")[0]} a {currentMonthConfig.weekLabels[currentMonthConfig.weekLabels.length - 1]?.range.split(" – ")[1]} · Atualizado para hoje
               </p>
@@ -733,7 +733,7 @@ export default function AdminConteudo() {
           {/* Completed month with no plan */}
           {currentMonthConfig.status === "concluido" && !currentPlan && (
             <div className="text-center py-10">
-              <CheckCircle2 className="w-12 h-12 text-emerald-400/40 mx-auto mb-3" />
+              <CheckCircle2 className="w-12 h-12 text-white/20 mx-auto mb-3" />
               <p className="text-white/50 text-sm">Planejamento de {currentMonthConfig.label} já foi concluído.</p>
             </div>
           )}
@@ -751,7 +751,7 @@ export default function AdminConteudo() {
             <Accordion type="single" collapsible defaultValue={currentPlan ? undefined : "generator"}>
               <AccordionItem value="generator" className="border-white/[0.06] bg-white/[0.03] rounded-lg border px-4">
                 <AccordionTrigger className="text-sm font-semibold text-white/70 hover:no-underline py-3">
-                  <span className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-purple-400" /> Gerar planejamento de {currentMonthConfig.label}</span>
+                  <span className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-white/60" /> Gerar planejamento de {currentMonthConfig.label}</span>
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="space-y-5 pb-2">
@@ -793,7 +793,7 @@ export default function AdminConteudo() {
                     <Button
                       onClick={handleGenerate}
                       disabled={isGenerating || !allFilled}
-                      className="w-full md:w-auto bg-gradient-to-r from-pink-500 via-purple-500 to-orange-500 hover:opacity-90 text-white font-semibold py-5"
+                      className="w-full md:w-auto bg-white text-black hover:bg-white/90 font-semibold py-5"
                     >
                       {isGenerating ? (
                         <><RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Gerando planejamento...</>
@@ -810,9 +810,9 @@ export default function AdminConteudo() {
           {/* Plan Results */}
           {currentPlan && (
             <div className="space-y-5 mt-5">
-              <Card className="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-500/20">
+              <Card className="p-4 bg-white/[0.04] border-white/[0.08]">
                 <div className="flex items-start gap-3">
-                  <Lightbulb className="w-5 h-5 text-purple-400 mt-0.5 shrink-0" />
+                  <Lightbulb className="w-5 h-5 text-white/60 mt-0.5 shrink-0" />
                   <div>
                     <h3 className="font-semibold text-white text-sm">Estratégia de {currentMonthConfig.label}</h3>
                     <p className="text-white/60 text-sm mt-1.5 leading-relaxed">{currentPlan.monthStrategy}</p>
@@ -877,7 +877,7 @@ export default function AdminConteudo() {
                                   <AccordionContent>
                                     <div className="space-y-3 pb-1">
                                       {dayPosts.map((post) => (
-                                        <Card key={post.id} className={`border-white/[0.06] overflow-hidden transition-colors ${post.checked ? "bg-emerald-500/[0.06] border-emerald-500/20" : "bg-white/[0.03]"}`}>
+                                        <Card key={post.id} className={`border-white/[0.06] overflow-hidden transition-colors ${post.checked ? "bg-white/[0.06] border-white/[0.15]" : "bg-white/[0.03]"}`}>
                                           <div className="flex flex-col sm:flex-row">
                                             <div className="sm:w-44 md:w-56 shrink-0 bg-white/[0.02] flex items-center justify-center relative min-h-[140px] md:min-h-[180px]">
                                               {post.generatedImage ? (
@@ -893,7 +893,7 @@ export default function AdminConteudo() {
                                               ) : (
                                                 <div className="flex flex-col items-center gap-3 p-4">
                                                   <ImageIcon className="w-8 h-8 text-white/15" />
-                                                  <Button size="sm" onClick={() => handleGenerateImage(weekIdx, post.id, post.imageDescription, "feed")} disabled={post.isGeneratingImage} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white text-xs">
+                                                  <Button size="sm" onClick={() => handleGenerateImage(weekIdx, post.id, post.imageDescription, "feed")} disabled={post.isGeneratingImage} className="bg-white text-black hover:bg-white/90 text-xs">
                                                     {post.isGeneratingImage ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <><ImageIcon className="w-3.5 h-3.5 mr-1" /> Gerar imagem</>}
                                                   </Button>
                                                 </div>
@@ -921,13 +921,13 @@ export default function AdminConteudo() {
                                               </div>
                                               <p className="text-xs text-white/60 leading-relaxed line-clamp-3">{post.caption}</p>
                                               {post.marketingTip && (
-                                                <div className="flex items-start gap-2 p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                                                  <Lightbulb className="w-3.5 h-3.5 text-amber-400 mt-0.5 shrink-0" />
-                                                  <p className="text-xs text-amber-200/80 line-clamp-2">{post.marketingTip}</p>
+                                                 <div className="flex items-start gap-2 p-2.5 rounded-lg bg-white/[0.04] border border-white/[0.08]">
+                                                   <Lightbulb className="w-3.5 h-3.5 text-white/50 mt-0.5 shrink-0" />
+                                                   <p className="text-xs text-white/50 line-clamp-2">{post.marketingTip}</p>
                                                 </div>
                                               )}
                                               <div className="flex items-center gap-1 md:gap-2 pt-1 flex-wrap">
-                                                <Button variant="ghost" size="sm" onClick={() => toggleChecked(weekIdx, post.id, "feed")} className={`h-7 text-[11px] md:text-xs ${post.checked ? "text-emerald-400 hover:text-emerald-300" : "text-white/40 hover:text-white"}`}>
+                                                <Button variant="ghost" size="sm" onClick={() => toggleChecked(weekIdx, post.id, "feed")} className={`h-7 text-[11px] md:text-xs ${post.checked ? "text-white/80 hover:text-white" : "text-white/40 hover:text-white"}`}>
                                                   {post.checked ? <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> : <Circle className="w-3.5 h-3.5 mr-1" />}{post.checked ? "Conferido ✓" : "Conferir"}
                                                 </Button>
                                                 <Button variant="ghost" size="sm" onClick={() => copyToClipboard(post.caption)} className="text-white/40 hover:text-white h-7 text-[11px] md:text-xs"><Copy className="w-3 h-3 mr-1" /> Copiar</Button>
@@ -943,7 +943,7 @@ export default function AdminConteudo() {
                                                       <p className="text-[10px] text-white/40 uppercase tracking-wider font-semibold flex items-center gap-1 mt-1"><ImageIcon className="w-3 h-3" /> Refazer imagem</p>
                                                       <div className="flex gap-2">
                                                         <Input placeholder="Ex: mais colorido, fundo azul..." value={imageHint} onChange={(e) => setImageHint(e.target.value)} className="bg-white/[0.05] border-white/10 text-white text-xs flex-1 h-9" />
-                                                        <Button size="sm" onClick={() => handleGenerateImage(weekIdx, post.id, post.imageDescription, "feed", imageHint || undefined)} disabled={post.isGeneratingImage} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white h-9 px-3 shrink-0 text-xs gap-1.5">
+                                                        <Button size="sm" onClick={() => handleGenerateImage(weekIdx, post.id, post.imageDescription, "feed", imageHint || undefined)} disabled={post.isGeneratingImage} className="bg-white text-black hover:bg-white/90 h-9 px-3 shrink-0 text-xs gap-1.5">
                                                           {post.isGeneratingImage ? <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Gerando...</> : <><RefreshCw className="w-3.5 h-3.5" /> Refazer</>}
                                                         </Button>
                                                       </div>
@@ -990,7 +990,7 @@ export default function AdminConteudo() {
                                   <AccordionContent>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pb-1">
                                       {dayStories.map((story) => (
-                                        <Card key={story.id} className={`border-white/[0.06] overflow-hidden flex flex-col transition-colors ${story.checked ? "bg-emerald-500/[0.06] border-emerald-500/20" : "bg-white/[0.03]"}`}>
+                                        <Card key={story.id} className={`border-white/[0.06] overflow-hidden flex flex-col transition-colors ${story.checked ? "bg-white/[0.06] border-white/[0.15]" : "bg-white/[0.03]"}`}>
                                           <div className="aspect-[9/16] max-h-52 bg-white/[0.02] flex items-center justify-center relative">
                                             {story.generatedImage ? (
                                               <>
@@ -1000,18 +1000,18 @@ export default function AdminConteudo() {
                                             ) : (
                                               <div className="flex flex-col items-center gap-2">
                                                 <ImageIcon className="w-6 h-6 text-white/15" />
-                                                <Button size="sm" onClick={() => handleGenerateImage(weekIdx, story.id, story.visualDescription, "story")} disabled={story.isGeneratingImage} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white text-[10px] h-7 px-2">
+                                                <Button size="sm" onClick={() => handleGenerateImage(weekIdx, story.id, story.visualDescription, "story")} disabled={story.isGeneratingImage} className="bg-white text-black hover:bg-white/90 text-[10px] h-7 px-2">
                                                   {story.isGeneratingImage ? <><RefreshCw className="w-3 h-3 animate-spin mr-1" /> Gerando...</> : <><ImageIcon className="w-3 h-3 mr-1" /> Gerar</>}
                                                 </Button>
                                               </div>
                                             )}
                                           </div>
                                           <div className="p-3 space-y-2 flex-1">
-                                            <span className="px-2 py-0.5 rounded-md bg-pink-500/20 text-pink-300 text-[10px] font-semibold uppercase">{story.type}</span>
+                                            <span className="px-2 py-0.5 rounded-md bg-white/10 text-white/60 text-[10px] font-semibold uppercase">{story.type}</span>
                                             <p className="text-xs text-white/80 line-clamp-2">{story.mainText}</p>
                                             <p className="text-[10px] text-white/40 italic line-clamp-1">{story.callToAction}</p>
                                             <div className="flex items-center gap-1 pt-1">
-                                              <Button variant="ghost" size="sm" onClick={() => toggleChecked(weekIdx, story.id, "story")} className={`h-6 p-0 px-1 text-[10px] ${story.checked ? "text-emerald-400 hover:text-emerald-300" : "text-white/30 hover:text-white"}`}>
+                                              <Button variant="ghost" size="sm" onClick={() => toggleChecked(weekIdx, story.id, "story")} className={`h-6 p-0 px-1 text-[10px] ${story.checked ? "text-white/80 hover:text-white" : "text-white/30 hover:text-white"}`}>
                                                 {story.checked ? <CheckCircle2 className="w-3 h-3 mr-0.5" /> : <Circle className="w-3 h-3 mr-0.5" />}{story.checked ? "✓" : "Conferir"}
                                               </Button>
                                               <Button variant="ghost" size="sm" onClick={() => copyToClipboard(story.mainText)} className="text-white/30 hover:text-white h-6 w-6 p-0"><Copy className="w-3 h-3" /></Button>
@@ -1033,7 +1033,7 @@ export default function AdminConteudo() {
                                                     <p className="text-[10px] text-white/40 uppercase tracking-wider font-semibold flex items-center gap-1 mt-1"><ImageIcon className="w-3 h-3" /> Refazer imagem</p>
                                                     <div className="flex gap-2">
                                                       <Input placeholder="Ex: mais colorido, fundo azul..." value={imageHint} onChange={(e) => setImageHint(e.target.value)} className="bg-white/[0.05] border-white/10 text-white text-xs flex-1 h-9" />
-                                                      <Button size="sm" onClick={() => handleGenerateImage(weekIdx, story.id, story.visualDescription, "story", imageHint || undefined)} disabled={story.isGeneratingImage} className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white h-9 px-3 shrink-0 text-xs gap-1.5">
+                                                      <Button size="sm" onClick={() => handleGenerateImage(weekIdx, story.id, story.visualDescription, "story", imageHint || undefined)} disabled={story.isGeneratingImage} className="bg-white text-black hover:bg-white/90 h-9 px-3 shrink-0 text-xs gap-1.5">
                                                         {story.isGeneratingImage ? <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Gerando...</> : <><RefreshCw className="w-3.5 h-3.5" /> Refazer</>}
                                                       </Button>
                                                     </div>
@@ -1066,7 +1066,7 @@ export default function AdminConteudo() {
         <DialogContent className="bg-[#111] border-white/10 text-white max-w-lg max-h-[85vh] overflow-y-auto" onPointerDownOutside={(e) => e.preventDefault()} onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => { if (quickPostLoading || quickPostImageLoading) e.preventDefault(); }}>
           <DialogHeader>
             <DialogTitle className="text-white flex items-center gap-2">
-              <Wand2 className="w-5 h-5 text-purple-400" />
+              <Wand2 className="w-5 h-5 text-white/60" />
               Criar post: {quickPostTemplate}
             </DialogTitle>
           </DialogHeader>
@@ -1090,7 +1090,7 @@ export default function AdminConteudo() {
                 void handleQuickPost();
               }}
               disabled={quickPostLoading || !quickPostInput.trim()}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold"
+              className="w-full bg-white text-black hover:bg-white/90 font-semibold"
             >
               {quickPostLoading ? (
                 <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Gerando post...</>
@@ -1265,8 +1265,8 @@ export default function AdminConteudo() {
 
                 {/* Marketing Tip */}
                 {quickPostResult.marketingTip && (
-                  <div className="flex items-start gap-2 bg-amber-500/5 border border-amber-500/10 rounded-lg p-3">
-                    <Lightbulb className="w-3.5 h-3.5 text-amber-400 mt-0.5 shrink-0" />
+                 <div className="flex items-start gap-2 bg-white/[0.04] border border-white/[0.08] rounded-lg p-3">
+                    <Lightbulb className="w-3.5 h-3.5 text-white/50 mt-0.5 shrink-0" />
                     <p className="text-xs text-amber-300/70">{quickPostResult.marketingTip}</p>
                   </div>
                 )}
