@@ -1066,7 +1066,7 @@ export default function AdminConteudo() {
         <DialogContent className="bg-[#111] border-white/10 text-white max-w-lg max-h-[85vh] overflow-y-auto" onPointerDownOutside={(e) => e.preventDefault()} onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => { if (quickPostLoading || quickPostImageLoading) e.preventDefault(); }}>
           <DialogHeader>
             <DialogTitle className="text-white flex items-center gap-2">
-              <Wand2 className="w-5 h-5 text-purple-400" />
+              <Wand2 className="w-5 h-5 text-white/60" />
               Criar post: {quickPostTemplate}
             </DialogTitle>
           </DialogHeader>
