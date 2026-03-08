@@ -546,7 +546,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
               </div>
               {!isGeneratingCopy && generatedCopy && (
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <Button onClick={handleGenerateImage} className="flex-1 bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 border-0 text-white font-medium h-12">
+                  <Button onClick={handleGenerateImage} className="flex-1 bg-white text-black hover:bg-white/90 border-0 font-medium h-12">
                     <Check className="w-4 h-4 mr-2" />Confirmar e gerar post
                   </Button>
                   <Button onClick={() => handleGenerateCopy()} variant="ghost" className="border border-white/10 text-white/50 hover:text-white hover:bg-white/[0.08] bg-white/[0.04] h-12">
