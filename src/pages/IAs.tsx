@@ -1256,7 +1256,7 @@ export default function IAs() {
           {/* Sidebar header */}
           <div className="p-4 border-b border-white/[0.05]">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500/20 to-pink-500/20 border border-violet-400/10 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-white/[0.06] border border-white/[0.08] flex items-center justify-center">
                 <Zap className="w-4 h-4 text-violet-400" />
               </div>
               <div>
