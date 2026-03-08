@@ -936,7 +936,7 @@ function ChatTab({ user }: { user: User | null }) {
                   </motion.div>
                 </div>
                 <h2 className="text-2xl md:text-3xl font-bold text-white mb-3" style={{ fontFamily: "'Sora', sans-serif" }}>
-                  Como posso <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">ajudar</span>?
+                  Como posso <span className="text-white/60">ajudar</span>?
                 </h2>
                 <p className="text-white/35 text-sm text-center max-w-md mb-10">Sou o assistente da Brandify. Posso criar textos, legendas, estratégias de marketing e responder qualquer dúvida.</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
