@@ -658,7 +658,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
             </div>
             <div className="flex gap-3">
               <Button onClick={() => { setEditingImage(null); setEditInstruction(""); }} variant="ghost" className="flex-1 text-white/40 hover:text-white">Cancelar</Button>
-              <Button onClick={() => handleEditImage(editingImage, editInstruction)} disabled={isEditing || !editInstruction.trim()} className="flex-1 bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 border-0 text-white font-medium">
+              <Button onClick={() => handleEditImage(editingImage, editInstruction)} disabled={isEditing || !editInstruction.trim()} className="flex-1 bg-white text-black hover:bg-white/90 border-0 font-medium">
                 {isEditing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <PenTool className="w-4 h-4 mr-2" />}
                 {isEditing ? "Editando..." : "Refazer post"}
               </Button>
