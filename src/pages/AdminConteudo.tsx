@@ -751,7 +751,7 @@ export default function AdminConteudo() {
             <Accordion type="single" collapsible defaultValue={currentPlan ? undefined : "generator"}>
               <AccordionItem value="generator" className="border-white/[0.06] bg-white/[0.03] rounded-lg border px-4">
                 <AccordionTrigger className="text-sm font-semibold text-white/70 hover:no-underline py-3">
-                  <span className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-purple-400" /> Gerar planejamento de {currentMonthConfig.label}</span>
+                  <span className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-white/60" /> Gerar planejamento de {currentMonthConfig.label}</span>
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="space-y-5 pb-2">
