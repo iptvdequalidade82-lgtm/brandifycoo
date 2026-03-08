@@ -1238,7 +1238,7 @@ export default function IAs() {
             </Link>
             <div className="h-5 w-px bg-white/[0.08]" />
             <span className="text-white font-semibold text-sm flex items-center gap-1.5" style={{ fontFamily: "'Sora', sans-serif" }}>
-              <Sparkles className="w-3.5 h-3.5 text-violet-400" />
+              <Sparkles className="w-3.5 h-3.5 text-white/50" />
               <span className="hidden sm:inline">IA Studio</span>
               <span className="sm:hidden text-white/60 truncate max-w-[140px]">{activeToolLabel}</span>
             </span>
