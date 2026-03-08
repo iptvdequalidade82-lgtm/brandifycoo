@@ -502,7 +502,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
                           {img.copy && <button onClick={() => { navigator.clipboard.writeText(img.copy!); toast({ title: "Copy copiada! 📋" }); }} className="text-white/50 text-xs hover:text-white transition-colors text-left">📋 Copiar legenda</button>}
                           <div className="flex gap-2">
                             <Button onClick={() => { const a = document.createElement("a"); a.href = img.url; a.download = `brandify-post-${i + 1}.png`; a.click(); }} size="sm" className="bg-white text-black hover:bg-white/90 border-0 text-xs font-medium h-8 px-4"><Download className="w-3.5 h-3.5 mr-1.5" />Baixar</Button>
-                            <Button onClick={() => { setEditingImage(img); setEditInstruction(""); }} size="sm" variant="outline" className="border-violet-500/30 text-violet-300 hover:bg-violet-500/20 hover:text-violet-200 text-xs font-medium h-8 px-4"><PenTool className="w-3.5 h-3.5 mr-1.5" />Editar</Button>
+                            <Button onClick={() => { setEditingImage(img); setEditInstruction(""); }} size="sm" variant="outline" className="border-white/20 text-white/70 hover:bg-white/10 hover:text-white text-xs font-medium h-8 px-4"><PenTool className="w-3.5 h-3.5 mr-1.5" />Editar</Button>
                           </div>
                         </div>
                       </div>
