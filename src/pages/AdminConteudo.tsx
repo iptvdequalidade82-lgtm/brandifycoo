@@ -733,7 +733,7 @@ export default function AdminConteudo() {
           {/* Completed month with no plan */}
           {currentMonthConfig.status === "concluido" && !currentPlan && (
             <div className="text-center py-10">
-              <CheckCircle2 className="w-12 h-12 text-emerald-400/40 mx-auto mb-3" />
+              <CheckCircle2 className="w-12 h-12 text-white/20 mx-auto mb-3" />
               <p className="text-white/50 text-sm">Planejamento de {currentMonthConfig.label} já foi concluído.</p>
             </div>
           )}
