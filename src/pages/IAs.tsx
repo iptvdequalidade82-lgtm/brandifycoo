@@ -705,7 +705,7 @@ const ChatBubble = memo(({ msg }: { msg: Msg }) => (
         <img src={logo} alt="Brandify" className="w-full h-full object-cover" />
       </div>
     )}
-    <div className={`max-w-[80%] md:max-w-[70%] ${msg.role === "user" ? "bg-blue-600/15 border border-blue-500/15 rounded-2xl rounded-tr-sm px-4 py-3" : "bg-white/[0.03] border border-white/[0.06] rounded-2xl rounded-tl-sm px-4 py-3"}`}>
+    <div className={`max-w-[80%] md:max-w-[70%] ${msg.role === "user" ? "bg-white/[0.06] border border-white/[0.08] rounded-2xl rounded-tr-sm px-4 py-3" : "bg-white/[0.03] border border-white/[0.06] rounded-2xl rounded-tl-sm px-4 py-3"}`}>
       {msg.role === "assistant" ? (
         <div className="text-[13px] text-white/85 leading-relaxed prose prose-invert prose-sm max-w-none prose-p:my-1.5 prose-headings:text-white prose-strong:text-white prose-li:text-white/80">
           <ReactMarkdown>{msg.content}</ReactMarkdown>
