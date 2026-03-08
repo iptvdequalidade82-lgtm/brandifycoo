@@ -722,8 +722,8 @@ export default function AdminConteudo() {
 
           {/* Info about date range */}
           {weeksCount > 0 && (
-            <div className="mb-4 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
-              <p className="text-xs text-blue-300/80 flex items-center gap-2">
+            <div className="mb-4 p-3 rounded-lg bg-white/[0.04] border border-white/[0.08]">
+              <p className="text-xs text-white/50 flex items-center gap-2">
                 <Calendar className="w-3.5 h-3.5 shrink-0" />
                 {currentMonthConfig.weekLabels.length} semana{currentMonthConfig.weekLabels.length > 1 ? "s" : ""} · {currentMonthConfig.weekLabels[0]?.range.split(" – ")[0]} a {currentMonthConfig.weekLabels[currentMonthConfig.weekLabels.length - 1]?.range.split(" – ")[1]} · Atualizado para hoje
               </p>
