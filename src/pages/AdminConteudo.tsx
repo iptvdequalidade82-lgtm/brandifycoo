@@ -201,7 +201,7 @@ function getDayItemStatus(dateStr: string, time: string, checked: boolean, month
 function getDayStatus(dateStr: string, items: { time?: string; checked?: boolean }[], monthIndex: number, year: number): { label: string; color: string } {
   if (items.length === 0) return { label: "", color: "" };
   const allChecked = items.every((i) => i.checked);
-  if (allChecked) return { label: "Conferido", color: "text-emerald-400" };
+  if (allChecked) return { label: "Conferido", color: "text-white/80" };
 
   const parts = dateStr.split("/");
   if (parts.length !== 2) return { label: "", color: "" };
