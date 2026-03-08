@@ -810,9 +810,9 @@ export default function AdminConteudo() {
           {/* Plan Results */}
           {currentPlan && (
             <div className="space-y-5 mt-5">
-              <Card className="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-500/20">
+              <Card className="p-4 bg-white/[0.04] border-white/[0.08]">
                 <div className="flex items-start gap-3">
-                  <Lightbulb className="w-5 h-5 text-purple-400 mt-0.5 shrink-0" />
+                  <Lightbulb className="w-5 h-5 text-white/60 mt-0.5 shrink-0" />
                   <div>
                     <h3 className="font-semibold text-white text-sm">Estratégia de {currentMonthConfig.label}</h3>
                     <p className="text-white/60 text-sm mt-1.5 leading-relaxed">{currentPlan.monthStrategy}</p>
