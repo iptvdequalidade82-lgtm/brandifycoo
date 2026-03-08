@@ -920,9 +920,9 @@ function ChatTab({ user }: { user: User | null }) {
                 {/* Premium avatar with glow */}
                 <div className="relative mb-8">
                   <motion.div
-                    animate={{ boxShadow: ["0 0 30px rgba(59,130,246,0.15)", "0 0 60px rgba(59,130,246,0.25)", "0 0 30px rgba(59,130,246,0.15)"] }}
+                    animate={{ boxShadow: ["0 0 30px rgba(255,255,255,0.05)", "0 0 60px rgba(255,255,255,0.1)", "0 0 30px rgba(255,255,255,0.05)"] }}
                     transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                    className="w-20 h-20 rounded-2xl overflow-hidden ring-2 ring-blue-500/20"
+                    className="w-20 h-20 rounded-2xl overflow-hidden ring-2 ring-white/10"
                   >
                     <img src={logo} alt="Brandify" className="w-full h-full object-cover" />
                   </motion.div>
