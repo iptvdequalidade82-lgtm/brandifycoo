@@ -78,7 +78,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       '--accent-foreground': '0 0% 100%',
       '--border': '0 0% 18%',
       '--input': '0 0% 18%',
-      '--ring': '224 76% 48%',
+      '--ring': '0 0% 100%',
     } as React.CSSProperties}>
       {/* Top header */}
       <header className="border-b border-white/[0.06] px-6 py-3 flex items-center justify-between bg-[#0a0a0a]/80 backdrop-blur-xl sticky top-0 z-50">
