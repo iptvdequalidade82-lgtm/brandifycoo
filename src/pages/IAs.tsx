@@ -1175,7 +1175,7 @@ export default function IAs() {
       <div className="min-h-screen bg-[#030306] flex items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-white/[0.03] blur-[120px]" />
-          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-pink-600/10 blur-[100px]" />
+          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-white/[0.02] blur-[100px]" />
         </div>
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
