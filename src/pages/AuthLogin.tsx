@@ -25,20 +25,25 @@ const AuthLogin = () => {
 
   const checkAdminAndRedirect = async (userId: string) => {
     try {
-      const { data } = await supabase
+      const roleCheck = supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", userId)
         .eq("role", "admin")
         .maybeSingle();
-      
+
+      const timeout = new Promise<{ data: null; error: null }>((resolve) =>
+        setTimeout(() => resolve({ data: null, error: null }), 4000)
+      );
+
+      const { data } = await Promise.race([roleCheck, timeout]);
+
       if (data) {
         navigate("/admin");
       } else {
         navigate(redirectTo);
       }
     } catch {
-      // If role check fails, still redirect user
       navigate(redirectTo);
     }
   };
