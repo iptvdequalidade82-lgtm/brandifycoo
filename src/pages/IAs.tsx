@@ -1269,8 +1269,8 @@ export default function IAs() {
           {userPlan && (
             <div className="p-3 border-t border-white/[0.05]">
               <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06]">
-                <Crown className="w-3.5 h-3.5 text-amber-400" />
-                <span className="text-amber-300/60 text-xs font-medium">{PLAN_LABELS[userPlan] || userPlan}</span>
+                <Crown className="w-3.5 h-3.5 text-white/50" />
+                <span className="text-white/40 text-xs font-medium">{PLAN_LABELS[userPlan] || userPlan}</span>
               </div>
             </div>
           )}
