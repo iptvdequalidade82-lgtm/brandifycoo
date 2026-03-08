@@ -1232,7 +1232,7 @@ export default function IAs() {
               <Menu className="w-5 h-5" />
             </button>
             <Link to="/">
-              <motion.div whileHover={{ scale: 1.05 }} className="w-9 h-9 rounded-xl overflow-hidden ring-1 ring-white/15 shadow-lg shadow-violet-500/10">
+              <motion.div whileHover={{ scale: 1.05 }} className="w-9 h-9 rounded-xl overflow-hidden ring-1 ring-white/15">
                 <img src={logo} alt="Brandify" className="w-full h-full object-cover" />
               </motion.div>
             </Link>
