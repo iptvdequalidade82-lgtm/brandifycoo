@@ -23,15 +23,15 @@ import { useGating, type PlanTier } from "@/hooks/useGating";
 
 // ── Ambient background config per tool ──
 const TOOL_AMBIENTS: Record<string, { gradient: string; orbColor1: string; orbColor2: string }> = {
-  posts: { gradient: "from-violet-900/30 via-purple-900/10 to-pink-900/20", orbColor1: "rgba(139,92,246,0.15)", orbColor2: "rgba(236,72,153,0.1)" },
-  chat: { gradient: "from-blue-900/30 via-cyan-900/10 to-indigo-900/20", orbColor1: "rgba(59,130,246,0.15)", orbColor2: "rgba(6,182,212,0.1)" },
-  copy: { gradient: "from-amber-900/30 via-orange-900/10 to-yellow-900/20", orbColor1: "rgba(245,158,11,0.15)", orbColor2: "rgba(249,115,22,0.1)" },
-  landing: { gradient: "from-emerald-900/30 via-teal-900/10 to-green-900/20", orbColor1: "rgba(16,185,129,0.15)", orbColor2: "rgba(20,184,166,0.1)" },
-  atendedor: { gradient: "from-blue-900/30 via-indigo-900/10 to-violet-900/20", orbColor1: "rgba(99,102,241,0.15)", orbColor2: "rgba(79,70,229,0.1)" },
-  agendador: { gradient: "from-pink-900/30 via-rose-900/10 to-red-900/20", orbColor1: "rgba(236,72,153,0.15)", orbColor2: "rgba(244,63,94,0.1)" },
-  diagnostico: { gradient: "from-violet-900/30 via-purple-900/10 to-fuchsia-900/20", orbColor1: "rgba(168,85,247,0.15)", orbColor2: "rgba(192,38,211,0.1)" },
-  planejamento: { gradient: "from-cyan-900/30 via-sky-900/10 to-blue-900/20", orbColor1: "rgba(6,182,212,0.15)", orbColor2: "rgba(14,165,233,0.1)" },
-  simulador: { gradient: "from-green-900/30 via-emerald-900/10 to-teal-900/20", orbColor1: "rgba(34,197,94,0.15)", orbColor2: "rgba(16,185,129,0.1)" },
+  posts: { gradient: "from-white/5 via-white/[0.02] to-white/5", orbColor1: "rgba(255,255,255,0.04)", orbColor2: "rgba(255,255,255,0.03)" },
+  chat: { gradient: "from-white/5 via-white/[0.02] to-white/5", orbColor1: "rgba(255,255,255,0.04)", orbColor2: "rgba(255,255,255,0.03)" },
+  copy: { gradient: "from-white/5 via-white/[0.02] to-white/5", orbColor1: "rgba(255,255,255,0.04)", orbColor2: "rgba(255,255,255,0.03)" },
+  landing: { gradient: "from-white/5 via-white/[0.02] to-white/5", orbColor1: "rgba(255,255,255,0.04)", orbColor2: "rgba(255,255,255,0.03)" },
+  atendedor: { gradient: "from-white/5 via-white/[0.02] to-white/5", orbColor1: "rgba(255,255,255,0.04)", orbColor2: "rgba(255,255,255,0.03)" },
+  agendador: { gradient: "from-white/5 via-white/[0.02] to-white/5", orbColor1: "rgba(255,255,255,0.04)", orbColor2: "rgba(255,255,255,0.03)" },
+  diagnostico: { gradient: "from-white/5 via-white/[0.02] to-white/5", orbColor1: "rgba(255,255,255,0.04)", orbColor2: "rgba(255,255,255,0.03)" },
+  planejamento: { gradient: "from-white/5 via-white/[0.02] to-white/5", orbColor1: "rgba(255,255,255,0.04)", orbColor2: "rgba(255,255,255,0.03)" },
+  simulador: { gradient: "from-white/5 via-white/[0.02] to-white/5", orbColor1: "rgba(255,255,255,0.04)", orbColor2: "rgba(255,255,255,0.03)" },
 };
 
 // ── Floating orbs component ──
@@ -175,9 +175,9 @@ function ProBanner({ user, remaining, userPlan }: { user: User | null; remaining
     const isUnlimited = monthlyCredits === Infinity;
     return (
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mx-3 md:mx-6 mt-2 mb-0">
-        <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-yellow-500/10 border border-amber-500/20">
+        <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08]">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shrink-0">
+            <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
               <Crown className="w-3.5 h-3.5 text-white" />
             </div>
             <p className="text-white/80 text-xs font-medium">
@@ -185,7 +185,7 @@ function ProBanner({ user, remaining, userPlan }: { user: User | null; remaining
             </p>
           </div>
           {userPlan !== "premium" && (
-            <button onClick={handleUpgrade} className="text-amber-400/70 hover:text-amber-300 text-xs font-medium transition-colors">Fazer upgrade →</button>
+            <button onClick={handleUpgrade} className="text-white/50 hover:text-white text-xs font-medium transition-colors">Fazer upgrade →</button>
           )}
         </div>
       </motion.div>
@@ -194,9 +194,9 @@ function ProBanner({ user, remaining, userPlan }: { user: User | null; remaining
 
   return (
     <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mx-3 md:mx-6 mt-2 mb-0">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-3 py-2.5 rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-yellow-500/10 border border-amber-500/20">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.08]">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shrink-0">
+          <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
             <Crown className="w-3.5 h-3.5 text-white" />
           </div>
           <div>
@@ -206,7 +206,7 @@ function ProBanner({ user, remaining, userPlan }: { user: User | null; remaining
             <p className="text-white/30 text-[10px] hidden sm:block">Assine um plano para mais créditos mensais</p>
           </div>
         </div>
-        <button onClick={handleUpgrade} className="shrink-0 flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-gradient-to-r from-amber-400 to-orange-500 text-black text-xs font-bold hover:from-amber-300 hover:to-orange-400 transition-all shadow-lg shadow-amber-500/20 w-full sm:w-auto">
+        <button onClick={handleUpgrade} className="shrink-0 flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-white text-black text-xs font-bold hover:bg-white/90 transition-all w-full sm:w-auto">
           <Crown className="w-3.5 h-3.5" /><span>Ver planos</span>
         </button>
       </div>
@@ -405,39 +405,38 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="pt-6 md:pt-12">
               {/* Hero Card — Gerador de Posts — 3D Glass Style */}
               <div className="relative rounded-3xl border border-white/[0.08] p-8 md:p-12 text-center mb-8 overflow-hidden group">
-                {/* Multi-layer background */}
-                <div className="absolute inset-0 bg-gradient-to-br from-violet-600/[0.08] via-transparent to-pink-600/[0.06]" />
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(139,92,246,0.12),transparent_60%)] pointer-events-none" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(236,72,153,0.08),transparent_50%)] pointer-events-none" />
+                {/* Multi-layer background — B&W */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white/[0.04] via-transparent to-white/[0.03]" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.06),transparent_60%)] pointer-events-none" />
                 {/* Animated border glow */}
-                <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" style={{ boxShadow: "inset 0 0 60px rgba(139,92,246,0.1), 0 0 80px rgba(139,92,246,0.05)" }} />
-                {/* Floating 3D orbs */}
-                <motion.div className="absolute top-6 right-8 w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500/20 to-pink-500/20 border border-violet-400/10 backdrop-blur-sm" animate={{ y: [0, -8, 0], rotate: [0, 5, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }} style={{ transform: "perspective(600px) rotateY(-15deg)" }} />
-                <motion.div className="absolute bottom-8 left-6 w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500/15 to-orange-500/15 border border-pink-400/10 backdrop-blur-sm" animate={{ y: [0, 6, 0], rotate: [0, -8, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }} style={{ transform: "perspective(600px) rotateX(10deg)" }} />
-                <motion.div className="absolute top-1/2 left-[10%] w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500/10 to-violet-500/10 border border-white/5" animate={{ y: [0, -12, 0], x: [0, 5, 0] }} transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 2 }} />
+                <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" style={{ boxShadow: "inset 0 0 60px rgba(255,255,255,0.04), 0 0 80px rgba(255,255,255,0.02)" }} />
+                {/* Floating 3D orbs — B&W */}
+                <motion.div className="absolute top-6 right-8 w-16 h-16 rounded-2xl bg-white/[0.04] border border-white/[0.06] backdrop-blur-sm" animate={{ y: [0, -8, 0], rotate: [0, 5, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }} style={{ transform: "perspective(600px) rotateY(-15deg)" }} />
+                <motion.div className="absolute bottom-8 left-6 w-12 h-12 rounded-xl bg-white/[0.03] border border-white/[0.05] backdrop-blur-sm" animate={{ y: [0, 6, 0], rotate: [0, -8, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }} style={{ transform: "perspective(600px) rotateX(10deg)" }} />
+                <motion.div className="absolute top-1/2 left-[10%] w-8 h-8 rounded-lg bg-white/[0.03] border border-white/5" animate={{ y: [0, -12, 0], x: [0, 5, 0] }} transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 2 }} />
                 
                 <div className="relative z-10">
                   <motion.div
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/10 border border-violet-500/20 mb-6 backdrop-blur-sm"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.06] border border-white/[0.1] mb-6 backdrop-blur-sm"
                   >
-                    <div className="w-2 h-2 rounded-full bg-violet-400 animate-pulse" />
-                    <span className="text-violet-300/90 text-xs font-semibold tracking-wide">Gerador de Posts IA</span>
+                    <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                    <span className="text-white/70 text-xs font-semibold tracking-wide">Gerador de Posts IA</span>
                   </motion.div>
                   <h2 className="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight" style={{ fontFamily: "'Sora', sans-serif" }}>
                     Crie posts<br />
-                    <span className="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-orange-400 bg-clip-text text-transparent">profissionais com IA</span>
+                    <span className="text-white/60">profissionais com IA</span>
                   </h2>
                   <p className="text-white/40 text-sm md:text-base max-w-md mx-auto mb-8">Descreva sua ideia e a IA transforma em arte profissional</p>
                   
-                  {/* 3D Step cards */}
+                  {/* 3D Step cards — B&W */}
                   <div className="flex items-center justify-center gap-3 md:gap-5 mb-4">
                     {[
-                      { num: "1", label: "Descreva", icon: "✍️", color: "from-violet-500/20 to-violet-600/10" },
-                      { num: "2", label: "IA aprimora", icon: "✨", color: "from-fuchsia-500/20 to-pink-600/10" },
-                      { num: "3", label: "Post pronto", icon: "🎨", color: "from-orange-500/20 to-amber-600/10" },
+                      { num: "1", label: "Descreva", icon: "✍️", color: "from-white/[0.06] to-white/[0.03]" },
+                      { num: "2", label: "IA aprimora", icon: "✨", color: "from-white/[0.06] to-white/[0.03]" },
+                      { num: "3", label: "Post pronto", icon: "🎨", color: "from-white/[0.06] to-white/[0.03]" },
                     ].map((s, i) => (
                       <div key={s.num} className="flex items-center gap-3">
                         {i > 0 && <div className="w-6 md:w-10 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />}
@@ -469,7 +468,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.5 + i * 0.05 }}
                       onClick={() => { setPrompt(s.prompt); handleGenerateCopy(s.prompt); }}
-                      className="group flex items-center gap-2.5 px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.08] hover:border-violet-500/20 text-white/60 hover:text-white text-sm transition-all duration-300 hover:shadow-lg hover:shadow-violet-500/5"
+                      className="group flex items-center gap-2.5 px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.08] hover:border-white/[0.12] text-white/60 hover:text-white text-sm transition-all duration-300"
                     >
                       <span className="text-lg group-hover:scale-110 transition-transform">{s.icon}</span>
                       <span className="text-left text-xs font-medium">{s.label}</span>
@@ -500,10 +499,10 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
                         <div className="space-y-3">
                           <span className="text-[10px] uppercase tracking-wider text-white/40 font-medium px-2 py-0.5 rounded-md bg-white/10">{img.type === "feed" ? "Feed 1:1" : "Story 9:16"}</span>
                           <p className="text-white/70 text-xs line-clamp-2">{img.prompt}</p>
-                          {img.copy && <button onClick={() => { navigator.clipboard.writeText(img.copy!); toast({ title: "Copy copiada! 📋" }); }} className="text-violet-300/80 text-xs hover:text-violet-200 transition-colors text-left">📋 Copiar legenda</button>}
+                          {img.copy && <button onClick={() => { navigator.clipboard.writeText(img.copy!); toast({ title: "Copy copiada! 📋" }); }} className="text-white/50 text-xs hover:text-white transition-colors text-left">📋 Copiar legenda</button>}
                           <div className="flex gap-2">
                             <Button onClick={() => { const a = document.createElement("a"); a.href = img.url; a.download = `brandify-post-${i + 1}.png`; a.click(); }} size="sm" className="bg-white text-black hover:bg-white/90 border-0 text-xs font-medium h-8 px-4"><Download className="w-3.5 h-3.5 mr-1.5" />Baixar</Button>
-                            <Button onClick={() => { setEditingImage(img); setEditInstruction(""); }} size="sm" variant="outline" className="border-violet-500/30 text-violet-300 hover:bg-violet-500/20 hover:text-violet-200 text-xs font-medium h-8 px-4"><PenTool className="w-3.5 h-3.5 mr-1.5" />Editar</Button>
+                            <Button onClick={() => { setEditingImage(img); setEditInstruction(""); }} size="sm" variant="outline" className="border-white/20 text-white/70 hover:bg-white/10 hover:text-white text-xs font-medium h-8 px-4"><PenTool className="w-3.5 h-3.5 mr-1.5" />Editar</Button>
                           </div>
                         </div>
                       </div>
@@ -525,15 +524,15 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
                   <p className="text-white/30 text-sm">Confirme se é isso que você quer</p>
                 </div>
               </div>
-              <div className="mb-4 px-4 py-3 rounded-xl bg-blue-600/10 border border-blue-500/15">
-                <p className="text-blue-300/60 text-xs font-medium uppercase tracking-wider mb-1">Sua ideia original</p>
+              <div className="mb-4 px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08]">
+                <p className="text-white/40 text-xs font-medium uppercase tracking-wider mb-1">Sua ideia original</p>
                 <p className="text-white/70 text-sm">{prompt}</p>
               </div>
               <div className="mb-6 px-5 py-4 rounded-xl bg-white/[0.03] border border-white/[0.08]">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-6 h-6 rounded-md overflow-hidden"><img src={logo} alt="" className="w-full h-full object-cover" /></div>
                   <span className="text-white/40 text-xs font-medium">Brandify IA</span>
-                  {isGeneratingCopy && <Loader2 className="w-3 h-3 text-violet-400 animate-spin" />}
+                  {isGeneratingCopy && <Loader2 className="w-3 h-3 text-white/50 animate-spin" />}
                 </div>
                 {isGeneratingCopy ? (
                   <div className="space-y-2">
@@ -547,7 +546,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
               </div>
               {!isGeneratingCopy && generatedCopy && (
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <Button onClick={handleGenerateImage} className="flex-1 bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 border-0 text-white font-medium h-12">
+                  <Button onClick={handleGenerateImage} className="flex-1 bg-white text-black hover:bg-white/90 border-0 font-medium h-12">
                     <Check className="w-4 h-4 mr-2" />Confirmar e gerar post
                   </Button>
                   <Button onClick={() => handleGenerateCopy()} variant="ghost" className="border border-white/10 text-white/50 hover:text-white hover:bg-white/[0.08] bg-white/[0.04] h-12">
@@ -564,15 +563,15 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
             <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center py-16">
               <StepIndicator current={3} />
               <div className="relative mb-6 mt-6">
-                <div className="w-24 h-24 rounded-2xl overflow-hidden border border-violet-500/20 flex items-center justify-center">
-                  <img src={logo} alt="Brandify" className="w-full h-full object-cover opacity-30" />
-                  <Loader2 className="w-10 h-10 text-violet-400 animate-spin absolute" />
+              <div className="w-24 h-24 rounded-2xl overflow-hidden border border-white/10 flex items-center justify-center">
+                  <img src={logo} alt="Lovibook" className="w-full h-full object-cover opacity-30" />
+                  <Loader2 className="w-10 h-10 text-white/60 animate-spin absolute" />
                 </div>
               </div>
               <h3 className="text-white font-medium text-lg mb-2" style={{ fontFamily: "'Sora', sans-serif" }}>Criando seu post...</h3>
               <p className="text-white/30 text-sm">Nossa IA está trabalhando na arte</p>
               <div className="mt-4 w-48 h-1 rounded-full bg-white/[0.06] overflow-hidden">
-                <motion.div className="h-full rounded-full bg-gradient-to-r from-violet-500 to-pink-500" initial={{ width: "0%" }} animate={{ width: "90%" }} transition={{ duration: 25, ease: "easeOut" }} />
+                <motion.div className="h-full rounded-full bg-white" initial={{ width: "0%" }} animate={{ width: "90%" }} transition={{ duration: 25, ease: "easeOut" }} />
               </div>
             </motion.div>
           )}
@@ -595,7 +594,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
               <div className="flex flex-col sm:flex-row gap-3 mb-6">
                 <Button onClick={() => { const a = document.createElement("a"); a.href = generatedImages[0].url; a.download = "brandify-post.png"; a.click(); }} className="flex-1 bg-white text-black hover:bg-white/90 border-0 font-medium h-11"><Download className="w-4 h-4 mr-2" />Baixar post</Button>
                 <Button onClick={() => { if (generatedImages[0].copy) navigator.clipboard.writeText(generatedImages[0].copy); toast({ title: "Legenda copiada! 📋" }); }} variant="ghost" className="border border-white/10 text-white/50 hover:text-white hover:bg-white/[0.08] bg-white/[0.04] h-11">📋 Copiar legenda</Button>
-                <Button onClick={() => { setEditingImage(generatedImages[0]); setEditInstruction(""); }} variant="ghost" className="border border-violet-500/20 text-violet-300/70 hover:text-violet-200 hover:bg-violet-500/10 bg-white/[0.02] h-11"><PenTool className="w-4 h-4 mr-2" />Editar</Button>
+                <Button onClick={() => { setEditingImage(generatedImages[0]); setEditInstruction(""); }} variant="ghost" className="border border-white/[0.1] text-white/50 hover:text-white hover:bg-white/[0.08] bg-white/[0.02] h-11"><PenTool className="w-4 h-4 mr-2" />Editar</Button>
               </div>
               <Button onClick={handleNewPost} variant="ghost" className="w-full border border-white/[0.08] text-white/40 hover:text-white hover:bg-white/[0.06] h-11"><Sparkles className="w-4 h-4 mr-2" />Criar outro post</Button>
             </motion.div>
@@ -622,14 +621,14 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
             <div className="flex items-center gap-2 mb-3">
               <span className="text-white/30 text-xs font-medium mr-1">Formato:</span>
               {[{ value: "feed" as const, label: "Feed (1:1)", icon: "📐" }, { value: "story" as const, label: "Story (9:16)", icon: "📱" }].map((opt) => (
-                <button key={opt.value} onClick={() => setPostType(opt.value)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${postType === opt.value ? "bg-violet-500/20 text-violet-300 border border-violet-500/30" : "text-white/30 hover:text-white/50 border border-transparent hover:bg-white/[0.04]"}`}>{opt.icon} {opt.label}</button>
+                <button key={opt.value} onClick={() => setPostType(opt.value)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${postType === opt.value ? "bg-white/10 text-white border border-white/20" : "text-white/30 hover:text-white/50 border border-transparent hover:bg-white/[0.04]"}`}>{opt.icon} {opt.label}</button>
               ))}
             </div>
             <div className="relative">
               <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
-              <Textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="Ex: Restaurante delivery com entrega grátis na cidade inteira..." className="min-h-[56px] max-h-[120px] bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/25 resize-none rounded-xl pl-12 pr-14 text-sm focus:border-violet-500/40 focus:ring-1 focus:ring-violet-500/20" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleGenerateCopy(); } }} />
+              <Textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="Ex: Restaurante delivery com entrega grátis na cidade inteira..." className="min-h-[56px] max-h-[120px] bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/25 resize-none rounded-xl pl-12 pr-14 text-sm focus:border-white/20 focus:ring-1 focus:ring-white/10" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleGenerateCopy(); } }} />
               <button onClick={() => fileInputRef.current?.click()} className="absolute bottom-2.5 left-2.5 h-9 w-9 rounded-lg flex items-center justify-center text-white/30 hover:text-white/60 hover:bg-white/[0.06] transition-all" title="Enviar logo ou referência"><ImagePlus className="w-4 h-4" /></button>
-              <Button onClick={() => handleGenerateCopy()} disabled={isGeneratingCopy || !prompt.trim() || remaining <= 0} className="absolute bottom-2.5 right-2.5 h-9 w-9 p-0 rounded-lg bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 border-0 shadow-lg shadow-violet-500/20 disabled:shadow-none">
+              <Button onClick={() => handleGenerateCopy()} disabled={isGeneratingCopy || !prompt.trim() || remaining <= 0} className="absolute bottom-2.5 right-2.5 h-9 w-9 p-0 rounded-lg bg-white text-black hover:bg-white/90 border-0 disabled:opacity-30">
                 {isGeneratingCopy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
               </Button>
             </div>
@@ -649,7 +648,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
             <div className="flex gap-3">
               <img src={editingImage.url} alt="" className={`rounded-xl object-cover border border-white/10 shrink-0 ${editingImage.type === "story" ? "w-16 h-28" : "w-24 h-24"}`} />
               <div className="flex-1 space-y-1">
-                <p className="text-white/40 text-xs">Post original — <span className="text-violet-300/60">{editingImage.type === "story" ? "Story 9:16" : "Feed 1:1"}</span></p>
+                <p className="text-white/40 text-xs">Post original — <span className="text-white/50">{editingImage.type === "story" ? "Story 9:16" : "Feed 1:1"}</span></p>
                 <p className="text-white/60 text-xs line-clamp-3">{editingImage.prompt}</p>
               </div>
             </div>
@@ -659,7 +658,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
             </div>
             <div className="flex gap-3">
               <Button onClick={() => { setEditingImage(null); setEditInstruction(""); }} variant="ghost" className="flex-1 text-white/40 hover:text-white">Cancelar</Button>
-              <Button onClick={() => handleEditImage(editingImage, editInstruction)} disabled={isEditing || !editInstruction.trim()} className="flex-1 bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 border-0 text-white font-medium">
+              <Button onClick={() => handleEditImage(editingImage, editInstruction)} disabled={isEditing || !editInstruction.trim()} className="flex-1 bg-white text-black hover:bg-white/90 border-0 font-medium">
                 {isEditing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <PenTool className="w-4 h-4 mr-2" />}
                 {isEditing ? "Editando..." : "Refazer post"}
               </Button>
@@ -706,7 +705,7 @@ const ChatBubble = memo(({ msg }: { msg: Msg }) => (
         <img src={logo} alt="Brandify" className="w-full h-full object-cover" />
       </div>
     )}
-    <div className={`max-w-[80%] md:max-w-[70%] ${msg.role === "user" ? "bg-blue-600/15 border border-blue-500/15 rounded-2xl rounded-tr-sm px-4 py-3" : "bg-white/[0.03] border border-white/[0.06] rounded-2xl rounded-tl-sm px-4 py-3"}`}>
+    <div className={`max-w-[80%] md:max-w-[70%] ${msg.role === "user" ? "bg-white/[0.06] border border-white/[0.08] rounded-2xl rounded-tr-sm px-4 py-3" : "bg-white/[0.03] border border-white/[0.06] rounded-2xl rounded-tl-sm px-4 py-3"}`}>
       {msg.role === "assistant" ? (
         <div className="text-[13px] text-white/85 leading-relaxed prose prose-invert prose-sm max-w-none prose-p:my-1.5 prose-headings:text-white prose-strong:text-white prose-li:text-white/80">
           <ReactMarkdown>{msg.content}</ReactMarkdown>
@@ -921,25 +920,25 @@ function ChatTab({ user }: { user: User | null }) {
                 {/* Premium avatar with glow */}
                 <div className="relative mb-8">
                   <motion.div
-                    animate={{ boxShadow: ["0 0 30px rgba(59,130,246,0.15)", "0 0 60px rgba(59,130,246,0.25)", "0 0 30px rgba(59,130,246,0.15)"] }}
+                    animate={{ boxShadow: ["0 0 30px rgba(255,255,255,0.05)", "0 0 60px rgba(255,255,255,0.1)", "0 0 30px rgba(255,255,255,0.05)"] }}
                     transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                    className="w-20 h-20 rounded-2xl overflow-hidden ring-2 ring-blue-500/20"
+                    className="w-20 h-20 rounded-2xl overflow-hidden ring-2 ring-white/10"
                   >
-                    <img src={logo} alt="Brandify" className="w-full h-full object-cover" />
+                    <img src={logo} alt="Lovibook" className="w-full h-full object-cover" />
                   </motion.div>
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
-                    className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center ring-2 ring-[#030306]"
+                    className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-full bg-white flex items-center justify-center ring-2 ring-[#030306]"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-white" />
+                    <Sparkles className="w-3.5 h-3.5 text-black" />
                   </motion.div>
                 </div>
                 <h2 className="text-2xl md:text-3xl font-bold text-white mb-3" style={{ fontFamily: "'Sora', sans-serif" }}>
-                  Como posso <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">ajudar</span>?
+                  Como posso <span className="text-white/60">ajudar</span>?
                 </h2>
-                <p className="text-white/35 text-sm text-center max-w-md mb-10">Sou o assistente da Brandify. Posso criar textos, legendas, estratégias de marketing e responder qualquer dúvida.</p>
+                <p className="text-white/35 text-sm text-center max-w-md mb-10">Sou o assistente da Lovibook. Posso criar textos, legendas, estratégias de marketing e responder qualquer dúvida.</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
                   {CHAT_SUGGESTIONS.map((s, i) => (
                     <motion.button
@@ -948,7 +947,7 @@ function ChatTab({ user }: { user: User | null }) {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4 + i * 0.1 }}
                       onClick={() => handleSend(s.prompt)}
-                      className="group flex items-start gap-3 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-blue-500/[0.06] hover:border-blue-500/20 text-left transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/5"
+                      className="group flex items-start gap-3 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] hover:border-white/[0.12] text-left transition-all duration-300"
                     >
                       <span className="text-xl mt-0.5 group-hover:scale-110 transition-transform">{s.icon}</span>
                       <div>
@@ -1013,9 +1012,9 @@ function ChatTab({ user }: { user: User | null }) {
             )}
             <input ref={chatFileRef} type="file" accept="image/*" onChange={handleChatFileUpload} className="hidden" />
             <div className="relative">
-              <Textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder={chatAttachment ? "O que quer fazer com a imagem..." : "Digite sua mensagem..."} className="min-h-[52px] max-h-[150px] bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/25 resize-none rounded-xl pl-12 pr-14 text-sm focus:border-blue-500/40 focus:ring-1 focus:ring-blue-500/20" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }} />
+              <Textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder={chatAttachment ? "O que quer fazer com a imagem..." : "Digite sua mensagem..."} className="min-h-[52px] max-h-[150px] bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/25 resize-none rounded-xl pl-12 pr-14 text-sm focus:border-white/20 focus:ring-1 focus:ring-white/10" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }} />
               <button onClick={() => chatFileRef.current?.click()} className="absolute bottom-2.5 left-2.5 h-9 w-9 rounded-lg flex items-center justify-center text-white/30 hover:text-white/60 hover:bg-white/[0.06] transition-all" title="Anexar imagem"><ImagePlus className="w-4 h-4" /></button>
-              <Button onClick={() => handleSend()} disabled={isLoading || (!input.trim() && !chatAttachment)} className="absolute bottom-2.5 right-2.5 h-9 w-9 p-0 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 border-0 shadow-lg shadow-blue-500/20 disabled:shadow-none">
+              <Button onClick={() => handleSend()} disabled={isLoading || (!input.trim() && !chatAttachment)} className="absolute bottom-2.5 right-2.5 h-9 w-9 p-0 rounded-lg bg-white text-black hover:bg-white/90 border-0 disabled:opacity-30">
                 {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               </Button>
             </div>
@@ -1035,29 +1034,29 @@ const TOOL_GROUPS: { label: string; badge?: string; badgeColor?: string; tools: 
   {
     label: "Criação",
     tools: [
-      { key: "posts", label: "Gerador de Posts", icon: ImagePlus, color: "text-violet-400", gradient: "from-violet-600/20 to-pink-600/20" },
-      { key: "chat", label: "Chat com IA", icon: MessageSquare, color: "text-blue-400", gradient: "from-blue-600/20 to-cyan-600/20" },
+      { key: "posts", label: "Gerador de Posts", icon: ImagePlus, color: "text-white", gradient: "from-white/[0.08] to-white/[0.04]" },
+      { key: "chat", label: "Chat com IA", icon: MessageSquare, color: "text-white", gradient: "from-white/[0.08] to-white/[0.04]" },
     ],
   },
   {
     label: "Marketing",
     badge: "Pro",
-    badgeColor: "text-amber-400/60",
+    badgeColor: "text-white/40",
     tools: [
-      { key: "copy", label: "Gerador de Copy", icon: PenTool, color: "text-amber-400", gradient: "from-amber-600/20 to-orange-600/20", minPlan: "pro" },
-      { key: "landing", label: "Textos de Venda", icon: Layout, color: "text-emerald-400", gradient: "from-emerald-600/20 to-teal-600/20", minPlan: "pro" },
-      { key: "atendedor", label: "Atendedor IA", icon: Headphones, color: "text-blue-400", gradient: "from-blue-600/20 to-indigo-600/20", minPlan: "pro" },
-      { key: "agendador", label: "Agendador de Consultas", icon: Calendar, color: "text-pink-400", gradient: "from-pink-600/20 to-rose-600/20", minPlan: "pro" },
+      { key: "copy", label: "Gerador de Copy", icon: PenTool, color: "text-white", gradient: "from-white/[0.08] to-white/[0.04]", minPlan: "pro" },
+      { key: "landing", label: "Textos de Venda", icon: Layout, color: "text-white", gradient: "from-white/[0.08] to-white/[0.04]", minPlan: "pro" },
+      { key: "atendedor", label: "Atendedor IA", icon: Headphones, color: "text-white", gradient: "from-white/[0.08] to-white/[0.04]", minPlan: "pro" },
+      { key: "agendador", label: "Agendador de Consultas", icon: Calendar, color: "text-white", gradient: "from-white/[0.08] to-white/[0.04]", minPlan: "pro" },
     ],
   },
   {
     label: "Estratégia",
     badge: "Premium",
-    badgeColor: "text-violet-400/60",
+    badgeColor: "text-white/40",
     tools: [
-      { key: "diagnostico", label: "Diagnóstico IG", icon: Target, color: "text-violet-400", gradient: "from-violet-600/20 to-purple-600/20", minPlan: "premium" },
-      { key: "planejamento", label: "Plano Estratégico", icon: BarChart3, color: "text-cyan-400", gradient: "from-cyan-600/20 to-sky-600/20", minPlan: "premium" },
-      { key: "simulador", label: "Simulador de Faturamento", icon: TrendingUp, color: "text-green-400", gradient: "from-green-600/20 to-emerald-600/20", minPlan: "premium" },
+      { key: "diagnostico", label: "Diagnóstico IG", icon: Target, color: "text-white", gradient: "from-white/[0.08] to-white/[0.04]", minPlan: "premium" },
+      { key: "planejamento", label: "Plano Estratégico", icon: BarChart3, color: "text-white", gradient: "from-white/[0.08] to-white/[0.04]", minPlan: "premium" },
+      { key: "simulador", label: "Simulador de Faturamento", icon: TrendingUp, color: "text-white", gradient: "from-white/[0.08] to-white/[0.04]", minPlan: "premium" },
     ],
   },
 ];
@@ -1175,18 +1174,18 @@ export default function IAs() {
     return (
       <div className="min-h-screen bg-[#030306] flex items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-violet-600/10 blur-[120px]" />
-          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-pink-600/10 blur-[100px]" />
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-white/[0.03] blur-[120px]" />
+          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-white/[0.02] blur-[100px]" />
         </div>
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="flex flex-col items-center gap-4 relative z-10"
         >
-          <div className="w-14 h-14 rounded-2xl overflow-hidden ring-2 ring-violet-500/20 shadow-2xl shadow-violet-500/20">
-            <img src={logo} alt="Brandify" className="w-full h-full object-cover" />
+          <div className="w-14 h-14 rounded-2xl overflow-hidden ring-2 ring-white/10 shadow-2xl">
+            <img src={logo} alt="Lovibook" className="w-full h-full object-cover" />
           </div>
-          <div className="w-8 h-8 border-2 border-violet-500/40 border-t-violet-400 rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
           <p className="text-white/20 text-xs font-medium">Carregando IA Studio...</p>
         </motion.div>
       </div>
@@ -1233,13 +1232,13 @@ export default function IAs() {
               <Menu className="w-5 h-5" />
             </button>
             <Link to="/">
-              <motion.div whileHover={{ scale: 1.05 }} className="w-9 h-9 rounded-xl overflow-hidden ring-1 ring-white/15 shadow-lg shadow-violet-500/10">
-                <img src={logo} alt="Brandify" className="w-full h-full object-cover" />
+              <motion.div whileHover={{ scale: 1.05 }} className="w-9 h-9 rounded-xl overflow-hidden ring-1 ring-white/15">
+                <img src={logo} alt="Lovibook" className="w-full h-full object-cover" />
               </motion.div>
             </Link>
             <div className="h-5 w-px bg-white/[0.08]" />
             <span className="text-white font-semibold text-sm flex items-center gap-1.5" style={{ fontFamily: "'Sora', sans-serif" }}>
-              <Sparkles className="w-3.5 h-3.5 text-violet-400" />
+              <Sparkles className="w-3.5 h-3.5 text-white/50" />
               <span className="hidden sm:inline">IA Studio</span>
               <span className="sm:hidden text-white/60 truncate max-w-[140px]">{activeToolLabel}</span>
             </span>
@@ -1257,8 +1256,8 @@ export default function IAs() {
           {/* Sidebar header */}
           <div className="p-4 border-b border-white/[0.05]">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500/20 to-pink-500/20 border border-violet-400/10 flex items-center justify-center">
-                <Zap className="w-4 h-4 text-violet-400" />
+              <div className="w-8 h-8 rounded-lg bg-white/[0.06] border border-white/[0.08] flex items-center justify-center">
+                <Zap className="w-4 h-4 text-white/50" />
               </div>
               <div>
                 <p className="text-white text-xs font-bold tracking-wide">Ferramentas</p>
@@ -1269,9 +1268,9 @@ export default function IAs() {
           <SidebarNav activeTool={activeTool} setActiveTool={setActiveTool} hasAccess={hasAccess} />
           {userPlan && (
             <div className="p-3 border-t border-white/[0.05]">
-              <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/10">
-                <Crown className="w-3.5 h-3.5 text-amber-400" />
-                <span className="text-amber-300/60 text-xs font-medium">{PLAN_LABELS[userPlan] || userPlan}</span>
+              <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06]">
+                <Crown className="w-3.5 h-3.5 text-white/50" />
+                <span className="text-white/40 text-xs font-medium">{PLAN_LABELS[userPlan] || userPlan}</span>
               </div>
             </div>
           )}
@@ -1284,14 +1283,14 @@ export default function IAs() {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 md:hidden" onClick={() => setMobileSidebar(false)} />
               <motion.aside initial={{ x: -280 }} animate={{ x: 0 }} exit={{ x: -280 }} transition={{ type: "spring", damping: 25, stiffness: 300 }} className="fixed left-0 top-0 bottom-0 w-64 z-50 bg-[#08080c]/95 backdrop-blur-xl border-r border-white/[0.06] flex flex-col md:hidden">
                 <div className="p-4 border-b border-white/[0.06] flex items-center justify-between">
-                  <span className="text-white font-semibold text-sm flex items-center gap-2"><Sparkles className="w-3.5 h-3.5 text-violet-400" />IA Studio</span>
+                  <span className="text-white font-semibold text-sm flex items-center gap-2"><Sparkles className="w-3.5 h-3.5 text-white/50" />IA Studio</span>
                   <button onClick={() => setMobileSidebar(false)} className="text-white/30 hover:text-white p-1"><X className="w-5 h-5" /></button>
                 </div>
                 <SidebarNav activeTool={activeTool} setActiveTool={setActiveTool} hasAccess={hasAccess} onSelect={() => setMobileSidebar(false)} />
                 {userPlan && (
                   <div className="p-3 border-t border-white/[0.06]">
                     <div className="flex items-center gap-2 px-3 py-2">
-                      <Crown className="w-3.5 h-3.5 text-amber-400" />
+                      <Crown className="w-3.5 h-3.5 text-white/50" />
                       <span className="text-white/40 text-xs">Plano {PLAN_LABELS[userPlan] || userPlan}</span>
                     </div>
                   </div>
