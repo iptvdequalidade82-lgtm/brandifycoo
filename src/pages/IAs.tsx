@@ -932,7 +932,7 @@ function ChatTab({ user }: { user: User | null }) {
                     transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
                     className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-full bg-white flex items-center justify-center ring-2 ring-[#030306]"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-white" />
+                    <Sparkles className="w-3.5 h-3.5 text-black" />
                   </motion.div>
                 </div>
                 <h2 className="text-2xl md:text-3xl font-bold text-white mb-3" style={{ fontFamily: "'Sora', sans-serif" }}>
