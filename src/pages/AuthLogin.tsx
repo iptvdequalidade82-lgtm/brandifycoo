@@ -24,16 +24,21 @@ const AuthLogin = () => {
   const redirectTo = searchParams.get("redirect") || "/ias";
 
   const checkAdminAndRedirect = async (userId: string) => {
-    const { data } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .eq("role", "admin")
-      .maybeSingle();
-    
-    if (data) {
-      navigate("/admin");
-    } else {
+    try {
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .eq("role", "admin")
+        .maybeSingle();
+      
+      if (data) {
+        navigate("/admin");
+      } else {
+        navigate(redirectTo);
+      }
+    } catch {
+      // If role check fails, still redirect user
       navigate(redirectTo);
     }
   };
