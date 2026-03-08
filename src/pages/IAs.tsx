@@ -524,7 +524,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
                   <p className="text-white/30 text-sm">Confirme se é isso que você quer</p>
                 </div>
               </div>
-              <div className="mb-4 px-4 py-3 rounded-xl bg-blue-600/10 border border-blue-500/15">
+              <div className="mb-4 px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08]">
                 <p className="text-blue-300/60 text-xs font-medium uppercase tracking-wider mb-1">Sua ideia original</p>
                 <p className="text-white/70 text-sm">{prompt}</p>
               </div>
