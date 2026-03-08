@@ -921,9 +921,9 @@ export default function AdminConteudo() {
                                               </div>
                                               <p className="text-xs text-white/60 leading-relaxed line-clamp-3">{post.caption}</p>
                                               {post.marketingTip && (
-                                                <div className="flex items-start gap-2 p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                                                  <Lightbulb className="w-3.5 h-3.5 text-amber-400 mt-0.5 shrink-0" />
-                                                  <p className="text-xs text-amber-200/80 line-clamp-2">{post.marketingTip}</p>
+                                                 <div className="flex items-start gap-2 p-2.5 rounded-lg bg-white/[0.04] border border-white/[0.08]">
+                                                   <Lightbulb className="w-3.5 h-3.5 text-white/50 mt-0.5 shrink-0" />
+                                                   <p className="text-xs text-white/50 line-clamp-2">{post.marketingTip}</p>
                                                 </div>
                                               )}
                                               <div className="flex items-center gap-1 md:gap-2 pt-1 flex-wrap">
