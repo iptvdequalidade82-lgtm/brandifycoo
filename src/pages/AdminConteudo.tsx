@@ -1007,7 +1007,7 @@ export default function AdminConteudo() {
                                             )}
                                           </div>
                                           <div className="p-3 space-y-2 flex-1">
-                                            <span className="px-2 py-0.5 rounded-md bg-pink-500/20 text-pink-300 text-[10px] font-semibold uppercase">{story.type}</span>
+                                            <span className="px-2 py-0.5 rounded-md bg-white/10 text-white/60 text-[10px] font-semibold uppercase">{story.type}</span>
                                             <p className="text-xs text-white/80 line-clamp-2">{story.mainText}</p>
                                             <p className="text-[10px] text-white/40 italic line-clamp-1">{story.callToAction}</p>
                                             <div className="flex items-center gap-1 pt-1">
