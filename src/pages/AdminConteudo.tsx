@@ -1011,7 +1011,7 @@ export default function AdminConteudo() {
                                             <p className="text-xs text-white/80 line-clamp-2">{story.mainText}</p>
                                             <p className="text-[10px] text-white/40 italic line-clamp-1">{story.callToAction}</p>
                                             <div className="flex items-center gap-1 pt-1">
-                                              <Button variant="ghost" size="sm" onClick={() => toggleChecked(weekIdx, story.id, "story")} className={`h-6 p-0 px-1 text-[10px] ${story.checked ? "text-emerald-400 hover:text-emerald-300" : "text-white/30 hover:text-white"}`}>
+                                              <Button variant="ghost" size="sm" onClick={() => toggleChecked(weekIdx, story.id, "story")} className={`h-6 p-0 px-1 text-[10px] ${story.checked ? "text-white/80 hover:text-white" : "text-white/30 hover:text-white"}`}>
                                                 {story.checked ? <CheckCircle2 className="w-3 h-3 mr-0.5" /> : <Circle className="w-3 h-3 mr-0.5" />}{story.checked ? "✓" : "Conferir"}
                                               </Button>
                                               <Button variant="ghost" size="sm" onClick={() => copyToClipboard(story.mainText)} className="text-white/30 hover:text-white h-6 w-6 p-0"><Copy className="w-3 h-3" /></Button>
