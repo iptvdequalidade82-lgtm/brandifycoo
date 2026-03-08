@@ -213,7 +213,7 @@ function getDayStatus(dateStr: string, items: { time?: string; checked?: boolean
   const dayStart = new Date(dayDate);
   dayStart.setHours(0, 0, 0, 0);
 
-  if (dayStart < today) return { label: "Atrasado", color: "text-red-400" };
+  if (dayStart < today) return { label: "Atrasado", color: "text-white/60" };
   return { label: "", color: "" };
 }
 
