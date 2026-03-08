@@ -594,7 +594,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
               <div className="flex flex-col sm:flex-row gap-3 mb-6">
                 <Button onClick={() => { const a = document.createElement("a"); a.href = generatedImages[0].url; a.download = "brandify-post.png"; a.click(); }} className="flex-1 bg-white text-black hover:bg-white/90 border-0 font-medium h-11"><Download className="w-4 h-4 mr-2" />Baixar post</Button>
                 <Button onClick={() => { if (generatedImages[0].copy) navigator.clipboard.writeText(generatedImages[0].copy); toast({ title: "Legenda copiada! 📋" }); }} variant="ghost" className="border border-white/10 text-white/50 hover:text-white hover:bg-white/[0.08] bg-white/[0.04] h-11">📋 Copiar legenda</Button>
-                <Button onClick={() => { setEditingImage(generatedImages[0]); setEditInstruction(""); }} variant="ghost" className="border border-violet-500/20 text-violet-300/70 hover:text-violet-200 hover:bg-violet-500/10 bg-white/[0.02] h-11"><PenTool className="w-4 h-4 mr-2" />Editar</Button>
+                <Button onClick={() => { setEditingImage(generatedImages[0]); setEditInstruction(""); }} variant="ghost" className="border border-white/[0.1] text-white/50 hover:text-white hover:bg-white/[0.08] bg-white/[0.02] h-11"><PenTool className="w-4 h-4 mr-2" />Editar</Button>
               </div>
               <Button onClick={handleNewPost} variant="ghost" className="w-full border border-white/[0.08] text-white/40 hover:text-white hover:bg-white/[0.06] h-11"><Sparkles className="w-4 h-4 mr-2" />Criar outro post</Button>
             </motion.div>
