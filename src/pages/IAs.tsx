@@ -947,7 +947,7 @@ function ChatTab({ user }: { user: User | null }) {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4 + i * 0.1 }}
                       onClick={() => handleSend(s.prompt)}
-                      className="group flex items-start gap-3 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-blue-500/[0.06] hover:border-blue-500/20 text-left transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/5"
+                      className="group flex items-start gap-3 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] hover:border-white/[0.12] text-left transition-all duration-300"
                     >
                       <span className="text-xl mt-0.5 group-hover:scale-110 transition-transform">{s.icon}</span>
                       <div>
