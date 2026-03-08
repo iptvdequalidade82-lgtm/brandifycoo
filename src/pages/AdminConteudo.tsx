@@ -193,8 +193,8 @@ function getDayItemStatus(dateStr: string, time: string, checked: boolean, month
   itemDate.setHours(itemHour, itemMin, 0, 0);
 
   const now = new Date();
-  if (itemDate < now) return { label: "Atrasado", color: "bg-red-500/20 text-red-300 border-red-500/30" };
-  return { label: "Pendente", color: "bg-blue-500/20 text-blue-300 border-blue-500/30" };
+  if (itemDate < now) return { label: "Atrasado", color: "bg-white/20 text-white/90 border-white/30" };
+  return { label: "Pendente", color: "bg-white/10 text-white/50 border-white/15" };
 }
 
 /** Get overall day status from items */
