@@ -137,14 +137,31 @@ serve(async (req) => {
       "ótica|óculos|lente|optometria": "EYEWEAR: Stylish glasses, eye chart, frames. Modern, sophisticated.",
     };
 
+    const normalizeText = (text: string) =>
+      text
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+
     let nicheInstruction = "";
-    const promptLower = prompt.toLowerCase();
+    const detectionSource = normalizeText([niche, prompt].filter(Boolean).join(" "));
+
     for (const [keywords, instruction] of Object.entries(nicheMap)) {
-      if (keywords.split("|").some((kw) => promptLower.includes(kw))) {
-        nicheInstruction = `\n🏪 NICHE VISUALS: ${instruction}\nEvery visual element MUST match this business niche.`;
+      const hasMatch = keywords
+        .split("|")
+        .map((kw) => normalizeText(kw.trim()))
+        .some((kw) => detectionSource.includes(kw));
+
+      if (hasMatch) {
+        nicheInstruction = `\n🏪 NICHE VISUALS (MANDATORY): ${instruction}\nUse ONLY props, scenery, clothing, symbols and textures from this niche. If any style element conflicts with niche relevance, niche relevance ALWAYS wins.`;
         break;
       }
     }
+
+    if (!nicheInstruction && niche) {
+      nicheInstruction = `\n🏪 NICHE VISUALS (MANDATORY): ${niche}\nCreate a premium composition that is unmistakably from this business niche. Do not include unrelated objects or generic symbols.`;
+    }
+
     if (!nicheInstruction) {
       nicheInstruction = `\n🏪 AUTO-DETECT: Analyze the topic and include ONLY visual elements directly related to that specific business.`;
     }
