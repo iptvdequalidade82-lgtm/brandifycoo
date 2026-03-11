@@ -1078,11 +1078,16 @@ export default function AdminConteudo() {
 
       {/* Quick Post Generator Dialog */}
       <Dialog open={quickPostOpen} onOpenChange={(open) => { if (!quickPostLoading && !quickPostImageLoading) setQuickPostOpen(open); }}>
-        <DialogContent className="bg-[#111] border-white/10 text-white max-w-lg max-h-[85vh] overflow-y-auto" onPointerDownOutside={(e) => e.preventDefault()} onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => { if (quickPostLoading || quickPostImageLoading) e.preventDefault(); }}>
+        <DialogContent className="bg-[#0d0d0d] border-white/10 text-white max-w-lg max-h-[85vh] overflow-y-auto shadow-2xl shadow-black/50" onPointerDownOutside={(e) => e.preventDefault()} onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => { if (quickPostLoading || quickPostImageLoading) e.preventDefault(); }}>
           <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
-              <Wand2 className="w-5 h-5 text-white/60" />
-              Criar post: {quickPostTemplate}
+            <DialogTitle className="text-white flex items-center gap-2.5">
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-white/15 to-white/5 border border-white/10">
+                <Wand2 className="w-4 h-4 text-white/80" />
+              </div>
+              <div>
+                <span className="text-base">Criar post: {quickPostTemplate}</span>
+                <p className="text-[10px] text-white/30 font-normal mt-0.5">Powered by IA Premium</p>
+              </div>
             </DialogTitle>
           </DialogHeader>
 
