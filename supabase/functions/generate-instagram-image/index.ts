@@ -9,7 +9,18 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { prompt, type, referenceImage } = await req.json();
+    const body = await req.json();
+    const prompt = typeof body?.prompt === "string" ? body.prompt.trim() : "";
+    const type = typeof body?.type === "string" ? body.type.toLowerCase() : "feed";
+    const referenceImage = typeof body?.referenceImage === "string" ? body.referenceImage : undefined;
+    const niche = typeof body?.niche === "string" ? body.niche.trim() : "";
+
+    if (!prompt) {
+      return new Response(JSON.stringify({ error: "Prompt da imagem é obrigatório." }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
@@ -126,14 +137,31 @@ serve(async (req) => {
       "ótica|óculos|lente|optometria": "EYEWEAR: Stylish glasses, eye chart, frames. Modern, sophisticated.",
     };
 
+    const normalizeText = (text: string) =>
+      text
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+
     let nicheInstruction = "";
-    const promptLower = prompt.toLowerCase();
+    const detectionSource = normalizeText([niche, prompt].filter(Boolean).join(" "));
+
     for (const [keywords, instruction] of Object.entries(nicheMap)) {
-      if (keywords.split("|").some((kw) => promptLower.includes(kw))) {
-        nicheInstruction = `\n🏪 NICHE VISUALS: ${instruction}\nEvery visual element MUST match this business niche.`;
+      const hasMatch = keywords
+        .split("|")
+        .map((kw) => normalizeText(kw.trim()))
+        .some((kw) => detectionSource.includes(kw));
+
+      if (hasMatch) {
+        nicheInstruction = `\n🏪 NICHE VISUALS (MANDATORY): ${instruction}\nUse ONLY props, scenery, clothing, symbols and textures from this niche. If any style element conflicts with niche relevance, niche relevance ALWAYS wins.`;
         break;
       }
     }
+
+    if (!nicheInstruction && niche) {
+      nicheInstruction = `\n🏪 NICHE VISUALS (MANDATORY): ${niche}\nCreate a premium composition that is unmistakably from this business niche. Do not include unrelated objects or generic symbols.`;
+    }
+
     if (!nicheInstruction) {
       nicheInstruction = `\n🏪 AUTO-DETECT: Analyze the topic and include ONLY visual elements directly related to that specific business.`;
     }
@@ -150,6 +178,9 @@ CRITICAL RULES:
 3. MAX 3-6 words in the headline. Short, impactful, editorial.
 4. 2-3 color palette MAX. Bold but restrained.
 5. Headline MUST mention websites/digital services for the niche (e.g. "Seu site que vende 24h", "Loja virtual para [nicho]"). NEVER generic phrases.
+
+🔒 NICHE LOCK (NON-NEGOTIABLE): ${niche || "Use the niche inferred from topic"}
+If the output is beautiful but not clearly from this niche, it is WRONG and must be regenerated.
 
 🎯 VISUAL STYLE — ${selected.id}:
 ${selected.desc}
