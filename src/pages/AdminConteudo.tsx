@@ -407,8 +407,20 @@ export default function AdminConteudo() {
     }
   };
 
-  const handleGenerateImage = async (weekIdx: number, itemId: string, description: string, type: "feed" | "story", hint?: string) => {
-    const fullPrompt = hint ? `${description}. OBSERVAÇÃO DO USUÁRIO: ${hint}` : description;
+  const handleGenerateImage = async (
+    weekIdx: number,
+    itemId: string,
+    description: string,
+    type: "feed" | "story",
+    hint?: string,
+    niche?: string,
+  ) => {
+    const resolvedNiche = niche?.trim() || monthPlans[activeMonth]?.weeks?.[weekIdx]?.niche?.trim() || "";
+    const promptWithNiche = resolvedNiche
+      ? `${description}. NICHO OBRIGATÓRIO: ${resolvedNiche}.`
+      : description;
+    const fullPrompt = hint ? `${promptWithNiche} OBSERVAÇÃO DO USUÁRIO: ${hint}` : promptWithNiche;
+
     const updateWeekItem = (updating: boolean, imageUrl?: string) => {
       setMonthPlans((prev) => {
         const plan = prev[activeMonth];
@@ -423,6 +435,7 @@ export default function AdminConteudo() {
         return { ...prev, [activeMonth]: { ...plan, weeks } };
       });
     };
+
     updateWeekItem(true);
     try {
       // Use raw fetch with longer timeout (120s) since image generation can take 60+ seconds
@@ -438,7 +451,11 @@ export default function AdminConteudo() {
           "apikey": supabaseKey,
           "Authorization": `Bearer ${session?.access_token || supabaseKey}`,
         },
-        body: JSON.stringify({ prompt: fullPrompt, type }),
+        body: JSON.stringify({
+          prompt: fullPrompt,
+          type,
+          ...(resolvedNiche ? { niche: resolvedNiche } : {}),
+        }),
         signal: controller.signal,
       });
       clearTimeout(timeout);
