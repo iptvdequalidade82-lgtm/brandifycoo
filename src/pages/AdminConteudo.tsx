@@ -456,6 +456,7 @@ export default function AdminConteudo() {
           prompt: fullPrompt,
           type,
           ...(resolvedNiche ? { niche: resolvedNiche } : {}),
+          ...(existingImageUrl ? { referenceImage: existingImageUrl } : {}),
         }),
         signal: controller.signal,
       });
