@@ -816,7 +816,6 @@ export default function AdminConteudo() {
                         <><Sparkles className="w-4 h-4 mr-2" /> Gerar planejamento de {currentMonthConfig.label}</>
                       )}
                     </Button>
-                    </Button>
                   </div>
                 </AccordionContent>
               </AccordionItem>
