@@ -928,6 +928,12 @@ export default function AdminConteudo() {
                                               ) : (
                                                 <div className="flex flex-col items-center gap-3 p-4">
                                                   <ImageIcon className="w-8 h-8 text-white/15" />
+                                                  <Textarea
+                                                    value={post.imageDescription}
+                                                    onChange={(e) => updateItemField(weekIdx, post.id, "feed", "imageDescription", e.target.value)}
+                                                    placeholder="Prompt da imagem (edite antes de gerar)..."
+                                                    className="bg-white/[0.05] border-white/10 text-white text-[10px] min-h-[50px] resize-none w-full"
+                                                  />
                                                   <Button size="sm" onClick={() => handleGenerateImage(weekIdx, post.id, post.imageDescription, "feed", undefined, week.niche)} disabled={post.isGeneratingImage} className="bg-white text-black hover:bg-white/90 text-xs">
                                                     {post.isGeneratingImage ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <><ImageIcon className="w-3.5 h-3.5 mr-1" /> Gerar imagem</>}
                                                   </Button>
