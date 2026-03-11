@@ -414,6 +414,7 @@ export default function AdminConteudo() {
     type: "feed" | "story",
     hint?: string,
     niche?: string,
+    existingImageUrl?: string,
   ) => {
     const resolvedNiche = niche?.trim() || monthPlans[activeMonth]?.weeks?.[weekIdx]?.niche?.trim() || "";
     const promptWithNiche = resolvedNiche
