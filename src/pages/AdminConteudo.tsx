@@ -624,6 +624,7 @@ export default function AdminConteudo() {
         body: JSON.stringify({
           prompt: quickPostResult.imageDescription,
           type: quickPostFormat,
+          niche: quickPostInput,
           ...(quickPostRefImage ? { referenceImage: quickPostRefImage } : {}),
         }),
         signal: controller.signal,
