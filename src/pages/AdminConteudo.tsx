@@ -640,14 +640,22 @@ export default function AdminConteudo() {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 md:gap-4">
-          <div className="p-2.5 md:p-3 rounded-xl bg-white/10 border border-white/20">
-            <Instagram className="w-5 h-5 md:w-7 md:h-7 text-white" />
+            <div className="p-2.5 md:p-3 rounded-xl bg-gradient-to-br from-white/15 to-white/5 border border-white/20 shadow-lg shadow-white/5">
+              <Instagram className="w-5 h-5 md:w-7 md:h-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg md:text-2xl font-bold text-white tracking-tight">Conteúdo Instagram</h1>
+              <p className="text-xs md:text-sm text-white/40 mt-0.5">Planejamento anual 2026 · IA Premium</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-lg md:text-2xl font-bold text-white">Conteúdo Instagram</h1>
-            <p className="text-xs md:text-sm text-white/40 mt-0.5">Planejamento anual 2026</p>
-          </div>
+          {isGenerating && (
+            <div className="flex items-center gap-2 bg-white/[0.06] border border-white/10 rounded-lg px-3 py-2 animate-pulse">
+              <Loader2 className="w-4 h-4 text-white/60 animate-spin" />
+              <span className="text-xs text-white/60">Gerando...</span>
+            </div>
+          )}
         </div>
 
         {/* Quick Action Templates — Gerar Post Avulso */}
