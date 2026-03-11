@@ -690,25 +690,29 @@ export default function AdminConteudo() {
           </div>
         </div>
 
-        {/* Monthly Navigation */}
+        {/* Monthly Navigation — Premium Grid */}
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-1.5 md:gap-2">
           {months.map((month) => {
             const sc = STATUS_CONFIG[month.status];
             const isActive = month.key === activeMonth;
+            const hasPlan = !!monthPlans[month.key];
             return (
               <button
                 key={month.key}
                 onClick={() => { setActiveMonth(month.key); setActiveWeek("1"); setFeedbackItemId(null); }}
-                className={`relative flex flex-col items-center gap-1 p-2.5 rounded-lg border transition-all text-center ${
+                className={`relative flex flex-col items-center gap-1.5 p-2.5 rounded-xl border transition-all text-center ${
                   isActive
-                    ? "bg-white/10 border-white/20 ring-1 ring-white/20"
-                    : "bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.05]"
+                    ? "bg-white/12 border-white/25 ring-1 ring-white/20 shadow-lg shadow-white/5"
+                    : "bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.06] hover:border-white/[0.12]"
                 }`}
               >
                 <span className={`text-xs font-bold ${isActive ? "text-white" : "text-white/60"}`}>{month.shortLabel}</span>
                 <span className={`inline-flex items-center gap-0.5 text-[9px] px-1.5 py-0.5 rounded-full border ${sc.color}`}>
                   {sc.icon}
                 </span>
+                {hasPlan && (
+                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-white/40" />
+                )}
               </button>
             );
           })}
