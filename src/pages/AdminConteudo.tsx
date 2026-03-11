@@ -981,13 +981,19 @@ export default function AdminConteudo() {
                                                   <Textarea placeholder="Legenda..." value={post.caption} onChange={(e) => updateItemField(weekIdx, post.id, "feed", "caption", e.target.value)} className="bg-white/[0.05] border-white/10 text-white text-[10px] min-h-[60px] resize-none" />
                                                   {post.generatedImage && (
                                                     <>
-                                                      <p className="text-[10px] text-white/40 uppercase tracking-wider font-semibold flex items-center gap-1 mt-1"><ImageIcon className="w-3 h-3" /> Refazer imagem</p>
-                                                      <div className="flex gap-2">
-                                                        <Input placeholder="Ex: mais colorido, fundo azul..." value={imageHint} onChange={(e) => setImageHint(e.target.value)} className="bg-white/[0.05] border-white/10 text-white text-xs flex-1 h-9" />
-                                                        <Button size="sm" onClick={() => handleGenerateImage(weekIdx, post.id, post.imageDescription, "feed", imageHint || undefined, week.niche)} disabled={post.isGeneratingImage} className="bg-white text-black hover:bg-white/90 h-9 px-3 shrink-0 text-xs gap-1.5">
-                                                          {post.isGeneratingImage ? <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Gerando...</> : <><RefreshCw className="w-3.5 h-3.5" /> Refazer</>}
-                                                        </Button>
-                                                      </div>
+                                                       <p className="text-[10px] text-white/40 uppercase tracking-wider font-semibold flex items-center gap-1 mt-1"><ImageIcon className="w-3 h-3" /> Refazer imagem</p>
+                                                       <Textarea
+                                                         value={post.imageDescription}
+                                                         onChange={(e) => updateItemField(weekIdx, post.id, "feed", "imageDescription", e.target.value)}
+                                                         placeholder="Prompt da imagem (edite livremente)..."
+                                                         className="bg-white/[0.05] border-white/10 text-white text-[10px] min-h-[50px] resize-none"
+                                                       />
+                                                       <div className="flex gap-2">
+                                                         <Input placeholder="Dica extra: ex. trocar fonte, cor azul..." value={imageHint} onChange={(e) => setImageHint(e.target.value)} className="bg-white/[0.05] border-white/10 text-white text-xs flex-1 h-9" />
+                                                         <Button size="sm" onClick={() => handleGenerateImage(weekIdx, post.id, post.imageDescription, "feed", imageHint || undefined, week.niche, post.generatedImage)} disabled={post.isGeneratingImage} className="bg-white text-black hover:bg-white/90 h-9 px-3 shrink-0 text-xs gap-1.5">
+                                                           {post.isGeneratingImage ? <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Gerando...</> : <><RefreshCw className="w-3.5 h-3.5" /> Refazer</>}
+                                                         </Button>
+                                                       </div>
                                                     </>
                                                   )}
                                                 </div>
