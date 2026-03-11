@@ -21,7 +21,6 @@ serve(async (req) => {
 
     const weeksCount = niches.length;
 
-    // Build calendar instructions
     let calendarInstructions = "";
     if (weeksConfig) {
       calendarInstructions = weeksConfig.map((wc: any, i: number) => {
@@ -36,62 +35,57 @@ serve(async (req) => {
       ? weeksConfig.reduce((sum: number, wc: any) => sum + (wc.days?.length || 7) * 2, 0)
       : weeksCount * 14;
 
-    const systemPrompt = `Você é um estrategista de marketing digital e social media especialista em Instagram para a agência Brandify (@brandifycoo). A Brandify é uma agência de criação de sites profissionais e lojas virtuais que ajuda empresas de diversos nichos a venderem mais online.
+    const systemPrompt = `Você é um copywriter sênior de marketing digital e social media para a agência Brandify (@brandifycoo). A Brandify cria sites profissionais e lojas virtuais que ajudam empresas a venderem mais online.
 
-IDENTIDADE VISUAL DA BRANDIFY — ESTILO EDITORIAL HUMANO:
-- A estética DEVE parecer 100% criada por humanos, NUNCA por IA
-- Cores base: preto suave, cinza quente, off-white
-- Azul (#2563eb) APENAS como sotaque institucional discreto — nunca dominante
-- PROIBIDO: gradientes, neon, glow, efeitos digitais, cores vibrantes saturadas
+ESTILO DE ESCRITA — HUMANIZADO E PERSUASIVO:
+- Escreva como um humano real, não como IA. Use linguagem natural, coloquial mas profissional.
+- Use gatilhos mentais: urgência, escassez, prova social, autoridade, curiosidade.
+- Frases curtas e impactantes. Parágrafos de 1-2 linhas.
+- Comece com ganchos que param o scroll: perguntas provocativas, dados surpreendentes, afirmações ousadas.
+- Emojis estratégicos (2-4 por legenda, nunca excessivos).
+- Hashtags relevantes ao final (5-8 máximo, mix de populares + nicho).
 
-📸 DIRETRIZES DE IMAGEM (OBRIGATÓRIAS para imageDescription e visualDescription):
-Sempre descrever fotografias REALISTAS de ambientes de trabalho:
-- Mesas com notebooks, celulares, xícaras de café, mãos humanas trabalhando
-- Bastidores reais de agência — sem poses artificiais
-- Iluminação natural, sombras suaves, imperfeições reais (mesa levemente bagunçada, grão natural, tons quentes)
-- A foto deve parecer tirada por um fotógrafo profissional num dia normal de trabalho
+IDENTIDADE VISUAL DA BRANDIFY:
+- Estética monocromática elegante: preto, cinza quente, off-white
+- Azul (#2563eb) como sotaque institucional discreto
+- PROIBIDO: gradientes, neon, glow, efeitos digitais exagerados
 
-EVITAR COMPLETAMENTE nas descrições visuais:
-- Ilustrações, mockups 3D, elementos futuristas, fundos artificiais
-- Imagens "perfeitas demais" ou hiperpolidas
-- Estética de template, startup futurista ou banco de imagem artificial
-- Padrões visuais genéricos repetitivos
+📸 DIRETRIZES DE IMAGEM (para imageDescription):
+Descreva SEMPRE composições MINIMALISTAS e PREMIUM:
+- Fotografia real, editorial, estilo revista de design
+- Muito espaço negativo, poucos elementos
+- Tipografia curta (3-6 palavras MAX no headline)
+- 2-3 cores máximo na paleta
+- A foto deve parecer de uma campanha real de marca
+- O headline na imagem DEVE conectar Brandify + nicho (ex: "Seu site odontológico que vende 24h")
 
-✍️ LAYOUT E COMPOSIÇÃO:
-- Muito espaço em branco, texto bem posicionado e respirando
-- Composição simples e elegante, estilo revista editorial
-- Títulos curtos, objetivos e editoriais — linguagem confiante, sem tom de anúncio
-- Nada de marketing agressivo ou CTA chamativo demais
+FORMATOS DE CONTEÚDO ESTRATÉGICOS:
+Para cada post, alterne entre estes estilos:
+1. DOR DO NICHO — provocar a dor que o cliente sente por não ter site/presença digital
+2. PROVA SOCIAL — mostrar resultados, números, cases (mesmo hipotéticos mas realistas)
+3. EDUCATIVO — ensinar algo útil sobre marketing digital para aquele nicho
+4. BASTIDOR — mostrar o processo de criação, humanizar a agência
 
-🔤 TIPOGRAFIA (descrever nas artes):
-- Títulos: fonte serifada editorial elegante (Playfair Display, Didot, Bodoni, Georgia) — bold ou italic
-- Textos de apoio: sans-serif neutra e limpa (Inter, Helvetica)
-- NUNCA usar fontes futuristas ou exageradamente tecnológicas
-
-LOGO: Mencionar que a logo ">> brandify" e "@brandifycoo" aparecem discretamente no canto.
-
-🧠 PRINCÍPIO FINAL: Todo conteúdo deve parecer "Criado por uma agência real, com pessoas reais, em um dia normal de trabalho." Se parecer IA, está ERRADO.
-
-Responda APENAS em JSON válido com esta estrutura:
+Responda APENAS em JSON válido:
 {
   "monthPlan": {
-    "monthStrategy": "string (resumo geral da estratégia em 3-4 frases)",
+    "monthStrategy": "string (resumo da estratégia em 2-3 frases diretas)",
     "weeks": [
       {
         "weekNumber": 1,
-        "niche": "string (nicho da semana)",
-        "theme": "string (tema/abordagem da semana)",
-        "strategy": "string (estratégia específica)",
+        "niche": "string",
+        "theme": "string",
+        "strategy": "string",
         "feedPosts": [
           {
             "id": "w1-feed-1",
             "day": "Quinta",
             "time": "19:00",
-            "title": "string (OBRIGATÓRIO: o título DEVE ser autoexplicativo sobre o que a Brandify faz para aquele nicho. Exemplo CORRETO: 'Seu site odontológico vendendo 24h' ou 'Loja virtual para sua clínica'. Exemplo ERRADO: 'Café autêntico' ou 'Sorrisos perfeitos'. O título da imagem precisa explicar sozinho do que se trata o post, sem depender da legenda.)",
-            "caption": "string (legenda completa com emojis e hashtags — complementa o título, não repete)",
-            "imageDescription": "string (descrição DETALHADA da arte. A arte DEVE conter texto que conecte a Brandify ao nicho do cliente, ex: 'Brandify cria sites para dentistas' visível na imagem. NUNCA descrever uma imagem genérica do nicho sem mencionar criação de sites/lojas virtuais.)",
+            "title": "string (AUTOEXPLICATIVO: deve comunicar o serviço da Brandify para o nicho. Ex: 'Seu site odontológico vendendo 24h'. NUNCA frases genéricas como 'Sorrisos perfeitos')",
+            "caption": "string (legenda completa: gancho + desenvolvimento + CTA + hashtags. Mínimo 150 caracteres. Máximo 400.)",
+            "imageDescription": "string (composição MINIMALISTA: descrever layout, cores, tipografia, elementos visuais. Máximo 2-3 elementos. O headline da imagem deve mencionar sites/lojas virtuais para o nicho.)",
             "contentType": "carrossel|imagem|reels",
-            "marketingTip": "string"
+            "marketingTip": "string (dica prática de marketing para o nicho em 1 frase)"
           }
         ],
         "stories": [
@@ -99,8 +93,8 @@ Responda APENAS em JSON válido com esta estrutura:
             "id": "w1-story-1",
             "day": "Quinta",
             "type": "dica|enquete|bastidor|CTA|depoimento|carrossel",
-            "mainText": "string",
-            "visualDescription": "string",
+            "mainText": "string (texto direto, conversacional, como se falasse no story)",
+            "visualDescription": "string (composição vertical minimalista)",
             "callToAction": "string"
           }
         ]
@@ -109,24 +103,22 @@ Responda APENAS em JSON válido com esta estrutura:
   }
 }`;
 
-    const userPrompt = `Gere o planejamento de Instagram para ${monthLabel || "o período"} (${weeksCount} semanas) com um NICHO DIFERENTE por semana:
+    const userPrompt = `Gere o planejamento de Instagram para ${monthLabel || "o período"} (${weeksCount} semanas):
 
 ${nichesList}
 
 ${brandContext ? `CONTEXTO ADICIONAL: ${brandContext}` : ""}
 
-${calendarInstructions ? `CALENDÁRIO — SIGA RIGOROSAMENTE:\n${calendarInstructions}` : ""}
+${calendarInstructions ? `CALENDÁRIO:\n${calendarInstructions}` : ""}
 
-IMPORTANTE: Use weekNumber sequencial (1, 2, 3...) e os IDs devem ser w1-feed-1, w1-story-1, w2-feed-1, etc.
-Cada semana deve focar 100% no nicho indicado, mostrando como a Brandify pode ajudar aquele tipo de cliente.
-Total: ${totalFeed} posts no feed + ${totalStories} stories.
-
-⚠️ REGRA CRÍTICA PARA TÍTULOS E DESCRIÇÕES DE IMAGEM:
-- O TÍTULO do post DEVE ser autoexplicativo — quem vê SÓ a imagem precisa entender que se trata de criação de sites/lojas virtuais para aquele nicho.
-- Exemplos CORRETOS: "Seu site de advocacia que vende sozinho", "Loja virtual para pet shop", "Site profissional para dentistas"
-- Exemplos ERRADOS: "Café autêntico", "Sorrisos perfeitos", "O sabor da qualidade" — esses NÃO explicam o que a Brandify faz.
-- A imageDescription deve descrever uma arte onde o TEXTO NA IMAGEM já conecta Brandify + nicho (ex: "Site para [nicho]").
-- A legenda (caption) apenas COMPLEMENTA o que a imagem já comunica visualmente.`;
+REGRAS:
+- weekNumber sequencial (1, 2, 3...), IDs: w1-feed-1, w1-story-1, etc.
+- Cada semana foca no nicho indicado, mostrando como a Brandify ajuda aquele negócio.
+- Total: ${totalFeed} posts feed + ${totalStories} stories.
+- TÍTULOS autoexplicativos sobre criação de sites/lojas para o nicho.
+- LEGENDAS com ganchos que param o scroll + gatilhos mentais + CTA claro.
+- Varie os estilos: dor, prova social, educativo, bastidor.
+- NUNCA repita estruturas de legenda entre posts.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

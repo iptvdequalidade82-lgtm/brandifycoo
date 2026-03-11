@@ -9,597 +9,176 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { prompt, type, referenceImage } = await req.json(); // referenceImage: optional base64 data URL
+    const { prompt, type, referenceImage } = await req.json();
 
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!GEMINI_API_KEY && !LOVABLE_API_KEY) throw new Error("No API key configured");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    if (!LOVABLE_API_KEY && !GEMINI_API_KEY) throw new Error("No API key configured");
 
     const isStory = type === "story" || type === "stories";
     const aspectRatio = isStory ? "9:16" : "1:1";
     const dimensions = isStory ? "1080x1920" : "1080x1080";
 
-    // Rotate between 28 visual models trained from real reference posts
-    const visualModels = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AE"];
-    const selectedModel = visualModels[Math.floor(Math.random() * visualModels.length)];
+    // 12 curated visual styles — best performing, most diverse
+    const styles = [
+      {
+        id: "CINEMATIC_LANDSCAPE",
+        desc: `Full-bleed dramatic landscape photograph (ocean, mountains, golden hour sky). Person with back turned or silhouetted. MASSIVE bold typography filling 40-50% of frame using clipping mask (sky/landscape visible THROUGH the letters). Cinematic color grading. Aspirational mood.`
+      },
+      {
+        id: "DARK_LUXURY",
+        desc: `Night urban setting with dramatic low-key lighting. Dark clothing, mysterious figure. One luxury element (car, watch, environment). High contrast: deep blacks + bright whites + subtle warm accent. Bold white typography with texture fill or pattern inside letters.`
+      },
+      {
+        id: "EDITORIAL_BRAND",
+        desc: `Magazine-quality dark editorial layout. Large hero portrait with dramatic side lighting. Multi-weight typography: big headline + small body + brand credits. One accent color (orange or gold) for key words. Design overlays: subtle grids, brackets. Agency feel.`
+      },
+      {
+        id: "CLEAN_TYPOGRAPHY_3D",
+        desc: `Clean white/light gray background — ultra minimal, Swiss poster aesthetic. MASSIVE bold black condensed text dominating frame. ONE letter replaced by hyper-realistic 3D textured object (grass, metal, fabric, food). Object casts real shadow. Small orange accent label. Handwritten subtitle.`
+      },
+      {
+        id: "MONOCHROME_BOLD",
+        desc: `Strong single vivid color background (gold, emerald, royal blue). One dominant visual element matching niche. GIANT bold typography with texture fill — animal print, metal, fabric pattern inside letters. Mix of script + massive bold for hierarchy. Minimal composition.`
+      },
+      {
+        id: "WARM_NATURE_EDITORIAL",
+        desc: `Warm dominant palette: amber, golden orange. Photorealistic macro-style hero element relevant to niche. GIANT mixed typography: massive serif word + elegant script accent. Warm bokeh particles. Glass/translucent overlay cards. Numbered counter in corner. Nature editorial feel.`
+      },
+      {
+        id: "DARK_DRAMATIC_CREATURE",
+        desc: `Deep moody dark atmosphere (underwater, cave, dark forest). Dramatic 3D element central. GIANT bold gradient typography (white to amber) overlapping the scene. Bioluminescent glows, particles, dramatic rim lighting. Deep blues + teal + amber text accents.`
+      },
+      {
+        id: "GLASSMORPHISM_PORTRAIT",
+        desc: `Dramatic full-frame background (nature, cityscape, abstract). FROSTED GLASS CARD at bottom — glassmorphism with rounded corners, blur backdrop. Glass card has bold accent text in orange/gold + regular white. Cinematic lighting, rich colors, depth layers.`
+      },
+      {
+        id: "STATUE_REMIX",
+        desc: `Greek/Roman marble statue or 3D sculpture, REMIXED with modern elements. Strong single color dominates (purple, blue, pink). ENORMOUS condensed bold typography filling background at multiple opacity levels (100%, 40%, 15%). Accent labels in tilted dark tags.`
+      },
+      {
+        id: "RETRO_EDITORIAL",
+        desc: `Real landscape with vintage/retro color grading — warm film grain. One focal object relevant to niche. GIANT bold editorial typography: strong condensed sans-serif + flowing script mix. Handwritten annotation accent. Photographic toolbar mockup as meta-reference.`
+      },
+      {
+        id: "ACTION_NEON",
+        desc: `Near-black background with dramatic NEON LIGHT TRAILS (pink, cyan, purple). Dynamic action pose or moving element. Smoke/fog effects. GIANT white bold typography STACKED VERTICALLY. Script/graffiti accent at bottom. Geometric patterns subtly in background.`
+      },
+      {
+        id: "VIBRANT_3D_MASCOT",
+        desc: `Light/white background. MASSIVE bold vivid-colored word as background element filling entire frame. Hyper-realistic colorful 3D element centered, overlapping the giant text. Color palette swatches scattered. Small decorative elements (sparkles, petals). Energetic, eye-catching.`
+      },
+    ];
 
-    const modelInstructions: Record<string, string> = {
-      A: `MODEL A — IMPACTFUL TYPOGRAPHY WITH SCENIC BACKGROUND:
-- Dramatic real photograph as full background (ocean cliffs, mountains, sunsets, city skylines, epic landscapes)
-- Person (back turned or face hidden) as central figure — wearing streetwear, hoodie, or dark clothes
-- MASSIVE bold typography that DOMINATES the image — words so big they fill 40-60% of the frame
-- Text uses CLIPPING MASK effect: the letters are filled with a different landscape/sky texture visible THROUGH the text
-- Cinematic color grading: golden hour, blue tones, dramatic clouds
-- Motivational/aspirational Portuguese text in the headline
-- Reference: "O PLANO DE DEUS NUNCA INCLUIU DESISTIR, SÓ VENCER" style with landscape-filled giant text`,
+    const selected = styles[Math.floor(Math.random() * styles.length)];
 
-      B: `MODEL B — DARK LUXURY NIGHT SCENE:
-- Night urban setting: gas station, parking lot, city street at night — low-key dramatic lighting
-- Luxury/sport car (BMW, Mercedes, Porsche) as main element with person leaning on it
-- Person in dark clothing, face obscured or in shadow — mysterious, powerful vibe
-- GIANT white bold typography with BRAND PATTERN FILL (like Louis Vuitton monogram inside letters)
-- High contrast: deep blacks, bright whites, subtle red accents from car lights
-- Mood: power, ambition, luxury, street culture meets high fashion
-- Reference: "A ÚNICA OPÇÃO É VENCER" with LV-pattern filled letters over night car scene`,
-
-      C: `MODEL C — EXTREME SPORTS ACTION:
-- Real action photography: snowboarding, surfing, skateboarding, mountain biking, motorsport
-- Dynamic composition with motion blur or powder/spray effects
-- Person in the middle of action — full body, dramatic pose
-- Clean, elegant typography — mix of italic script and bold sans-serif
-- Soft or dramatic colors matching the sport: pink/purple for snow, blue for ocean, warm for desert
-- Text positioned to complement the action, not block it
-- Reference: snowboarder with clean white text and generous negative space`,
-
-      D: `MODEL D — CINEMATIC SPEED & MOTION:
-- Motion blur background suggesting high speed — racing, driving, running
-- Dark/moody atmosphere with dramatic lighting (headlights, speed streaks)
-- Object in sharp focus against blurred background (helmet, car detail, face)
-- Bold white/silver typography with MOTION BLUR EFFECT on the text itself
-- Red and black color palette, cinematic grain
-- Reference: Ferrari helmet with "NÃO TENHA MEDO DE IR DEVAGAR, SÓ EM PARAR" in motion-blurred text`,
-
-      E: `MODEL E — EDITORIAL BRAND STORYTELLING:
-- Dark, sophisticated editorial layout — magazine-quality composition
-- Large hero portrait (profile shot, close-up) with dramatic side lighting
-- Overlay of subtle design elements: grids, brackets, technical marks, UI hints
-- Multi-weight typography: large headline + smaller body text + brand credits
-- Key words highlighted in ACCENT COLOR (orange, red, or brand color)
-- Agency branding visible at top
-- Reference: Nike editorial with "Como a Nike descobriu um novo pote de ouro" style dark layout`,
-
-      F: `MODEL F — ASPIRATIONAL LIFESTYLE WITH GIANT NUMBERS/TEXT:
-- Golden hour or dramatic sunset/sunrise as background
-- Person reaching out toward camera (POV perspective) or standing at dramatic location
-- ENORMOUS numbers or single word that FILLS the entire frame
-- Numbers/text use CLIPPING MASK showing the sky/landscape THROUGH the characters
-- Warm golden tones, ocean rocks, dramatic clouds
-- Reference: "SEJA BEM VINDO 2026" with sunset-filled numbers over ocean rocks`,
-
-      G: `MODEL G — SURREAL ENVIRONMENT WITH PRODUCT/LAPTOP:
-- Creative surreal-but-grounded scene: underwater, jungle, space, fantasy setting
-- Real product (laptop, phone, tablet) floating or placed in the surreal environment
-- Laptop screen showing a real website or social media feed
-- GIANT stylized text with CLIPPING MASK or transparency — text filled with environment texture
-- Bubbles, particles, organic elements (rope, plants, rocks) adding depth
-- Agency branding at bottom with elegant small text
-- Think "tech product in magical world" — premium and creative
-- Reference: Laptop underwater with "4 EXTENSÕES ESCONDIDAS QUE VÃO SALVAR A SUA VIDA!" style`,
-
-      H: `MODEL H — BOLD AGENCY SOCIAL MEDIA STYLE (Orange/Dark):
-- Strong brand colors: ORANGE and BLACK as dominant palette, or vibrant accent + dark background
-- 3D rendered characters, mascots, or stylized portraits as hero elements
-- Character can be: funny/expressive person, animal with human traits, superhero-styled figure
-- Bold, chunky typography — mix of different weights and sizes for visual hierarchy
-- Agency header bar at top: "AGÊNCIA [NAME]" with logo
-- Multiple text elements: headline + subheadline + CTA + small body text
-- Energetic, fun, attention-grabbing — designed to STOP THE SCROLL
-- Social media UI elements visible (save icon, share icon) as design accents
-- Reference: Agência Tenks grid with orange/dark posts, 3D characters, bold headlines`,
-
-      I: `MODEL I — ROYAL/PREMIUM PORTRAIT:
-- Rich, deep color background (burgundy, royal red, deep purple, dark gold)
-- Person facing camera with CROWN, luxury accessories, or royal elements
-- Premium editorial portrait — dramatic lighting on face, dark vignette
-- Overlay of faded text (lorem ipsum style) as texture behind the person
-- GIANT headline at bottom using GRADIENT TEXT (gold to orange) or mixed serif/sans-serif
-- "Parental Advisory" style badges or stamp-like design elements as accents
-- Mood: royalty, authority, confidence, premium content
-- Reference: Man with crown, red background, "Copie o meu Prompt" with gradient gold text`,
-
-      J: `MODEL J — DARK TECH/LAUNCH ANNOUNCEMENT:
-- Deep black/dark background with subtle grid or particle effects
-- Hyper-detailed 3D rendered animal or creature as hero (cat, wolf, lion, eagle)
-- Creature has GLOWING EYES (red, orange, or electric blue) — dramatic and intense
-- Brand logo and name prominently at top
-- GIANT bold colored text (orange, red) as main headline — product or event name
-- "SAVE THE DATE" or launch-style urgency elements
-- Design tool icons (Photoshop toolbar, pen tool icons) floating as subtle background elements
-- Mood: powerful, tech-forward, aggressive launch energy
-- Reference: Black cat with red glowing eyes, "MIAL - Método IA Lucrativa" dark launch post`,
-
-      K: `MODEL K — BEACH/LIFESTYLE RETROSPECTIVE:
-- Person at beach or outdoor lifestyle setting — relaxed, confident pose
-- GIANT white typography (numbers or words) as background element, person IN FRONT of text
-- Text so large it extends beyond the frame edges
-- Mix of handwritten script + bold block text
-- Small design elements: measurement scale on sides, brand credits in corners
-- Bright blue sky, warm natural light, summer vibes
-- Reference: "RETROSPECTIVA 2025" with giant white numbers behind beach person`,
-
-      L: `MODEL L — SURREAL FLYING OBJECT WITH FLOWERS:
-- Object (car, product, person) FLOATING in the sky among clouds
-- Surrounded by flowers, petals, or natural organic elements
-- Dreamy, magical composition — surreal but beautiful
-- GIANT 3D-perspective typography that wraps around or behind the floating object
-- Script/handwritten accent text in contrasting color (red, orange)
-- Warm golden/sunset tones mixed with floral colors
-- Reference: Red Porsche flying among clouds and flowers with giant perspective text`,
-
-      M: `MODEL M — MONOCHROMATIC BOLD WITH ANIMAL:
-- Strong single-color background (gold/yellow, red, blue, green)
-- Hyper-detailed animal as hero: lion, leopard, tiger, eagle, wolf
-- GIANT bold typography with TEXTURE FILL — text filled with animal print or material pattern
-- Mix of script + massive bold text for hierarchy
-- Small decorative elements: checkered bars, star icons, brand watermarks
-- Reference: Golden leopard on yellow with textured "GRADIENTS" text`,
-
-      N: `MODEL N — CLASSICAL STATUE REMIX:
-- Greek/Roman marble statue REMIXED with modern elements (fur coat, gold chains, sneakers)
-- Bright sky background with fluffy clouds — pastel palette (pink, baby blue)
-- GIANT white text behind statue using CLIPPING MASK
-- Elegant script + massive bold text combination
-- Measurement scale and technical marks on edges
-- Reference: Greek statue with pink fur coat, "Posts dos ALUNOS" giant text`,
-
-      O: `MODEL O — GOLDEN HOUR SPORTS ACTION:
-- Dynamic sports action: basketball dunk, soccer, boxing, MMA
-- Golden hour lighting with LIGHT TRAIL effects (glowing streaks around athlete)
-- Low-angle dramatic camera — athlete looks heroic
-- Bold white + gold/orange typography at top
-- Mix of block sans-serif + hand-brushed text
-- Lens flare and bokeh effects — cinematic sports photography
-- Reference: Basketball player mid-dunk with golden light trails, "PROMPTS SPORTS"`,
-
-      P: `MODEL P — FUTURISTIC FASHION EDITORIAL:
-- Strong single-color background (electric blue, hot pink, chrome silver)
-- Person in futuristic/metallic fashion: chrome jacket, reflective visor, metallic helmet
-- Profile or 3/4 angle portrait — editorial fashion photography
-- GIANT text same color as background but different shade — embossed/debossed effect
-- Mix of elegant script + massive block letters
-- Technical marks: measurement scale, year, category labels
-- Reference: Woman in chrome blue outfit with tonal "TEXTURAS" text`,
-
-      Q: `MODEL Q — CHROME/METALLIC ANIMAL TYPOGRAPHY:
-- Deep black background — pure darkness
-- Hyper-detailed animal face: white tiger, wolf, eagle, panther
-- Animal has GLOWING EYES (electric blue, ice white)
-- CHROME/METALLIC 3D typography arching above — letters look like liquid metal
-- Script accent text in white or silver
-- Monochromatic cool palette: black, white, silver, ice blue
-- Reference: White tiger with blue eyes, chrome "ESTAMPAS" text arching above`,
-
-      R: `MODEL R — VIBRANT COLOR-BLOCKED WITH VEHICLE:
-- Rich saturated single-color environment (emerald green, deep red, electric blue, hot pink)
-- Person in matching-color outfit + luxury car in SAME COLOR
-- Everything color-coordinated — monochromatic but vibrant
-- GIANT bold white or contrasting text overlaid
-- Mix of script + bold typography
-- Cherry blossoms, fabric waves, or themed elements matching the color
-- Reference: Mercedes G-Class in pink cherry blossom scene with giant text`,
-
-      S: `MODEL S — CLEAN TYPOGRAPHY WITH 3D TEXTURED ELEMENT:
-- Clean white/light gray background — minimal, editorial, no clutter
-- MASSIVE bold black condensed typography that DOMINATES the frame (60-70% of space)
-- ONE letter or element replaced by a hyper-realistic 3D TEXTURED OBJECT (grass, fur, metal, wood, fabric, food)
-- The 3D element casts a subtle real shadow on the white background
-- Small accent text in ORANGE or warm color (like a label/tag) between the large words
-- Handwritten or script-style subtitle at bottom
-- Clean folder/path breadcrumb at top-left corner (like "inspirações/cores")
-- Arrow icon at top-right
-- Think: Swiss poster design meets 3D rendering — ultra-clean but tactile
-- Reference: "CORES com VERDE" with grass-textured 3D "O" letter on white background`,
-
-      T: `MODEL T — WARM NATURE EDITORIAL WITH ANIMAL PROTAGONIST:
-- WARM dominant color palette: deep orange, amber, golden yellow — the entire image bathes in this warm tone
-- Hyper-detailed ANIMAL as hero — butterfly, bird, exotic insect — photorealistic with incredible detail
-- Animal positioned on natural element (flower, branch, rock) with macro-photography feel
-- GIANT mixed typography behind/around: massive serif word + elegant script accent word
-- Title structure: small intro text + MASSIVE main word + script accent (like "Aprenda o estilo: Animal art")
-- Agency branding at top-left corner with pipe separator
-- Numbered counter at top-right in rounded border (like "#041 / 365")
-- Warm bokeh particles floating, magical atmosphere, nature details in background
-- Glass/translucent text overlay cards with body text visible but subtle
-- Reference: Golden butterfly on flower with "Animal Art" giant text in warm orange atmosphere`,
-
-      U: `MODEL U — DARK UNDERWATER/DEEP SCENE WITH CREATURE:
-- DARK moody atmosphere: deep ocean, underwater, cave, or dark fantasy environment
-- Hyper-detailed 3D CREATURE as hero: octopus, dragon, sea monster, mythical beast
-- Creature wrapping around or interacting with objects (shipwreck, ruins, artifacts)
-- GIANT bold typography with GRADIENT FILL (white to orange/amber) — text overlapping creature
-- Small intro word in highlighted badge/label style above main text
-- Script or handwritten accent word after/below main text
-- Bioluminescent glows, bubbles, underwater particles, dramatic rim lighting
-- Agency branding at top-left, numbered counter at top-right
-- Dark blue, teal, deep black with orange/amber text accents
-- Reference: Giant octopus on shipwreck with "gerar imagens" gradient text, dark underwater scene`,
-
-      V: `MODEL V — ANIMAL PORTRAIT WITH GLASS CARD OVERLAY:
-- Hyper-detailed ANIMAL face as FULL background — lion, jaguar, wolf, eagle — staring directly at camera
-- Dark jungle/forest environment with magical light particles and foliage
-- FROSTED GLASS CARD at bottom of image — glassmorphism panel with rounded corners
-- Glass card contains: bold title text (mixed serif + script in ORANGE/accent) + body text in two columns
-- Glass card has subtle blur backdrop, thin white border, semi-transparent
-- Small green leaf or organic element breaking out of the glass card for depth
-- Text on glass mixes BOLD accent words in orange with regular white text
-- Moody, cinematic forest lighting — greens, teals, subtle golden particles
-- Reference: Jaguar face close-up with frosted glass "Animal Art" text card at bottom`,
-
-      W: `MODEL W — MONOCHROME STATUE WITH MASSIVE BOLD TYPOGRAPHY:
-- Single STRONG color dominates EVERYTHING: purple, electric blue, hot pink, or emerald
-- Greek/Roman 3D STATUE in dramatic action pose (warrior, hero, athlete) — same color tint
-- ENORMOUS condensed bold typography filling the ENTIRE background — text so big it goes edge-to-edge
-- Text REPEATED at multiple opacity levels creating depth (100%, 40%, 15% opacity stacked)
-- Italic accent labels in contrasting dark badges scattered around (like "BRiEFiNG" in tilted black tags)
-- 4-point star/sparkle decorative elements scattered across composition
-- Page counter at top center (like "01 02 03") with current page underlined
-- "Save This Post" and "Graphic Design" small accent labels in corners
-- "Arrasta para o lado" CTA bar at bottom
-- Reference: Purple warrior statue with massive "BRIEFING" text repeated at multiple opacities`,
-
-      X: `MODEL X — 3D CHARACTER RUNNING WITH MASSIVE TEXT BEHIND:
-- Dark dramatic background with fog, city silhouette, or fantasy environment
-- Hyper-detailed 3D ANIMATED CHARACTER running TOWARD camera — anthropomorphic animal (tiger, wolf, bear) in action pose
-- Character has dynamic clothing, expression, and motion — Pixar/DreamWorks quality rendering
-- Character PUNCHING or REACHING toward viewer — dynamic foreshortening
-- MASSIVE white/light typography BEHIND the character — character breaks through the text
-- Multiple small ACCENT LABELS in highlighted purple/blue badges floating around
-- Design software tool icons (pen, move, shape) as subtle background texture elements
-- Handwritten brand text at bottom in ghost/watermark opacity
-- Page counter at top, agency branding, "Arrasta para o lado" CTA bar at bottom
-- Strong color accent (purple, blue, or orange) throughout
-- Reference: Tiger character running through "PHOTOSHOP" text with purple accents`,
-
-      Y: `MODEL Y — NEON TRAIL ACTION POSE WITH STACKED TEXT:
-- DARK background (near black) with dramatic NEON LIGHT TRAILS
-- Person in dynamic action pose — dancing, jumping, martial arts — full body
-- GLOWING NEON TRAILS following the person's movement (pink, cyan, or electric purple)
-- Smoke/fog effects adding atmosphere — colored to match the neon
-- GIANT white bold typography STACKED VERTICALLY — one word per line, huge scale
-- Script/graffiti accent text at bottom in neon matching color
-- Geometric patterns (circles, tech grids, sacred geometry) subtly in background
-- Multi-language small text at bottom (English + Portuguese) as design element
-- Small icon flags and directional elements as accent details
-- "ARRASTA PRO LADO" CTA with arrow at bottom
-- Reference: Dancer with pink neon trails, stacked "CORES" text, graffiti "Rosa" accent`,
-
-      Z: `MODEL Z — NATURE ANIMAL DOCUMENTARY WITH GLASS TEXT PANEL:
-- Hyper-detailed ANIMAL walking toward camera in natural habitat — jungle, savanna, forest
-- Cinematic documentary photography style — dramatic lighting, shallow depth of field
-- Floating leaves, particles, insects adding life and motion to the scene
-- FROSTED GLASS PANEL in upper portion with TWO-COLUMN text layout
-- Glass panel text uses ORANGE/accent bold for key phrases, white for regular text
-- Italic/serif quote text above the glass panel — philosophical or poetic
-- Rich earth tones: deep greens, warm browns, golden highlights
-- Organic debris and elements in foreground for depth layering
-- Mood: National Geographic meets editorial design
-- Reference: Anteater walking in jungle with glass text panel about "Animal Art" style`,
-
-      AA: `MODEL AA — CLEAN CATALOG/GRID WITH MASKED FIGURE:
-- Clean WHITE/light background — editorial, organized, catalog-style layout
-- Central MASKED FIGURE (balaclava, hood, or face-obscured person) — streetwear, urban fashion
-- Figure wearing CROWN or luxury accessories — mysterious and powerful
-- GRID of colorful rectangular image thumbnails arranged around the figure
-- Thumbnails show abstract textures, fabrics, gradients — like a material library
-- MASSIVE bold condensed typography at top — "BACKGROUNDS" style catalog headline
-- Smaller subtitle text and "Swipe to discover" type CTA
-- Brand logo at top center, @ handle at top-left, page counter at top-right (like "1/7")
-- Script handwritten accent text (like "Part 5")
-- Very clean, organized, almost Swiss-poster aesthetic with urban edge
-- Reference: Masked figure with crown, grid of texture thumbnails, "BACKGROUNDS" catalog title`,
-
-      AB: `MODEL AB — DARK 3D SCULPTURE WITH BOLD COLORED TEXT:
-- Deep DARK background (near black) with subtle texture or grain
-- 3D rendered SCULPTURE or BUST as hero — marble, metallic, or obsidian material
-- Sculpture has ONE colored accent element (yellow blindfold, red lips, gold crown, blue tears)
-- Design software interface elements as subtle background: tool panels, selection marquee (dashed lines), cursor icons
-- GIANT bold colored typography in MATCHING accent color — wide-spaced letters or massive block text
-- Category labels in corners: "LEARN DESIGN" at top-left, "PART 02" at top-right
-- Small "LOREM IPSUM" text as design placeholder accent
-- User profile bar at bottom with play buttons and audio icon
-- 4-point selection handles (yellow/colored squares) around the sculpture
-- Mood: dark, powerful, design-education editorial
-- Reference: Dark marble head with yellow blindfold, "DESIGNERS WEBSITE" in yellow text`,
-
-      AC: `MODEL AC — 3D CHARACTER PEEK WITH ELEGANT SCRIPT TYPOGRAPHY:
-- DEEP BLACK or very dark cinematic background with soft bokeh lights
-- Hyper-realistic 3D ANIMATED CHARACTER peeking from the RIGHT edge of the frame — only half visible
-- Character is adorable/stylized (large expressive eyes, detailed fur/skin texture, Pixar-quality rendering)
-- LEFT side dominated by ELEGANT MIXED TYPOGRAPHY: cursive SCRIPT font for the main word + bold SANS-SERIF for the subtitle
-- Warm accent color (peach, gold, coral) for the script text contrasting against dark background
-- Small metadata labels: "@handle" top-left, "Year 2026" top-right, category label bottom-left
-- "Swipe →" CTA at bottom-right corner
-- Mood: premium editorial meets playful 3D art, dark and sophisticated
-- The 3D character and subject MUST be replaced to match the client's business niche
-- Reference: Cute rabbit character peeking with "Color Inspiration" in peach script on black`,
-
-      AD: `MODEL AD — VIBRANT 3D MASCOT WITH GIANT BACKGROUND TYPOGRAPHY:
-- LIGHT background (white, off-white, or very light gray) with subtle watermark text pattern
-- MASSIVE bold PURPLE/VIBRANT colored word as background element — so large it fills the entire frame
-- Hyper-realistic 3D CHARACTER/MASCOT centered and OVERLAPPING the giant text — wings spread, dynamic pose
-- Character is colorful, detailed, and energetic (feathers, fur, scales with multiple vivid colors)
-- Color palette swatches scattered around (small squares showing the palette)
-- Small decorative elements floating: butterflies, sparkles, petals matching the theme
-- Bottom CTA bar in accent color: "Arrasta para o lado" or similar
-- Corner labels: "@handle" rotated on left edge, "Design Graphic" bottom-right
-- Small disclaimer text at very bottom in light gray
-- Mood: explosive color, joyful, eye-catching, social-media-native
-- The 3D character and subject MUST be replaced to match the client's business niche
-- Reference: Colorful parrot with spread wings over giant purple "CORES" text on white`,
-
-      AE: `MODEL AE — RETRO PHOTOGRAPHY WITH BOLD EDITORIAL TYPOGRAPHY:
-- Real LANDSCAPE PHOTOGRAPH as full background — rolling hills, open fields, countryside, golden hour
-- Vintage/retro color grading: slightly desaturated, warm film grain, nostalgic feel
-- ONE retro object as focal point: vintage VW van, old bicycle, classic car, retro camera
-- GIANT bold editorial typography overlaid — mix of STRONG CONDENSED sans-serif and FLOWING SCRIPT
-- Text dominates upper 60% of frame with 3-4 lines of decreasing size
-- Handwritten annotation or speech bubble with casual text ("o meu passo a passo", "dica especial")
-- Photoshop-style toolbar mockup at top edge (subtle design meta-reference)
-- Small paper airplane or bookmark icon as accent
-- Mood: warm nostalgia, personal storytelling, career/lifestyle content
-- The retro object and landscape MUST be replaced to match the client's business niche
-- Reference: Yellow VW van on green hill with "De CLT a Designer freelancer" in bold editorial type`,
-    };
-
-    const referenceInstruction = referenceImage
-      ? `\n\n📎 REFERENCE IMAGE PROVIDED:
-The user has uploaded a reference image (could be a logo, photo, or design idea).
-- Analyze the reference image carefully: extract colors, style, mood, branding elements, logos, and visual identity.
-- INCORPORATE elements from the reference into the final post design.
-- If it's a LOGO: integrate it prominently into the post design as the brand identity.
-- If it's a PHOTO: use it as visual inspiration for the composition, colors, and mood.
-- If it's a DESIGN: absorb the style and recreate something similar but elevated and professional.
-- The final result should feel like a natural evolution of the reference, not a copy.`
-      : "";
-
-    // ── Niche detection: add contextually relevant visual elements ──
+    // ── Niche detection ──
     const nicheMap: Record<string, string> = {
-      // ALIMENTAÇÃO & BEBIDAS
-      "churrascaria|churrasco|grelha|churrasqueira|açougue|carnes|picanha": `🥩 NICHE — CHURRASCARIA/BBQ: Smoking grill, charcoal flames, sizzling picanha, espeto/skewers, rustic wood boards. Fire orange, ember red, smoky atmosphere.`,
-      "restaurante|comida|food|gastronomia|culinária|culinaria": `🍽️ NICHE — RESTAURANT: Beautifully plated dishes, chef hands, fresh ingredients, steam. Warm golden, rich browns.`,
-      "pizza|pizzaria": `🍕 NICHE — PIZZARIA: Wood-fired oven, stretching cheese, pizza paddle, rustic table. Warm reds, golden crust tones.`,
-      "hambúrguer|hamburgueria|burger|lanche|lanchonete|fast food": `🍔 NICHE — HAMBURGUERIA: Juicy stacked burger, melting cheese, crispy fries, craft beer. Dark moody, warm amber.`,
-      "sushi|japonês|japones|temaki|sashimi": `🍣 NICHE — JAPANESE FOOD: Sushi platter, chopsticks, soy sauce, bamboo mat, wasabi. Black, red, minimalist zen.`,
-      "padaria|confeitaria|bolo|doce|pão|panificadora": `🧁 NICHE — BAKERY: Fresh bread, pastries, flour dust, wooden shelves, cake displays. Warm cream, golden wheat tones.`,
-      "café|cafeteria|coffee|cappuccino|expresso": `☕ NICHE — COFFEE SHOP: Latte art, coffee beans, espresso machine, cozy mugs. Warm browns, cream, rustic wood.`,
-      "açaí|acai|sorveteria|sorvete|gelato|frozen": `🍦 NICHE — ICE CREAM/AÇAÍ: Colorful bowls, toppings, fruit, frozen treats. Vibrant purple, pink, tropical.`,
-      "cervejaria|cerveja|brewery|bar|pub|boteco": `🍺 NICHE — BAR/BREWERY: Craft beer taps, amber pints, bar counter, neon signs. Amber gold, dark wood, moody lighting.`,
-      "doceria|brigadeiro|chocolate|trufa": `🍫 NICHE — SWEETS: Artisan chocolates, brigadeiros, elegant packaging. Rich brown, gold accents, velvet.`,
-      "food truck|trailer|comida de rua": `🚚 NICHE — FOOD TRUCK: Street food, colorful truck, outdoor scene, casual vibes. Vibrant, urban, fun.`,
-      "nutrição|nutricionista|dieta|alimentação saudável|healthy": `🥗 NICHE — NUTRITION: Fresh salads, meal prep, measuring tape, healthy bowls. Fresh greens, clean whites.`,
-
-      // BELEZA & ESTÉTICA
-      "salão|salao|cabeleireiro|cabelo|beleza|beauty|hair": `💇 NICHE — BEAUTY SALON: Scissors, hair styling, mirrors, salon chairs. Rose gold, soft pink, champagne.`,
-      "barbearia|barbeiro|barba|corte masculino|fade": `💈 NICHE — BARBERSHOP: Straight razor, barber chair, pomade, hot towel. Deep blacks, gold, chrome.`,
-      "manicure|unhas|nail|pedicure|esmalteria": `💅 NICHE — NAIL SALON: Polished nails, nail art, UV lamp, color palette. Soft pink, nude, elegant.`,
-      "estética|estetica|skincare|limpeza de pele|peeling|facial": `✨ NICHE — AESTHETICS: Facial treatment, clean skin, spa elements, serums. Soft whites, rose, clinical elegance.`,
-      "maquiagem|makeup|maquiadora": `💄 NICHE — MAKEUP: Brushes, palettes, lipstick, mirror, beauty editorial. Glam, rich tones, editorial lighting.`,
-      "sobrancelha|micropigmentação|design de sobrancelha": `👁️ NICHE — BROW DESIGN: Precise brow shaping, micro tools, before/after. Clean, precise, soft tones.`,
-      "depilação|depilacao|laser|cera": `🌸 NICHE — HAIR REMOVAL: Clean skin, laser equipment, spa room. Soft pink, clinical white, calming.`,
-      "spa|massagem|relaxamento|terapia": `🧖 NICHE — SPA: Hot stones, essential oils, bamboo, towels, candles. Earth tones, zen, tranquil.`,
-      "perfumaria|perfume|fragrância|fragrancia": `🌹 NICHE — PERFUME: Elegant bottles, flowers, mist, luxury packaging. Gold, deep burgundy, sophisticated.`,
-
-      // SAÚDE & BEM-ESTAR
-      "dentista|odontologia|odontológico|clareamento|sorriso|ortodontia|implante": `🦷 NICHE — DENTAL: Bright smiles, clean clinical elements, dental tools. Whites, light blues, mint green.`,
-      "médico|medico|hospital|clínica médica|clinica medica|saúde|saude": `🏥 NICHE — HEALTH/MEDICAL: Stethoscope, white coat, clean clinical elements. Whites, light blues, professional.`,
-      "farmácia|farmacia|drogaria|medicamento": `💊 NICHE — PHARMACY: Medicine shelves, clean counter, health products. Green cross, white, clinical.`,
-      "psicólogo|psicologo|psicologia|terapia|saúde mental": `🧠 NICHE — PSYCHOLOGY: Calm environment, cozy office, warm light, notebook. Soft lavender, warm cream, peaceful.`,
-      "fisioterapia|fisioterapeuta|reabilitação|pilates|rpg": `🏃 NICHE — PHYSIOTHERAPY: Exercise equipment, stretching, rehabilitation. Blue, white, active, clinical.`,
-      "fonoaudiologia|fonoaudiólogo|fono": `🗣️ NICHE — SPEECH THERAPY: Communication, voice, calm office, kid-friendly. Soft blue, warm, professional.`,
-      "oftalmologista|ótica|otica|óculos|oculos|lente|optometria|visão": `👓 NICHE — OPTICIAN/EYEWEAR: Stylish glasses displays, eye chart, lens equipment, frames. Clean modern, sophisticated blacks, golds.`,
-      "dermatologista|dermatologia|pele": `🧴 NICHE — DERMATOLOGY: Healthy skin close-up, skincare products, clinical. Clean whites, soft pink, medical.`,
-      "ortopedia|ortopedista|coluna|joelho": `🦴 NICHE — ORTHOPEDICS: X-ray imagery, skeleton models, rehabilitation. Clinical blue, white, professional.`,
-      "pediatra|pediatria|criança|infantil": `👶 NICHE — PEDIATRICS: Happy children, colorful toys, friendly doctor. Bright pastels, playful, warm.`,
-      "veterinário|veterinaria|vet|animal|clínica veterinária": `🐾 NICHE — VETERINARY: Dogs/cats, stethoscope, clinic. Warm pastels, caring, professional.`,
-
-      // FITNESS & ESPORTES
-      "academia|fitness|gym|treino|musculação|crossfit|personal": `🏋️ NICHE — FITNESS/GYM: Dumbbells, barbells, weight plates, gym floor. Dark blacks, neon accents, steel grays.`,
-      "yoga|meditação|meditacao|mindfulness": `🧘 NICHE — YOGA: Mat, peaceful pose, nature, sunrise. Soft earth tones, zen, minimal.`,
-      "artes marciais|mma|jiu jitsu|muay thai|karate|boxe|luta": `🥊 NICHE — MARTIAL ARTS: Fight gloves, octagon, training, sweat. Dark reds, blacks, intense energy.`,
-      "futebol|soccer|campo|quadra": `⚽ NICHE — SOCCER: Ball, cleats, pitch, goal net. Green, white, action shots.`,
-      "corrida|running|maratona|atletismo": `🏃 NICHE — RUNNING: Track, running shoes, finish line, motion blur. Dynamic, energetic colors.`,
-      "natação|natacao|piscina|swimming": `🏊 NICHE — SWIMMING: Pool lanes, goggles, splash, underwater. Deep blue, aqua, clean.`,
-      "surf|praia|beach|stand up|sup": `🏄 NICHE — SURF: Waves, surfboard, beach sunset, ocean. Blue, sand, golden hour.`,
-      "ciclismo|bike|bicicleta|mountain bike": `🚴 NICHE — CYCLING: Bike, trail, helmet, road. Dynamic, outdoor greens, action.`,
-      "skate|skateboard": `🛹 NICHE — SKATE: Board, ramp, urban, streetwear. Grungy, bold, street culture.`,
-      "dança|danca|ballet|funk|studio de dança": `💃 NICHE — DANCE: Dance studio, mirrors, movement, expression. Vibrant, expressive, dynamic.`,
-
-      // SERVIÇOS PROFISSIONAIS
-      "advocacia|advogado|jurídico|juridico|direito|lei|escritório de advocacia": `⚖️ NICHE — LAW: Gavel, law books, scales of justice. Navy blue, dark wood, gold. Elegant office.`,
-      "contabilidade|contador|contábil|contabil|financeiro|fiscal": `📊 NICHE — ACCOUNTING: Calculator, spreadsheets, financial charts, documents. Navy, gray, professional.`,
-      "arquitetura|arquiteto|projeto|planta|design de interiores|decoração|decoracao": `📐 NICHE — ARCHITECTURE/DESIGN: Blueprints, models, modern buildings, drafting tools. Clean whites, blacks, minimal.`,
-      "engenharia|engenheiro|obra|construção|construcao|construtora|pedreiro|empreiteira": `🏗️ NICHE — CONSTRUCTION/ENGINEERING: Hard hat, crane, building site, blueprints, concrete. Safety yellow, steel gray, industrial.`,
-      "eletricista|elétrica|eletrica|instalação elétrica|fiação|quadro elétrico|energia": `⚡ NICHE — ELECTRICIAN: Wiring, electrical panel, multimeter, light bulbs, cable tools, safety gloves. Electric yellow, blue sparks, industrial gray.`,
-      "encanador|encanamento|hidráulica|hidraulica|cano|tubulação|vazamento|bombeiro hidráulico": `🔧 NICHE — PLUMBER: Pipes, wrench, water faucet, copper tubing, bathroom fixtures. Blue, chrome, industrial.`,
-      "pintor|pintura|tinta|parede|reforma": `🎨 NICHE — PAINTER: Paint roller, color swatches, fresh painted wall, brushes. Colorful, clean, fresh.`,
-      "marceneiro|marcenaria|madeira|móveis|moveis|carpintaria": `🪵 NICHE — CARPENTRY: Wood workshop, saw, custom furniture, wood grain. Warm wood tones, rustic, craftsmanship.`,
-      "serralheiro|serralheria|ferro|portão|grade|solda": `🔩 NICHE — METALWORK: Welding sparks, iron gate, metal workshop. Orange sparks, dark gray, industrial.`,
-      "vidraceiro|vidraçaria|vidro|espelho|box": `🪟 NICHE — GLASS: Glass panels, mirrors, clean reflections, frameless shower. Transparent, light blue, modern.`,
-      "dedetização|dedetizadora|controle de pragas|pest control": `🦟 NICHE — PEST CONTROL: Spray equipment, protective gear, clean home after. Green, white, professional.`,
-      "limpeza|faxina|cleaning|lavanderia|passadeira": `🧹 NICHE — CLEANING: Sparkling clean surfaces, cleaning supplies, before/after. Fresh blue, white, spotless.`,
-      "jardinagem|jardineiro|paisagismo|jardim|gramado": `🌿 NICHE — LANDSCAPING: Lush garden, tools, green lawn, flower beds. Fresh greens, earth tones, natural.`,
-      "mudança|frete|transporte|carreto": `🚚 NICHE — MOVING/FREIGHT: Truck, boxes, organized loading, team work. Blue, professional, reliable.`,
-      "segurança|vigilância|monitoramento|câmera|alarme|portaria": `🔒 NICHE — SECURITY: Cameras, control room, security guard, alarm system. Dark blue, black, authoritative.`,
-      "ar condicionado|climatização|refrigeração|hvac|split": `❄️ NICHE — AC/HVAC: AC unit, comfortable room, installation, fresh air. Cool blue, white, clean.`,
-      "energia solar|painel solar|fotovoltaica|solar": `☀️ NICHE — SOLAR ENERGY: Solar panels, rooftop, sun rays, green energy. Blue, yellow, sustainable green.`,
-      "desentupidora|desentupimento|esgoto": `🚿 NICHE — DRAIN CLEANING: Equipment, pipe clearing, professional service. Blue, gray, industrial.`,
-
-      // TECNOLOGIA & DIGITAL
-      "tecnologia|tech|software|app|aplicativo|startup|saas": `💻 NICHE — TECH: Laptop, code, modern workspace, digital screens. Electric blue, dark, futuristic-minimal.`,
-      "celular|smartphone|loja de celular|assistência técnica|conserto de celular|iphone|samsung": `📱 NICHE — CELL PHONE SHOP: Phone displays, repair tools, accessories, screen fix. Sleek black, electric blue, modern.`,
-      "informática|computador|notebook|pc|hardware": `🖥️ NICHE — COMPUTER: Hardware, components, setup, workstation. Dark, RGB accents, tech.`,
-      "marketing|marketing digital|social media|agência|agencia|tráfego|trafego": `📈 NICHE — DIGITAL MARKETING: Analytics dashboard, social icons, growth charts. Modern purple, blue, dynamic.`,
-      "fotografia|fotógrafo|fotografo|ensaio|foto|studio fotográfico": `📸 NICHE — PHOTOGRAPHY: Camera, lens, lighting setup, beautiful shot. Rich cinematic, dramatic light.`,
-      "videografia|vídeo|video|filmagem|produtora|audiovisual": `🎬 NICHE — VIDEO: Cinema camera, clapperboard, film reel, editing suite. Cinematic dark, rich color grading.`,
-      "design gráfico|designer|logo|identidade visual|branding": `🎨 NICHE — GRAPHIC DESIGN: Color palette, design tools, creative workspace. Creative, bold, modern.`,
-      "desenvolvimento|programação|programacao|desenvolvedor|dev|web": `👨‍💻 NICHE — DEVELOPMENT: Code editor, terminal, modern desk setup. Dark theme, green/blue code highlights.`,
-      "impressão|gráfica|grafica|banner|adesivo|comunicação visual": `🖨️ NICHE — PRINT SHOP: Large format printer, banners, business cards, vinyl. Colorful, professional, production.`,
-
-      // EDUCAÇÃO & FORMAÇÃO
-      "escola|colégio|colegio|ensino|infantil|creche": `🏫 NICHE — SCHOOL: Classroom, children, books, playground. Bright, playful, educational.`,
-      "faculdade|universidade|vestibular|enem|cursinho|pré-vestibular": `🎓 NICHE — UNIVERSITY: Campus, study groups, graduation. Navy, academic, aspirational.`,
-      "curso|treinamento|capacitação|workshop|mentoria|coaching": `📚 NICHE — COURSES/TRAINING: Whiteboard, presentation, group learning. Professional, inspiring.`,
-      "idiomas|inglês|ingles|espanhol|francês|lingua|language": `🌍 NICHE — LANGUAGES: World flags, conversation bubbles, study materials. International, colorful, educational.`,
-      "música|musica|instrumento|violão|guitarra|piano|bateria|escola de música": `🎵 NICHE — MUSIC: Instruments, sheet music, studio, performance. Rich, artistic, expressive.`,
-      "auto escola|autoescola|cnh|habilitação|habilitacao|carteira de motorista": `🚗 NICHE — DRIVING SCHOOL: Car with learner sign, steering wheel, traffic signs. Blue, yellow, educational.`,
-
-      // COMÉRCIO & VAREJO
-      "loja de roupa|moda|fashion|vestuário|boutique|streetwear|tênis|sneaker": `👗 NICHE — FASHION: Clothing racks, fabric textures, styled outfits. Trendy colors, editorial.`,
-      "joalheria|joia|ouro|prata|bijuteria|semi joia": `💎 NICHE — JEWELRY: Sparkling pieces, elegant display, velvet boxes. Gold, silver, luxury black.`,
-      "floricultura|flores|flower|buquê|arranjo|florista": `💐 NICHE — FLORIST: Beautiful arrangements, colorful petals, elegant vases. Vibrant, romantic, natural.`,
-      "supermercado|mercado|mercearia|hortifruti|atacado": `🛒 NICHE — SUPERMARKET: Fresh produce, organized aisles, shopping cart. Fresh, colorful, abundant.`,
-      "papelaria|material escolar|escritório|office": `📝 NICHE — STATIONERY: Notebooks, pens, organized desk, colorful supplies. Pastel, organized, creative.`,
-      "sex shop|lingerie|sensual": `🖤 NICHE — LINGERIE: Elegant fabrics, lace details, sophisticated setting. Deep red, black, sensual elegance.`,
-      "cosméticos|cosmético|cosmetico|skincare|dermocosmético": `🧴 NICHE — COSMETICS: Product bottles, serums, clean aesthetic. Soft pink, white, minimal luxury.`,
-      "brinquedo|toy|loja infantil|kids": `🧸 NICHE — TOY STORE: Colorful toys, playful setting, children joy. Bright, fun, energetic.`,
-      "varejo|loja|comércio|comercio|promoção|liquidação": `🏪 NICHE — RETAIL: Store displays, sale tags, shopping bags. Bold red, commercial, dynamic.`,
-      "móveis|moveis|colchão|colchao|decoração de interiores|home": `🛋️ NICHE — FURNITURE: Beautiful room setups, modern furniture, cozy spaces. Warm neutrals, elegant.`,
-      "material de construção|ferragista|ferragem|ferramentaria": `🏗️ NICHE — HARDWARE STORE: Tools, building materials, organized shelves. Industrial orange, gray.`,
-
-      // AUTOMOTIVO
-      "oficina|mecânica|mecanica|carro|auto|funilaria": `🔧 NICHE — AUTO SHOP: Car parts, tools, lifted vehicle, engine. Metallic grays, chrome. Garage.`,
-      "lavagem|lava jato|lava-jato|car wash|polimento|estética automotiva|estetica automotiva": `🚿 NICHE — CAR WASH: Shiny wet car, foam, pressure washer, gleaming finish. Blue, chrome, reflective.`,
-      "pneu|borracharia|alinhamento|balanceamento": `🛞 NICHE — TIRES: Tire stack, alignment machine, workshop. Black rubber, industrial, professional.`,
-      "autopeças|auto peças|peça automotiva|retífica": `⚙️ NICHE — AUTO PARTS: Engine components, organized shelves, car parts. Chrome, dark, industrial.`,
-      "moto|motocicleta|oficina de motos|motociclismo": `🏍️ NICHE — MOTORCYCLE: Bike, helmet, leather, speed. Dark chrome, rebellious, powerful.`,
-      "concessionária|concessionaria|revenda|seminovos|carros usados": `🚘 NICHE — CAR DEALER: Showroom, shiny cars, keys handover. Luxury, polished, professional.`,
-
-      // IMÓVEIS & MORADIA
-      "imobiliária|imobiliaria|imóvel|imovel|casa|apartamento|corretor|condomínio|condominio": `🏠 NICHE — REAL ESTATE: Luxury property, keys, modern architecture. Warm whites, golden hour.`,
-      "hotel|pousada|hospedagem|resort|airbnb": `🏨 NICHE — HOTEL: Luxury room, pool, concierge, lobby. Elegant gold, warm whites, hospitality.`,
-      "síndico|sindico|administradora|condomínio": `🏢 NICHE — CONDO MANAGEMENT: Building facade, common areas, organized. Professional blue, clean.`,
-
-      // EVENTOS & ENTRETENIMENTO
-      "festa|evento|buffet|decoração de festa|balão|aniversário|casamento|wedding": `🎉 NICHE — EVENTS: Balloons, decorations, tables, lighting, celebration. Festive gold, vibrant, elegant.`,
-      "dj|som|iluminação|iluminacao|balada|show|banda|música ao vivo": `🎧 NICHE — DJ/ENTERTAINMENT: Turntable, stage lights, crowd, speakers. Neon, dark, energetic.`,
-      "cinema|teatro|espetáculo|cultura": `🎭 NICHE — THEATER/CINEMA: Stage, curtains, spotlight, popcorn. Rich red, dramatic, artistic.`,
-      "parque|diversão|recreação|playground|lazer": `🎠 NICHE — AMUSEMENT: Fun rides, colorful, family joy. Bright, playful, exciting.`,
-
-      // PET & ANIMAIS
-      "pet|pet shop|cachorro|gato|banho e tosa|ração|animal de estimação": `🐾 NICHE — PET: Cute dogs/cats, paw prints, grooming tools. Warm pastels, playful.`,
-      "aquário|peixe|aquarismo": `🐠 NICHE — AQUARIUM: Colorful fish, tanks, aquatic plants. Deep blue, aquatic, serene.`,
-
-      // RELIGIÃO & COMUNIDADE
-      "igreja|pastor|culto|cristão|cristao|evangélico|evangelico|católico|catolico": `⛪ NICHE — CHURCH: Sanctuary, cross, worship, community. Warm gold, deep blue, spiritual.`,
-      "ong|social|comunidade|voluntário|voluntario|caridade": `🤝 NICHE — NGO/CHARITY: Helping hands, community, hope. Warm, compassionate, human.`,
-
-      // FINANÇAS & NEGÓCIOS
-      "banco|financeira|empréstimo|emprestimo|crédito|credito|consórcio|consorcio": `🏦 NICHE — FINANCE: Money, charts, secure vault, growth graphs. Dark green, gold, trustworthy.`,
-      "investimento|bolsa|trader|trading|cripto|bitcoin|ações|acoes": `📈 NICHE — INVESTMENTS: Stock charts, bull/bear, trading screens. Green/red, dark, dynamic.`,
-      "seguros|seguro|seguradora|proteção": `🛡️ NICHE — INSURANCE: Shield, family, protection, safety umbrella. Blue, trustworthy, reliable.`,
-      "consultoria|consultor|assessoria|gestão|gestao": `💼 NICHE — CONSULTING: Boardroom, strategy, presentation, leadership. Navy, gold, corporate.`,
-
-      // TRANSPORTE & LOGÍSTICA
-      "uber|motorista|transporte|táxi|taxi|99|corrida": `🚗 NICHE — RIDE SERVICE: Car, city streets, driver. Dark, urban, professional.`,
-      "logística|logistica|entrega|delivery|motoboy|envio|courier": `📦 NICHE — LOGISTICS/DELIVERY: Packages, delivery van, organized warehouse. Blue, brown, efficient.`,
-
-      // AGRO & NATUREZA
-      "agro|agrícola|agricola|fazenda|rural|pecuária|pecuaria|soja|milho|plantação": `🌾 NICHE — AGRICULTURE: Golden fields, tractor, harvest, sunrise over crops. Green, golden, earthy.`,
-      "paisagismo|piscina|piscineiro|manutenção de piscina": `🏊 NICHE — POOL: Crystal clear pool, maintenance tools, beautiful backyard. Aqua blue, clean, refreshing.`,
-
-      // MODA & ACESSÓRIOS
-      "tatuagem|tattoo|tatuador|estúdio de tatuagem": `🖋️ NICHE — TATTOO: Tattoo machine, ink, skin art, studio. Dark, artistic, edgy.`,
-      "ótica|relojoaria|relógio|relogio|acessórios|acessorios": `⌚ NICHE — WATCHES/ACCESSORIES: Luxury timepieces, displays, elegant details. Gold, black, sophisticated.`,
-      "costura|costureira|alfaiate|ateliê|atelie|sob medida": `🧵 NICHE — TAILOR: Sewing machine, fabric, measuring tape, needles. Classic, craftsmanship, elegant.`,
+      "churrascaria|churrasco|açougue|carnes|picanha": "BBQ/GRILL: Smoking grill, charcoal flames, sizzling meat, rustic wood. Fire orange, ember red.",
+      "restaurante|comida|food|gastronomia|culinária": "RESTAURANT: Plated dishes, chef hands, fresh ingredients, steam. Warm golden, rich browns.",
+      "pizza|pizzaria": "PIZZARIA: Wood-fired oven, stretching cheese, rustic table. Warm reds, golden crust.",
+      "hambúrguer|hamburgueria|burger|lanche": "HAMBURGUERIA: Juicy burger, melting cheese, crispy fries. Dark moody, warm amber.",
+      "padaria|confeitaria|bolo|doce|pão": "BAKERY: Fresh bread, pastries, flour dust. Warm cream, golden wheat.",
+      "café|cafeteria|coffee": "COFFEE: Latte art, coffee beans, espresso machine, cozy mugs. Warm browns, cream.",
+      "salão|cabeleireiro|cabelo|beleza|beauty": "BEAUTY: Scissors, hair styling, salon chairs. Rose gold, soft pink.",
+      "barbearia|barbeiro|barba": "BARBERSHOP: Straight razor, barber chair, pomade. Deep blacks, gold, chrome.",
+      "dentista|odontologia|sorriso": "DENTAL: Bright smiles, clean clinical. Whites, light blues, mint green.",
+      "médico|hospital|clínica|saúde": "MEDICAL: Stethoscope, white coat, clinical. Whites, light blues.",
+      "advocacia|advogado|jurídico|direito": "LAW: Gavel, law books, scales of justice. Navy blue, dark wood, gold.",
+      "contabilidade|contador|financeiro": "ACCOUNTING: Calculator, financial charts. Navy, gray, professional.",
+      "arquitetura|arquiteto|design de interiores": "ARCHITECTURE: Blueprints, modern buildings. Clean whites, blacks, minimal.",
+      "academia|fitness|gym|treino|musculação|personal": "FITNESS: Dumbbells, barbells, gym. Dark blacks, neon accents, steel grays.",
+      "imobiliária|imóvel|casa|apartamento|corretor": "REAL ESTATE: Luxury property, keys, modern architecture. Warm whites, golden hour.",
+      "tecnologia|tech|software|app|startup": "TECH: Laptop, code, modern workspace. Electric blue, dark, minimal.",
+      "marketing|social media|agência|tráfego": "DIGITAL MARKETING: Analytics, social icons, growth. Modern purple, blue.",
+      "fotografia|fotógrafo|ensaio": "PHOTOGRAPHY: Camera, lens, lighting. Rich cinematic, dramatic light.",
+      "loja de roupa|moda|fashion|boutique": "FASHION: Clothing racks, styled outfits. Trendy colors, editorial.",
+      "pet|pet shop|cachorro|gato|banho e tosa": "PET: Cute dogs/cats, paw prints, grooming. Warm pastels, playful.",
+      "estética|skincare|limpeza de pele": "AESTHETICS: Facial treatment, clean skin, serums. Soft whites, rose.",
+      "oficina|mecânica|carro|auto": "AUTO SHOP: Car parts, tools, engine. Metallic grays, chrome.",
+      "engenharia|construção|construtora": "CONSTRUCTION: Hard hat, crane, building. Safety yellow, steel gray.",
+      "eletricista|elétrica|instalação elétrica": "ELECTRICIAN: Wiring, electrical panel, tools. Electric yellow, blue, gray.",
+      "escola|ensino|educação|curso": "EDUCATION: Classroom, books, learning. Bright, professional.",
+      "psicólogo|psicologia|terapia|saúde mental": "PSYCHOLOGY: Calm environment, warm light. Soft lavender, cream.",
+      "farmácia|drogaria|medicamento": "PHARMACY: Medicine shelves, health products. Green cross, white.",
+      "nutrição|nutricionista|dieta|saudável": "NUTRITION: Fresh salads, meal prep, healthy. Fresh greens, clean whites.",
+      "floricultura|flores|buquê": "FLORIST: Beautiful arrangements, colorful petals. Vibrant, romantic.",
+      "joalheria|joia|ouro|prata": "JEWELRY: Sparkling pieces, velvet boxes. Gold, silver, luxury black.",
+      "energia solar|painel solar|fotovoltaica": "SOLAR: Solar panels, sun rays, green energy. Blue, yellow, green.",
+      "celular|smartphone|assistência técnica": "CELL PHONE: Phone displays, repair tools. Sleek black, electric blue.",
+      "veterinário|clínica veterinária": "VETERINARY: Dogs/cats, stethoscope, clinic. Warm pastels, professional.",
+      "hotel|pousada|hospedagem|resort": "HOTEL: Luxury room, pool, lobby. Elegant gold, warm whites.",
+      "festa|evento|buffet|casamento": "EVENTS: Balloons, decorations, celebration. Festive gold, vibrant.",
+      "supermercado|mercado|hortifruti": "SUPERMARKET: Fresh produce, organized aisles. Fresh, colorful.",
+      "ar condicionado|climatização|refrigeração": "AC/HVAC: AC unit, comfortable room. Cool blue, white, clean.",
+      "limpeza|faxina|lavanderia": "CLEANING: Sparkling surfaces, supplies. Fresh blue, white.",
+      "jardinagem|paisagismo|jardim": "LANDSCAPING: Lush garden, tools, green lawn. Fresh greens, earthy.",
+      "segurança|vigilância|monitoramento|câmera": "SECURITY: Cameras, control room, alarm. Dark blue, black.",
+      "manicure|unhas|nail|pedicure": "NAIL SALON: Polished nails, nail art. Soft pink, nude, elegant.",
+      "maquiagem|makeup|maquiadora": "MAKEUP: Brushes, palettes, lipstick. Glam, rich tones.",
+      "yoga|meditação|mindfulness": "YOGA: Mat, peaceful pose, nature. Earth tones, zen, minimal.",
+      "sushi|japonês|temaki|sashimi": "JAPANESE FOOD: Sushi platter, chopsticks, bamboo. Black, red, zen.",
+      "cervejaria|cerveja|bar|pub": "BAR/BREWERY: Craft beer taps, bar counter. Amber gold, moody.",
+      "açaí|sorveteria|sorvete|gelato": "ICE CREAM/AÇAÍ: Colorful bowls, toppings. Vibrant purple, tropical.",
+      "tatuagem|tattoo|tatuador": "TATTOO: Tattoo machine, ink, skin art. Dark, artistic, edgy.",
+      "agro|fazenda|rural|pecuária": "AGRICULTURE: Golden fields, tractor, harvest. Green, golden, earthy.",
+      "ótica|óculos|lente|optometria": "EYEWEAR: Stylish glasses, eye chart, frames. Modern, sophisticated.",
     };
 
     let nicheInstruction = "";
     const promptLower = prompt.toLowerCase();
     for (const [keywords, instruction] of Object.entries(nicheMap)) {
       if (keywords.split("|").some((kw) => promptLower.includes(kw))) {
-        nicheInstruction = `\n\n🏪 NICHE-SPECIFIC VISUALS:\n${instruction}\nCRITICAL: Visual elements MUST match the business niche. Do NOT use random animals or unrelated objects. Every element should reinforce the niche.`;
+        nicheInstruction = `\n🏪 NICHE VISUALS: ${instruction}\nEvery visual element MUST match this business niche.`;
         break;
       }
     }
-
-    // Fallback: even if no niche keyword matched, instruct the AI to auto-detect and adapt
     if (!nicheInstruction) {
-      nicheInstruction = `\n\n🏪 AUTO-DETECT NICHE:\nAnalyze the topic/headline below and automatically determine the business niche. Then include ONLY visual elements that are directly related to that specific business. For example: if the topic mentions a bakery, show bread and ovens, NOT cars or animals. Every prop, background, and visual element must reinforce the client's business sector.`;
+      nicheInstruction = `\n🏪 AUTO-DETECT: Analyze the topic and include ONLY visual elements directly related to that specific business.`;
     }
 
-    const imagePrompt = `Create a MINIMALIST, high-end, professional social media ${isStory ? "STORY in VERTICAL 9:16 PORTRAIT format (1080x1920px — TALLER than wide, like a phone screen). THIS IS CRITICAL: the image MUST be vertical/portrait orientation, NOT square" : "feed post in SQUARE 1:1 format (1080x1080px — equal width and height)"} for BRANDIFY, a premium Brazilian creative agency.
+    const referenceInstruction = referenceImage
+      ? `\n📎 REFERENCE IMAGE: Analyze the uploaded reference — extract colors, style, mood, branding. Incorporate these elements into the final design naturally.`
+      : "";
 
-The image must look 100% realistic, like a real brand campaign — NOT AI-generated.
+    const imagePrompt = `Create a PREMIUM social media ${isStory ? "STORY (VERTICAL 9:16, 1080x1920px — MUST be portrait/vertical)" : "post (SQUARE 1:1, 1080x1080px)"} for BRANDIFY (@brandifycoo), a Brazilian creative agency.
 
-🏆 #1 PRIORITY — FOLLOW THE VISUAL MODEL REFERENCES:
-The visual model below is your PRIMARY guide. Study its EXACT layout, composition, typography placement, font style, color grading, and overall vibe. Replicate that SAME level of quality and style.
-ONLY adapt the subject matter/props to match the client's business niche (described in the topic below).
+CRITICAL RULES:
+1. Must look 100% HUMAN-MADE — like a real designer created it. NO AI artifacts.
+2. MINIMALIST — generous negative space, clean composition, one focal point.
+3. MAX 3-6 words in the headline. Short, impactful, editorial.
+4. 2-3 color palette MAX. Bold but restrained.
+5. Headline MUST mention websites/digital services for the niche (e.g. "Seu site que vende 24h", "Loja virtual para [nicho]"). NEVER generic phrases.
 
-⚠️ NICHE ADAPTATION:
-- KEEP the same layout structure, text placement, font style, color grading from the visual model
-- REPLACE subject matter, objects, scenery to match the CLIENT'S BUSINESS NICHE
-- The final image should look like the same designer made it, but for a different business
+🎯 VISUAL STYLE — ${selected.id}:
+${selected.desc}
 
-🎯 VISUAL MODEL (PRIMARY REFERENCE — REPLICATE THIS STYLE): ${selectedModel}
-${modelInstructions[selectedModel]}
-${referenceInstruction}
+ADAPT the style above to match the client's niche below. Keep the SAME composition/layout quality but replace subjects/props to fit the business.
 ${nicheInstruction}
+${referenceInstruction}
 
-📸 STYLE & MOOD:
-- MINIMALIST and CLEAN — less is more
-- Camera feel: real photography, DSLR/cinema camera, shallow depth of field
-- Lighting: dramatic but simple — golden hour, moody, cinematic
-- Colors: RESTRAINED palette — 2-3 colors maximum. Avoid gray text, avoid too many accent colors
-- Finish: ultra-polished, editorial, premium
+📸 PHOTOGRAPHY: Real DSLR quality, shallow depth of field, cinematic lighting, natural textures.
+✍️ TYPOGRAPHY: Bold sans-serif or elegant serif. Clean, integrated, not overwhelming (20-35% of frame max).
+🏷️ Small subtle "@brandifycoo" watermark in bottom-right corner.
 
-✍️ TYPOGRAPHY — KEEP IT SIMPLE:
-- Use FEW words — short headline only (3-6 words MAX). No long phrases or paragraphs
-- Bold sans-serif or elegant serif — one font style, clean
-- Text should be impactful but NOT overwhelming — 20-35% of frame at most
-- NO excessive text layers, NO multiple captions, NO bullet points
-- WATERMARK: Small subtle "@brandifycoo" in bottom-right corner — semi-transparent
-- Text must feel INTEGRATED into the composition
-- CRITICAL: The headline text on the image MUST be self-explanatory about what Brandify does for the client's niche. Example: "Seu site que vende 24h" or "Loja virtual para [niche]". NEVER use generic niche phrases like "Café autêntico" or "Sorrisos perfeitos" that don't mention websites/digital services.
+🚫 FORBIDDEN: AI artifacts, too much text, gray text, busy compositions, stock-photo look, Canva templates, vector art, AI watermarks.
 
-📐 COMPOSITION — MINIMALIST:
-- GENEROUS negative space — let the image BREATHE
-- One clear focal point, not cluttered
-- Simple, elegant, modern — like a high-end magazine ad
-- Main subject relevant to the client's business niche
-
-🚫 ABSOLUTELY FORBIDDEN:
-- AI artifacts, fake lighting, plastic skin
-- TOO MUCH TEXT — if there are more than 6-8 words in the headline, it's WRONG
-- Too many colors, gray colored text, overly busy compositions
-- Stock-photo look, generic marketing layout, Canva templates
-- Futuristic UI, cyberpunk aesthetics, flat design, vector art
-- USING THE VISUAL MODEL SUBJECT LITERALLY when niche differs
-- Visual elements that DON'T MATCH the business niche
-- Gemini star watermark or any AI branding
-- Cluttered, busy, or text-heavy designs — KEEP IT MINIMAL
-
-🧠 QUALITY CHECK: The result must be SIMPLE, CLEAN, MINIMAL, and PREMIUM. Follow the visual model reference as closely as possible. Few words, few colors, maximum impact. If the design has too much text or feels busy → WRONG.
-
-CONTENT/TOPIC for the headline: ${prompt}`;
+TOPIC/HEADLINE: ${prompt}`;
 
     let imageUrl: string | undefined;
 
-    // Build message content parts (text + optional reference image)
     const buildMessageContent = () => {
       const parts: any[] = [{ type: "text", text: imagePrompt }];
       if (referenceImage) {
-        // referenceImage is a base64 data URL like "data:image/png;base64,..."
-        parts.push({
-          type: "image_url",
-          image_url: { url: referenceImage },
-        });
+        parts.push({ type: "image_url", image_url: { url: referenceImage } });
       }
       return parts;
     };
 
-    // Provider 1: Lovable AI Gateway (primary)
+    // Primary: Lovable AI Gateway
     if (LOVABLE_API_KEY && !imageUrl) {
-      const gatewayModels = ["google/gemini-3-pro-image-preview", "google/gemini-2.5-flash-image"];
+      const gatewayModels = ["google/gemini-3.1-flash-image-preview", "google/gemini-3-pro-image-preview"];
       for (const model of gatewayModels) {
         if (imageUrl) break;
         console.log(`Trying gateway: ${model}`);
@@ -614,9 +193,7 @@ CONTENT/TOPIC for the headline: ${prompt}`;
               model,
               messages: [{ role: "user", content: buildMessageContent() }],
               modalities: ["image", "text"],
-              image_config: {
-                aspect_ratio: aspectRatio,
-              },
+              image_config: { aspect_ratio: aspectRatio },
             }),
           });
           if (res.status === 429) {
@@ -644,27 +221,18 @@ CONTENT/TOPIC for the headline: ${prompt}`;
       }
     }
 
-    // Provider 2: Direct Gemini API (fallback)
+    // Fallback: Direct Gemini API
     if (GEMINI_API_KEY && !imageUrl) {
-      const model = "gemini-2.5-flash-image";
-      console.log(`Trying direct Gemini fallback: ${model}`);
+      console.log("Trying direct Gemini fallback");
       try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 45000);
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
-
-        // Build parts for Gemini native format
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${GEMINI_API_KEY}`;
         const geminiParts: any[] = [{ text: imagePrompt }];
         if (referenceImage) {
-          // Extract mime type and base64 data from data URL
           const match = referenceImage.match(/^data:(image\/\w+);base64,(.+)$/);
-          if (match) {
-            geminiParts.push({
-              inlineData: { mimeType: match[1], data: match[2] },
-            });
-          }
+          if (match) geminiParts.push({ inlineData: { mimeType: match[1], data: match[2] } });
         }
-
         const res = await fetch(geminiUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -682,23 +250,21 @@ CONTENT/TOPIC for the headline: ${prompt}`;
             for (const part of parts) {
               if (part.inlineData?.mimeType?.startsWith("image/")) {
                 imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-                console.log(`Direct Gemini succeeded`);
+                console.log("Direct Gemini succeeded");
                 break;
               }
             }
           }
         } else {
           const t = await res.text();
-          console.error(`Direct Gemini failed:`, res.status, t.slice(0, 300));
+          console.error("Direct Gemini failed:", res.status, t.slice(0, 300));
         }
       } catch (e) {
-        console.error(`Direct Gemini threw:`, e);
+        console.error("Direct Gemini threw:", e);
       }
     }
 
-    if (!imageUrl) {
-      throw new Error("Serviços de IA temporariamente indisponíveis. Tente novamente em alguns minutos.");
-    }
+    if (!imageUrl) throw new Error("Serviços de IA temporariamente indisponíveis. Tente novamente em alguns minutos.");
 
     return new Response(JSON.stringify({ imageUrl }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
