@@ -808,13 +808,14 @@ export default function AdminConteudo() {
                     <Button
                       onClick={handleGenerate}
                       disabled={isGenerating || !allFilled}
-                      className="w-full md:w-auto bg-white text-black hover:bg-white/90 font-semibold py-5"
+                      className="w-full md:w-auto bg-white text-black hover:bg-white/90 font-semibold py-5 shadow-lg shadow-white/10 transition-all hover:shadow-white/20"
                     >
                       {isGenerating ? (
-                        <><RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Gerando planejamento...</>
+                        <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Gerando planejamento com IA...</>
                       ) : (
                         <><Sparkles className="w-4 h-4 mr-2" /> Gerar planejamento de {currentMonthConfig.label}</>
                       )}
+                    </Button>
                     </Button>
                   </div>
                 </AccordionContent>
