@@ -1045,8 +1045,14 @@ export default function AdminConteudo() {
                                                 <a href={story.generatedImage} download={`story-${story.id}.png`} className="absolute top-2 right-2 p-1.5 bg-black/60 rounded-lg hover:bg-black/80 transition-colors"><Download className="w-3 h-3 text-white" /></a>
                                               </>
                                             ) : (
-                                              <div className="flex flex-col items-center gap-2">
+                                              <div className="flex flex-col items-center gap-2 p-2">
                                                 <ImageIcon className="w-6 h-6 text-white/15" />
+                                                <Textarea
+                                                  value={story.visualDescription}
+                                                  onChange={(e) => updateItemField(weekIdx, story.id, "story", "visualDescription", e.target.value)}
+                                                  placeholder="Prompt da imagem (edite antes de gerar)..."
+                                                  className="bg-white/[0.05] border-white/10 text-white text-[10px] min-h-[40px] resize-none w-full"
+                                                />
                                                 <Button size="sm" onClick={() => handleGenerateImage(weekIdx, story.id, story.visualDescription, "story", undefined, week.niche)} disabled={story.isGeneratingImage} className="bg-white text-black hover:bg-white/90 text-[10px] h-7 px-2">
                                                   {story.isGeneratingImage ? <><RefreshCw className="w-3 h-3 animate-spin mr-1" /> Gerando...</> : <><ImageIcon className="w-3 h-3 mr-1" /> Gerar</>}
                                                 </Button>
