@@ -414,6 +414,7 @@ export default function AdminConteudo() {
     type: "feed" | "story",
     hint?: string,
     niche?: string,
+    existingImageUrl?: string,
   ) => {
     const resolvedNiche = niche?.trim() || monthPlans[activeMonth]?.weeks?.[weekIdx]?.niche?.trim() || "";
     const promptWithNiche = resolvedNiche
@@ -455,6 +456,7 @@ export default function AdminConteudo() {
           prompt: fullPrompt,
           type,
           ...(resolvedNiche ? { niche: resolvedNiche } : {}),
+          ...(existingImageUrl ? { referenceImage: existingImageUrl } : {}),
         }),
         signal: controller.signal,
       });
@@ -926,6 +928,12 @@ export default function AdminConteudo() {
                                               ) : (
                                                 <div className="flex flex-col items-center gap-3 p-4">
                                                   <ImageIcon className="w-8 h-8 text-white/15" />
+                                                  <Textarea
+                                                    value={post.imageDescription}
+                                                    onChange={(e) => updateItemField(weekIdx, post.id, "feed", "imageDescription", e.target.value)}
+                                                    placeholder="Prompt da imagem (edite antes de gerar)..."
+                                                    className="bg-white/[0.05] border-white/10 text-white text-[10px] min-h-[50px] resize-none w-full"
+                                                  />
                                                   <Button size="sm" onClick={() => handleGenerateImage(weekIdx, post.id, post.imageDescription, "feed", undefined, week.niche)} disabled={post.isGeneratingImage} className="bg-white text-black hover:bg-white/90 text-xs">
                                                     {post.isGeneratingImage ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <><ImageIcon className="w-3.5 h-3.5 mr-1" /> Gerar imagem</>}
                                                   </Button>
@@ -973,13 +981,19 @@ export default function AdminConteudo() {
                                                   <Textarea placeholder="Legenda..." value={post.caption} onChange={(e) => updateItemField(weekIdx, post.id, "feed", "caption", e.target.value)} className="bg-white/[0.05] border-white/10 text-white text-[10px] min-h-[60px] resize-none" />
                                                   {post.generatedImage && (
                                                     <>
-                                                      <p className="text-[10px] text-white/40 uppercase tracking-wider font-semibold flex items-center gap-1 mt-1"><ImageIcon className="w-3 h-3" /> Refazer imagem</p>
-                                                      <div className="flex gap-2">
-                                                        <Input placeholder="Ex: mais colorido, fundo azul..." value={imageHint} onChange={(e) => setImageHint(e.target.value)} className="bg-white/[0.05] border-white/10 text-white text-xs flex-1 h-9" />
-                                                        <Button size="sm" onClick={() => handleGenerateImage(weekIdx, post.id, post.imageDescription, "feed", imageHint || undefined, week.niche)} disabled={post.isGeneratingImage} className="bg-white text-black hover:bg-white/90 h-9 px-3 shrink-0 text-xs gap-1.5">
-                                                          {post.isGeneratingImage ? <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Gerando...</> : <><RefreshCw className="w-3.5 h-3.5" /> Refazer</>}
-                                                        </Button>
-                                                      </div>
+                                                       <p className="text-[10px] text-white/40 uppercase tracking-wider font-semibold flex items-center gap-1 mt-1"><ImageIcon className="w-3 h-3" /> Refazer imagem</p>
+                                                       <Textarea
+                                                         value={post.imageDescription}
+                                                         onChange={(e) => updateItemField(weekIdx, post.id, "feed", "imageDescription", e.target.value)}
+                                                         placeholder="Prompt da imagem (edite livremente)..."
+                                                         className="bg-white/[0.05] border-white/10 text-white text-[10px] min-h-[50px] resize-none"
+                                                       />
+                                                       <div className="flex gap-2">
+                                                         <Input placeholder="Dica extra: ex. trocar fonte, cor azul..." value={imageHint} onChange={(e) => setImageHint(e.target.value)} className="bg-white/[0.05] border-white/10 text-white text-xs flex-1 h-9" />
+                                                         <Button size="sm" onClick={() => handleGenerateImage(weekIdx, post.id, post.imageDescription, "feed", imageHint || undefined, week.niche, post.generatedImage)} disabled={post.isGeneratingImage} className="bg-white text-black hover:bg-white/90 h-9 px-3 shrink-0 text-xs gap-1.5">
+                                                           {post.isGeneratingImage ? <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Gerando...</> : <><RefreshCw className="w-3.5 h-3.5" /> Refazer</>}
+                                                         </Button>
+                                                       </div>
                                                     </>
                                                   )}
                                                 </div>
@@ -1031,8 +1045,14 @@ export default function AdminConteudo() {
                                                 <a href={story.generatedImage} download={`story-${story.id}.png`} className="absolute top-2 right-2 p-1.5 bg-black/60 rounded-lg hover:bg-black/80 transition-colors"><Download className="w-3 h-3 text-white" /></a>
                                               </>
                                             ) : (
-                                              <div className="flex flex-col items-center gap-2">
+                                              <div className="flex flex-col items-center gap-2 p-2">
                                                 <ImageIcon className="w-6 h-6 text-white/15" />
+                                                <Textarea
+                                                  value={story.visualDescription}
+                                                  onChange={(e) => updateItemField(weekIdx, story.id, "story", "visualDescription", e.target.value)}
+                                                  placeholder="Prompt da imagem (edite antes de gerar)..."
+                                                  className="bg-white/[0.05] border-white/10 text-white text-[10px] min-h-[40px] resize-none w-full"
+                                                />
                                                 <Button size="sm" onClick={() => handleGenerateImage(weekIdx, story.id, story.visualDescription, "story", undefined, week.niche)} disabled={story.isGeneratingImage} className="bg-white text-black hover:bg-white/90 text-[10px] h-7 px-2">
                                                   {story.isGeneratingImage ? <><RefreshCw className="w-3 h-3 animate-spin mr-1" /> Gerando...</> : <><ImageIcon className="w-3 h-3 mr-1" /> Gerar</>}
                                                 </Button>
@@ -1064,9 +1084,15 @@ export default function AdminConteudo() {
                                                 {story.generatedImage && (
                                                   <>
                                                     <p className="text-[10px] text-white/40 uppercase tracking-wider font-semibold flex items-center gap-1 mt-1"><ImageIcon className="w-3 h-3" /> Refazer imagem</p>
+                                                    <Textarea
+                                                      value={story.visualDescription}
+                                                      onChange={(e) => updateItemField(weekIdx, story.id, "story", "visualDescription", e.target.value)}
+                                                      placeholder="Prompt da imagem (edite livremente)..."
+                                                      className="bg-white/[0.05] border-white/10 text-white text-[10px] min-h-[40px] resize-none"
+                                                    />
                                                     <div className="flex gap-2">
-                                                      <Input placeholder="Ex: mais colorido, fundo azul..." value={imageHint} onChange={(e) => setImageHint(e.target.value)} className="bg-white/[0.05] border-white/10 text-white text-xs flex-1 h-9" />
-                                                      <Button size="sm" onClick={() => handleGenerateImage(weekIdx, story.id, story.visualDescription, "story", imageHint || undefined, week.niche)} disabled={story.isGeneratingImage} className="bg-white text-black hover:bg-white/90 h-9 px-3 shrink-0 text-xs gap-1.5">
+                                                      <Input placeholder="Dica extra: ex. trocar fonte, cor azul..." value={imageHint} onChange={(e) => setImageHint(e.target.value)} className="bg-white/[0.05] border-white/10 text-white text-xs flex-1 h-9" />
+                                                      <Button size="sm" onClick={() => handleGenerateImage(weekIdx, story.id, story.visualDescription, "story", imageHint || undefined, week.niche, story.generatedImage)} disabled={story.isGeneratingImage} className="bg-white text-black hover:bg-white/90 h-9 px-3 shrink-0 text-xs gap-1.5">
                                                         {story.isGeneratingImage ? <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Gerando...</> : <><RefreshCw className="w-3.5 h-3.5" /> Refazer</>}
                                                       </Button>
                                                     </div>
