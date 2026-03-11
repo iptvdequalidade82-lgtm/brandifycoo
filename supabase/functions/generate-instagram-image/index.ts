@@ -9,7 +9,18 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { prompt, type, referenceImage } = await req.json();
+    const body = await req.json();
+    const prompt = typeof body?.prompt === "string" ? body.prompt.trim() : "";
+    const type = typeof body?.type === "string" ? body.type.toLowerCase() : "feed";
+    const referenceImage = typeof body?.referenceImage === "string" ? body.referenceImage : undefined;
+    const niche = typeof body?.niche === "string" ? body.niche.trim() : "";
+
+    if (!prompt) {
+      return new Response(JSON.stringify({ error: "Prompt da imagem é obrigatório." }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
