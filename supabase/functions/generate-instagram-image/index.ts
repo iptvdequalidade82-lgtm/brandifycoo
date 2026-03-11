@@ -179,6 +179,9 @@ CRITICAL RULES:
 4. 2-3 color palette MAX. Bold but restrained.
 5. Headline MUST mention websites/digital services for the niche (e.g. "Seu site que vende 24h", "Loja virtual para [nicho]"). NEVER generic phrases.
 
+🔒 NICHE LOCK (NON-NEGOTIABLE): ${niche || "Use the niche inferred from topic"}
+If the output is beautiful but not clearly from this niche, it is WRONG and must be regenerated.
+
 🎯 VISUAL STYLE — ${selected.id}:
 ${selected.desc}
 
