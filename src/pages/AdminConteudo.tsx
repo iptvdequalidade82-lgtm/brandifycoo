@@ -916,7 +916,7 @@ export default function AdminConteudo() {
                                                 <>
                                                   <img src={post.generatedImage} alt={post.title} className="w-full h-full object-cover aspect-square" />
                                                   <div className="absolute top-2 right-2 flex gap-1.5">
-                                                    <Button size="sm" onClick={() => handleGenerateImage(weekIdx, post.id, post.imageDescription, "feed")} disabled={post.isGeneratingImage} className="p-1.5 h-auto bg-black/60 hover:bg-black/80 text-white">
+                                                    <Button size="sm" onClick={() => handleGenerateImage(weekIdx, post.id, post.imageDescription, "feed", undefined, week.niche)} disabled={post.isGeneratingImage} className="p-1.5 h-auto bg-black/60 hover:bg-black/80 text-white">
                                                       {post.isGeneratingImage ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
                                                     </Button>
                                                     <a href={post.generatedImage} download={`feed-${post.id}.png`} className="p-1.5 bg-black/60 rounded-lg hover:bg-black/80 transition-colors"><Download className="w-3.5 h-3.5 text-white" /></a>
