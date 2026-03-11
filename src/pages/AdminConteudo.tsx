@@ -658,12 +658,15 @@ export default function AdminConteudo() {
           )}
         </div>
 
-        {/* Quick Action Templates — Gerar Post Avulso */}
-        <div className="space-y-2">
-          <p className="text-xs font-semibold text-white/40 uppercase tracking-wider flex items-center gap-1.5">
-            <Wand2 className="w-3.5 h-3.5" /> Criar post avulso
-          </p>
-          <div className="flex flex-wrap gap-2">
+        {/* Quick Action Templates — Premium style */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-semibold text-white/50 uppercase tracking-wider flex items-center gap-1.5">
+              <Wand2 className="w-3.5 h-3.5" /> Atalhos rápidos
+            </p>
+            <span className="text-[10px] text-white/20">Crie posts avulsos em segundos</span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
             {QUICK_TEMPLATES.map((tpl) => (
               <button
                 key={tpl.label}
@@ -678,10 +681,10 @@ export default function AdminConteudo() {
                   setQuickPostFormat("feed");
                   setQuickPostOpen(true);
                 }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.15] text-white/60 hover:text-white text-xs font-medium transition-all"
+                className="group flex flex-col items-center gap-1.5 px-3 py-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] hover:border-white/[0.15] text-white/50 hover:text-white text-xs font-medium transition-all hover:shadow-lg hover:shadow-white/5 hover:-translate-y-0.5"
               >
-                <span>{tpl.emoji}</span>
-                {tpl.label}
+                <span className="text-lg group-hover:scale-110 transition-transform">{tpl.emoji}</span>
+                <span className="text-[11px]">{tpl.label}</span>
               </button>
             ))}
           </div>
