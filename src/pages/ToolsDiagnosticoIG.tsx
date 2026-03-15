@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import html2canvas from "html2canvas";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
@@ -6,7 +6,7 @@ import {
   ArrowLeft, Instagram, TrendingUp, AlertTriangle, CheckCircle2,
   XCircle, Target, Zap, BarChart3, Loader2, Download, Share2, Sparkles,
   GripVertical, Plus, Trash2, Edit3, Users, Eye, Heart, MessageCircle,
-  ShoppingCart, MousePointer, Percent
+  ShoppingCart, MousePointer, Percent, ArrowUpRight, Shield, Flame, Award
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import PlanGate from "@/components/PlanGate";
