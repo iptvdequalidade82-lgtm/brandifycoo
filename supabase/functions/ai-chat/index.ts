@@ -41,8 +41,8 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+    if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY not configured");
 
     const authHeader = req.headers.get("Authorization");
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -55,7 +55,6 @@ serve(async (req) => {
     if (authHeader) {
       const token = authHeader.replace("Bearer ", "");
       const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-      // If the token is NOT the anon key, try to authenticate the user
       if (token !== anonKey) {
         const anonClient = createClient(supabaseUrl, anonKey);
         const { data: { user } } = await anonClient.auth.getUser(token);
@@ -87,29 +86,7 @@ serve(async (req) => {
     // IMAGE GENERATION / EDITING MODE
     // ═══════════════════════════════════════════
     if (shouldGenerateImage) {
-      // Use Gemini for image generation (best at multimodal)
-      const imageModels = ["google/gemini-3-pro-image-preview", "google/gemini-2.5-flash-image"];
-
-      let imageUrl: string | undefined;
-      let textContent = "";
-
-      for (const imageModel of imageModels) {
-        if (imageUrl) break;
-        console.log(`Image gen: trying ${imageModel}`);
-
-        try {
-          const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${LOVABLE_API_KEY}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              model: imageModel,
-              messages: [
-                {
-                  role: "system",
-                  content: `Você é um designer profissional da Brandify, especialista em criar posts virais para Instagram.
+      const imageSystemPrompt = `Você é um designer profissional da Brandify, especialista em criar posts virais para Instagram.
 
 ESTILO VISUAL TREINADO (use como base para TODA geração de imagem):
 - Posts com TIPOGRAFIA GIGANTE que domina 40-60% do frame
@@ -122,11 +99,36 @@ ESTILO VISUAL TREINADO (use como base para TODA geração de imagem):
 - Frases motivacionais/aspiracionais em português com tipografia impactante
 - NUNCA crie imagens genéricas, flat design, ou com cara de template
 
-Se receber uma imagem de referência, analise cores, estilo, logo e incorpore no resultado.`,
-                },
-                lastMsg,
-              ],
-              modalities: ["image", "text"],
+Se receber uma imagem de referência, analise cores, estilo, logo e incorpore no resultado.`;
+
+      // Build Gemini parts from last message
+      const geminiParts: any[] = [{ text: imageSystemPrompt + "\n\n" + lastText }];
+      if (Array.isArray(lastMsg.content)) {
+        for (const part of lastMsg.content) {
+          if (part.type === "image_url" && part.image_url?.url) {
+            const url = part.image_url.url;
+            const match = url.match(/^data:(image\/\w+);base64,(.+)$/);
+            if (match) {
+              geminiParts.push({ inlineData: { mimeType: match[1], data: match[2] } });
+            }
+          }
+        }
+      }
+
+      const imageModels = ["gemini-2.5-flash-preview-image-generation", "gemini-2.0-flash-exp"];
+      let imageUrl: string | undefined;
+      let textContent = "";
+
+      for (const imageModel of imageModels) {
+        if (imageUrl) break;
+        console.log(`Image gen: trying ${imageModel}`);
+        try {
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${imageModel}:generateContent?key=${GEMINI_API_KEY}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: geminiParts }],
+              generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
             }),
           });
 
@@ -135,18 +137,19 @@ Se receber uma imagem de referência, analise cores, estilo, logo e incorpore no
               status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
             });
           }
-          if (res.status === 402) {
-            return new Response(JSON.stringify({ error: "Créditos insuficientes." }), {
-              status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-            });
-          }
 
           if (res.ok) {
             const data = await res.json();
-            imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-            textContent = data.choices?.[0]?.message?.content || "";
-            if (imageUrl) {
-              console.log(`Image gen succeeded with ${imageModel}`);
+            const parts = data.candidates?.[0]?.content?.parts;
+            if (parts) {
+              for (const part of parts) {
+                if (part.inlineData?.mimeType?.startsWith("image/")) {
+                  imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                  console.log(`Image gen succeeded with ${imageModel}`);
+                } else if (part.text) {
+                  textContent += part.text;
+                }
+              }
             }
           } else {
             const t = await res.text();
@@ -166,87 +169,122 @@ Se receber uma imagem de referência, analise cores, estilo, logo e incorpore no
         });
       }
 
-      return new Response(JSON.stringify({ imageUrl, content: textContent || "Aqui está a imagem gerada! 🎨", model: imageModels[0] }), {
+      return new Response(JSON.stringify({ imageUrl, content: textContent || "Aqui está a imagem gerada! 🎨", model: "gemini-image" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     // ═══════════════════════════════════════════
-    // TEXT CHAT MODE (with smart model routing)
+    // TEXT CHAT MODE (Gemini streaming)
     // ═══════════════════════════════════════════
-    let aiModel: string;
-    if (model === "gpt") {
-      aiModel = "openai/gpt-5-mini";
-    } else if (model === "gemini") {
-      aiModel = "google/gemini-3-flash-preview";
-    } else {
-      // Auto mode: use GPT for complex reasoning, Gemini for speed
-      // If there's an image attachment but no image generation intent, use Gemini (better at vision)
-      if (hasAttachment) {
-        aiModel = "google/gemini-3-flash-preview";
-      } else {
-        aiModel = "google/gemini-3-flash-preview";
-      }
-    }
+    const systemPrompt = "Você é um assistente de IA avançado da Brandify. Responda sempre em português brasileiro. Seja claro, profissional e útil. Você pode ajudar com textos, ideias, estratégias de marketing, copywriting, análise de dados e muito mais. Se o usuário enviar uma imagem, analise-a e responda sobre ela. Formate suas respostas com markdown quando apropriado. IMPORTANTE: Você NÃO tem ferramentas externas. NUNCA responda com JSON, blocos de código com ações, ou formatos de tool-calling como {\"action\": ...}. Responda sempre em linguagem natural. Se o usuário pedir para GERAR ou CRIAR uma imagem, diga que você está processando a solicitação.";
 
     // Clean base64 from old messages to reduce payload
     const cleanedMessages = messages.map((m: any, i: number) => {
-      if (i === messages.length - 1) return m; // keep last message intact
+      if (i === messages.length - 1) return m;
       if (typeof m.content === "string") return m;
       if (Array.isArray(m.content)) {
-        return {
-          ...m,
-          content: m.content.filter((p: any) => p.type !== "image_url"),
-        };
+        return { ...m, content: m.content.filter((p: any) => p.type !== "image_url") };
       }
       return m;
     }).filter((m: any) => {
-      // Remove messages that became empty after cleaning
       if (Array.isArray(m.content) && m.content.length === 0) return false;
       return true;
     });
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: aiModel,
-        messages: [
-          {
-            role: "system",
-            content: "Você é um assistente de IA avançado da Brandify. Responda sempre em português brasileiro. Seja claro, profissional e útil. Você pode ajudar com textos, ideias, estratégias de marketing, copywriting, análise de dados e muito mais. Se o usuário enviar uma imagem, analise-a e responda sobre ela. Formate suas respostas com markdown quando apropriado. IMPORTANTE: Você NÃO tem ferramentas externas. NUNCA responda com JSON, blocos de código com ações, ou formatos de tool-calling como {\"action\": ...}. Responda sempre em linguagem natural. Se o usuário pedir para GERAR ou CRIAR uma imagem, diga que você está processando a solicitação.",
-          },
-          ...cleanedMessages,
-        ],
-        stream: true,
-      }),
+    // Convert to Gemini format
+    const geminiContents = cleanedMessages.map((m: any) => {
+      const role = m.role === "assistant" ? "model" : "user";
+      if (typeof m.content === "string") {
+        return { role, parts: [{ text: m.content }] };
+      }
+      if (Array.isArray(m.content)) {
+        const parts: any[] = [];
+        for (const p of m.content) {
+          if (p.type === "text") parts.push({ text: p.text });
+          else if (p.type === "image_url" && p.image_url?.url) {
+            const match = p.image_url.url.match(/^data:(image\/\w+);base64,(.+)$/);
+            if (match) parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
+          }
+        }
+        return { role, parts };
+      }
+      return { role, parts: [{ text: String(m.content) }] };
     });
+
+    const geminiModel = "gemini-2.5-flash";
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:streamGenerateContent?alt=sse&key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: systemPrompt }] },
+          contents: geminiContents,
+          generationConfig: { maxOutputTokens: 4096 },
+        }),
+      }
+    );
 
     if (response.status === 429) {
       return new Response(JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns minutos." }), {
         status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    if (response.status === 402) {
-      return new Response(JSON.stringify({ error: "Créditos insuficientes." }), {
-        status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
 
     if (!response.ok) {
       const t = await response.text();
-      console.error("AI gateway error:", response.status, t.slice(0, 500));
-      throw new Error("Erro no gateway de IA");
+      console.error("Gemini error:", response.status, t.slice(0, 500));
+      throw new Error("Erro no serviço de IA");
     }
 
-    return new Response(response.body, {
+    // Transform Gemini SSE to OpenAI-compatible SSE
+    const { readable, writable } = new TransformStream();
+    const writer = writable.getWriter();
+    const encoder = new TextEncoder();
+
+    (async () => {
+      try {
+        const reader = response.body!.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+
+          let idx: number;
+          while ((idx = buffer.indexOf("\n")) !== -1) {
+            let line = buffer.slice(0, idx);
+            buffer = buffer.slice(idx + 1);
+            if (line.endsWith("\r")) line = line.slice(0, -1);
+            if (!line.startsWith("data: ")) continue;
+            const json = line.slice(6).trim();
+            if (json === "[DONE]") continue;
+            try {
+              const parsed = JSON.parse(json);
+              const text = parsed.candidates?.[0]?.content?.parts?.[0]?.text;
+              if (text) {
+                const chunk = JSON.stringify({ choices: [{ delta: { content: text } }] });
+                await writer.write(encoder.encode(`data: ${chunk}\n\n`));
+              }
+            } catch { /* partial json */ }
+          }
+        }
+        await writer.write(encoder.encode("data: [DONE]\n\n"));
+      } catch (e) {
+        console.error("Stream transform error:", e);
+      } finally {
+        await writer.close();
+      }
+    })();
+
+    return new Response(readable, {
       headers: {
         ...corsHeaders,
         "Content-Type": "text/event-stream",
-        "X-Model-Used": aiModel,
+        "X-Model-Used": geminiModel,
       },
     });
   } catch (e) {
