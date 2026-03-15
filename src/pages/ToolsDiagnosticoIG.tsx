@@ -6,8 +6,10 @@ import {
   ArrowLeft, Instagram, TrendingUp, AlertTriangle, CheckCircle2,
   XCircle, Target, Zap, BarChart3, Loader2, Download, Share2, Sparkles,
   GripVertical, Plus, Trash2, Edit3, Users, Eye, Heart, MessageCircle,
-  ShoppingCart, MousePointer, Percent, ArrowUpRight, Shield, Flame, Award
+  ShoppingCart, MousePointer, Percent, ArrowUpRight, Shield, Flame, Award,
+  ChevronRight, Star, Lightbulb
 } from "lucide-react";
+import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, Tooltip } from "recharts";
 import { useAuth } from "@/contexts/AuthContext";
 import PlanGate from "@/components/PlanGate";
 import { useToast } from "@/hooks/use-toast";
