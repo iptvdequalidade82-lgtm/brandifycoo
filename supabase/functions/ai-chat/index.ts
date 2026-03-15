@@ -326,6 +326,8 @@ Se receber uma imagem de referência, analise cores, estilo, logo e incorpore no
       throw new Error(textLastError || "Erro no serviço de IA");
     }
 
+    const streamResponse = response;
+
     // Transform Gemini SSE to OpenAI-compatible SSE
     const { readable, writable } = new TransformStream();
     const writer = writable.getWriter();
@@ -333,7 +335,7 @@ Se receber uma imagem de referência, analise cores, estilo, logo e incorpore no
 
     (async () => {
       try {
-        const reader = response.body!.getReader();
+        const reader = streamResponse.body!.getReader();
         const decoder = new TextDecoder();
         let buffer = "";
 
