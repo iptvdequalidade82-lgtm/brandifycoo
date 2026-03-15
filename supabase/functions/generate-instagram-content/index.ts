@@ -290,50 +290,49 @@ CHECKLIST OBRIGATÓRIO:
     let content = "";
     let sawRateLimit = false;
     let lastProviderError = "";
-      for (const model of directModels) {
-        if (content) break;
-        for (let attempt = 1; attempt <= maxAttemptsPerModel; attempt++) {
-          const controller = new AbortController();
-          const timeout = setTimeout(() => controller.abort(), 90000);
+    for (const model of directModels) {
+      if (content) break;
+      for (let attempt = 1; attempt <= maxAttemptsPerModel; attempt++) {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 90000);
 
-          try {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              signal: controller.signal,
-              body: JSON.stringify({
-                system_instruction: { parts: [{ text: systemPrompt }] },
-                contents: [{ parts: [{ text: userPrompt }] }],
-              }),
-            });
+        try {
+          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            signal: controller.signal,
+            body: JSON.stringify({
+              system_instruction: { parts: [{ text: systemPrompt }] },
+              contents: [{ parts: [{ text: userPrompt }] }],
+            }),
+          });
 
-            if (response.status === 429) {
-              sawRateLimit = true;
-              if (attempt < maxAttemptsPerModel) {
-                await sleep(1200 * attempt);
-                continue;
-              }
-              break;
+          if (response.status === 429) {
+            sawRateLimit = true;
+            if (attempt < maxAttemptsPerModel) {
+              await sleep(1200 * attempt);
+              continue;
             }
-
-            if (!response.ok) {
-              const errText = await response.text();
-              lastProviderError = `Gemini ${model}: ${response.status} ${errText.slice(0, 200)}`;
-              break;
-            }
-
-            const data = await response.json();
-            const extracted = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-            if (typeof extracted === "string" && extracted.trim()) {
-              content = extracted;
-              break;
-            }
-
-            lastProviderError = `Gemini ${model}: resposta vazia`;
             break;
-          } finally {
-            clearTimeout(timeout);
           }
+
+          if (!response.ok) {
+            const errText = await response.text();
+            lastProviderError = `Gemini ${model}: ${response.status} ${errText.slice(0, 200)}`;
+            break;
+          }
+
+          const data = await response.json();
+          const extracted = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+          if (typeof extracted === "string" && extracted.trim()) {
+            content = extracted;
+            break;
+          }
+
+          lastProviderError = `Gemini ${model}: resposta vazia`;
+          break;
+        } finally {
+          clearTimeout(timeout);
         }
       }
     }
