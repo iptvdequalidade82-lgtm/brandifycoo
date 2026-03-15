@@ -254,8 +254,17 @@ export function DiagnosticoContent() {
     setLoading(true);
     setDiagnosis(null);
     try {
-      const cleanHandle = handle.trim().replace(/^@/, "").replace(/^https?:\/\/(www\.)?instagram\.com\//, "").replace(/\/$/, "");
-      
+      const cleanHandle = handle
+        .trim()
+        .replace(/^@/, "")
+        .replace(/^https?:\/\/(www\.)?instagram\.com\//i, "")
+        .split(/[/?#]/)[0]
+        .trim();
+
+      if (!cleanHandle) {
+        throw new Error("Informe um @ válido do Instagram");
+      }
+
       // Include custom metrics in the analysis
       const extraContext = customMetrics.filter(m => m.value.trim()).length > 0
         ? customMetrics.filter(m => m.value.trim()).map(m => `${m.label}: ${m.value}`).join(", ")
@@ -264,9 +273,12 @@ export function DiagnosticoContent() {
       const { data, error } = await supabase.functions.invoke("diagnose-instagram", {
         body: { handle: cleanHandle, extraMetrics: extraContext },
       });
+
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-      setDiagnosis(data);
+
+      const normalized = normalizeDiagnosis(data);
+      setDiagnosis(normalized);
     } catch (e: any) {
       toast({ title: "Erro na análise", description: e.message, variant: "destructive" });
     } finally {
