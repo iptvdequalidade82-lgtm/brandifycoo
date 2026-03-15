@@ -69,6 +69,79 @@ const PRESET_METRICS = [
   { label: "Visualizações de Reels", icon: "eye", placeholder: "Ex: 8.000" },
 ];
 
+const DIAGNOSIS_METRIC_NAMES = [
+  "Bio e Apresentação",
+  "Identidade Visual",
+  "Estratégia de Conteúdo",
+  "Uso de Reels",
+  "Engajamento",
+  "Frequência de Posts",
+];
+
+const toText = (value: unknown, fallback: string) => {
+  if (typeof value !== "string") return fallback;
+  const normalized = value.trim();
+  return normalized.length > 0 ? normalized : fallback;
+};
+
+const normalizeStatus = (value: unknown): Metric["status"] => {
+  if (value === "good" || value === "warning" || value === "critical") return value;
+  return "warning";
+};
+
+const normalizeDiagnosis = (raw: any): Diagnosis => {
+  const scoreValue = Number(raw?.score);
+  const score = Number.isFinite(scoreValue) ? Math.max(0, Math.min(100, Math.round(scoreValue))) : 50;
+  const rawMetrics = Array.isArray(raw?.metrics) ? raw.metrics : [];
+
+  const metrics = DIAGNOSIS_METRIC_NAMES.map((name, index) => {
+    const source = rawMetrics[index] ?? {};
+    return {
+      name,
+      value: toText(source?.value, "Não foi possível avaliar com os dados disponíveis."),
+      status: normalizeStatus(source?.status),
+      tip: toText(source?.tip, "Adicione métricas do cliente para personalizar esta recomendação."),
+    };
+  });
+
+  const strengths = Array.isArray(raw?.strengths)
+    ? raw.strengths.filter((item: unknown) => typeof item === "string" && item.trim().length > 0).slice(0, 3)
+    : [];
+
+  const weaknesses = Array.isArray(raw?.weaknesses)
+    ? raw.weaknesses.filter((item: unknown) => typeof item === "string" && item.trim().length > 0).slice(0, 3)
+    : [];
+
+  const actionPlanInput = Array.isArray(raw?.actionPlan) ? raw.actionPlan : [];
+  const actionPlan = Array.from({ length: 5 }, (_, index) => {
+    const source = actionPlanInput[index] ?? {};
+    return {
+      priority: toText(source?.priority, index < 2 ? "alta" : index < 4 ? "media" : "baixa"),
+      action: toText(source?.action, `Executar ação estratégica #${index + 1} para melhorar performance do perfil.`),
+      expectedImpact: toText(source?.expectedImpact, "Aumentar clareza de posicionamento, engajamento e conversão."),
+    };
+  });
+
+  return {
+    score,
+    scoreLabel: toText(raw?.scoreLabel, score >= 80 ? "Excelente" : score >= 60 ? "Bom" : score >= 40 ? "Regular" : score >= 20 ? "Fraco" : "Crítico"),
+    summary: toText(raw?.summary, "Diagnóstico gerado com dados limitados. Adicione métricas para maior precisão."),
+    metrics,
+    strengths: [
+      strengths[0] ?? "Há oportunidade clara de melhorar consistência e clareza do conteúdo.",
+      strengths[1] ?? "Existe potencial para fortalecer autoridade do perfil com posicionamento mais direto.",
+      strengths[2] ?? "Com ajustes de comunicação e formato, o perfil pode gerar mais resultado.",
+    ],
+    weaknesses: [
+      weaknesses[0] ?? "A proposta de valor ainda pode estar pouco explícita para novos visitantes.",
+      weaknesses[1] ?? "A estratégia de conteúdo pode estar inconsistente para o objetivo de negócio.",
+      weaknesses[2] ?? "Faltam sinais claros de otimização contínua para engajamento e conversão.",
+    ],
+    actionPlan,
+    _dataSource: raw?._dataSource === "real" ? "real" : "general",
+  };
+};
+
 export function DiagnosticoContent() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);

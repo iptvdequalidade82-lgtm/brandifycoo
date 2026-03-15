@@ -5,34 +5,150 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+type MetricStatus = "good" | "warning" | "critical";
+
+const METRIC_NAMES = [
+  "Bio e Apresentação",
+  "Identidade Visual",
+  "Estratégia de Conteúdo",
+  "Uso de Reels",
+  "Engajamento",
+  "Frequência de Posts",
+];
+
+const NEGATIVE_SIGNAL_PATTERN = /(not found|page isn't available|perfil não encontrado|perfil indisponível|404|doesn't exist|conta inexistente|não foi possível acessar)/i;
+const POSITIVE_SIGNAL_PATTERN = /(seguidores|followers|seguindo|following|publicações|posts|reels|bio|engajamento|curtidas|comentários)/i;
+
+const toText = (value: unknown, fallback: string) => {
+  if (typeof value !== "string") return fallback;
+  const normalized = value.trim();
+  return normalized.length > 0 ? normalized : fallback;
+};
+
+const normalizeStatus = (value: unknown): MetricStatus => {
+  if (value === "good" || value === "warning" || value === "critical") return value;
+  return "warning";
+};
+
+const clampScore = (value: unknown): number => {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return 50;
+  return Math.max(0, Math.min(100, Math.round(n)));
+};
+
+const scoreLabelFromScore = (score: number) => {
+  if (score >= 80) return "Excelente";
+  if (score >= 60) return "Bom";
+  if (score >= 40) return "Regular";
+  if (score >= 20) return "Fraco";
+  return "Crítico";
+};
+
+const normalizeDiagnosis = (raw: any, hasRealData: boolean) => {
+  const score = clampScore(raw?.score);
+  const rawMetrics = Array.isArray(raw?.metrics) ? raw.metrics : [];
+
+  const metrics = METRIC_NAMES.map((metricName, index) => {
+    const source = rawMetrics[index] ?? rawMetrics.find((m: any) => toText(m?.name, "").toLowerCase() === metricName.toLowerCase()) ?? {};
+    return {
+      name: metricName,
+      value: toText(source?.value, "Não foi possível avaliar com os dados disponíveis."),
+      status: normalizeStatus(source?.status),
+      tip: toText(source?.tip, "Adicione métricas próprias para receber recomendações mais precisas."),
+    };
+  });
+
+  const rawStrengths = Array.isArray(raw?.strengths) ? raw.strengths.filter((s: unknown) => typeof s === "string" && s.trim().length > 0) : [];
+  const rawWeaknesses = Array.isArray(raw?.weaknesses) ? raw.weaknesses.filter((w: unknown) => typeof w === "string" && w.trim().length > 0) : [];
+  const rawActions = Array.isArray(raw?.actionPlan) ? raw.actionPlan : [];
+
+  const strengths = [
+    rawStrengths[0] ?? "Existe oportunidade clara para melhorar a consistência de conteúdo.",
+    rawStrengths[1] ?? "Há potencial para fortalecer posicionamento e autoridade do perfil.",
+    rawStrengths[2] ?? "Com ajustes de formato e CTA, o perfil pode aumentar conversão.",
+  ];
+
+  const weaknesses = [
+    rawWeaknesses[0] ?? "Faltam sinais claros de diferenciação da proposta de valor.",
+    rawWeaknesses[1] ?? "A estrutura editorial pode estar pouco estratégica ou inconsistente.",
+    rawWeaknesses[2] ?? "A comunicação pode ser mais orientada para objetivo de negócio.",
+  ];
+
+  const actionPlan = Array.from({ length: 5 }, (_, index) => {
+    const source = rawActions[index] ?? {};
+    return {
+      priority: toText(source?.priority, index < 2 ? "alta" : index < 4 ? "media" : "baixa").toLowerCase(),
+      action: toText(source?.action, `Definir ação estratégica #${index + 1} com foco em crescimento de alcance e conversão.`),
+      expectedImpact: toText(source?.expectedImpact, "Melhorar consistência, posicionamento e performance do perfil no Instagram."),
+    };
+  });
+
+  const summaryFallback = hasRealData
+    ? "Diagnóstico concluído com base em dados públicos coletados e padrões de performance no Instagram."
+    : "Não foi possível coletar dados públicos suficientes do perfil, então a análise foi baseada em melhores práticas e métricas informadas.";
+
+  return {
+    score,
+    scoreLabel: toText(raw?.scoreLabel, scoreLabelFromScore(score)),
+    summary: toText(raw?.summary, summaryFallback),
+    metrics,
+    strengths,
+    weaknesses,
+    actionPlan,
+    _dataSource: hasRealData ? "real" : "general",
+  };
+};
+
+const cleanHandleInput = (value: string) =>
+  value
+    .trim()
+    .replace(/^@/, "")
+    .replace(/^https?:\/\/(www\.)?instagram\.com\//i, "")
+    .split(/[/?#]/)[0]
+    .trim();
+
+const extractJsonText = (text: string) => {
+  const withoutFence = text.replace(/```json\n?/gi, "").replace(/```\n?/g, "").trim();
+  const firstBrace = withoutFence.indexOf("{");
+  const lastBrace = withoutFence.lastIndexOf("}");
+  const candidate = firstBrace >= 0 && lastBrace > firstBrace
+    ? withoutFence.slice(firstBrace, lastBrace + 1)
+    : withoutFence;
+
+  return candidate
+    .replace(/[\x00-\x1F\x7F]/g, (c: string) => (c === "\n" || c === "\r" || c === "\t" ? c : ""))
+    .replace(/,\s*([}\]])/g, "$1")
+    .trim();
+};
+
 serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
     const { handle, extraMetrics } = await req.json();
     if (!handle) throw new Error("Handle é obrigatório");
 
-    const cleanHandle = handle.replace(/^@/, "").trim();
+    const cleanHandle = cleanHandleInput(handle);
+    if (!cleanHandle) throw new Error("Informe um @ válido do Instagram");
 
-    // Step 1: Use Firecrawl search to find real info about the Instagram profile
     const FIRECRAWL_API_KEY = Deno.env.get("FIRECRAWL_API_KEY");
     if (!FIRECRAWL_API_KEY) throw new Error("Firecrawl não configurado");
 
     console.log("Searching for Instagram profile:", cleanHandle);
 
     const searchQueries = [
-      `site:instagram.com "${cleanHandle}" bio followers`,
+      `site:instagram.com "${cleanHandle}" followers posts bio`,
       `"@${cleanHandle}" instagram perfil`,
     ];
 
-    let searchResults = "";
+    const fragments: string[] = [];
 
     for (const query of searchQueries) {
       try {
         const searchRes = await fetch("https://api.firecrawl.dev/v1/search", {
           method: "POST",
           headers: {
-            "Authorization": `Bearer ${FIRECRAWL_API_KEY}`,
+            Authorization: `Bearer ${FIRECRAWL_API_KEY}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
@@ -43,14 +159,19 @@ serve(async (req) => {
         });
 
         const searchData = await searchRes.json();
-        if (searchRes.ok && searchData?.data) {
+
+        if (searchRes.ok && Array.isArray(searchData?.data)) {
           for (const result of searchData.data) {
-            searchResults += `\n--- Fonte: ${result.url || "N/A"} ---\n`;
-            searchResults += `Título: ${result.title || "N/A"}\n`;
-            searchResults += `Descrição: ${result.description || "N/A"}\n`;
-            if (result.markdown) {
-              searchResults += result.markdown.substring(0, 2000) + "\n";
-            }
+            const chunk = [
+              `Fonte: ${result?.url || "N/A"}`,
+              `Título: ${result?.title || "N/A"}`,
+              `Descrição: ${result?.description || "N/A"}`,
+              typeof result?.markdown === "string" ? result.markdown.substring(0, 2000) : "",
+            ]
+              .filter(Boolean)
+              .join("\n");
+
+            if (chunk.trim().length > 0) fragments.push(chunk);
           }
         }
       } catch (e) {
@@ -58,100 +179,115 @@ serve(async (req) => {
       }
     }
 
-    // Also try scraping a third-party Instagram viewer
-    try {
-      const viewerRes = await fetch("https://api.firecrawl.dev/v1/scrape", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${FIRECRAWL_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          url: `https://imginn.com/${cleanHandle}/`,
-          formats: ["markdown"],
-          waitFor: 2000,
-        }),
-      });
+    const scrapeTargets = [
+      `https://www.instagram.com/${cleanHandle}/`,
+      `https://imginn.com/${cleanHandle}/`,
+    ];
 
-      const viewerData = await viewerRes.json();
-      if (viewerRes.ok) {
-        const md = viewerData?.data?.markdown || viewerData?.markdown || "";
-        if (md) {
-          searchResults += `\n--- Dados do perfil (viewer) ---\n${md.substring(0, 4000)}\n`;
+    for (const url of scrapeTargets) {
+      try {
+        const scrapeRes = await fetch("https://api.firecrawl.dev/v1/scrape", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${FIRECRAWL_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            url,
+            formats: ["markdown"],
+            waitFor: 2000,
+          }),
+        });
+
+        const scrapeData = await scrapeRes.json();
+
+        if (scrapeRes.ok) {
+          const md = scrapeData?.data?.markdown || scrapeData?.markdown || "";
+          if (typeof md === "string" && md.trim().length > 0) {
+            fragments.push(`Fonte: ${url}\n${md.substring(0, 4000)}`);
+          }
         }
+      } catch (e) {
+        console.error("Scrape target failed:", url, e);
       }
-    } catch (e) {
-      console.error("Viewer scrape failed:", e);
     }
 
-    console.log("Total search results length:", searchResults.length);
+    const searchResults = fragments.join("\n\n---\n\n").trim();
+    const normalizedSearchResults = searchResults.toLowerCase();
+    const hasPositiveSignals = POSITIVE_SIGNAL_PATTERN.test(normalizedSearchResults);
+    const hasNegativeSignals = NEGATIVE_SIGNAL_PATTERN.test(normalizedSearchResults);
+    const enoughLength = searchResults.length > 300;
+    const hasRealData = enoughLength && hasPositiveSignals && !(hasNegativeSignals && !hasPositiveSignals);
 
-    // Step 2: Send real data to AI
-    const hasRealData = searchResults.length > 100;
+    console.log("Total search results length:", searchResults.length);
+    console.log("Has real data:", hasRealData);
 
     const prompt = hasRealData
-      ? `Você é um especialista em marketing digital e Instagram com anos de experiência.
+      ? `Você é um especialista sênior em marketing digital e Instagram.
 
-Abaixo estão dados REAIS coletados da internet sobre o perfil @${cleanHandle} no Instagram. Analise APENAS o que você consegue ver nos dados. NÃO INVENTE informações. Se algo não está nos dados, diga "Não foi possível avaliar com os dados disponíveis".
+Analise APENAS os dados reais abaixo sobre @${cleanHandle}. NÃO invente.
+Se algum ponto for incerto, informe de forma explícita e sugera próximos passos.
 
-=== DADOS REAIS COLETADOS ===
-${searchResults.substring(0, 10000)}
+=== DADOS COLETADOS ===
+${searchResults.substring(0, 12000)}
 === FIM DOS DADOS ===
 ${extraMetrics ? `\n=== MÉTRICAS INFORMADAS PELO CLIENTE ===\n${extraMetrics}\n=== FIM DAS MÉTRICAS ===\n` : ""}
-Com base nos dados acima${extraMetrics ? " e nas métricas do cliente" : ""}, faça um diagnóstico honesto. Se há pouco conteúdo visível, reflita isso no score. Não invente posts, reels ou métricas que não estão nos dados. ${extraMetrics ? "Use as métricas fornecidas pelo cliente para enriquecer a análise." : ""}
 
-Responda APENAS com JSON válido (sem markdown, sem \`\`\`):
+Retorne SOMENTE JSON válido com este formato (sem markdown):
 {
-  "score": (número de 0 a 100),
-  "scoreLabel": "(Crítico / Fraco / Regular / Bom / Excelente)",
-  "summary": "(resumo honesto baseado nos dados reais encontrados)",
+  "score": 0,
+  "scoreLabel": "Crítico|Fraco|Regular|Bom|Excelente",
+  "summary": "Resumo objetivo e estratégico",
   "metrics": [
-    { "name": "Bio e Apresentação", "value": "(baseado nos dados reais)", "status": "good|warning|critical", "tip": "(dica específica)" },
-    { "name": "Identidade Visual", "value": "(baseado nos dados reais)", "status": "good|warning|critical", "tip": "(dica)" },
-    { "name": "Estratégia de Conteúdo", "value": "(baseado nos dados reais)", "status": "good|warning|critical", "tip": "(dica)" },
-    { "name": "Uso de Reels", "value": "(baseado nos dados reais)", "status": "good|warning|critical", "tip": "(dica)" },
-    { "name": "Engajamento", "value": "(baseado nos dados reais)", "status": "good|warning|critical", "tip": "(dica)" },
-    { "name": "Frequência de Posts", "value": "(baseado nos dados reais)", "status": "good|warning|critical", "tip": "(dica)" }
+    { "name": "Bio e Apresentação", "value": "...", "status": "good|warning|critical", "tip": "..." },
+    { "name": "Identidade Visual", "value": "...", "status": "good|warning|critical", "tip": "..." },
+    { "name": "Estratégia de Conteúdo", "value": "...", "status": "good|warning|critical", "tip": "..." },
+    { "name": "Uso de Reels", "value": "...", "status": "good|warning|critical", "tip": "..." },
+    { "name": "Engajamento", "value": "...", "status": "good|warning|critical", "tip": "..." },
+    { "name": "Frequência de Posts", "value": "...", "status": "good|warning|critical", "tip": "..." }
   ],
-  "strengths": ["(ponto forte real)", "(ponto forte real)", "(ponto forte real)"],
-  "weaknesses": ["(fraqueza real)", "(fraqueza real)", "(fraqueza real)"],
+  "strengths": ["...", "...", "..."],
+  "weaknesses": ["...", "...", "..."],
   "actionPlan": [
-    { "priority": "alta", "action": "(ação concreta)", "expectedImpact": "(resultado)" },
-    { "priority": "alta", "action": "(ação concreta)", "expectedImpact": "(resultado)" },
-    { "priority": "media", "action": "(ação concreta)", "expectedImpact": "(resultado)" },
-    { "priority": "media", "action": "(ação concreta)", "expectedImpact": "(resultado)" },
-    { "priority": "baixa", "action": "(ação concreta)", "expectedImpact": "(resultado)" }
+    { "priority": "alta", "action": "...", "expectedImpact": "..." },
+    { "priority": "alta", "action": "...", "expectedImpact": "..." },
+    { "priority": "media", "action": "...", "expectedImpact": "..." },
+    { "priority": "media", "action": "...", "expectedImpact": "..." },
+    { "priority": "baixa", "action": "...", "expectedImpact": "..." }
   ]
-}`
+}
+
+Regra crítica: nenhum campo pode vir vazio.`
       : `Você é um especialista em marketing digital e Instagram.
 
-O usuário quer um diagnóstico do perfil @${cleanHandle} no Instagram. Não foi possível coletar dados detalhados automaticamente, mas como especialista, use seu conhecimento geral para dar recomendações baseadas em boas práticas de Instagram para perfis comerciais/pessoais.
+Não foi possível coletar dados públicos suficientes para @${cleanHandle}.
+${extraMetrics ? `Use fortemente as métricas fornecidas pelo cliente para personalizar a análise: ${extraMetrics}.` : "Faça uma análise estratégica baseada em boas práticas para perfis comerciais."}
 
-IMPORTANTE: Seja transparente e diga que a análise é baseada em recomendações gerais, já que não foi possível acessar os dados completos do perfil. Dê dicas práticas e acionáveis.
-
-Responda APENAS com JSON válido (sem markdown, sem \`\`\`):
+Retorne SOMENTE JSON válido (sem markdown) no formato:
 {
-  "score": 50,
+  "score": 0,
   "scoreLabel": "Análise Geral",
-  "summary": "(explique que não foi possível acessar dados completos do perfil @${cleanHandle}, mas aqui estão recomendações baseadas em boas práticas)",
+  "summary": "Explique com transparência que houve baixa visibilidade de dados públicos e entregue diagnóstico prático",
   "metrics": [
-    { "name": "Bio e Apresentação", "value": "Verificação necessária", "status": "warning", "tip": "(dica de boas práticas)" },
-    { "name": "Identidade Visual", "value": "Verificação necessária", "status": "warning", "tip": "(dica)" },
-    { "name": "Estratégia de Conteúdo", "value": "Verificação necessária", "status": "warning", "tip": "(dica)" },
-    { "name": "Uso de Reels", "value": "Verificação necessária", "status": "warning", "tip": "(dica)" },
-    { "name": "Engajamento", "value": "Verificação necessária", "status": "warning", "tip": "(dica)" },
-    { "name": "Frequência de Posts", "value": "Verificação necessária", "status": "warning", "tip": "(dica)" }
+    { "name": "Bio e Apresentação", "value": "...", "status": "good|warning|critical", "tip": "..." },
+    { "name": "Identidade Visual", "value": "...", "status": "good|warning|critical", "tip": "..." },
+    { "name": "Estratégia de Conteúdo", "value": "...", "status": "good|warning|critical", "tip": "..." },
+    { "name": "Uso de Reels", "value": "...", "status": "good|warning|critical", "tip": "..." },
+    { "name": "Engajamento", "value": "...", "status": "good|warning|critical", "tip": "..." },
+    { "name": "Frequência de Posts", "value": "...", "status": "good|warning|critical", "tip": "..." }
   ],
-  "strengths": ["(recomendação 1)", "(recomendação 2)", "(recomendação 3)"],
-  "weaknesses": ["(erro comum 1)", "(erro comum 2)", "(erro comum 3)"],
+  "strengths": ["...", "...", "..."],
+  "weaknesses": ["...", "...", "..."],
   "actionPlan": [
-    { "priority": "alta", "action": "(ação)", "expectedImpact": "(resultado)" },
-    { "priority": "alta", "action": "(ação)", "expectedImpact": "(resultado)" },
-    { "priority": "media", "action": "(ação)", "expectedImpact": "(resultado)" },
-    { "priority": "media", "action": "(ação)", "expectedImpact": "(resultado)" },
-    { "priority": "baixa", "action": "(ação)", "expectedImpact": "(resultado)" }
+    { "priority": "alta", "action": "...", "expectedImpact": "..." },
+    { "priority": "alta", "action": "...", "expectedImpact": "..." },
+    { "priority": "media", "action": "...", "expectedImpact": "..." },
+    { "priority": "media", "action": "...", "expectedImpact": "..." },
+    { "priority": "baixa", "action": "...", "expectedImpact": "..." }
   ]
-}`;
+}
+
+Regra crítica: nenhum campo pode vir vazio.`;
 
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY not configured");
@@ -159,11 +295,19 @@ Responda APENAS com JSON válido (sem markdown, sem \`\`\`):
     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+      body: JSON.stringify({
+        generationConfig: {
+          responseMimeType: "application/json",
+          temperature: 0.6,
+        },
+        contents: [{ parts: [{ text: prompt }] }],
+      }),
     });
 
     if (!res.ok) {
       if (res.status === 429) throw new Error("Limite de requisições atingido. Tente novamente em alguns segundos.");
+      const errorText = await res.text();
+      console.error("Gemini diagnose error:", res.status, errorText);
       throw new Error("Erro ao consultar IA");
     }
 
@@ -172,12 +316,17 @@ Responda APENAS com JSON válido (sem markdown, sem \`\`\`):
 
     if (!responseText) throw new Error("IA não retornou resposta");
 
-    let cleaned = responseText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-    cleaned = cleaned.replace(/[\x00-\x1F\x7F]/g, (c: string) => c === "\n" || c === "\r" || c === "\t" ? c : "");
-    cleaned = cleaned.replace(/,\s*([}\]])/g, "$1");
+    const cleanedJson = extractJsonText(responseText);
+    let parsed: any;
 
-    const diagnosis = JSON.parse(cleaned);
-    diagnosis._dataSource = hasRealData ? "real" : "general";
+    try {
+      parsed = JSON.parse(cleanedJson);
+    } catch (parseError) {
+      console.error("Failed to parse AI diagnosis JSON", parseError, cleanedJson.substring(0, 1000));
+      throw new Error("Não foi possível interpretar o diagnóstico gerado. Tente novamente.");
+    }
+
+    const diagnosis = normalizeDiagnosis(parsed, hasRealData);
 
     return new Response(JSON.stringify(diagnosis), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
