@@ -90,6 +90,23 @@ const HOOK_PATTERNS = [
   "'Isso aqui salvou [resultado] para [tipo de cliente]'",
 ];
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const extractGatewayText = (payload: any): string => {
+  const raw = payload?.choices?.[0]?.message?.content;
+  if (typeof raw === "string") return raw;
+  if (Array.isArray(raw)) {
+    return raw
+      .map((part: any) => {
+        if (typeof part === "string") return part;
+        if (typeof part?.text === "string") return part.text;
+        return "";
+      })
+      .join("");
+  }
+  return "";
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
