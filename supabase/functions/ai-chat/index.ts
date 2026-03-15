@@ -37,6 +37,9 @@ function hasImageAttachment(messages: any[]): boolean {
   return false;
 }
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const MAX_ATTEMPTS_PER_MODEL = 2;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -118,49 +121,91 @@ Se receber uma imagem de referência, analise cores, estilo, logo e incorpore no
       const imageModels = ["gemini-2.5-flash-preview-image-generation", "gemini-2.0-flash-exp"];
       let imageUrl: string | undefined;
       let textContent = "";
+      let imageModelUsed = "";
+      let imageRateLimited = false;
+      let imageLastError = "";
 
       for (const imageModel of imageModels) {
         if (imageUrl) break;
-        console.log(`Image gen: trying ${imageModel}`);
-        try {
-          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${imageModel}:generateContent?key=${GEMINI_API_KEY}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [{ parts: geminiParts }],
-              generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
-            }),
-          });
 
-          if (res.status === 429) {
-            return new Response(JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns minutos." }), {
-              status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        for (let attempt = 1; attempt <= MAX_ATTEMPTS_PER_MODEL; attempt++) {
+          console.log(`Image gen: trying ${imageModel} (attempt ${attempt}/${MAX_ATTEMPTS_PER_MODEL})`);
+
+          try {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${imageModel}:generateContent?key=${GEMINI_API_KEY}`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                contents: [{ parts: geminiParts }],
+                generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
+              }),
             });
-          }
 
-          if (res.ok) {
+            if (res.status === 429) {
+              imageRateLimited = true;
+              if (attempt < MAX_ATTEMPTS_PER_MODEL) {
+                await sleep(1200 * attempt);
+                continue;
+              }
+              break;
+            }
+
+            if (!res.ok) {
+              const t = await res.text();
+              imageLastError = `${imageModel} failed: ${res.status} ${t.slice(0, 300)}`;
+              console.error(imageLastError);
+              if (res.status >= 500 && attempt < MAX_ATTEMPTS_PER_MODEL) {
+                await sleep(900 * attempt);
+                continue;
+              }
+              break;
+            }
+
             const data = await res.json();
             const parts = data.candidates?.[0]?.content?.parts;
             if (parts) {
               for (const part of parts) {
                 if (part.inlineData?.mimeType?.startsWith("image/")) {
                   imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-                  console.log(`Image gen succeeded with ${imageModel}`);
+                  imageModelUsed = imageModel;
                 } else if (part.text) {
                   textContent += part.text;
                 }
               }
             }
-          } else {
-            const t = await res.text();
-            console.error(`${imageModel} failed:`, res.status, t.slice(0, 300));
+
+            if (imageUrl) {
+              console.log(`Image gen succeeded with ${imageModel}`);
+              break;
+            }
+
+            imageLastError = `${imageModel} returned no image`;
+            if (attempt < MAX_ATTEMPTS_PER_MODEL) {
+              await sleep(700 * attempt);
+              continue;
+            }
+            break;
+          } catch (e) {
+            imageLastError = `${imageModel} threw: ${e instanceof Error ? e.message : String(e)}`;
+            console.error(imageLastError);
+            if (attempt < MAX_ATTEMPTS_PER_MODEL) {
+              await sleep(900 * attempt);
+              continue;
+            }
+            break;
           }
-        } catch (e) {
-          console.error(`${imageModel} threw:`, e);
         }
       }
 
       if (!imageUrl) {
+        if (imageRateLimited) {
+          return new Response(JSON.stringify({ error: "Limite de requisições excedido. Aguarde alguns segundos e tente novamente." }), {
+            status: 429,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+
+        console.error("Image generation failed:", imageLastError || "unknown error");
         return new Response(JSON.stringify({
           content: "Desculpe, não consegui gerar a imagem no momento. Tente novamente em alguns instantes.",
           model: "error",
@@ -169,7 +214,7 @@ Se receber uma imagem de referência, analise cores, estilo, logo e incorpore no
         });
       }
 
-      return new Response(JSON.stringify({ imageUrl, content: textContent || "Aqui está a imagem gerada! 🎨", model: "gemini-image" }), {
+      return new Response(JSON.stringify({ imageUrl, content: textContent || "Aqui está a imagem gerada! 🎨", model: imageModelUsed || "gemini-image" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -212,31 +257,76 @@ Se receber uma imagem de referência, analise cores, estilo, logo e incorpore no
       return { role, parts: [{ text: String(m.content) }] };
     });
 
-    const geminiModel = "gemini-2.5-flash";
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:streamGenerateContent?alt=sse&key=${GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: systemPrompt }] },
-          contents: geminiContents,
-          generationConfig: { maxOutputTokens: 4096 },
-        }),
+    const textModels = ["gemini-2.5-flash", "gemini-2.5-flash-lite"];
+    let geminiModel = textModels[0];
+    let response: Response | null = null;
+    let textRateLimited = false;
+    let textLastError = "";
+
+    for (const candidateModel of textModels) {
+      if (response?.ok) break;
+
+      for (let attempt = 1; attempt <= MAX_ATTEMPTS_PER_MODEL; attempt++) {
+        try {
+          const res = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${candidateModel}:streamGenerateContent?alt=sse&key=${GEMINI_API_KEY}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                system_instruction: { parts: [{ text: systemPrompt }] },
+                contents: geminiContents,
+                generationConfig: { maxOutputTokens: 4096 },
+              }),
+            }
+          );
+
+          if (res.status === 429) {
+            textRateLimited = true;
+            if (attempt < MAX_ATTEMPTS_PER_MODEL) {
+              await sleep(1200 * attempt);
+              continue;
+            }
+            break;
+          }
+
+          if (!res.ok) {
+            const t = await res.text();
+            textLastError = `${candidateModel}: ${res.status} ${t.slice(0, 500)}`;
+            console.error("Gemini error:", textLastError);
+            if (res.status >= 500 && attempt < MAX_ATTEMPTS_PER_MODEL) {
+              await sleep(900 * attempt);
+              continue;
+            }
+            break;
+          }
+
+          response = res;
+          geminiModel = candidateModel;
+          break;
+        } catch (err) {
+          textLastError = `${candidateModel}: ${err instanceof Error ? err.message : String(err)}`;
+          console.error("Gemini stream error:", textLastError);
+          if (attempt < MAX_ATTEMPTS_PER_MODEL) {
+            await sleep(900 * attempt);
+            continue;
+          }
+          break;
+        }
       }
-    );
-
-    if (response.status === 429) {
-      return new Response(JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns minutos." }), {
-        status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
     }
 
-    if (!response.ok) {
-      const t = await response.text();
-      console.error("Gemini error:", response.status, t.slice(0, 500));
-      throw new Error("Erro no serviço de IA");
+    if (!response || !response.ok) {
+      if (textRateLimited) {
+        return new Response(JSON.stringify({ error: "Limite de requisições excedido. Aguarde alguns segundos e tente novamente." }), {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      throw new Error(textLastError || "Erro no serviço de IA");
     }
+
+    const streamResponse = response;
 
     // Transform Gemini SSE to OpenAI-compatible SSE
     const { readable, writable } = new TransformStream();
@@ -245,7 +335,7 @@ Se receber uma imagem de referência, analise cores, estilo, logo e incorpore no
 
     (async () => {
       try {
-        const reader = response.body!.getReader();
+        const reader = streamResponse.body!.getReader();
         const decoder = new TextDecoder();
         let buffer = "";
 
