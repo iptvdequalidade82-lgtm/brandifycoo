@@ -124,6 +124,44 @@ const extractJsonText = (text: string) => {
     .trim();
 };
 
+const pushUniqueFragment = (fragments: string[], fragment: string, maxLength = 4500) => {
+  const normalized = fragment.trim();
+  if (!normalized) return;
+
+  const clipped = normalized.length > maxLength ? normalized.substring(0, maxLength) : normalized;
+  if (!fragments.includes(clipped)) fragments.push(clipped);
+};
+
+const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const assessDataSignals = (searchResults: string, cleanHandle: string) => {
+  const normalized = searchResults.toLowerCase();
+  const hasPositiveSignals = POSITIVE_SIGNAL_PATTERN.test(normalized);
+  const hasNegativeSignals = NEGATIVE_SIGNAL_PATTERN.test(normalized);
+  const hasNumericSignals = NUMERIC_SIGNAL_PATTERN.test(normalized);
+  const handlePattern = new RegExp(`(^|[^a-z0-9_])@?${escapeRegex(cleanHandle)}([^a-z0-9_]|$)`, "i");
+  const hasHandleMention = handlePattern.test(searchResults);
+
+  const signalScore =
+    (hasPositiveSignals ? 1 : 0) +
+    (hasNumericSignals ? 2 : 0) +
+    (hasHandleMention ? 1 : 0) -
+    (hasNegativeSignals ? 2 : 0);
+
+  const hasRealData = searchResults.length >= MIN_REAL_DATA_LENGTH && signalScore >= 2;
+  const hasPartialData = !hasRealData && searchResults.length >= MIN_PARTIAL_DATA_LENGTH && signalScore >= 1;
+
+  return {
+    hasRealData,
+    hasPartialData,
+    signalScore,
+    hasPositiveSignals,
+    hasNegativeSignals,
+    hasNumericSignals,
+    hasHandleMention,
+  };
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
