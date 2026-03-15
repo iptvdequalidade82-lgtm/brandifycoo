@@ -54,32 +54,21 @@ Gere o plano em JSON com esta estrutura exata:
 Crie 3-4 fases. Responda APENAS com JSON válido, sem markdown.`;
 
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY not configured");
 
-    let responseText = "";
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+    });
 
-    if (GEMINI_API_KEY) {
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
-      });
-      const data = await res.json();
-      responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-    } else if (LOVABLE_API_KEY) {
-      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
-          messages: [{ role: "user", content: prompt }],
-        }),
-      });
-      const data = await res.json();
-      responseText = data?.choices?.[0]?.message?.content || "";
-    } else {
-      throw new Error("No AI API key configured");
+    if (!res.ok) {
+      if (res.status === 429) throw new Error("Limite de requisições atingido. Tente novamente em alguns segundos.");
+      throw new Error("Erro ao consultar IA");
     }
+
+    const data = await res.json();
+    const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
     let cleaned = responseText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
     cleaned = cleaned.replace(/[\x00-\x1F\x7F]/g, (c) => c === "\n" || c === "\r" || c === "\t" ? c : "");

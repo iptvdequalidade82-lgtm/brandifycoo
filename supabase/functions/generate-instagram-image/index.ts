@@ -6,7 +6,6 @@ const corsHeaders = {
 };
 
 // ── Niche Visual DNA ──
-// Each niche has specific props, environments, color palettes, and hero elements
 const NICHE_VISUAL_DNA: Record<string, { props: string; environment: string; palette: string; heroElement: string }> = {
   "barbearia|barbeiro|barba": {
     props: "straight razor, barber scissors, pomade jar, hot towel, barber cape, shaving brush",
@@ -201,9 +200,8 @@ serve(async (req) => {
       });
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    if (!LOVABLE_API_KEY && !GEMINI_API_KEY) throw new Error("No API key configured");
+    if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY not configured");
 
     const isStory = type === "story" || type === "stories";
     const aspectRatio = isStory ? "9:16" : "1:1";
@@ -211,54 +209,18 @@ serve(async (req) => {
 
     // 12 curated visual styles
     const styles = [
-      {
-        id: "CINEMATIC_LANDSCAPE",
-        desc: `Full-bleed dramatic landscape photograph. Person silhouetted or with back turned. MASSIVE bold typography filling 40-50% of frame using clipping mask. Cinematic color grading.`
-      },
-      {
-        id: "DARK_LUXURY",
-        desc: `Night urban setting with dramatic low-key lighting. High contrast: deep blacks + bright whites + subtle warm accent. Bold white typography with texture fill inside letters.`
-      },
-      {
-        id: "EDITORIAL_BRAND",
-        desc: `Magazine-quality dark editorial layout. Large hero subject with dramatic side lighting. Multi-weight typography. One accent color for key words. Design overlays: subtle grids.`
-      },
-      {
-        id: "CLEAN_TYPOGRAPHY_3D",
-        desc: `Clean white/light gray background — Swiss poster aesthetic. MASSIVE bold black condensed text. ONE letter replaced by hyper-realistic 3D textured object. Real shadow. Small accent label.`
-      },
-      {
-        id: "MONOCHROME_BOLD",
-        desc: `Strong single vivid color background. One dominant visual element. GIANT bold typography with texture fill. Mix of script + massive bold for hierarchy. Minimal composition.`
-      },
-      {
-        id: "WARM_NATURE_EDITORIAL",
-        desc: `Warm amber/golden palette. Photorealistic macro hero element. GIANT mixed typography: massive serif + elegant script accent. Warm bokeh particles. Glass overlay cards.`
-      },
-      {
-        id: "DARK_DRAMATIC",
-        desc: `Deep moody dark atmosphere. Dramatic 3D element central. GIANT bold gradient typography overlapping the scene. Rim lighting. Deep blues + teal + amber text.`
-      },
-      {
-        id: "GLASSMORPHISM",
-        desc: `Dramatic full-frame background. FROSTED GLASS CARD at bottom with bold accent text + regular white. Cinematic lighting, depth layers.`
-      },
-      {
-        id: "SCULPTURE_REMIX",
-        desc: `Classical sculpture or 3D form REMIXED with modern elements. Strong single dominant color. ENORMOUS condensed bold typography at multiple opacity levels.`
-      },
-      {
-        id: "RETRO_EDITORIAL",
-        desc: `Real landscape with vintage/retro color grading. One focal object. GIANT bold editorial typography: condensed sans-serif + flowing script mix. Film grain texture.`
-      },
-      {
-        id: "SPOTLIGHT_PRODUCT",
-        desc: `Near-black background with single dramatic spotlight from above. Hero product/object centered, floating. Bold white stacked typography. Smoke/dust particles catching light.`
-      },
-      {
-        id: "VIBRANT_3D",
-        desc: `Light/white background. MASSIVE bold vivid-colored word filling frame. Hyper-realistic colorful 3D element centered overlapping text. Color palette swatches. Energetic.`
-      },
+      { id: "CINEMATIC_LANDSCAPE", desc: `Full-bleed dramatic landscape photograph. Person silhouetted or with back turned. MASSIVE bold typography filling 40-50% of frame using clipping mask. Cinematic color grading.` },
+      { id: "DARK_LUXURY", desc: `Night urban setting with dramatic low-key lighting. High contrast: deep blacks + bright whites + subtle warm accent. Bold white typography with texture fill inside letters.` },
+      { id: "EDITORIAL_BRAND", desc: `Magazine-quality dark editorial layout. Large hero subject with dramatic side lighting. Multi-weight typography. One accent color for key words. Design overlays: subtle grids.` },
+      { id: "CLEAN_TYPOGRAPHY_3D", desc: `Clean white/light gray background — Swiss poster aesthetic. MASSIVE bold black condensed text. ONE letter replaced by hyper-realistic 3D textured object. Real shadow. Small accent label.` },
+      { id: "MONOCHROME_BOLD", desc: `Strong single vivid color background. One dominant visual element. GIANT bold typography with texture fill. Mix of script + massive bold for hierarchy. Minimal composition.` },
+      { id: "WARM_NATURE_EDITORIAL", desc: `Warm amber/golden palette. Photorealistic macro hero element. GIANT mixed typography: massive serif + elegant script accent. Warm bokeh particles. Glass overlay cards.` },
+      { id: "DARK_DRAMATIC", desc: `Deep moody dark atmosphere. Dramatic 3D element central. GIANT bold gradient typography overlapping the scene. Rim lighting. Deep blues + teal + amber text.` },
+      { id: "GLASSMORPHISM", desc: `Dramatic full-frame background. FROSTED GLASS CARD at bottom with bold accent text + regular white. Cinematic lighting, depth layers.` },
+      { id: "SCULPTURE_REMIX", desc: `Classical sculpture or 3D form REMIXED with modern elements. Strong single dominant color. ENORMOUS condensed bold typography at multiple opacity levels.` },
+      { id: "RETRO_EDITORIAL", desc: `Real landscape with vintage/retro color grading. One focal object. GIANT bold editorial typography: condensed sans-serif + flowing script mix. Film grain texture.` },
+      { id: "SPOTLIGHT_PRODUCT", desc: `Near-black background with single dramatic spotlight from above. Hero product/object centered, floating. Bold white stacked typography. Smoke/dust particles catching light.` },
+      { id: "VIBRANT_3D", desc: `Light/white background. MASSIVE bold vivid-colored word filling frame. Hyper-realistic colorful 3D element centered overlapping text. Color palette swatches. Energetic.` },
     ];
 
     const selected = styles[Math.floor(Math.random() * styles.length)];
@@ -338,72 +300,21 @@ ${prompt}`;
 
     let imageUrl: string | undefined;
 
-    const buildMessageContent = () => {
-      const parts: any[] = [{ type: "text", text: imagePrompt }];
-      if (referenceImage) {
-        parts.push({ type: "image_url", image_url: { url: referenceImage } });
-      }
-      return parts;
-    };
-
-    // Primary: Lovable AI Gateway
-    if (LOVABLE_API_KEY && !imageUrl) {
-      const gatewayModels = ["google/gemini-3.1-flash-image-preview", "google/gemini-3-pro-image-preview"];
-      for (const model of gatewayModels) {
-        if (imageUrl) break;
-        console.log(`Trying gateway: ${model}`);
-        try {
-          const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${LOVABLE_API_KEY}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              model,
-              messages: [{ role: "user", content: buildMessageContent() }],
-              modalities: ["image", "text"],
-              image_config: { aspect_ratio: aspectRatio },
-            }),
-          });
-          if (res.status === 429) {
-            return new Response(JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns minutos." }), {
-              status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-            });
-          }
-          if (res.status === 402) {
-            return new Response(JSON.stringify({ error: "Créditos de IA insuficientes." }), {
-              status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-            });
-          }
-          if (res.ok) {
-            const data = await res.json();
-            imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-            if (imageUrl) { console.log(`Gateway ${model} succeeded`); break; }
-            console.error(`Gateway ${model}: no image`);
-          } else {
-            const t = await res.text();
-            console.error(`Gateway ${model} failed:`, res.status, t.slice(0, 300));
-          }
-        } catch (e) {
-          console.error(`Gateway ${model} threw:`, e);
-        }
-      }
+    const geminiParts: any[] = [{ text: imagePrompt }];
+    if (referenceImage) {
+      const match = referenceImage.match(/^data:(image\/\w+);base64,(.+)$/);
+      if (match) geminiParts.push({ inlineData: { mimeType: match[1], data: match[2] } });
     }
 
-    // Fallback: Direct Gemini API
-    if (GEMINI_API_KEY && !imageUrl) {
-      console.log("Trying direct Gemini fallback");
+    // Try image generation models
+    const imageModels = ["gemini-2.5-flash-preview-image-generation", "gemini-2.0-flash-exp"];
+    for (const model of imageModels) {
+      if (imageUrl) break;
+      console.log(`Trying direct Gemini: ${model}`);
       try {
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 45000);
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${GEMINI_API_KEY}`;
-        const geminiParts: any[] = [{ text: imagePrompt }];
-        if (referenceImage) {
-          const match = referenceImage.match(/^data:(image\/\w+);base64,(.+)$/);
-          if (match) geminiParts.push({ inlineData: { mimeType: match[1], data: match[2] } });
-        }
-        const res = await fetch(geminiUrl, {
+        const timeout = setTimeout(() => controller.abort(), 60000);
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           signal: controller.signal,
@@ -413,6 +324,13 @@ ${prompt}`;
           }),
         });
         clearTimeout(timeout);
+
+        if (res.status === 429) {
+          return new Response(JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns minutos." }), {
+            status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+
         if (res.ok) {
           const data = await res.json();
           const parts = data.candidates?.[0]?.content?.parts;
@@ -420,17 +338,17 @@ ${prompt}`;
             for (const part of parts) {
               if (part.inlineData?.mimeType?.startsWith("image/")) {
                 imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-                console.log("Direct Gemini succeeded");
+                console.log(`Direct Gemini ${model} succeeded`);
                 break;
               }
             }
           }
         } else {
           const t = await res.text();
-          console.error("Direct Gemini failed:", res.status, t.slice(0, 300));
+          console.error(`Direct Gemini ${model} failed:`, res.status, t.slice(0, 300));
         }
       } catch (e) {
-        console.error("Direct Gemini threw:", e);
+        console.error(`Direct Gemini ${model} threw:`, e);
       }
     }
 
