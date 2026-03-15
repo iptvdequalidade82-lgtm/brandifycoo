@@ -180,6 +180,10 @@ serve(async (req) => {
     const searchQueries = [
       `site:instagram.com "${cleanHandle}" followers posts bio`,
       `"@${cleanHandle}" instagram perfil`,
+      `site:instagram.com/${cleanHandle} reels publicações`,
+      `"${cleanHandle}" instagram seguidores`,
+      `site:dumpor.com "${cleanHandle}" instagram`,
+      `site:greatfon.com "${cleanHandle}" instagram`,
     ];
 
     const fragments: string[] = [];
@@ -194,7 +198,7 @@ serve(async (req) => {
           },
           body: JSON.stringify({
             query,
-            limit: 5,
+            limit: 6,
             scrapeOptions: { formats: ["markdown"] },
           }),
         });
@@ -207,12 +211,12 @@ serve(async (req) => {
               `Fonte: ${result?.url || "N/A"}`,
               `Título: ${result?.title || "N/A"}`,
               `Descrição: ${result?.description || "N/A"}`,
-              typeof result?.markdown === "string" ? result.markdown.substring(0, 2000) : "",
+              typeof result?.markdown === "string" ? result.markdown.substring(0, 2200) : "",
             ]
               .filter(Boolean)
               .join("\n");
 
-            if (chunk.trim().length > 0) fragments.push(chunk);
+            pushUniqueFragment(fragments, chunk, 2800);
           }
         }
       } catch (e) {
@@ -223,6 +227,10 @@ serve(async (req) => {
     const scrapeTargets = [
       `https://www.instagram.com/${cleanHandle}/`,
       `https://imginn.com/${cleanHandle}/`,
+      `https://dumpor.com/v/${cleanHandle}`,
+      `https://greatfon.com/v/${cleanHandle}`,
+      `https://inflact.com/tools/profile-analyzer/?profile=${cleanHandle}`,
+      `https://www.picuki.com/profile/${cleanHandle}`,
     ];
 
     for (const url of scrapeTargets) {
@@ -245,7 +253,7 @@ serve(async (req) => {
         if (scrapeRes.ok) {
           const md = scrapeData?.data?.markdown || scrapeData?.markdown || "";
           if (typeof md === "string" && md.trim().length > 0) {
-            fragments.push(`Fonte: ${url}\n${md.substring(0, 4000)}`);
+            pushUniqueFragment(fragments, `Fonte: ${url}\n${md}`, 4200);
           }
         }
       } catch (e) {
@@ -254,14 +262,27 @@ serve(async (req) => {
     }
 
     const searchResults = fragments.join("\n\n---\n\n").trim();
-    const normalizedSearchResults = searchResults.toLowerCase();
-    const hasPositiveSignals = POSITIVE_SIGNAL_PATTERN.test(normalizedSearchResults);
-    const hasNegativeSignals = NEGATIVE_SIGNAL_PATTERN.test(normalizedSearchResults);
-    const enoughLength = searchResults.length > 300;
-    const hasRealData = enoughLength && hasPositiveSignals && !(hasNegativeSignals && !hasPositiveSignals);
+    const {
+      hasRealData,
+      hasPartialData,
+      signalScore,
+      hasPositiveSignals,
+      hasNegativeSignals,
+      hasNumericSignals,
+      hasHandleMention,
+    } = assessDataSignals(searchResults, cleanHandle);
 
     console.log("Total search results length:", searchResults.length);
-    console.log("Has real data:", hasRealData);
+    console.log("Signals:", {
+      hasRealData,
+      hasPartialData,
+      signalScore,
+      hasPositiveSignals,
+      hasNegativeSignals,
+      hasNumericSignals,
+      hasHandleMention,
+      fragmentCount: fragments.length,
+    });
 
     const prompt = hasRealData
       ? `Você é um especialista sênior em marketing digital e Instagram.
