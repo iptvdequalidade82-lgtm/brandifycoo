@@ -326,9 +326,8 @@ ${prompt}`;
         clearTimeout(timeout);
 
         if (res.status === 429) {
-          return new Response(JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns minutos." }), {
-            status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-          });
+          console.warn(`Rate limited on ${model}, trying next...`);
+          continue;
         }
 
         if (res.ok) {
