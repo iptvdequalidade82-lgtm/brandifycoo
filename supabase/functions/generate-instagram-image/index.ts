@@ -300,29 +300,59 @@ ${prompt}`;
 
     let imageUrl: string | undefined;
 
-    const geminiParts: any[] = [{ text: imagePrompt }];
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+
+    // Build content parts for the gateway
+    const userContent: any[] = [{ type: "text", text: imagePrompt }];
     if (referenceImage) {
-      const match = referenceImage.match(/^data:(image\/\w+);base64,(.+)$/);
-      if (match) geminiParts.push({ inlineData: { mimeType: match[1], data: match[2] } });
+      userContent.push({ type: "image_url", image_url: { url: referenceImage } });
     }
 
-    // Try image generation models
-    const imageModels = ["gemini-3.1-flash-image-preview", "gemini-3-pro-image-preview"];
+    const imageModels = ["google/gemini-3.1-flash-image-preview", "google/gemini-3-pro-image-preview", "google/gemini-2.5-flash-image"];
+    
     for (const model of imageModels) {
       if (imageUrl) break;
-      console.log(`Trying direct Gemini: ${model}`);
+      console.log(`Trying Lovable AI Gateway: ${model}`);
       try {
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 60000);
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          signal: controller.signal,
-          body: JSON.stringify({
-            contents: [{ parts: geminiParts }],
-            generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
-          }),
-        });
+        const timeout = setTimeout(() => controller.abort(), 120000);
+
+        const useGateway = !!LOVABLE_API_KEY;
+        let res: Response;
+
+        if (useGateway) {
+          res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${LOVABLE_API_KEY}`,
+              "Content-Type": "application/json",
+            },
+            signal: controller.signal,
+            body: JSON.stringify({
+              model,
+              messages: [{ role: "user", content: userContent }],
+              modalities: ["image", "text"],
+            }),
+          });
+        } else {
+          // Fallback to direct Gemini API
+          const GEMINI_KEY = Deno.env.get("GEMINI_API_KEY");
+          if (!GEMINI_KEY) throw new Error("No AI keys configured");
+          const geminiParts: any[] = [{ text: imagePrompt }];
+          if (referenceImage) {
+            const match = referenceImage.match(/^data:(image\/\w+);base64,(.+)$/);
+            if (match) geminiParts.push({ inlineData: { mimeType: match[1], data: match[2] } });
+          }
+          res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_KEY}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            signal: controller.signal,
+            body: JSON.stringify({
+              contents: [{ parts: geminiParts }],
+              generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
+            }),
+          });
+        }
         clearTimeout(timeout);
 
         if (res.status === 429) {
@@ -332,22 +362,31 @@ ${prompt}`;
 
         if (res.ok) {
           const data = await res.json();
-          const parts = data.candidates?.[0]?.content?.parts;
-          if (parts) {
-            for (const part of parts) {
-              if (part.inlineData?.mimeType?.startsWith("image/")) {
-                imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-                console.log(`Direct Gemini ${model} succeeded`);
-                break;
+          if (useGateway) {
+            // Lovable AI Gateway response format
+            const img = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+            if (img) {
+              imageUrl = img;
+              console.log(`Lovable AI Gateway ${model} succeeded`);
+            }
+          } else {
+            // Direct Gemini response format
+            const parts = data.candidates?.[0]?.content?.parts;
+            if (parts) {
+              for (const part of parts) {
+                if (part.inlineData?.mimeType?.startsWith("image/")) {
+                  imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                  break;
+                }
               }
             }
           }
         } else {
           const t = await res.text();
-          console.error(`Direct Gemini ${model} failed:`, res.status, t.slice(0, 300));
+          console.error(`${model} failed:`, res.status, t.slice(0, 300));
         }
       } catch (e) {
-        console.error(`Direct Gemini ${model} threw:`, e);
+        console.error(`${model} threw:`, e);
       }
     }
 
