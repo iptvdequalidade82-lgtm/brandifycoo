@@ -308,6 +308,32 @@ export function DiagnosticoContent() {
     return "text-red-400";
   };
 
+  const scoreRingColor = (score: number) => {
+    if (score >= 80) return "#34d399";
+    if (score >= 60) return "#fbbf24";
+    if (score >= 40) return "#fb923c";
+    return "#f87171";
+  };
+
+  const scoreRingBg = (score: number) => {
+    if (score >= 80) return "rgba(52,211,153,0.1)";
+    if (score >= 60) return "rgba(251,191,36,0.1)";
+    if (score >= 40) return "rgba(251,146,60,0.1)";
+    return "rgba(248,113,113,0.1)";
+  };
+
+  const statusBarWidth = (s: string) => {
+    if (s === "good") return "100%";
+    if (s === "warning") return "60%";
+    return "30%";
+  };
+
+  const statusBarColor = (s: string) => {
+    if (s === "good") return "bg-emerald-400";
+    if (s === "warning") return "bg-amber-400";
+    return "bg-red-400";
+  };
+
   const inputCls = "w-full rounded-xl bg-white/[0.03] border border-white/[0.08] focus:border-pink-500/30 px-4 py-3 text-sm text-white placeholder:text-white/20 outline-none transition-colors";
   const editInputCls = "bg-transparent border-b border-white/10 focus:border-pink-400/50 outline-none text-white w-full transition-colors";
 
