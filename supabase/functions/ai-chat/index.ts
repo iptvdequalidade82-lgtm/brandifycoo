@@ -37,6 +37,9 @@ function hasImageAttachment(messages: any[]): boolean {
   return false;
 }
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const MAX_ATTEMPTS_PER_MODEL = 2;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
