@@ -487,202 +487,310 @@ export function DiagnosticoContent() {
           )}
         </AnimatePresence>
 
-        {/* Results - fully editable */}
+        {/* Results - Premium Layout */}
         <AnimatePresence>
           {diagnosis && !loading && (
-            <motion.div key="results" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+            <motion.div key="results" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="space-y-8">
               {diagnosis._dataSource === "general" && (
-                <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-amber-500/[0.06] border border-amber-500/15 backdrop-blur-sm">
                   <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                  <span className="text-xs text-amber-300">Análise baseada em recomendações gerais. Adicione suas métricas acima para um diagnóstico mais preciso.</span>
-                </div>
+                  <span className="text-xs text-amber-300/80">Análise baseada em recomendações gerais. Adicione suas métricas para um diagnóstico mais preciso.</span>
+                </motion.div>
               )}
 
-              <div ref={resultsRef} className="space-y-6 bg-black p-1">
-                {/* Score - editable */}
-                <div className="text-center py-6">
-                  <div className="flex items-center justify-center gap-2">
-                    <input
-                      type="number"
-                      min={0}
-                      max={100}
-                      value={editableScore}
-                      onChange={e => setEditableScore(Math.min(100, Math.max(0, Number(e.target.value))))}
-                      className={`text-6xl font-bold font-['Playfair_Display'] ${scoreColor(editableScore)} bg-transparent text-center w-28 outline-none border-b-2 border-transparent hover:border-white/10 focus:border-pink-400/30 transition-colors`}
-                    />
-                  </div>
-                  <div className="text-white/40 text-sm mt-1">{
-                    editableScore >= 80 ? "Excelente" :
-                    editableScore >= 60 ? "Bom" :
-                    editableScore >= 40 ? "Regular" :
-                    editableScore >= 20 ? "Fraco" : "Crítico"
-                  }</div>
-                  
-                  {editingSummary ? (
-                    <textarea
-                      autoFocus
-                      value={editedSummary}
-                      onChange={e => setEditedSummary(e.target.value)}
-                      onBlur={() => setEditingSummary(false)}
-                      rows={3}
-                      className="text-white/60 text-sm mt-3 max-w-md mx-auto bg-transparent border border-white/10 rounded-lg p-2 w-full outline-none focus:border-pink-400/30 resize-none"
-                    />
-                  ) : (
-                    <p
-                      onClick={() => setEditingSummary(true)}
-                      className="text-white/60 text-sm mt-3 max-w-md mx-auto cursor-text hover:text-white/80 transition-colors border-b border-transparent hover:border-white/10"
-                    >
-                      {editedSummary}
-                    </p>
-                  )}
-                </div>
-
-                {/* Metrics - editable values + clickable status */}
-                <Reorder.Group
-                  axis="y"
-                  values={editableMetrics}
-                  onReorder={setEditableMetrics}
-                  className="grid grid-cols-1 sm:grid-cols-2 gap-3"
-                  as="div"
+              <div ref={resultsRef} className="space-y-8 bg-black p-1">
+                {/* Hero Score Section */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.1, duration: 0.6 }}
+                  className="relative overflow-hidden rounded-3xl border border-white/[0.06] p-8 sm:p-10"
+                  style={{ background: `radial-gradient(ellipse at 50% 0%, ${scoreRingBg(editableScore)}, transparent 70%), rgba(255,255,255,0.02)` }}
                 >
-                  {editableMetrics.map((m, i) => (
-                    <Reorder.Item
-                      key={m.name}
-                      value={m}
-                      className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4 cursor-grab active:cursor-grabbing group"
-                      as="div"
-                    >
-                      <div className="flex items-center gap-2 mb-2">
-                        <GripVertical className="w-3 h-3 text-white/10 group-hover:text-white/25" />
-                        <button onClick={() => cycleStatus(i)} className="hover:scale-110 transition-transform" title="Clique para mudar status">
-                          {statusIcon(m.status)}
-                        </button>
-                        <span className="text-xs text-white/50">{m.name}</span>
-                      </div>
-                      <input
-                        value={m.value}
-                        onChange={e => updateEditableMetricValue(i, e.target.value)}
-                        className={`${editInputCls} text-lg font-semibold mb-1`}
-                        placeholder="Editar avaliação..."
-                      />
-                      <p className="text-[11px] text-white/30 mt-1">{m.tip}</p>
-                    </Reorder.Item>
-                  ))}
-                </Reorder.Group>
+                  {/* Ambient glow */}
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full opacity-20 blur-[80px] pointer-events-none" style={{ background: scoreRingColor(editableScore) }} />
 
-                {/* Custom metrics display */}
-                {customMetrics.filter(m => m.value.trim()).length > 0 && (
-                  <div>
-                    <span className="text-xs text-white/30 uppercase font-semibold tracking-wider mb-3 block">Métricas do cliente</span>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                      {customMetrics.filter(m => m.value.trim()).map(m => (
-                        <div key={m.id} className="rounded-xl bg-pink-500/[0.04] border border-pink-500/10 p-4">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-pink-400/60">{METRIC_ICONS[m.icon]}</span>
-                            <span className="text-xs text-white/40">{m.label}</span>
-                          </div>
-                          <div className="text-lg font-semibold text-white">{m.value}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Strengths & Weaknesses - editable */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="rounded-xl bg-emerald-500/[0.06] border border-emerald-500/20 p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                      <span className="text-xs font-semibold text-emerald-400 uppercase">Pontos fortes</span>
-                    </div>
-                    <ul className="space-y-2">
-                      {editableStrengths.map((s, i) => (
-                        <li key={i} className="flex items-start gap-1">
-                          <span className="text-white/40 mt-0.5">•</span>
-                          <input
-                            value={s}
-                            onChange={e => updateEditableStrength(i, e.target.value)}
-                            className={`${editInputCls} text-sm text-white/60 focus:text-white`}
-                          />
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="rounded-xl bg-red-500/[0.06] border border-red-500/20 p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <AlertTriangle className="w-4 h-4 text-red-400" />
-                      <span className="text-xs font-semibold text-red-400 uppercase">Pontos fracos</span>
-                    </div>
-                    <ul className="space-y-2">
-                      {editableWeaknesses.map((w, i) => (
-                        <li key={i} className="flex items-start gap-1">
-                          <span className="text-white/40 mt-0.5">•</span>
-                          <input
-                            value={w}
-                            onChange={e => updateEditableWeakness(i, e.target.value)}
-                            className={`${editInputCls} text-sm text-white/60 focus:text-white`}
-                          />
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
-                {/* Action Plan - editable */}
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <Target className="w-4 h-4 text-pink-400" />
-                    <span className="text-xs font-semibold text-white/40 uppercase">Plano de ação</span>
-                  </div>
-                  <Reorder.Group axis="y" values={editableActions} onReorder={setEditableActions} className="space-y-2">
-                    {editableActions.map((a, i) => (
-                      <Reorder.Item key={`action-${i}`} value={a} className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4 cursor-grab active:cursor-grabbing group">
-                        <div className="flex items-center gap-2 mb-2">
-                          <GripVertical className="w-3 h-3 text-white/10 group-hover:text-white/25" />
-                          <select
-                            value={a.priority}
-                            onChange={e => updateEditableAction(i, "priority", e.target.value)}
-                            className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full cursor-pointer outline-none ${
-                              a.priority === "alta" ? "bg-red-500/20 text-red-400" :
-                              a.priority === "media" ? "bg-amber-500/20 text-amber-400" :
-                              "bg-blue-500/20 text-blue-400"
-                            }`}
-                          >
-                            <option value="alta">Alta</option>
-                            <option value="media">Média</option>
-                            <option value="baixa">Baixa</option>
-                          </select>
-                        </div>
-                        <input
-                          value={a.action}
-                          onChange={e => updateEditableAction(i, "action", e.target.value)}
-                          className={`${editInputCls} text-sm font-medium text-white/80 focus:text-white mb-1`}
+                  <div className="relative flex flex-col items-center gap-6">
+                    {/* SVG Score Ring */}
+                    <div className="relative w-36 h-36">
+                      <svg viewBox="0 0 120 120" className="w-full h-full -rotate-90">
+                        <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="6" />
+                        <motion.circle
+                          cx="60" cy="60" r="52" fill="none"
+                          stroke={scoreRingColor(editableScore)}
+                          strokeWidth="6"
+                          strokeLinecap="round"
+                          strokeDasharray={`${2 * Math.PI * 52}`}
+                          initial={{ strokeDashoffset: 2 * Math.PI * 52 }}
+                          animate={{ strokeDashoffset: 2 * Math.PI * 52 * (1 - editableScore / 100) }}
+                          transition={{ delay: 0.3, duration: 1.5, ease: "easeOut" }}
                         />
-                        <div className="flex items-center gap-1 mt-1">
-                          <Zap className="w-3 h-3 text-white/20 flex-shrink-0" />
+                      </svg>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <input
+                          type="number"
+                          min={0}
+                          max={100}
+                          value={editableScore}
+                          onChange={e => setEditableScore(Math.min(100, Math.max(0, Number(e.target.value))))}
+                          className={`text-4xl font-bold font-['Playfair_Display'] ${scoreColor(editableScore)} bg-transparent text-center w-16 outline-none`}
+                        />
+                        <span className="text-[10px] text-white/30 uppercase tracking-[0.2em]">/ 100</span>
+                      </div>
+                    </div>
+
+                    {/* Label */}
+                    <div className="text-center">
+                      <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider border ${
+                        editableScore >= 80 ? "text-emerald-400 border-emerald-400/20 bg-emerald-400/[0.06]" :
+                        editableScore >= 60 ? "text-amber-400 border-amber-400/20 bg-amber-400/[0.06]" :
+                        editableScore >= 40 ? "text-orange-400 border-orange-400/20 bg-orange-400/[0.06]" :
+                        "text-red-400 border-red-400/20 bg-red-400/[0.06]"
+                      }`}>
+                        {editableScore >= 80 ? <Award className="w-3 h-3" /> : editableScore >= 40 ? <TrendingUp className="w-3 h-3" /> : <Flame className="w-3 h-3" />}
+                        {editableScore >= 80 ? "Excelente" : editableScore >= 60 ? "Bom" : editableScore >= 40 ? "Regular" : editableScore >= 20 ? "Fraco" : "Crítico"}
+                      </div>
+                    </div>
+
+                    {/* Summary */}
+                    {editingSummary ? (
+                      <textarea
+                        autoFocus
+                        value={editedSummary}
+                        onChange={e => setEditedSummary(e.target.value)}
+                        onBlur={() => setEditingSummary(false)}
+                        rows={4}
+                        className="text-white/60 text-sm leading-relaxed max-w-lg w-full mx-auto bg-white/[0.03] border border-white/10 rounded-xl p-4 outline-none focus:border-white/20 resize-none text-center"
+                      />
+                    ) : (
+                      <p
+                        onClick={() => setEditingSummary(true)}
+                        className="text-white/50 text-sm leading-relaxed max-w-lg mx-auto text-center cursor-text hover:text-white/70 transition-colors"
+                      >
+                        {editedSummary}
+                      </p>
+                    )}
+                  </div>
+                </motion.div>
+
+                {/* Metrics Grid - Glassmorphism Cards */}
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <BarChart3 className="w-4 h-4 text-white/30" />
+                    <span className="text-[11px] font-semibold text-white/30 uppercase tracking-[0.15em]">Métricas de Performance</span>
+                  </div>
+                  <Reorder.Group
+                    axis="y"
+                    values={editableMetrics}
+                    onReorder={setEditableMetrics}
+                    className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+                    as="div"
+                  >
+                    {editableMetrics.map((m, i) => (
+                      <Reorder.Item
+                        key={m.name}
+                        value={m}
+                        as="div"
+                        className="group"
+                      >
+                        <motion.div
+                          initial={{ opacity: 0, y: 12 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.15 + i * 0.08 }}
+                          className="relative rounded-2xl border border-white/[0.06] p-5 cursor-grab active:cursor-grabbing overflow-hidden hover:border-white/[0.1] transition-colors"
+                          style={{ background: "rgba(255,255,255,0.02)" }}
+                        >
+                          {/* Status bar top accent */}
+                          <div className="absolute top-0 left-0 right-0 h-[2px] bg-white/[0.03]">
+                            <motion.div
+                              className={`h-full ${statusBarColor(m.status)} rounded-r-full`}
+                              initial={{ width: 0 }}
+                              animate={{ width: statusBarWidth(m.status) }}
+                              transition={{ delay: 0.4 + i * 0.1, duration: 0.8, ease: "easeOut" }}
+                            />
+                          </div>
+
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              <GripVertical className="w-3 h-3 text-white/[0.06] group-hover:text-white/20 transition-colors" />
+                              <span className="text-[11px] text-white/40 font-medium">{m.name}</span>
+                            </div>
+                            <button onClick={() => cycleStatus(i)} className="hover:scale-110 transition-transform">
+                              {statusIcon(m.status)}
+                            </button>
+                          </div>
+
                           <input
-                            value={a.expectedImpact}
-                            onChange={e => updateEditableAction(i, "expectedImpact", e.target.value)}
-                            className={`${editInputCls} text-[11px] text-white/30 focus:text-white/50`}
+                            value={m.value}
+                            onChange={e => updateEditableMetricValue(i, e.target.value)}
+                            className="bg-transparent border-none outline-none text-[13px] font-medium text-white/80 w-full mb-2 placeholder:text-white/15 focus:text-white transition-colors"
+                            placeholder="Editar avaliação..."
                           />
-                        </div>
+
+                          <p className="text-[11px] text-white/25 leading-relaxed line-clamp-2">{m.tip}</p>
+                        </motion.div>
                       </Reorder.Item>
                     ))}
                   </Reorder.Group>
                 </div>
+
+                {/* Custom metrics display */}
+                {customMetrics.filter(m => m.value.trim()).length > 0 && (
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
+                    <span className="text-[11px] text-white/25 uppercase font-semibold tracking-[0.15em] mb-3 block">Métricas do cliente</span>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {customMetrics.filter(m => m.value.trim()).map(m => (
+                        <div key={m.id} className="rounded-2xl bg-white/[0.02] border border-white/[0.06] p-4 hover:border-white/[0.1] transition-colors">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-white/20">{METRIC_ICONS[m.icon]}</span>
+                            <span className="text-[10px] text-white/30 uppercase tracking-wider">{m.label}</span>
+                          </div>
+                          <div className="text-lg font-bold text-white font-['Playfair_Display']">{m.value}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* SWOT - Modern Magazine Layout */}
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                  className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+                >
+                  {/* Strengths */}
+                  <div className="relative rounded-2xl border border-emerald-500/10 p-5 overflow-hidden" style={{ background: "rgba(52,211,153,0.03)" }}>
+                    <div className="absolute top-0 right-0 w-24 h-24 rounded-full bg-emerald-500/5 blur-2xl pointer-events-none" />
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-6 h-6 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                        <Shield className="w-3.5 h-3.5 text-emerald-400" />
+                      </div>
+                      <span className="text-[11px] font-bold text-emerald-400/80 uppercase tracking-[0.15em]">Pontos Fortes</span>
+                    </div>
+                    <ul className="space-y-3">
+                      {editableStrengths.map((s, i) => (
+                        <li key={i} className="flex items-start gap-2.5">
+                          <div className="w-1 h-1 rounded-full bg-emerald-400/40 mt-2 flex-shrink-0" />
+                          <input
+                            value={s}
+                            onChange={e => updateEditableStrength(i, e.target.value)}
+                            className="bg-transparent border-none outline-none text-[13px] text-white/50 w-full focus:text-white/80 transition-colors leading-relaxed"
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Weaknesses */}
+                  <div className="relative rounded-2xl border border-red-500/10 p-5 overflow-hidden" style={{ background: "rgba(248,113,113,0.03)" }}>
+                    <div className="absolute top-0 right-0 w-24 h-24 rounded-full bg-red-500/5 blur-2xl pointer-events-none" />
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-6 h-6 rounded-lg bg-red-500/10 flex items-center justify-center">
+                        <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
+                      </div>
+                      <span className="text-[11px] font-bold text-red-400/80 uppercase tracking-[0.15em]">Pontos Fracos</span>
+                    </div>
+                    <ul className="space-y-3">
+                      {editableWeaknesses.map((w, i) => (
+                        <li key={i} className="flex items-start gap-2.5">
+                          <div className="w-1 h-1 rounded-full bg-red-400/40 mt-2 flex-shrink-0" />
+                          <input
+                            value={w}
+                            onChange={e => updateEditableWeakness(i, e.target.value)}
+                            className="bg-transparent border-none outline-none text-[13px] text-white/50 w-full focus:text-white/80 transition-colors leading-relaxed"
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </motion.div>
+
+                {/* Action Plan - Timeline Style */}
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.7 }}
+                >
+                  <div className="flex items-center gap-2 mb-5">
+                    <div className="w-6 h-6 rounded-lg bg-white/[0.04] flex items-center justify-center">
+                      <Target className="w-3.5 h-3.5 text-white/40" />
+                    </div>
+                    <span className="text-[11px] font-bold text-white/30 uppercase tracking-[0.15em]">Plano de Ação</span>
+                  </div>
+
+                  <Reorder.Group axis="y" values={editableActions} onReorder={setEditableActions} className="relative">
+                    {/* Timeline line */}
+                    <div className="absolute left-[15px] top-4 bottom-4 w-[1px] bg-gradient-to-b from-white/[0.08] via-white/[0.04] to-transparent" />
+
+                    {editableActions.map((a, i) => (
+                      <Reorder.Item
+                        key={`action-${i}`}
+                        value={a}
+                        className="relative pl-10 pb-5 last:pb-0 cursor-grab active:cursor-grabbing group"
+                      >
+                        {/* Timeline dot */}
+                        <div className={`absolute left-[11px] top-1 w-[9px] h-[9px] rounded-full border-2 ${
+                          a.priority === "alta" ? "border-red-400 bg-red-400/20" :
+                          a.priority === "media" ? "border-amber-400 bg-amber-400/20" :
+                          "border-blue-400 bg-blue-400/20"
+                        }`} />
+
+                        <motion.div
+                          initial={{ opacity: 0, x: -8 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.8 + i * 0.1 }}
+                          className="rounded-2xl border border-white/[0.05] p-4 hover:border-white/[0.08] transition-colors"
+                          style={{ background: "rgba(255,255,255,0.015)" }}
+                        >
+                          <div className="flex items-center gap-2 mb-2.5">
+                            <GripVertical className="w-3 h-3 text-white/[0.06] group-hover:text-white/20 transition-colors" />
+                            <select
+                              value={a.priority}
+                              onChange={e => updateEditableAction(i, "priority", e.target.value)}
+                              className={`text-[9px] uppercase font-bold px-2.5 py-1 rounded-full cursor-pointer outline-none tracking-wider ${
+                                a.priority === "alta" ? "bg-red-500/10 text-red-400 border border-red-500/20" :
+                                a.priority === "media" ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" :
+                                "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                              }`}
+                            >
+                              <option value="alta">Alta</option>
+                              <option value="media">Média</option>
+                              <option value="baixa">Baixa</option>
+                            </select>
+                            <span className="text-[10px] text-white/15">#{i + 1}</span>
+                          </div>
+                          <input
+                            value={a.action}
+                            onChange={e => updateEditableAction(i, "action", e.target.value)}
+                            className="bg-transparent border-none outline-none text-[13px] font-medium text-white/70 w-full focus:text-white transition-colors mb-1.5"
+                          />
+                          <div className="flex items-center gap-1.5">
+                            <ArrowUpRight className="w-3 h-3 text-white/15 flex-shrink-0" />
+                            <input
+                              value={a.expectedImpact}
+                              onChange={e => updateEditableAction(i, "expectedImpact", e.target.value)}
+                              className="bg-transparent border-none outline-none text-[11px] text-white/25 w-full focus:text-white/45 transition-colors"
+                            />
+                          </div>
+                        </motion.div>
+                      </Reorder.Item>
+                    ))}
+                  </Reorder.Group>
+                </motion.div>
               </div>
 
               {/* Export buttons */}
-              <div className="flex gap-3">
-                <button onClick={handleDownload} disabled={exporting} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white/[0.05] border border-white/[0.08] text-white/60 hover:text-white hover:bg-white/[0.08] text-sm transition-all disabled:opacity-40">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} className="flex gap-3">
+                <button onClick={handleDownload} disabled={exporting} className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-white/40 hover:text-white hover:bg-white/[0.06] text-sm transition-all disabled:opacity-40 hover:border-white/[0.1]">
                   {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />} Salvar imagem
                 </button>
-                <button onClick={handleShare} disabled={exporting} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white/[0.05] border border-white/[0.08] text-white/60 hover:text-white hover:bg-white/[0.08] text-sm transition-all disabled:opacity-40">
+                <button onClick={handleShare} disabled={exporting} className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-white/40 hover:text-white hover:bg-white/[0.06] text-sm transition-all disabled:opacity-40 hover:border-white/[0.1]">
                   {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Share2 className="w-4 h-4" />} Compartilhar
                 </button>
-              </div>
+              </motion.div>
 
-              <button onClick={() => { setDiagnosis(null); setHandle(""); setCustomMetrics([]); }} className="w-full py-3 rounded-xl border border-white/[0.08] text-white/40 text-sm hover:text-white transition-colors">
+              <button onClick={() => { setDiagnosis(null); setHandle(""); setCustomMetrics([]); }} className="w-full py-3.5 rounded-2xl border border-white/[0.06] text-white/30 text-sm hover:text-white/60 hover:border-white/[0.1] transition-all">
                 Nova análise
               </button>
             </motion.div>
