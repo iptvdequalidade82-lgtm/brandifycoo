@@ -300,50 +300,29 @@ ${prompt}`;
 
     let imageUrl: string | undefined;
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-    // Build content parts for the gateway
-    const userContent: any[] = [{ type: "text", text: imagePrompt }];
+    // Build Gemini parts
+    const geminiParts: any[] = [{ text: imagePrompt }];
     if (referenceImage) {
-      userContent.push({ type: "image_url", image_url: { url: referenceImage } });
+      const match = referenceImage.match(/^data:(image\/\w+);base64,(.+)$/);
+      if (match) geminiParts.push({ inlineData: { mimeType: match[1], data: match[2] } });
     }
 
-    const imageModels = ["google/gemini-3.1-flash-image-preview", "google/gemini-3-pro-image-preview", "google/gemini-2.5-flash-image"];
-    
+    const imageModels = ["gemini-2.5-flash-preview-image-generation", "gemini-2.0-flash-exp"];
+    const MAX_ATTEMPTS = 2;
+    let sawRateLimit = false;
+
     for (const model of imageModels) {
       if (imageUrl) break;
-      console.log(`Trying Lovable AI Gateway: ${model}`);
-      try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 120000);
 
-        const useGateway = !!LOVABLE_API_KEY;
-        let res: Response;
+      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+        console.log(`Trying direct Gemini: ${model} (attempt ${attempt})`);
+        try {
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 120000);
 
-        if (useGateway) {
-          res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${LOVABLE_API_KEY}`,
-              "Content-Type": "application/json",
-            },
-            signal: controller.signal,
-            body: JSON.stringify({
-              model,
-              messages: [{ role: "user", content: userContent }],
-              modalities: ["image", "text"],
-            }),
-          });
-        } else {
-          // Fallback to direct Gemini API
-          const GEMINI_KEY = Deno.env.get("GEMINI_API_KEY");
-          if (!GEMINI_KEY) throw new Error("No AI keys configured");
-          const geminiParts: any[] = [{ text: imagePrompt }];
-          if (referenceImage) {
-            const match = referenceImage.match(/^data:(image\/\w+);base64,(.+)$/);
-            if (match) geminiParts.push({ inlineData: { mimeType: match[1], data: match[2] } });
-          }
-          res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_KEY}`, {
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             signal: controller.signal,
@@ -352,45 +331,51 @@ ${prompt}`;
               generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
             }),
           });
-        }
-        clearTimeout(timeout);
+          clearTimeout(timeout);
 
-        if (res.status === 429) {
-          console.warn(`Rate limited on ${model}, trying next...`);
-          continue;
-        }
+          if (res.status === 429) {
+            sawRateLimit = true;
+            console.warn(`Rate limited on ${model}, attempt ${attempt}`);
+            if (attempt < MAX_ATTEMPTS) { await sleep(1500 * attempt); continue; }
+            break;
+          }
 
-        if (res.ok) {
-          const data = await res.json();
-          if (useGateway) {
-            // Lovable AI Gateway response format
-            const img = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-            if (img) {
-              imageUrl = img;
-              console.log(`Lovable AI Gateway ${model} succeeded`);
-            }
-          } else {
-            // Direct Gemini response format
+          if (res.ok) {
+            const data = await res.json();
             const parts = data.candidates?.[0]?.content?.parts;
             if (parts) {
               for (const part of parts) {
                 if (part.inlineData?.mimeType?.startsWith("image/")) {
                   imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                  console.log(`Direct Gemini ${model} succeeded`);
                   break;
                 }
               }
             }
+            if (imageUrl) break;
+          } else {
+            const t = await res.text();
+            console.error(`${model} failed:`, res.status, t.slice(0, 300));
           }
-        } else {
-          const t = await res.text();
-          console.error(`${model} failed:`, res.status, t.slice(0, 300));
+
+          if (attempt < MAX_ATTEMPTS) { await sleep(900 * attempt); continue; }
+          break;
+        } catch (e) {
+          console.error(`${model} threw:`, e);
+          if (attempt < MAX_ATTEMPTS) { await sleep(900 * attempt); continue; }
+          break;
         }
-      } catch (e) {
-        console.error(`${model} threw:`, e);
       }
     }
 
-    if (!imageUrl) throw new Error("Serviços de IA temporariamente indisponíveis. Tente novamente em alguns minutos.");
+    if (!imageUrl) {
+      if (sawRateLimit) {
+        return new Response(JSON.stringify({ error: "Limite de requisições excedido. Aguarde um momento e tente novamente." }), {
+          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      throw new Error("Serviços de IA temporariamente indisponíveis. Tente novamente em alguns minutos.");
+    }
 
     return new Response(JSON.stringify({ imageUrl }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
