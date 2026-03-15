@@ -309,7 +309,7 @@ ${prompt}`;
       if (match) geminiParts.push({ inlineData: { mimeType: match[1], data: match[2] } });
     }
 
-    const imageModels = ["gemini-2.5-flash-preview-image-generation", "gemini-2.0-flash-exp"];
+    const imageModels = ["gemini-3.1-flash-image-preview", "gemini-3-pro-image-preview", "gemini-2.5-flash-image"];
     const MAX_ATTEMPTS = 2;
     let sawRateLimit = false;
 
