@@ -257,30 +257,73 @@ Se receber uma imagem de referência, analise cores, estilo, logo e incorpore no
       return { role, parts: [{ text: String(m.content) }] };
     });
 
-    const geminiModel = "gemini-2.5-flash";
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:streamGenerateContent?alt=sse&key=${GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: systemPrompt }] },
-          contents: geminiContents,
-          generationConfig: { maxOutputTokens: 4096 },
-        }),
-      }
-    );
+    const textModels = ["gemini-2.5-flash", "gemini-2.5-flash-lite"];
+    let geminiModel = textModels[0];
+    let response: Response | null = null;
+    let textRateLimited = false;
+    let textLastError = "";
 
-    if (response.status === 429) {
-      return new Response(JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns minutos." }), {
-        status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    for (const candidateModel of textModels) {
+      if (response?.ok) break;
+
+      for (let attempt = 1; attempt <= MAX_ATTEMPTS_PER_MODEL; attempt++) {
+        try {
+          const res = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${candidateModel}:streamGenerateContent?alt=sse&key=${GEMINI_API_KEY}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                system_instruction: { parts: [{ text: systemPrompt }] },
+                contents: geminiContents,
+                generationConfig: { maxOutputTokens: 4096 },
+              }),
+            }
+          );
+
+          if (res.status === 429) {
+            textRateLimited = true;
+            if (attempt < MAX_ATTEMPTS_PER_MODEL) {
+              await sleep(1200 * attempt);
+              continue;
+            }
+            break;
+          }
+
+          if (!res.ok) {
+            const t = await res.text();
+            textLastError = `${candidateModel}: ${res.status} ${t.slice(0, 500)}`;
+            console.error("Gemini error:", textLastError);
+            if (res.status >= 500 && attempt < MAX_ATTEMPTS_PER_MODEL) {
+              await sleep(900 * attempt);
+              continue;
+            }
+            break;
+          }
+
+          response = res;
+          geminiModel = candidateModel;
+          break;
+        } catch (err) {
+          textLastError = `${candidateModel}: ${err instanceof Error ? err.message : String(err)}`;
+          console.error("Gemini stream error:", textLastError);
+          if (attempt < MAX_ATTEMPTS_PER_MODEL) {
+            await sleep(900 * attempt);
+            continue;
+          }
+          break;
+        }
+      }
     }
 
-    if (!response.ok) {
-      const t = await response.text();
-      console.error("Gemini error:", response.status, t.slice(0, 500));
-      throw new Error("Erro no serviço de IA");
+    if (!response || !response.ok) {
+      if (textRateLimited) {
+        return new Response(JSON.stringify({ error: "Limite de requisições excedido. Aguarde alguns segundos e tente novamente." }), {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      throw new Error(textLastError || "Erro no serviço de IA");
     }
 
     // Transform Gemini SSE to OpenAI-compatible SSE
