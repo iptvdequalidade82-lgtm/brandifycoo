@@ -16,8 +16,11 @@ const METRIC_NAMES = [
   "Frequência de Posts",
 ];
 
-const NEGATIVE_SIGNAL_PATTERN = /(not found|page isn't available|perfil não encontrado|perfil indisponível|404|doesn't exist|conta inexistente|não foi possível acessar)/i;
-const POSITIVE_SIGNAL_PATTERN = /(seguidores|followers|seguindo|following|publicações|posts|reels|bio|engajamento|curtidas|comentários)/i;
+const NEGATIVE_SIGNAL_PATTERN = /(not found|page isn't available|perfil não encontrado|perfil indisponível|404|doesn't exist|conta inexistente|não foi possível acessar|profile is suspended|page not found|http error 429)/i;
+const POSITIVE_SIGNAL_PATTERN = /(seguidores|followers|seguindo|following|publicações|posts|reels|bio|engajamento|curtidas|comentários|stories)/i;
+const NUMERIC_SIGNAL_PATTERN = /(\d[\d.,\s]*\s*(followers|seguidores|following|seguindo|posts|publicações|reels|likes|curtidas|comments|comentários))/i;
+const MIN_PARTIAL_DATA_LENGTH = 120;
+const MIN_REAL_DATA_LENGTH = 260;
 
 const toText = (value: unknown, fallback: string) => {
   if (typeof value !== "string") return fallback;
@@ -121,6 +124,44 @@ const extractJsonText = (text: string) => {
     .trim();
 };
 
+const pushUniqueFragment = (fragments: string[], fragment: string, maxLength = 4500) => {
+  const normalized = fragment.trim();
+  if (!normalized) return;
+
+  const clipped = normalized.length > maxLength ? normalized.substring(0, maxLength) : normalized;
+  if (!fragments.includes(clipped)) fragments.push(clipped);
+};
+
+const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const assessDataSignals = (searchResults: string, cleanHandle: string) => {
+  const normalized = searchResults.toLowerCase();
+  const hasPositiveSignals = POSITIVE_SIGNAL_PATTERN.test(normalized);
+  const hasNegativeSignals = NEGATIVE_SIGNAL_PATTERN.test(normalized);
+  const hasNumericSignals = NUMERIC_SIGNAL_PATTERN.test(normalized);
+  const handlePattern = new RegExp(`(^|[^a-z0-9_])@?${escapeRegex(cleanHandle)}([^a-z0-9_]|$)`, "i");
+  const hasHandleMention = handlePattern.test(searchResults);
+
+  const signalScore =
+    (hasPositiveSignals ? 1 : 0) +
+    (hasNumericSignals ? 2 : 0) +
+    (hasHandleMention ? 1 : 0) -
+    (hasNegativeSignals ? 2 : 0);
+
+  const hasRealData = searchResults.length >= MIN_REAL_DATA_LENGTH && signalScore >= 2;
+  const hasPartialData = !hasRealData && searchResults.length >= MIN_PARTIAL_DATA_LENGTH && signalScore >= 1;
+
+  return {
+    hasRealData,
+    hasPartialData,
+    signalScore,
+    hasPositiveSignals,
+    hasNegativeSignals,
+    hasNumericSignals,
+    hasHandleMention,
+  };
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
@@ -139,6 +180,10 @@ serve(async (req) => {
     const searchQueries = [
       `site:instagram.com "${cleanHandle}" followers posts bio`,
       `"@${cleanHandle}" instagram perfil`,
+      `site:instagram.com/${cleanHandle} reels publicações`,
+      `"${cleanHandle}" instagram seguidores`,
+      `site:dumpor.com "${cleanHandle}" instagram`,
+      `site:greatfon.com "${cleanHandle}" instagram`,
     ];
 
     const fragments: string[] = [];
@@ -153,7 +198,7 @@ serve(async (req) => {
           },
           body: JSON.stringify({
             query,
-            limit: 5,
+            limit: 6,
             scrapeOptions: { formats: ["markdown"] },
           }),
         });
@@ -166,12 +211,12 @@ serve(async (req) => {
               `Fonte: ${result?.url || "N/A"}`,
               `Título: ${result?.title || "N/A"}`,
               `Descrição: ${result?.description || "N/A"}`,
-              typeof result?.markdown === "string" ? result.markdown.substring(0, 2000) : "",
+              typeof result?.markdown === "string" ? result.markdown.substring(0, 2200) : "",
             ]
               .filter(Boolean)
               .join("\n");
 
-            if (chunk.trim().length > 0) fragments.push(chunk);
+            pushUniqueFragment(fragments, chunk, 2800);
           }
         }
       } catch (e) {
@@ -182,6 +227,10 @@ serve(async (req) => {
     const scrapeTargets = [
       `https://www.instagram.com/${cleanHandle}/`,
       `https://imginn.com/${cleanHandle}/`,
+      `https://dumpor.com/v/${cleanHandle}`,
+      `https://greatfon.com/v/${cleanHandle}`,
+      `https://inflact.com/tools/profile-analyzer/?profile=${cleanHandle}`,
+      `https://www.picuki.com/profile/${cleanHandle}`,
     ];
 
     for (const url of scrapeTargets) {
@@ -204,7 +253,7 @@ serve(async (req) => {
         if (scrapeRes.ok) {
           const md = scrapeData?.data?.markdown || scrapeData?.markdown || "";
           if (typeof md === "string" && md.trim().length > 0) {
-            fragments.push(`Fonte: ${url}\n${md.substring(0, 4000)}`);
+            pushUniqueFragment(fragments, `Fonte: ${url}\n${md}`, 4200);
           }
         }
       } catch (e) {
@@ -213,30 +262,32 @@ serve(async (req) => {
     }
 
     const searchResults = fragments.join("\n\n---\n\n").trim();
-    const normalizedSearchResults = searchResults.toLowerCase();
-    const hasPositiveSignals = POSITIVE_SIGNAL_PATTERN.test(normalizedSearchResults);
-    const hasNegativeSignals = NEGATIVE_SIGNAL_PATTERN.test(normalizedSearchResults);
-    const enoughLength = searchResults.length > 300;
-    const hasRealData = enoughLength && hasPositiveSignals && !(hasNegativeSignals && !hasPositiveSignals);
+    const {
+      hasRealData,
+      hasPartialData,
+      signalScore,
+      hasPositiveSignals,
+      hasNegativeSignals,
+      hasNumericSignals,
+      hasHandleMention,
+    } = assessDataSignals(searchResults, cleanHandle);
 
     console.log("Total search results length:", searchResults.length);
-    console.log("Has real data:", hasRealData);
+    console.log("Signals:", {
+      hasRealData,
+      hasPartialData,
+      signalScore,
+      hasPositiveSignals,
+      hasNegativeSignals,
+      hasNumericSignals,
+      hasHandleMention,
+      fragmentCount: fragments.length,
+    });
 
-    const prompt = hasRealData
-      ? `Você é um especialista sênior em marketing digital e Instagram.
-
-Analise APENAS os dados reais abaixo sobre @${cleanHandle}. NÃO invente.
-Se algum ponto for incerto, informe de forma explícita e sugera próximos passos.
-
-=== DADOS COLETADOS ===
-${searchResults.substring(0, 12000)}
-=== FIM DOS DADOS ===
-${extraMetrics ? `\n=== MÉTRICAS INFORMADAS PELO CLIENTE ===\n${extraMetrics}\n=== FIM DAS MÉTRICAS ===\n` : ""}
-
-Retorne SOMENTE JSON válido com este formato (sem markdown):
+    const outputSchema = `Retorne SOMENTE JSON válido com este formato (sem markdown):
 {
   "score": 0,
-  "scoreLabel": "Crítico|Fraco|Regular|Bom|Excelente",
+  "scoreLabel": "Crítico|Fraco|Regular|Bom|Excelente|Análise Geral",
   "summary": "Resumo objetivo e estratégico",
   "metrics": [
     { "name": "Bio e Apresentação", "value": "...", "status": "good|warning|critical", "tip": "..." },
@@ -257,37 +308,48 @@ Retorne SOMENTE JSON válido com este formato (sem markdown):
   ]
 }
 
-Regra crítica: nenhum campo pode vir vazio.`
-      : `Você é um especialista em marketing digital e Instagram.
+Regra crítica: nenhum campo pode vir vazio.`;
+
+    const metricsContext = extraMetrics
+      ? `\n=== MÉTRICAS INFORMADAS PELO CLIENTE ===\n${extraMetrics}\n=== FIM DAS MÉTRICAS ===\n`
+      : "";
+
+    const promptMode = hasRealData ? "real" : hasPartialData ? "partial" : "general";
+
+    const prompt = promptMode === "real"
+      ? `Você é um especialista sênior em marketing digital e Instagram.
+
+Analise APENAS os dados reais abaixo sobre @${cleanHandle}. NÃO invente.
+Se algum ponto for incerto, informe de forma explícita e sugera próximos passos.
+
+=== DADOS COLETADOS ===
+${searchResults.substring(0, 12000)}
+=== FIM DOS DADOS ===
+${metricsContext}
+
+${outputSchema}`
+      : promptMode === "partial"
+        ? `Você é um especialista em marketing digital e Instagram.
+
+Temos DADOS PARCIAIS sobre @${cleanHandle}. Use o que for concreto nos dados abaixo e deixe explícito o que é inferência.
+Não trate como "sem dados": personalize a análise com os sinais disponíveis.
+
+=== DADOS PARCIAIS COLETADOS ===
+${searchResults.substring(0, 12000)}
+=== FIM DOS DADOS ===
+${metricsContext}
+
+Instruções adicionais:
+- Cite no summary que os dados são parciais.
+- Sempre priorize evidências coletadas antes de boas práticas gerais.
+
+${outputSchema}`
+        : `Você é um especialista em marketing digital e Instagram.
 
 Não foi possível coletar dados públicos suficientes para @${cleanHandle}.
 ${extraMetrics ? `Use fortemente as métricas fornecidas pelo cliente para personalizar a análise: ${extraMetrics}.` : "Faça uma análise estratégica baseada em boas práticas para perfis comerciais."}
 
-Retorne SOMENTE JSON válido (sem markdown) no formato:
-{
-  "score": 0,
-  "scoreLabel": "Análise Geral",
-  "summary": "Explique com transparência que houve baixa visibilidade de dados públicos e entregue diagnóstico prático",
-  "metrics": [
-    { "name": "Bio e Apresentação", "value": "...", "status": "good|warning|critical", "tip": "..." },
-    { "name": "Identidade Visual", "value": "...", "status": "good|warning|critical", "tip": "..." },
-    { "name": "Estratégia de Conteúdo", "value": "...", "status": "good|warning|critical", "tip": "..." },
-    { "name": "Uso de Reels", "value": "...", "status": "good|warning|critical", "tip": "..." },
-    { "name": "Engajamento", "value": "...", "status": "good|warning|critical", "tip": "..." },
-    { "name": "Frequência de Posts", "value": "...", "status": "good|warning|critical", "tip": "..." }
-  ],
-  "strengths": ["...", "...", "..."],
-  "weaknesses": ["...", "...", "..."],
-  "actionPlan": [
-    { "priority": "alta", "action": "...", "expectedImpact": "..." },
-    { "priority": "alta", "action": "...", "expectedImpact": "..." },
-    { "priority": "media", "action": "...", "expectedImpact": "..." },
-    { "priority": "media", "action": "...", "expectedImpact": "..." },
-    { "priority": "baixa", "action": "...", "expectedImpact": "..." }
-  ]
-}
-
-Regra crítica: nenhum campo pode vir vazio.`;
+${outputSchema}`;
 
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY not configured");
