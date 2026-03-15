@@ -284,21 +284,10 @@ serve(async (req) => {
       fragmentCount: fragments.length,
     });
 
-    const prompt = hasRealData
-      ? `Você é um especialista sênior em marketing digital e Instagram.
-
-Analise APENAS os dados reais abaixo sobre @${cleanHandle}. NÃO invente.
-Se algum ponto for incerto, informe de forma explícita e sugera próximos passos.
-
-=== DADOS COLETADOS ===
-${searchResults.substring(0, 12000)}
-=== FIM DOS DADOS ===
-${extraMetrics ? `\n=== MÉTRICAS INFORMADAS PELO CLIENTE ===\n${extraMetrics}\n=== FIM DAS MÉTRICAS ===\n` : ""}
-
-Retorne SOMENTE JSON válido com este formato (sem markdown):
+    const outputSchema = `Retorne SOMENTE JSON válido com este formato (sem markdown):
 {
   "score": 0,
-  "scoreLabel": "Crítico|Fraco|Regular|Bom|Excelente",
+  "scoreLabel": "Crítico|Fraco|Regular|Bom|Excelente|Análise Geral",
   "summary": "Resumo objetivo e estratégico",
   "metrics": [
     { "name": "Bio e Apresentação", "value": "...", "status": "good|warning|critical", "tip": "..." },
@@ -319,37 +308,48 @@ Retorne SOMENTE JSON válido com este formato (sem markdown):
   ]
 }
 
-Regra crítica: nenhum campo pode vir vazio.`
-      : `Você é um especialista em marketing digital e Instagram.
+Regra crítica: nenhum campo pode vir vazio.`;
+
+    const metricsContext = extraMetrics
+      ? `\n=== MÉTRICAS INFORMADAS PELO CLIENTE ===\n${extraMetrics}\n=== FIM DAS MÉTRICAS ===\n`
+      : "";
+
+    const promptMode = hasRealData ? "real" : hasPartialData ? "partial" : "general";
+
+    const prompt = promptMode === "real"
+      ? `Você é um especialista sênior em marketing digital e Instagram.
+
+Analise APENAS os dados reais abaixo sobre @${cleanHandle}. NÃO invente.
+Se algum ponto for incerto, informe de forma explícita e sugera próximos passos.
+
+=== DADOS COLETADOS ===
+${searchResults.substring(0, 12000)}
+=== FIM DOS DADOS ===
+${metricsContext}
+
+${outputSchema}`
+      : promptMode === "partial"
+        ? `Você é um especialista em marketing digital e Instagram.
+
+Temos DADOS PARCIAIS sobre @${cleanHandle}. Use o que for concreto nos dados abaixo e deixe explícito o que é inferência.
+Não trate como "sem dados": personalize a análise com os sinais disponíveis.
+
+=== DADOS PARCIAIS COLETADOS ===
+${searchResults.substring(0, 12000)}
+=== FIM DOS DADOS ===
+${metricsContext}
+
+Instruções adicionais:
+- Cite no summary que os dados são parciais.
+- Sempre priorize evidências coletadas antes de boas práticas gerais.
+
+${outputSchema}`
+        : `Você é um especialista em marketing digital e Instagram.
 
 Não foi possível coletar dados públicos suficientes para @${cleanHandle}.
 ${extraMetrics ? `Use fortemente as métricas fornecidas pelo cliente para personalizar a análise: ${extraMetrics}.` : "Faça uma análise estratégica baseada em boas práticas para perfis comerciais."}
 
-Retorne SOMENTE JSON válido (sem markdown) no formato:
-{
-  "score": 0,
-  "scoreLabel": "Análise Geral",
-  "summary": "Explique com transparência que houve baixa visibilidade de dados públicos e entregue diagnóstico prático",
-  "metrics": [
-    { "name": "Bio e Apresentação", "value": "...", "status": "good|warning|critical", "tip": "..." },
-    { "name": "Identidade Visual", "value": "...", "status": "good|warning|critical", "tip": "..." },
-    { "name": "Estratégia de Conteúdo", "value": "...", "status": "good|warning|critical", "tip": "..." },
-    { "name": "Uso de Reels", "value": "...", "status": "good|warning|critical", "tip": "..." },
-    { "name": "Engajamento", "value": "...", "status": "good|warning|critical", "tip": "..." },
-    { "name": "Frequência de Posts", "value": "...", "status": "good|warning|critical", "tip": "..." }
-  ],
-  "strengths": ["...", "...", "..."],
-  "weaknesses": ["...", "...", "..."],
-  "actionPlan": [
-    { "priority": "alta", "action": "...", "expectedImpact": "..." },
-    { "priority": "alta", "action": "...", "expectedImpact": "..." },
-    { "priority": "media", "action": "...", "expectedImpact": "..." },
-    { "priority": "media", "action": "...", "expectedImpact": "..." },
-    { "priority": "baixa", "action": "...", "expectedImpact": "..." }
-  ]
-}
-
-Regra crítica: nenhum campo pode vir vazio.`;
+${outputSchema}`;
 
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY not configured");
