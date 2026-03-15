@@ -285,69 +285,11 @@ CHECKLIST OBRIGATÓRIO:
 ✅ Horários variados e estratégicos (17h-21h para feed, manhã/noite para stories).`;
 
     const maxAttemptsPerModel = 2;
-    const gatewayModels = ["google/gemini-2.5-pro", "google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
     const directModels = ["gemini-2.5-pro", "gemini-2.5-flash"];
 
     let content = "";
     let sawRateLimit = false;
     let lastProviderError = "";
-
-    if (LOVABLE_API_KEY) {
-      for (const model of gatewayModels) {
-        if (content) break;
-        for (let attempt = 1; attempt <= maxAttemptsPerModel; attempt++) {
-          const controller = new AbortController();
-          const timeout = setTimeout(() => controller.abort(), 90000);
-
-          try {
-            const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${LOVABLE_API_KEY}`,
-                "Content-Type": "application/json",
-              },
-              signal: controller.signal,
-              body: JSON.stringify({
-                model,
-                messages: [
-                  { role: "system", content: systemPrompt },
-                  { role: "user", content: userPrompt },
-                ],
-              }),
-            });
-
-            if (response.status === 429) {
-              sawRateLimit = true;
-              if (attempt < maxAttemptsPerModel) {
-                await sleep(1200 * attempt);
-                continue;
-              }
-              break;
-            }
-
-            if (!response.ok) {
-              const errText = await response.text();
-              lastProviderError = `Gateway ${model}: ${response.status} ${errText.slice(0, 200)}`;
-              break;
-            }
-
-            const data = await response.json();
-            const extracted = extractGatewayText(data).trim();
-            if (extracted) {
-              content = extracted;
-              break;
-            }
-
-            lastProviderError = `Gateway ${model}: resposta vazia`;
-            break;
-          } finally {
-            clearTimeout(timeout);
-          }
-        }
-      }
-    }
-
-    if (!content && GEMINI_API_KEY) {
       for (const model of directModels) {
         if (content) break;
         for (let attempt = 1; attempt <= maxAttemptsPerModel; attempt++) {
