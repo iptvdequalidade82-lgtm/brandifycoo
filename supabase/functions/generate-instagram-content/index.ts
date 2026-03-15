@@ -92,20 +92,6 @@ const HOOK_PATTERNS = [
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const extractGatewayText = (payload: any): string => {
-  const raw = payload?.choices?.[0]?.message?.content;
-  if (typeof raw === "string") return raw;
-  if (Array.isArray(raw)) {
-    return raw
-      .map((part: any) => {
-        if (typeof part === "string") return part;
-        if (typeof part?.text === "string") return part.text;
-        return "";
-      })
-      .join("");
-  }
-  return "";
-};
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -114,9 +100,8 @@ serve(async (req) => {
     const { niches, brandContext, monthLabel, weeksConfig } = await req.json();
 
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!GEMINI_API_KEY && !LOVABLE_API_KEY) {
-      throw new Error("No AI provider key configured");
+    if (!GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY not configured");
     }
 
     const nichesList = niches.map((n: string, i: number) => {
@@ -286,113 +271,54 @@ CHECKLIST OBRIGATÓRIO:
 ✅ Horários variados e estratégicos (17h-21h para feed, manhã/noite para stories).`;
 
     const maxAttemptsPerModel = 2;
-    const gatewayModels = ["google/gemini-2.5-pro", "google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
     const directModels = ["gemini-2.5-pro", "gemini-2.5-flash"];
 
     let content = "";
     let sawRateLimit = false;
     let lastProviderError = "";
+    for (const model of directModels) {
+      if (content) break;
+      for (let attempt = 1; attempt <= maxAttemptsPerModel; attempt++) {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 90000);
 
-    if (LOVABLE_API_KEY) {
-      for (const model of gatewayModels) {
-        if (content) break;
-        for (let attempt = 1; attempt <= maxAttemptsPerModel; attempt++) {
-          const controller = new AbortController();
-          const timeout = setTimeout(() => controller.abort(), 90000);
+        try {
+          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            signal: controller.signal,
+            body: JSON.stringify({
+              system_instruction: { parts: [{ text: systemPrompt }] },
+              contents: [{ parts: [{ text: userPrompt }] }],
+            }),
+          });
 
-          try {
-            const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${LOVABLE_API_KEY}`,
-                "Content-Type": "application/json",
-              },
-              signal: controller.signal,
-              body: JSON.stringify({
-                model,
-                messages: [
-                  { role: "system", content: systemPrompt },
-                  { role: "user", content: userPrompt },
-                ],
-              }),
-            });
-
-            if (response.status === 429) {
-              sawRateLimit = true;
-              if (attempt < maxAttemptsPerModel) {
-                await sleep(1200 * attempt);
-                continue;
-              }
-              break;
+          if (response.status === 429) {
+            sawRateLimit = true;
+            if (attempt < maxAttemptsPerModel) {
+              await sleep(1200 * attempt);
+              continue;
             }
-
-            if (!response.ok) {
-              const errText = await response.text();
-              lastProviderError = `Gateway ${model}: ${response.status} ${errText.slice(0, 200)}`;
-              break;
-            }
-
-            const data = await response.json();
-            const extracted = extractGatewayText(data).trim();
-            if (extracted) {
-              content = extracted;
-              break;
-            }
-
-            lastProviderError = `Gateway ${model}: resposta vazia`;
             break;
-          } finally {
-            clearTimeout(timeout);
           }
-        }
-      }
-    }
 
-    if (!content && GEMINI_API_KEY) {
-      for (const model of directModels) {
-        if (content) break;
-        for (let attempt = 1; attempt <= maxAttemptsPerModel; attempt++) {
-          const controller = new AbortController();
-          const timeout = setTimeout(() => controller.abort(), 90000);
-
-          try {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              signal: controller.signal,
-              body: JSON.stringify({
-                system_instruction: { parts: [{ text: systemPrompt }] },
-                contents: [{ parts: [{ text: userPrompt }] }],
-              }),
-            });
-
-            if (response.status === 429) {
-              sawRateLimit = true;
-              if (attempt < maxAttemptsPerModel) {
-                await sleep(1200 * attempt);
-                continue;
-              }
-              break;
-            }
-
-            if (!response.ok) {
-              const errText = await response.text();
-              lastProviderError = `Gemini ${model}: ${response.status} ${errText.slice(0, 200)}`;
-              break;
-            }
-
-            const data = await response.json();
-            const extracted = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-            if (typeof extracted === "string" && extracted.trim()) {
-              content = extracted;
-              break;
-            }
-
-            lastProviderError = `Gemini ${model}: resposta vazia`;
+          if (!response.ok) {
+            const errText = await response.text();
+            lastProviderError = `Gemini ${model}: ${response.status} ${errText.slice(0, 200)}`;
             break;
-          } finally {
-            clearTimeout(timeout);
           }
+
+          const data = await response.json();
+          const extracted = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+          if (typeof extracted === "string" && extracted.trim()) {
+            content = extracted;
+            break;
+          }
+
+          lastProviderError = `Gemini ${model}: resposta vazia`;
+          break;
+        } finally {
+          clearTimeout(timeout);
         }
       }
     }
