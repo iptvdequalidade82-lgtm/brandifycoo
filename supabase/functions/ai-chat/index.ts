@@ -121,45 +121,79 @@ Se receber uma imagem de referência, analise cores, estilo, logo e incorpore no
       const imageModels = ["gemini-2.5-flash-preview-image-generation", "gemini-2.0-flash-exp"];
       let imageUrl: string | undefined;
       let textContent = "";
+      let imageModelUsed = "";
+      let imageRateLimited = false;
+      let imageLastError = "";
 
       for (const imageModel of imageModels) {
         if (imageUrl) break;
-        console.log(`Image gen: trying ${imageModel}`);
-        try {
-          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${imageModel}:generateContent?key=${GEMINI_API_KEY}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [{ parts: geminiParts }],
-              generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
-            }),
-          });
 
-          if (res.status === 429) {
-            return new Response(JSON.stringify({ error: "Limite de requisições excedido. Tente novamente em alguns minutos." }), {
-              status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        for (let attempt = 1; attempt <= MAX_ATTEMPTS_PER_MODEL; attempt++) {
+          console.log(`Image gen: trying ${imageModel} (attempt ${attempt}/${MAX_ATTEMPTS_PER_MODEL})`);
+
+          try {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${imageModel}:generateContent?key=${GEMINI_API_KEY}`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                contents: [{ parts: geminiParts }],
+                generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
+              }),
             });
-          }
 
-          if (res.ok) {
+            if (res.status === 429) {
+              imageRateLimited = true;
+              if (attempt < MAX_ATTEMPTS_PER_MODEL) {
+                await sleep(1200 * attempt);
+                continue;
+              }
+              break;
+            }
+
+            if (!res.ok) {
+              const t = await res.text();
+              imageLastError = `${imageModel} failed: ${res.status} ${t.slice(0, 300)}`;
+              console.error(imageLastError);
+              if (res.status >= 500 && attempt < MAX_ATTEMPTS_PER_MODEL) {
+                await sleep(900 * attempt);
+                continue;
+              }
+              break;
+            }
+
             const data = await res.json();
             const parts = data.candidates?.[0]?.content?.parts;
             if (parts) {
               for (const part of parts) {
                 if (part.inlineData?.mimeType?.startsWith("image/")) {
                   imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-                  console.log(`Image gen succeeded with ${imageModel}`);
+                  imageModelUsed = imageModel;
                 } else if (part.text) {
                   textContent += part.text;
                 }
               }
             }
-          } else {
-            const t = await res.text();
-            console.error(`${imageModel} failed:`, res.status, t.slice(0, 300));
+
+            if (imageUrl) {
+              console.log(`Image gen succeeded with ${imageModel}`);
+              break;
+            }
+
+            imageLastError = `${imageModel} returned no image`;
+            if (attempt < MAX_ATTEMPTS_PER_MODEL) {
+              await sleep(700 * attempt);
+              continue;
+            }
+            break;
+          } catch (e) {
+            imageLastError = `${imageModel} threw: ${e instanceof Error ? e.message : String(e)}`;
+            console.error(imageLastError);
+            if (attempt < MAX_ATTEMPTS_PER_MODEL) {
+              await sleep(900 * attempt);
+              continue;
+            }
+            break;
           }
-        } catch (e) {
-          console.error(`${imageModel} threw:`, e);
         }
       }
 
