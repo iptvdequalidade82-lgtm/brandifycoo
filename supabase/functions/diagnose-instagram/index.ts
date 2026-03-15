@@ -16,8 +16,11 @@ const METRIC_NAMES = [
   "Frequência de Posts",
 ];
 
-const NEGATIVE_SIGNAL_PATTERN = /(not found|page isn't available|perfil não encontrado|perfil indisponível|404|doesn't exist|conta inexistente|não foi possível acessar)/i;
-const POSITIVE_SIGNAL_PATTERN = /(seguidores|followers|seguindo|following|publicações|posts|reels|bio|engajamento|curtidas|comentários)/i;
+const NEGATIVE_SIGNAL_PATTERN = /(not found|page isn't available|perfil não encontrado|perfil indisponível|404|doesn't exist|conta inexistente|não foi possível acessar|profile is suspended|page not found|http error 429)/i;
+const POSITIVE_SIGNAL_PATTERN = /(seguidores|followers|seguindo|following|publicações|posts|reels|bio|engajamento|curtidas|comentários|stories)/i;
+const NUMERIC_SIGNAL_PATTERN = /(\d[\d.,\s]*\s*(followers|seguidores|following|seguindo|posts|publicações|reels|likes|curtidas|comments|comentários))/i;
+const MIN_PARTIAL_DATA_LENGTH = 120;
+const MIN_REAL_DATA_LENGTH = 260;
 
 const toText = (value: unknown, fallback: string) => {
   if (typeof value !== "string") return fallback;
