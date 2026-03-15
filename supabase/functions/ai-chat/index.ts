@@ -198,6 +198,14 @@ Se receber uma imagem de referência, analise cores, estilo, logo e incorpore no
       }
 
       if (!imageUrl) {
+        if (imageRateLimited) {
+          return new Response(JSON.stringify({ error: "Limite de requisições excedido. Aguarde alguns segundos e tente novamente." }), {
+            status: 429,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+
+        console.error("Image generation failed:", imageLastError || "unknown error");
         return new Response(JSON.stringify({
           content: "Desculpe, não consegui gerar a imagem no momento. Tente novamente em alguns instantes.",
           model: "error",
@@ -206,7 +214,7 @@ Se receber uma imagem de referência, analise cores, estilo, logo e incorpore no
         });
       }
 
-      return new Response(JSON.stringify({ imageUrl, content: textContent || "Aqui está a imagem gerada! 🎨", model: "gemini-image" }), {
+      return new Response(JSON.stringify({ imageUrl, content: textContent || "Aqui está a imagem gerada! 🎨", model: imageModelUsed || "gemini-image" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
