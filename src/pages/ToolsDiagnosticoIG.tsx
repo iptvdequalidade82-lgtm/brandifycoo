@@ -489,10 +489,10 @@ export function DiagnosticoContent() {
           )}
         </AnimatePresence>
 
-        {/* Results - Premium Layout */}
+        {/* Results - Premium Dashboard */}
         <AnimatePresence>
           {diagnosis && !loading && (
-            <motion.div key="results" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="space-y-8">
+            <motion.div key="results" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="space-y-6">
               {diagnosis._dataSource === "general" && (
                 <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-amber-500/[0.06] border border-amber-500/15 backdrop-blur-sm">
                   <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0" />
@@ -500,27 +500,28 @@ export function DiagnosticoContent() {
                 </motion.div>
               )}
 
-              <div ref={resultsRef} className="space-y-8 bg-black p-1">
-                {/* Hero Score Section */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.1, duration: 0.6 }}
-                  className="relative overflow-hidden rounded-3xl border border-white/[0.06] p-8 sm:p-10"
-                  style={{ background: `radial-gradient(ellipse at 50% 0%, ${scoreRingBg(editableScore)}, transparent 70%), rgba(255,255,255,0.02)` }}
-                >
-                  {/* Ambient glow */}
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full opacity-20 blur-[80px] pointer-events-none" style={{ background: scoreRingColor(editableScore) }} />
+              <div ref={resultsRef} className="space-y-6 bg-black p-1">
 
-                  <div className="relative flex flex-col items-center gap-6">
-                    {/* SVG Score Ring */}
-                    <div className="relative w-36 h-36">
+                {/* ═══ TOP ROW: Score + Radar Chart ═══ */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.97 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.1, duration: 0.5 }}
+                  className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+                >
+                  {/* Score Card */}
+                  <div
+                    className="relative overflow-hidden rounded-2xl border border-white/[0.06] p-6 flex flex-col items-center justify-center"
+                    style={{ background: `radial-gradient(ellipse at 50% 0%, ${scoreRingBg(editableScore)}, transparent 70%), rgba(255,255,255,0.02)` }}
+                  >
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-40 rounded-full opacity-15 blur-[60px] pointer-events-none" style={{ background: scoreRingColor(editableScore) }} />
+                    <div className="relative w-32 h-32 mb-3">
                       <svg viewBox="0 0 120 120" className="w-full h-full -rotate-90">
-                        <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="6" />
+                        <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="7" />
                         <motion.circle
                           cx="60" cy="60" r="52" fill="none"
                           stroke={scoreRingColor(editableScore)}
-                          strokeWidth="6"
+                          strokeWidth="7"
                           strokeLinecap="round"
                           strokeDasharray={`${2 * Math.PI * 52}`}
                           initial={{ strokeDashoffset: 2 * Math.PI * 52 }}
@@ -530,250 +531,250 @@ export function DiagnosticoContent() {
                       </svg>
                       <div className="absolute inset-0 flex flex-col items-center justify-center">
                         <input
-                          type="number"
-                          min={0}
-                          max={100}
+                          type="number" min={0} max={100}
                           value={editableScore}
                           onChange={e => setEditableScore(Math.min(100, Math.max(0, Number(e.target.value))))}
-                          className={`text-4xl font-bold font-['Playfair_Display'] ${scoreColor(editableScore)} bg-transparent text-center w-16 outline-none`}
+                          className={`text-4xl font-bold font-['Sora'] ${scoreColor(editableScore)} bg-transparent text-center w-16 outline-none`}
                         />
-                        <span className="text-[10px] text-white/30 uppercase tracking-[0.2em]">/ 100</span>
+                        <span className="text-[10px] text-white/25 tracking-[0.2em]">/ 100</span>
                       </div>
                     </div>
-
-                    {/* Label */}
-                    <div className="text-center">
-                      <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider border ${
-                        editableScore >= 80 ? "text-emerald-400 border-emerald-400/20 bg-emerald-400/[0.06]" :
-                        editableScore >= 60 ? "text-amber-400 border-amber-400/20 bg-amber-400/[0.06]" :
-                        editableScore >= 40 ? "text-orange-400 border-orange-400/20 bg-orange-400/[0.06]" :
-                        "text-red-400 border-red-400/20 bg-red-400/[0.06]"
-                      }`}>
-                        {editableScore >= 80 ? <Award className="w-3 h-3" /> : editableScore >= 40 ? <TrendingUp className="w-3 h-3" /> : <Flame className="w-3 h-3" />}
-                        {editableScore >= 80 ? "Excelente" : editableScore >= 60 ? "Bom" : editableScore >= 40 ? "Regular" : editableScore >= 20 ? "Fraco" : "Crítico"}
-                      </div>
+                    <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${
+                      editableScore >= 80 ? "text-emerald-400 border-emerald-400/20 bg-emerald-400/[0.06]" :
+                      editableScore >= 60 ? "text-amber-400 border-amber-400/20 bg-amber-400/[0.06]" :
+                      editableScore >= 40 ? "text-orange-400 border-orange-400/20 bg-orange-400/[0.06]" :
+                      "text-red-400 border-red-400/20 bg-red-400/[0.06]"
+                    }`}>
+                      {editableScore >= 80 ? <Award className="w-3 h-3" /> : editableScore >= 40 ? <TrendingUp className="w-3 h-3" /> : <Flame className="w-3 h-3" />}
+                      {editableScore >= 80 ? "Excelente" : editableScore >= 60 ? "Bom" : editableScore >= 40 ? "Regular" : editableScore >= 20 ? "Fraco" : "Crítico"}
                     </div>
+                  </div>
 
-                    {/* Summary */}
-                    {editingSummary ? (
-                      <textarea
-                        autoFocus
-                        value={editedSummary}
-                        onChange={e => setEditedSummary(e.target.value)}
-                        onBlur={() => setEditingSummary(false)}
-                        rows={4}
-                        className="text-white/60 text-sm leading-relaxed max-w-lg w-full mx-auto bg-white/[0.03] border border-white/10 rounded-xl p-4 outline-none focus:border-white/20 resize-none text-center"
-                      />
-                    ) : (
-                      <p
-                        onClick={() => setEditingSummary(true)}
-                        className="text-white/50 text-sm leading-relaxed max-w-lg mx-auto text-center cursor-text hover:text-white/70 transition-colors"
-                      >
-                        {editedSummary}
-                      </p>
-                    )}
+                  {/* Radar Chart */}
+                  <div className="relative rounded-2xl border border-white/[0.06] p-4 overflow-hidden" style={{ background: "rgba(255,255,255,0.02)" }}>
+                    <span className="text-[10px] text-white/25 uppercase tracking-widest font-semibold block mb-1">Visão Geral</span>
+                    <ResponsiveContainer width="100%" height={200}>
+                      <RadarChart data={editableMetrics.map(m => ({
+                        metric: m.name.replace("Bio e Apresentação", "Bio").replace("Identidade Visual", "Visual").replace("Estratégia de Conteúdo", "Conteúdo").replace("Frequência de Posts", "Frequência"),
+                        score: m.status === "good" ? 90 : m.status === "warning" ? 55 : 25,
+                        fullMark: 100
+                      }))}>
+                        <PolarGrid stroke="rgba(255,255,255,0.06)" />
+                        <PolarAngleAxis dataKey="metric" tick={{ fill: "rgba(255,255,255,0.35)", fontSize: 10 }} />
+                        <PolarRadiusAxis tick={false} axisLine={false} domain={[0, 100]} />
+                        <Radar name="Performance" dataKey="score" stroke={scoreRingColor(editableScore)} fill={scoreRingColor(editableScore)} fillOpacity={0.15} strokeWidth={2} />
+                        <Tooltip
+                          contentStyle={{ background: "rgba(0,0,0,0.85)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, fontSize: 11, color: "#fff" }}
+                          formatter={(value: number) => [`${value}/100`, "Nota"]}
+                        />
+                      </RadarChart>
+                    </ResponsiveContainer>
                   </div>
                 </motion.div>
 
-                {/* Metrics Grid - Glassmorphism Cards */}
-                <div>
-                  <div className="flex items-center gap-2 mb-4">
-                    <BarChart3 className="w-4 h-4 text-white/30" />
-                    <span className="text-[11px] font-semibold text-white/30 uppercase tracking-[0.15em]">Métricas de Performance</span>
+                {/* ═══ SUMMARY ═══ */}
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+                  {editingSummary ? (
+                    <textarea
+                      autoFocus value={editedSummary} onChange={e => setEditedSummary(e.target.value)} onBlur={() => setEditingSummary(false)} rows={3}
+                      className="w-full text-white/60 text-sm leading-relaxed bg-white/[0.03] border border-white/10 rounded-xl p-4 outline-none focus:border-white/20 resize-none"
+                    />
+                  ) : (
+                    <p onClick={() => setEditingSummary(true)} className="text-white/45 text-[13px] leading-relaxed cursor-text hover:text-white/65 transition-colors border border-transparent hover:border-white/[0.06] rounded-xl p-4">
+                      {editedSummary}
+                    </p>
+                  )}
+                </motion.div>
+
+                {/* ═══ METRICS TABLE ═══ */}
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <BarChart3 className="w-3.5 h-3.5 text-white/25" />
+                    <span className="text-[10px] font-bold text-white/25 uppercase tracking-widest">Métricas Detalhadas</span>
                   </div>
-                  <Reorder.Group
-                    axis="y"
-                    values={editableMetrics}
-                    onReorder={setEditableMetrics}
-                    className="grid grid-cols-1 sm:grid-cols-2 gap-3"
-                    as="div"
-                  >
-                    {editableMetrics.map((m, i) => (
-                      <Reorder.Item
-                        key={m.name}
-                        value={m}
-                        as="div"
-                        className="group"
-                      >
-                        <motion.div
-                          initial={{ opacity: 0, y: 12 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.15 + i * 0.08 }}
-                          className="relative rounded-2xl border border-white/[0.06] p-5 cursor-grab active:cursor-grabbing overflow-hidden hover:border-white/[0.1] transition-colors"
-                          style={{ background: "rgba(255,255,255,0.02)" }}
-                        >
-                          {/* Status bar top accent */}
-                          <div className="absolute top-0 left-0 right-0 h-[2px] bg-white/[0.03]">
-                            <motion.div
-                              className={`h-full ${statusBarColor(m.status)} rounded-r-full`}
-                              initial={{ width: 0 }}
-                              animate={{ width: statusBarWidth(m.status) }}
-                              transition={{ delay: 0.4 + i * 0.1, duration: 0.8, ease: "easeOut" }}
-                            />
-                          </div>
-
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-2">
-                              <GripVertical className="w-3 h-3 text-white/[0.06] group-hover:text-white/20 transition-colors" />
-                              <span className="text-[11px] text-white/40 font-medium">{m.name}</span>
+                  <div className="rounded-2xl border border-white/[0.06] overflow-hidden" style={{ background: "rgba(255,255,255,0.015)" }}>
+                    {/* Table header */}
+                    <div className="grid grid-cols-[1fr_auto_auto] sm:grid-cols-[180px_1fr_80px] gap-3 px-5 py-3 border-b border-white/[0.05]">
+                      <span className="text-[10px] text-white/20 uppercase tracking-wider font-semibold">Métrica</span>
+                      <span className="text-[10px] text-white/20 uppercase tracking-wider font-semibold hidden sm:block">Avaliação</span>
+                      <span className="text-[10px] text-white/20 uppercase tracking-wider font-semibold text-right">Status</span>
+                    </div>
+                    {/* Table rows */}
+                    <Reorder.Group axis="y" values={editableMetrics} onReorder={setEditableMetrics} as="div">
+                      {editableMetrics.map((m, i) => (
+                        <Reorder.Item key={m.name} value={m} as="div" className="group">
+                          <motion.div
+                            initial={{ opacity: 0, x: -6 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.35 + i * 0.06 }}
+                            className="grid grid-cols-[1fr_auto] sm:grid-cols-[180px_1fr_80px] gap-3 items-center px-5 py-3.5 border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors cursor-grab active:cursor-grabbing"
+                          >
+                            <div className="flex items-center gap-2.5">
+                              <GripVertical className="w-3 h-3 text-white/[0.06] group-hover:text-white/20 flex-shrink-0" />
+                              <span className="text-[12px] text-white/60 font-medium">{m.name}</span>
                             </div>
-                            <button onClick={() => cycleStatus(i)} className="hover:scale-110 transition-transform">
-                              {statusIcon(m.status)}
-                            </button>
-                          </div>
-
-                          <input
-                            value={m.value}
-                            onChange={e => updateEditableMetricValue(i, e.target.value)}
-                            className="bg-transparent border-none outline-none text-[13px] font-medium text-white/80 w-full mb-2 placeholder:text-white/15 focus:text-white transition-colors"
-                            placeholder="Editar avaliação..."
-                          />
-
-                          <p className="text-[11px] text-white/25 leading-relaxed line-clamp-2">{m.tip}</p>
-                        </motion.div>
-                      </Reorder.Item>
-                    ))}
-                  </Reorder.Group>
-                </div>
+                            <div className="hidden sm:block">
+                              <input
+                                value={m.value}
+                                onChange={e => updateEditableMetricValue(i, e.target.value)}
+                                className="bg-transparent outline-none text-[12px] text-white/50 w-full focus:text-white/80 transition-colors"
+                                placeholder="Editar avaliação..."
+                              />
+                              <p className="text-[10px] text-white/20 mt-0.5 line-clamp-1">{m.tip}</p>
+                            </div>
+                            <div className="flex justify-end">
+                              <button onClick={() => cycleStatus(i)} className="flex items-center gap-1.5 hover:scale-105 transition-transform">
+                                {statusIcon(m.status)}
+                                <span className={`text-[10px] font-semibold uppercase tracking-wider ${
+                                  m.status === "good" ? "text-emerald-400/70" : m.status === "warning" ? "text-amber-400/70" : "text-red-400/70"
+                                }`}>
+                                  {m.status === "good" ? "Bom" : m.status === "warning" ? "Alerta" : "Crítico"}
+                                </span>
+                              </button>
+                            </div>
+                            {/* Mobile value row */}
+                            <div className="sm:hidden col-span-2">
+                              <input
+                                value={m.value}
+                                onChange={e => updateEditableMetricValue(i, e.target.value)}
+                                className="bg-transparent outline-none text-[11px] text-white/40 w-full focus:text-white/70 transition-colors"
+                                placeholder="Editar avaliação..."
+                              />
+                            </div>
+                          </motion.div>
+                        </Reorder.Item>
+                      ))}
+                    </Reorder.Group>
+                  </div>
+                </motion.div>
 
                 {/* Custom metrics display */}
                 {customMetrics.filter(m => m.value.trim()).length > 0 && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
-                    <span className="text-[11px] text-white/25 uppercase font-semibold tracking-[0.15em] mb-3 block">Métricas do cliente</span>
+                    <span className="text-[10px] text-white/20 uppercase font-bold tracking-widest mb-3 block">Métricas do cliente</span>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {customMetrics.filter(m => m.value.trim()).map(m => (
-                        <div key={m.id} className="rounded-2xl bg-white/[0.02] border border-white/[0.06] p-4 hover:border-white/[0.1] transition-colors">
+                        <div key={m.id} className="rounded-xl bg-white/[0.02] border border-white/[0.06] p-4 hover:border-white/[0.1] transition-colors">
                           <div className="flex items-center gap-2 mb-2">
-                            <span className="text-white/20">{METRIC_ICONS[m.icon]}</span>
-                            <span className="text-[10px] text-white/30 uppercase tracking-wider">{m.label}</span>
+                            <span className="text-white/15">{METRIC_ICONS[m.icon]}</span>
+                            <span className="text-[9px] text-white/25 uppercase tracking-widest">{m.label}</span>
                           </div>
-                          <div className="text-lg font-bold text-white font-['Playfair_Display']">{m.value}</div>
+                          <div className="text-lg font-bold text-white font-['Sora']">{m.value}</div>
                         </div>
                       ))}
                     </div>
                   </motion.div>
                 )}
 
-                {/* SWOT - Modern Magazine Layout */}
-                <motion.div
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 }}
-                  className="grid grid-cols-1 sm:grid-cols-2 gap-3"
-                >
+                {/* ═══ SWOT - Two Column Premium Cards ═══ */}
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Strengths */}
-                  <div className="relative rounded-2xl border border-emerald-500/10 p-5 overflow-hidden" style={{ background: "rgba(52,211,153,0.03)" }}>
-                    <div className="absolute top-0 right-0 w-24 h-24 rounded-full bg-emerald-500/5 blur-2xl pointer-events-none" />
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="w-6 h-6 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                        <Shield className="w-3.5 h-3.5 text-emerald-400" />
+                  <div className="rounded-2xl border border-emerald-500/10 overflow-hidden" style={{ background: "linear-gradient(135deg, rgba(52,211,153,0.04), rgba(52,211,153,0.01))" }}>
+                    <div className="flex items-center gap-2.5 px-5 py-3 border-b border-emerald-500/10">
+                      <div className="w-5 h-5 rounded-md bg-emerald-500/15 flex items-center justify-center">
+                        <Shield className="w-3 h-3 text-emerald-400" />
                       </div>
-                      <span className="text-[11px] font-bold text-emerald-400/80 uppercase tracking-[0.15em]">Pontos Fortes</span>
+                      <span className="text-[10px] font-bold text-emerald-400/80 uppercase tracking-widest">Pontos Fortes</span>
                     </div>
-                    <ul className="space-y-3">
+                    <div className="p-5 space-y-3">
                       {editableStrengths.map((s, i) => (
-                        <li key={i} className="flex items-start gap-2.5">
-                          <div className="w-1 h-1 rounded-full bg-emerald-400/40 mt-2 flex-shrink-0" />
+                        <div key={i} className="flex items-start gap-3">
+                          <Star className="w-3 h-3 text-emerald-400/40 mt-1 flex-shrink-0" />
                           <input
-                            value={s}
-                            onChange={e => updateEditableStrength(i, e.target.value)}
-                            className="bg-transparent border-none outline-none text-[13px] text-white/50 w-full focus:text-white/80 transition-colors leading-relaxed"
+                            value={s} onChange={e => updateEditableStrength(i, e.target.value)}
+                            className="bg-transparent border-none outline-none text-[12px] text-white/50 w-full focus:text-white/80 transition-colors leading-relaxed"
                           />
-                        </li>
+                        </div>
                       ))}
-                    </ul>
+                    </div>
                   </div>
 
                   {/* Weaknesses */}
-                  <div className="relative rounded-2xl border border-red-500/10 p-5 overflow-hidden" style={{ background: "rgba(248,113,113,0.03)" }}>
-                    <div className="absolute top-0 right-0 w-24 h-24 rounded-full bg-red-500/5 blur-2xl pointer-events-none" />
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="w-6 h-6 rounded-lg bg-red-500/10 flex items-center justify-center">
-                        <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
+                  <div className="rounded-2xl border border-red-500/10 overflow-hidden" style={{ background: "linear-gradient(135deg, rgba(248,113,113,0.04), rgba(248,113,113,0.01))" }}>
+                    <div className="flex items-center gap-2.5 px-5 py-3 border-b border-red-500/10">
+                      <div className="w-5 h-5 rounded-md bg-red-500/15 flex items-center justify-center">
+                        <AlertTriangle className="w-3 h-3 text-red-400" />
                       </div>
-                      <span className="text-[11px] font-bold text-red-400/80 uppercase tracking-[0.15em]">Pontos Fracos</span>
+                      <span className="text-[10px] font-bold text-red-400/80 uppercase tracking-widest">Pontos Fracos</span>
                     </div>
-                    <ul className="space-y-3">
+                    <div className="p-5 space-y-3">
                       {editableWeaknesses.map((w, i) => (
-                        <li key={i} className="flex items-start gap-2.5">
-                          <div className="w-1 h-1 rounded-full bg-red-400/40 mt-2 flex-shrink-0" />
+                        <div key={i} className="flex items-start gap-3">
+                          <Lightbulb className="w-3 h-3 text-red-400/40 mt-1 flex-shrink-0" />
                           <input
-                            value={w}
-                            onChange={e => updateEditableWeakness(i, e.target.value)}
-                            className="bg-transparent border-none outline-none text-[13px] text-white/50 w-full focus:text-white/80 transition-colors leading-relaxed"
+                            value={w} onChange={e => updateEditableWeakness(i, e.target.value)}
+                            className="bg-transparent border-none outline-none text-[12px] text-white/50 w-full focus:text-white/80 transition-colors leading-relaxed"
                           />
-                        </li>
+                        </div>
                       ))}
-                    </ul>
+                    </div>
                   </div>
                 </motion.div>
 
-                {/* Action Plan - Timeline Style */}
-                <motion.div
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.7 }}
-                >
-                  <div className="flex items-center gap-2 mb-5">
-                    <div className="w-6 h-6 rounded-lg bg-white/[0.04] flex items-center justify-center">
-                      <Target className="w-3.5 h-3.5 text-white/40" />
+                {/* ═══ ACTION PLAN - Numbered Cards ═══ */}
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65 }}>
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-5 h-5 rounded-md bg-white/[0.04] flex items-center justify-center">
+                      <Target className="w-3 h-3 text-white/35" />
                     </div>
-                    <span className="text-[11px] font-bold text-white/30 uppercase tracking-[0.15em]">Plano de Ação</span>
+                    <span className="text-[10px] font-bold text-white/25 uppercase tracking-widest">Plano de Ação</span>
                   </div>
 
-                  <Reorder.Group axis="y" values={editableActions} onReorder={setEditableActions} className="relative">
-                    {/* Timeline line */}
-                    <div className="absolute left-[15px] top-4 bottom-4 w-[1px] bg-gradient-to-b from-white/[0.08] via-white/[0.04] to-transparent" />
-
+                  <Reorder.Group axis="y" values={editableActions} onReorder={setEditableActions} className="space-y-3">
                     {editableActions.map((a, i) => (
-                      <Reorder.Item
-                        key={`action-${i}`}
-                        value={a}
-                        className="relative pl-10 pb-5 last:pb-0 cursor-grab active:cursor-grabbing group"
-                      >
-                        {/* Timeline dot */}
-                        <div className={`absolute left-[11px] top-1 w-[9px] h-[9px] rounded-full border-2 ${
-                          a.priority === "alta" ? "border-red-400 bg-red-400/20" :
-                          a.priority === "media" ? "border-amber-400 bg-amber-400/20" :
-                          "border-blue-400 bg-blue-400/20"
-                        }`} />
-
+                      <Reorder.Item key={`action-${i}`} value={a} className="group cursor-grab active:cursor-grabbing">
                         <motion.div
                           initial={{ opacity: 0, x: -8 }}
                           animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.8 + i * 0.1 }}
-                          className="rounded-2xl border border-white/[0.05] p-4 hover:border-white/[0.08] transition-colors"
+                          transition={{ delay: 0.7 + i * 0.08 }}
+                          className="rounded-xl border border-white/[0.05] hover:border-white/[0.08] transition-all overflow-hidden"
                           style={{ background: "rgba(255,255,255,0.015)" }}
                         >
-                          <div className="flex items-center gap-2 mb-2.5">
-                            <GripVertical className="w-3 h-3 text-white/[0.06] group-hover:text-white/20 transition-colors" />
-                            <select
-                              value={a.priority}
-                              onChange={e => updateEditableAction(i, "priority", e.target.value)}
-                              className={`text-[9px] uppercase font-bold px-2.5 py-1 rounded-full cursor-pointer outline-none tracking-wider ${
-                                a.priority === "alta" ? "bg-red-500/10 text-red-400 border border-red-500/20" :
-                                a.priority === "media" ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" :
-                                "bg-blue-500/10 text-blue-400 border border-blue-500/20"
-                              }`}
-                            >
-                              <option value="alta">Alta</option>
-                              <option value="media">Média</option>
-                              <option value="baixa">Baixa</option>
-                            </select>
-                            <span className="text-[10px] text-white/15">#{i + 1}</span>
-                          </div>
-                          <input
-                            value={a.action}
-                            onChange={e => updateEditableAction(i, "action", e.target.value)}
-                            className="bg-transparent border-none outline-none text-[13px] font-medium text-white/70 w-full focus:text-white transition-colors mb-1.5"
-                          />
-                          <div className="flex items-center gap-1.5">
-                            <ArrowUpRight className="w-3 h-3 text-white/15 flex-shrink-0" />
-                            <input
-                              value={a.expectedImpact}
-                              onChange={e => updateEditableAction(i, "expectedImpact", e.target.value)}
-                              className="bg-transparent border-none outline-none text-[11px] text-white/25 w-full focus:text-white/45 transition-colors"
-                            />
+                          <div className="flex items-stretch">
+                            {/* Number strip */}
+                            <div className={`w-12 flex flex-col items-center justify-center flex-shrink-0 border-r border-white/[0.04] ${
+                              a.priority === "alta" ? "bg-red-500/[0.06]" :
+                              a.priority === "media" ? "bg-amber-500/[0.06]" :
+                              "bg-blue-500/[0.06]"
+                            }`}>
+                              <span className={`text-lg font-bold font-['Sora'] ${
+                                a.priority === "alta" ? "text-red-400/60" :
+                                a.priority === "media" ? "text-amber-400/60" :
+                                "text-blue-400/60"
+                              }`}>{i + 1}</span>
+                            </div>
+                            {/* Content */}
+                            <div className="flex-1 p-4">
+                              <div className="flex items-center gap-2 mb-2">
+                                <GripVertical className="w-3 h-3 text-white/[0.06] group-hover:text-white/20 transition-colors" />
+                                <select
+                                  value={a.priority}
+                                  onChange={e => updateEditableAction(i, "priority", e.target.value)}
+                                  className={`text-[9px] uppercase font-bold px-2 py-0.5 rounded-md cursor-pointer outline-none tracking-wider ${
+                                    a.priority === "alta" ? "bg-red-500/10 text-red-400 border border-red-500/20" :
+                                    a.priority === "media" ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" :
+                                    "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                                  }`}
+                                >
+                                  <option value="alta">Alta</option>
+                                  <option value="media">Média</option>
+                                  <option value="baixa">Baixa</option>
+                                </select>
+                              </div>
+                              <input
+                                value={a.action}
+                                onChange={e => updateEditableAction(i, "action", e.target.value)}
+                                className="bg-transparent border-none outline-none text-[12px] font-medium text-white/65 w-full focus:text-white transition-colors mb-1"
+                              />
+                              <div className="flex items-center gap-1.5">
+                                <ChevronRight className="w-3 h-3 text-white/10 flex-shrink-0" />
+                                <input
+                                  value={a.expectedImpact}
+                                  onChange={e => updateEditableAction(i, "expectedImpact", e.target.value)}
+                                  className="bg-transparent border-none outline-none text-[10px] text-white/20 w-full focus:text-white/40 transition-colors"
+                                />
+                              </div>
+                            </div>
                           </div>
                         </motion.div>
                       </Reorder.Item>
@@ -784,15 +785,15 @@ export function DiagnosticoContent() {
 
               {/* Export buttons */}
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} className="flex gap-3">
-                <button onClick={handleDownload} disabled={exporting} className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-white/40 hover:text-white hover:bg-white/[0.06] text-sm transition-all disabled:opacity-40 hover:border-white/[0.1]">
+                <button onClick={handleDownload} disabled={exporting} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06] text-white/40 hover:text-white hover:bg-white/[0.06] text-sm transition-all disabled:opacity-40 hover:border-white/[0.1]">
                   {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />} Salvar imagem
                 </button>
-                <button onClick={handleShare} disabled={exporting} className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.06] text-white/40 hover:text-white hover:bg-white/[0.06] text-sm transition-all disabled:opacity-40 hover:border-white/[0.1]">
+                <button onClick={handleShare} disabled={exporting} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06] text-white/40 hover:text-white hover:bg-white/[0.06] text-sm transition-all disabled:opacity-40 hover:border-white/[0.1]">
                   {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Share2 className="w-4 h-4" />} Compartilhar
                 </button>
               </motion.div>
 
-              <button onClick={() => { setDiagnosis(null); setHandle(""); setCustomMetrics([]); }} className="w-full py-3.5 rounded-2xl border border-white/[0.06] text-white/30 text-sm hover:text-white/60 hover:border-white/[0.1] transition-all">
+              <button onClick={() => { setDiagnosis(null); setHandle(""); setCustomMetrics([]); }} className="w-full py-3 rounded-xl border border-white/[0.06] text-white/25 text-sm hover:text-white/50 hover:border-white/[0.1] transition-all">
                 Nova análise
               </button>
             </motion.div>
