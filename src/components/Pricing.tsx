@@ -241,7 +241,7 @@ export default function Pricing() {
                 )}
                 <h3 className="font-display text-lg font-black">{plan.name}</h3>
                 <p className={`text-xs mt-1 mb-4 ${plan.featured ? "text-white/70" : "text-white/40"}`}>{plan.desc}</p>
-                <p className={`text-xs mt-2 ${plan.featured ? "text-white/50" : "text-white/30"}`}>Consulte valores sob medida</p>
+                <p className={`font-display text-3xl font-black mt-2 ${plan.featured ? "text-white" : "text-white/90"}`}>{plan.price}</p>
               </div>
 
               <div className="p-7 flex-1">
