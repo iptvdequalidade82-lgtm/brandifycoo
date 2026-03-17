@@ -331,7 +331,8 @@ export default function Pricing() {
                 <p className="text-white/50 mt-2 max-w-lg">Loja online completa, configurada e pronta para vender. Ideal para quem quer entrar no e-commerce com estrutura profissional.</p>
               </div>
               <div className="text-left md:text-right flex-shrink-0">
-                <p className="text-xs text-white/30 mt-1">Consulte valores sob medida</p>
+                <p className="font-display text-3xl md:text-4xl font-black text-white">R$ 2.500</p>
+                <p className="text-xs text-white/30 mt-1">configuração única</p>
               </div>
             </div>
           </div>
