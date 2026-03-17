@@ -7,17 +7,17 @@ import earthMoonBg from "@/assets/earth-moon-bg.jpg";
 
 const plans = [
   {
-    name: "Landing Page", desc: "Página estratégica de vendas — ideal para infoprodutos, lançamentos e captação de leads.",
+    name: "Landing Page", price: "R$ 800", desc: "Página estratégica de vendas — ideal para infoprodutos, lançamentos e captação de leads.",
     features: ["Página essencial de vendas", "Seção de vídeo + chamada para ação", "Apresentação do produto/serviço", "Design responsivo", "Certificado SSL", "Entrega rápida"],
     featured: false,
   },
   {
-    name: "Essencial", desc: "Ideal para quem está começando e precisa de presença online.",
+    name: "Essencial", price: "R$ 1.500", desc: "Ideal para quem está começando e precisa de presença online.",
     features: ["Site de até 6 páginas", "Design responsivo", "Certificado SSL", "Auxílio no registro de domínio", "1h de manutenção mensal gratuita"],
     featured: false,
   },
   {
-    name: "Premium", desc: "Solução completa para empresas que exigem o melhor.",
+    name: "Premium", price: "R$ 4.500", desc: "Solução completa para empresas que exigem o melhor.",
     features: ["Páginas ilimitadas", "Design exclusivo do zero", "SEO avançado + Blog", "Certificado SSL", "Auxílio no registro de domínio", "Painel administrativo", "Integrações personalizadas", "1h de manutenção mensal gratuita"],
     featured: true,
   },
@@ -241,7 +241,7 @@ export default function Pricing() {
                 )}
                 <h3 className="font-display text-lg font-black">{plan.name}</h3>
                 <p className={`text-xs mt-1 mb-4 ${plan.featured ? "text-white/70" : "text-white/40"}`}>{plan.desc}</p>
-                <p className={`text-xs mt-2 ${plan.featured ? "text-white/50" : "text-white/30"}`}>Consulte valores sob medida</p>
+                <p className={`font-display text-3xl font-black mt-2 ${plan.featured ? "text-white" : "text-white/90"}`}>{plan.price}</p>
               </div>
 
               <div className="p-7 flex-1">
@@ -331,7 +331,8 @@ export default function Pricing() {
                 <p className="text-white/50 mt-2 max-w-lg">Loja online completa, configurada e pronta para vender. Ideal para quem quer entrar no e-commerce com estrutura profissional.</p>
               </div>
               <div className="text-left md:text-right flex-shrink-0">
-                <p className="text-xs text-white/30 mt-1">Consulte valores sob medida</p>
+                <p className="font-display text-3xl md:text-4xl font-black text-white">R$ 2.500</p>
+                <p className="text-xs text-white/30 mt-1">configuração única</p>
               </div>
             </div>
           </div>
