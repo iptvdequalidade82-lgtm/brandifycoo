@@ -7,17 +7,17 @@ import earthMoonBg from "@/assets/earth-moon-bg.jpg";
 
 const plans = [
   {
-    name: "Landing Page", desc: "Página estratégica de vendas — ideal para infoprodutos, lançamentos e captação de leads.",
+    name: "Landing Page", price: "R$ 800", desc: "Página estratégica de vendas — ideal para infoprodutos, lançamentos e captação de leads.",
     features: ["Página essencial de vendas", "Seção de vídeo + chamada para ação", "Apresentação do produto/serviço", "Design responsivo", "Certificado SSL", "Entrega rápida"],
     featured: false,
   },
   {
-    name: "Essencial", desc: "Ideal para quem está começando e precisa de presença online.",
+    name: "Essencial", price: "R$ 1.500", desc: "Ideal para quem está começando e precisa de presença online.",
     features: ["Site de até 6 páginas", "Design responsivo", "Certificado SSL", "Auxílio no registro de domínio", "1h de manutenção mensal gratuita"],
     featured: false,
   },
   {
-    name: "Premium", desc: "Solução completa para empresas que exigem o melhor.",
+    name: "Premium", price: "R$ 4.500", desc: "Solução completa para empresas que exigem o melhor.",
     features: ["Páginas ilimitadas", "Design exclusivo do zero", "SEO avançado + Blog", "Certificado SSL", "Auxílio no registro de domínio", "Painel administrativo", "Integrações personalizadas", "1h de manutenção mensal gratuita"],
     featured: true,
   },
