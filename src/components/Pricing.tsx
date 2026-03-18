@@ -89,7 +89,6 @@ function NuvemshopPlans() {
                 <p className="text-xs text-white/40 mt-0.5">{p.desc}</p>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0 ml-4">
-                <span className="text-sm font-bold text-brand-accent">{p.price}</span>
                 <ChevronDown
                   size={16}
                   className={`text-white/40 gentle-animation ${openPlan === p.name ? "rotate-180" : ""}`}
