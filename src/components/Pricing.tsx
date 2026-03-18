@@ -28,7 +28,7 @@ const item = { hidden: { opacity: 0, y: 40 }, show: { opacity: 1, y: 0, transiti
 
 const nuvemshopPlans = [
   {
-    name: "Essencial", price: "R$ 69/mês", desc: "Para quem está começando a vender online",
+    name: "Essencial", desc: "Para quem está começando a vender online",
     included: [
       "Atendimento por e-mail e messenger",
       "+30 meios de envio integrados",
@@ -42,7 +42,7 @@ const nuvemshopPlans = [
     ],
   },
   {
-    name: "Impulso", price: "R$ 164/mês", desc: "Mais recursos e edição avançada do site",
+    name: "Impulso", desc: "Mais recursos e edição avançada do site",
     included: [
       "Todos os recursos do plano anterior",
       "Atendimento via WhatsApp",
@@ -58,7 +58,7 @@ const nuvemshopPlans = [
     ],
   },
   {
-    name: "Escala", price: "R$ 449/mês", desc: "Máxima personalização e ferramentas de gestão",
+    name: "Escala", desc: "Máxima personalização e ferramentas de gestão",
     included: [
       "Todos os recursos do plano anterior",
       "Relatórios ilimitados",
