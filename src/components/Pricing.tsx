@@ -7,17 +7,17 @@ import earthMoonBg from "@/assets/earth-moon-bg.jpg";
 
 const plans = [
   {
-    name: "Landing Page", price: "R$ 800", desc: "Página estratégica de vendas — ideal para infoprodutos, lançamentos e captação de leads.",
+    name: "Landing Page", desc: "Página estratégica de vendas — ideal para infoprodutos, lançamentos e captação de leads.",
     features: ["Página essencial de vendas", "Seção de vídeo + chamada para ação", "Apresentação do produto/serviço", "Design responsivo", "Certificado SSL", "Entrega rápida"],
     featured: false,
   },
   {
-    name: "Essencial", price: "R$ 1.500", desc: "Ideal para quem está começando e precisa de presença online.",
+    name: "Essencial", desc: "Ideal para quem está começando e precisa de presença online.",
     features: ["Site de até 6 páginas", "Design responsivo", "Certificado SSL", "Auxílio no registro de domínio", "1h de manutenção mensal gratuita"],
     featured: false,
   },
   {
-    name: "Premium", price: "R$ 4.500", desc: "Solução completa para empresas que exigem o melhor.",
+    name: "Premium", desc: "Solução completa para empresas que exigem o melhor.",
     features: ["Páginas ilimitadas", "Design exclusivo do zero", "SEO avançado + Blog", "Certificado SSL", "Auxílio no registro de domínio", "Painel administrativo", "Integrações personalizadas", "1h de manutenção mensal gratuita"],
     featured: true,
   },
@@ -28,7 +28,7 @@ const item = { hidden: { opacity: 0, y: 40 }, show: { opacity: 1, y: 0, transiti
 
 const nuvemshopPlans = [
   {
-    name: "Essencial", price: "R$ 69/mês", desc: "Para quem está começando a vender online",
+    name: "Essencial", desc: "Para quem está começando a vender online",
     included: [
       "Atendimento por e-mail e messenger",
       "+30 meios de envio integrados",
@@ -42,7 +42,7 @@ const nuvemshopPlans = [
     ],
   },
   {
-    name: "Impulso", price: "R$ 164/mês", desc: "Mais recursos e edição avançada do site",
+    name: "Impulso", desc: "Mais recursos e edição avançada do site",
     included: [
       "Todos os recursos do plano anterior",
       "Atendimento via WhatsApp",
@@ -58,7 +58,7 @@ const nuvemshopPlans = [
     ],
   },
   {
-    name: "Escala", price: "R$ 449/mês", desc: "Máxima personalização e ferramentas de gestão",
+    name: "Escala", desc: "Máxima personalização e ferramentas de gestão",
     included: [
       "Todos os recursos do plano anterior",
       "Relatórios ilimitados",
@@ -89,7 +89,6 @@ function NuvemshopPlans() {
                 <p className="text-xs text-white/40 mt-0.5">{p.desc}</p>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0 ml-4">
-                <span className="text-sm font-bold text-brand-accent">{p.price}</span>
                 <ChevronDown
                   size={16}
                   className={`text-white/40 gentle-animation ${openPlan === p.name ? "rotate-180" : ""}`}
@@ -241,7 +240,7 @@ export default function Pricing() {
                 )}
                 <h3 className="font-display text-lg font-black">{plan.name}</h3>
                 <p className={`text-xs mt-1 mb-4 ${plan.featured ? "text-white/70" : "text-white/40"}`}>{plan.desc}</p>
-                <p className={`font-display text-3xl font-black mt-2 ${plan.featured ? "text-white" : "text-white/90"}`}>{plan.price}</p>
+                <p className={`font-display text-xl font-black mt-2 ${plan.featured ? "text-white" : "text-white/90"}`}>Consulte</p>
               </div>
 
               <div className="p-7 flex-1">
@@ -331,8 +330,7 @@ export default function Pricing() {
                 <p className="text-white/50 mt-2 max-w-lg">Loja online completa, configurada e pronta para vender. Ideal para quem quer entrar no e-commerce com estrutura profissional.</p>
               </div>
               <div className="text-left md:text-right flex-shrink-0">
-                <p className="font-display text-3xl md:text-4xl font-black text-white">R$ 2.500</p>
-                <p className="text-xs text-white/30 mt-1">configuração única</p>
+                <p className="font-display text-xl font-black text-white">Consulte</p>
               </div>
             </div>
           </div>
