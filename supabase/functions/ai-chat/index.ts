@@ -1,386 +1,333 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
-
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
-// Keywords that indicate image generation/editing intent
-const IMAGE_KEYWORDS = [
-  "gerar imagem", "gere uma imagem", "crie uma imagem", "criar imagem",
-  "gerar foto", "crie uma foto", "criar foto",
-  "gerar logo", "crie um logo", "criar logo", "crie uma logo",
-  "gerar arte", "crie uma arte", "criar arte",
-  "gerar ilustração", "crie uma ilustração",
-  "gerar banner", "crie um banner", "criar banner",
-  "gerar post", "crie um post visual",
-  "editar imagem", "edite essa imagem", "editar essa foto",
-  "modifique essa imagem", "altere essa imagem",
-  "recrie essa imagem", "recriar imagem", "refazer imagem",
-  "transforme essa imagem", "melhore essa imagem",
-  "generate image", "create image", "edit image",
-  "desenhe", "desenhar", "ilustre", "ilustrar",
-];
+type Provider = 'gemini' | 'chatgpt';
+type ChatRole = 'system' | 'user' | 'assistant';
 
-function detectImageIntent(text: string): boolean {
-  const lower = text.toLowerCase();
-  return IMAGE_KEYWORDS.some((kw) => lower.includes(kw));
+interface ChatMessage {
+  role: ChatRole;
+  content: string;
 }
 
-function hasImageAttachment(messages: any[]): boolean {
-  const last = messages[messages.length - 1];
-  if (!last) return false;
-  if (Array.isArray(last.content)) {
-    return last.content.some((p: any) => p.type === "image_url");
+const PROVIDER_ALIASES: Record<string, Provider> = {
+  gemini: 'gemini',
+  google: 'gemini',
+  chatgpt: 'chatgpt',
+  openai: 'chatgpt',
+  gpt: 'chatgpt',
+};
+
+function jsonResponse(payload: unknown, status = 200) {
+  return new Response(JSON.stringify(payload), {
+    status,
+    headers: {
+      ...corsHeaders,
+      'Content-Type': 'application/json; charset=utf-8',
+    },
+  });
+}
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
+function normalizeProvider(raw: unknown): Provider | null {
+  if (!isNonEmptyString(raw)) return null;
+  const key = raw.trim().toLowerCase();
+  return PROVIDER_ALIASES[key] ?? null;
+}
+
+function normalizeMessages(input: unknown): ChatMessage[] {
+  if (!Array.isArray(input)) return [];
+
+  const output: ChatMessage[] = [];
+  for (const item of input) {
+    if (!item || typeof item !== 'object') continue;
+
+    const roleRaw = (item as Record<string, unknown>).role;
+    const contentRaw = (item as Record<string, unknown>).content;
+
+    if (!isNonEmptyString(roleRaw) || !isNonEmptyString(contentRaw)) continue;
+
+    const role = roleRaw.trim().toLowerCase();
+    if (role !== 'system' && role !== 'user' && role !== 'assistant') continue;
+
+    output.push({
+      role: role as ChatRole,
+      content: contentRaw.trim(),
+    });
   }
-  return false;
+
+  return output;
 }
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-const MAX_ATTEMPTS_PER_MODEL = 2;
+function clampTemperature(value: unknown): number {
+  if (typeof value !== 'number' || Number.isNaN(value)) return 0.7;
+  if (value < 0) return 0;
+  if (value > 1) return 1;
+  return value;
+}
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+function extractMessage(body: Record<string, unknown>, history: ChatMessage[]): string {
+  const direct = [body.message, body.prompt, body.input].find(isNonEmptyString);
+  if (direct) return direct.trim();
+
+  for (let i = history.length - 1; i >= 0; i -= 1) {
+    if (history[i].role === 'user' && history[i].content.trim()) {
+      return history[i].content.trim();
+    }
+  }
+
+  return '';
+}
+
+async function callChatGPT(params: {
+  message: string;
+  history: ChatMessage[];
+  systemPrompt: string;
+  model?: string;
+  temperature: number;
+}): Promise<{ text: string; model: string }> {
+  const apiKey = Deno.env.get('OPENAI_API_KEY');
+  if (!apiKey) {
+    throw new Error('MISSING_KEY:OPENAI_API_KEY');
+  }
+
+  const model = isNonEmptyString(params.model) ? params.model : 'gpt-4o-mini';
+
+  const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [];
+
+  if (isNonEmptyString(params.systemPrompt)) {
+    messages.push({ role: 'system', content: params.systemPrompt.trim() });
+  }
+
+  for (const msg of params.history) {
+    if (msg.role === 'system') continue;
+    messages.push({
+      role: msg.role === 'assistant' ? 'assistant' : 'user',
+      content: msg.content,
+    });
+  }
+
+  const hasSameLastUserMessage =
+    messages.length > 0 &&
+    messages[messages.length - 1].role === 'user' &&
+    messages[messages.length - 1].content.trim() === params.message.trim();
+
+  if (!hasSameLastUserMessage) {
+    messages.push({ role: 'user', content: params.message.trim() });
+  }
+
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model,
+      messages,
+      temperature: params.temperature,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(`UPSTREAM_OPENAI:${response.status}:${JSON.stringify(data).slice(0, 400)}`);
+  }
+
+  const text = data?.choices?.[0]?.message?.content;
+  if (!isNonEmptyString(text)) {
+    throw new Error('EMPTY_PROVIDER_RESPONSE:chatgpt');
+  }
+
+  return {
+    text: text.trim(),
+    model,
+  };
+}
+
+async function callGemini(params: {
+  message: string;
+  history: ChatMessage[];
+  systemPrompt: string;
+  model?: string;
+  temperature: number;
+}): Promise<{ text: string; model: string }> {
+  const apiKey = Deno.env.get('GEMINI_API_KEY');
+  if (!apiKey) {
+    throw new Error('MISSING_KEY:GEMINI_API_KEY');
+  }
+
+  const model = isNonEmptyString(params.model) ? params.model : 'gemini-1.5-flash';
+
+  const contents: Array<{ role: 'user' | 'model'; parts: Array<{ text: string }> }> = [];
+
+  for (const msg of params.history) {
+    if (msg.role === 'system') continue;
+    contents.push({
+      role: msg.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: msg.content }],
+    });
+  }
+
+  const last = contents[contents.length - 1];
+  const isDuplicateLastUser =
+    last?.role === 'user' &&
+    Array.isArray(last.parts) &&
+    last.parts[0]?.text?.trim?.() === params.message.trim();
+
+  if (!isDuplicateLastUser) {
+    contents.push({
+      role: 'user',
+      parts: [{ text: params.message.trim() }],
+    });
+  }
+
+  const payload: Record<string, unknown> = {
+    contents,
+    generationConfig: {
+      temperature: params.temperature,
+    },
+  };
+
+  if (isNonEmptyString(params.systemPrompt)) {
+    payload.system_instruction = {
+      parts: [{ text: params.systemPrompt.trim() }],
+    };
+  }
+
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(`UPSTREAM_GEMINI:${response.status}:${JSON.stringify(data).slice(0, 400)}`);
+  }
+
+  const parts = data?.candidates?.[0]?.content?.parts;
+  const text = Array.isArray(parts)
+    ? parts
+        .map((p: Record<string, unknown>) => (typeof p?.text === 'string' ? p.text : ''))
+        .filter(Boolean)
+        .join('\n')
+        .trim()
+    : '';
+
+  if (!isNonEmptyString(text)) {
+    throw new Error('EMPTY_PROVIDER_RESPONSE:gemini');
+  }
+
+  return {
+    text,
+    model,
+  };
+}
+
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
+
+  if (req.method !== 'POST') {
+    return jsonResponse({ ok: false, error: 'Método não permitido.' }, 405);
+  }
 
   try {
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY not configured");
+    const body = (await req.json()) as Record<string, unknown>;
 
-    const authHeader = req.headers.get("Authorization");
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const requestedProvider = body.provider ?? body.aiProvider ?? body.ai_provider;
+    const normalizedRequestedProvider = normalizeProvider(requestedProvider);
 
-    // Auth: allow anonymous access for basic chat, but track user if logged in
-    let userId: string | null = null;
-    let isAdmin = false;
-    if (authHeader) {
-      const token = authHeader.replace("Bearer ", "");
-      const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-      if (token !== anonKey) {
-        const anonClient = createClient(supabaseUrl, anonKey);
-        const { data: { user } } = await anonClient.auth.getUser(token);
-        if (user) {
-          userId = user.id;
-          const { data: adminCheck } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
-          isAdmin = !!adminCheck;
-        }
-      }
+    if (requestedProvider !== undefined && normalizedRequestedProvider === null) {
+      return jsonResponse(
+        {
+          ok: false,
+          error: 'Provider inválido. Use somente gemini ou chatgpt.',
+          allowed_providers: ['gemini', 'chatgpt'],
+        },
+        400,
+      );
     }
 
-    const { messages: allMessages, model, conversationId, generateImage } = await req.json();
-    const messages = allMessages.slice(-20);
+    const provider: Provider = normalizedRequestedProvider ?? 'gemini';
+    const history = normalizeMessages(body.messages ?? body.history ?? body.conversation);
+    const message = extractMessage(body, history);
 
-    // Extract text from last message for intent detection
-    const lastMsg = messages[messages.length - 1];
-    const lastText = typeof lastMsg?.content === "string"
-      ? lastMsg.content
-      : Array.isArray(lastMsg?.content)
-        ? lastMsg.content.find((p: any) => p.type === "text")?.text || ""
-        : "";
-
-    // Auto-detect: should we generate/edit an image?
-    const hasAttachment = hasImageAttachment(messages);
-    const wantsImage = generateImage || detectImageIntent(lastText);
-    const shouldGenerateImage = wantsImage || (hasAttachment && detectImageIntent(lastText));
-
-    // ═══════════════════════════════════════════
-    // IMAGE GENERATION / EDITING MODE
-    // ═══════════════════════════════════════════
-    if (shouldGenerateImage) {
-      const imageSystemPrompt = `Você é um designer profissional da Brandify, especialista em criar posts virais para Instagram.
-
-ESTILO VISUAL TREINADO (use como base para TODA geração de imagem):
-- Posts com TIPOGRAFIA GIGANTE que domina 40-60% do frame
-- Efeitos de CLIPPING MASK: paisagens/texturas visíveis DENTRO das letras
-- Fundos cinematográficos: paisagens épicas, cenas noturnas urbanas, esportes radicais
-- Pessoa como figura central (rosto oculto, de costas, ou na sombra) com streetwear
-- Alto contraste: pretos profundos, brancos brilhantes, tons dourados
-- Efeitos de MOTION BLUR no texto para sensação de velocidade
-- Estilo editorial de agência premium brasileira (@mentemilionaria, @agenciatenks)
-- Frases motivacionais/aspiracionais em português com tipografia impactante
-- NUNCA crie imagens genéricas, flat design, ou com cara de template
-
-Se receber uma imagem de referência, analise cores, estilo, logo e incorpore no resultado.`;
-
-      // Build Gemini parts from last message
-      const geminiParts: any[] = [{ text: imageSystemPrompt + "\n\n" + lastText }];
-      if (Array.isArray(lastMsg.content)) {
-        for (const part of lastMsg.content) {
-          if (part.type === "image_url" && part.image_url?.url) {
-            const url = part.image_url.url;
-            const match = url.match(/^data:(image\/\w+);base64,(.+)$/);
-            if (match) {
-              geminiParts.push({ inlineData: { mimeType: match[1], data: match[2] } });
-            }
-          }
-        }
-      }
-
-      const imageModels = ["gemini-3.1-flash-image-preview", "gemini-3-pro-image-preview", "gemini-2.5-flash-image"];
-      let imageUrl: string | undefined;
-      let textContent = "";
-      let imageModelUsed = "";
-      let imageRateLimited = false;
-      let imageLastError = "";
-
-      for (const imageModel of imageModels) {
-        if (imageUrl) break;
-
-        for (let attempt = 1; attempt <= MAX_ATTEMPTS_PER_MODEL; attempt++) {
-          console.log(`Image gen: trying ${imageModel} (attempt ${attempt}/${MAX_ATTEMPTS_PER_MODEL})`);
-
-          try {
-            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${imageModel}:generateContent?key=${GEMINI_API_KEY}`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                contents: [{ parts: geminiParts }],
-                generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
-              }),
-            });
-
-            if (res.status === 429) {
-              imageRateLimited = true;
-              if (attempt < MAX_ATTEMPTS_PER_MODEL) {
-                await sleep(1200 * attempt);
-                continue;
-              }
-              break;
-            }
-
-            if (!res.ok) {
-              const t = await res.text();
-              imageLastError = `${imageModel} failed: ${res.status} ${t.slice(0, 300)}`;
-              console.error(imageLastError);
-              if (res.status >= 500 && attempt < MAX_ATTEMPTS_PER_MODEL) {
-                await sleep(900 * attempt);
-                continue;
-              }
-              break;
-            }
-
-            const data = await res.json();
-            const parts = data.candidates?.[0]?.content?.parts;
-            if (parts) {
-              for (const part of parts) {
-                if (part.inlineData?.mimeType?.startsWith("image/")) {
-                  imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-                  imageModelUsed = imageModel;
-                } else if (part.text) {
-                  textContent += part.text;
-                }
-              }
-            }
-
-            if (imageUrl) {
-              console.log(`Image gen succeeded with ${imageModel}`);
-              break;
-            }
-
-            imageLastError = `${imageModel} returned no image`;
-            if (attempt < MAX_ATTEMPTS_PER_MODEL) {
-              await sleep(700 * attempt);
-              continue;
-            }
-            break;
-          } catch (e) {
-            imageLastError = `${imageModel} threw: ${e instanceof Error ? e.message : String(e)}`;
-            console.error(imageLastError);
-            if (attempt < MAX_ATTEMPTS_PER_MODEL) {
-              await sleep(900 * attempt);
-              continue;
-            }
-            break;
-          }
-        }
-      }
-
-      if (!imageUrl) {
-        if (imageRateLimited) {
-          return new Response(JSON.stringify({ error: "Limite de requisições excedido. Aguarde alguns segundos e tente novamente." }), {
-            status: 429,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          });
-        }
-
-        console.error("Image generation failed:", imageLastError || "unknown error");
-        return new Response(JSON.stringify({
-          content: "Desculpe, não consegui gerar a imagem no momento. Tente novamente em alguns instantes.",
-          model: "error",
-        }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
-      return new Response(JSON.stringify({ imageUrl, content: textContent || "Aqui está a imagem gerada! 🎨", model: imageModelUsed || "gemini-image" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (!isNonEmptyString(message)) {
+      return jsonResponse({ ok: false, error: 'Mensagem vazia.' }, 400);
     }
 
-    // ═══════════════════════════════════════════
-    // TEXT CHAT MODE (Gemini streaming)
-    // ═══════════════════════════════════════════
-    const systemPrompt = "Você é um assistente de IA avançado da Brandify. Responda sempre em português brasileiro. Seja claro, profissional e útil. Você pode ajudar com textos, ideias, estratégias de marketing, copywriting, análise de dados e muito mais. Se o usuário enviar uma imagem, analise-a e responda sobre ela. Formate suas respostas com markdown quando apropriado. IMPORTANTE: Você NÃO tem ferramentas externas. NUNCA responda com JSON, blocos de código com ações, ou formatos de tool-calling como {\"action\": ...}. Responda sempre em linguagem natural. Se o usuário pedir para GERAR ou CRIAR uma imagem, diga que você está processando a solicitação.";
+    const systemPrompt = isNonEmptyString(body.systemPrompt)
+      ? body.systemPrompt.trim()
+      : 'Você é um assistente útil, objetivo e confiável. Responda em português do Brasil.';
 
-    // Clean base64 from old messages to reduce payload
-    const cleanedMessages = messages.map((m: any, i: number) => {
-      if (i === messages.length - 1) return m;
-      if (typeof m.content === "string") return m;
-      if (Array.isArray(m.content)) {
-        return { ...m, content: m.content.filter((p: any) => p.type !== "image_url") };
-      }
-      return m;
-    }).filter((m: any) => {
-      if (Array.isArray(m.content) && m.content.length === 0) return false;
-      return true;
+    const temperature = clampTemperature(body.temperature);
+    const model = isNonEmptyString(body.model) ? body.model.trim() : undefined;
+
+    const result =
+      provider === 'chatgpt'
+        ? await callChatGPT({ message, history, systemPrompt, model, temperature })
+        : await callGemini({ message, history, systemPrompt, model, temperature });
+
+    return jsonResponse({
+      ok: true,
+      provider,
+      model: result.model,
+      reply: result.text,
+      response: result.text,
+      text: result.text,
+      message: result.text,
+      allowed_providers: ['gemini', 'chatgpt'],
     });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Erro inesperado';
 
-    // Convert to Gemini format
-    const geminiContents = cleanedMessages.map((m: any) => {
-      const role = m.role === "assistant" ? "model" : "user";
-      if (typeof m.content === "string") {
-        return { role, parts: [{ text: m.content }] };
-      }
-      if (Array.isArray(m.content)) {
-        const parts: any[] = [];
-        for (const p of m.content) {
-          if (p.type === "text") parts.push({ text: p.text });
-          else if (p.type === "image_url" && p.image_url?.url) {
-            const match = p.image_url.url.match(/^data:(image\/\w+);base64,(.+)$/);
-            if (match) parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
-          }
-        }
-        return { role, parts };
-      }
-      return { role, parts: [{ text: String(m.content) }] };
-    });
-
-    const textModels = ["gemini-2.5-flash", "gemini-2.5-flash-lite"];
-    let geminiModel = textModels[0];
-    let response: Response | null = null;
-    let textRateLimited = false;
-    let textLastError = "";
-
-    for (const candidateModel of textModels) {
-      if (response?.ok) break;
-
-      for (let attempt = 1; attempt <= MAX_ATTEMPTS_PER_MODEL; attempt++) {
-        try {
-          const res = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${candidateModel}:streamGenerateContent?alt=sse&key=${GEMINI_API_KEY}`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                system_instruction: { parts: [{ text: systemPrompt }] },
-                contents: geminiContents,
-                generationConfig: { maxOutputTokens: 4096 },
-              }),
-            }
-          );
-
-          if (res.status === 429) {
-            textRateLimited = true;
-            if (attempt < MAX_ATTEMPTS_PER_MODEL) {
-              await sleep(1200 * attempt);
-              continue;
-            }
-            break;
-          }
-
-          if (!res.ok) {
-            const t = await res.text();
-            textLastError = `${candidateModel}: ${res.status} ${t.slice(0, 500)}`;
-            console.error("Gemini error:", textLastError);
-            if (res.status >= 500 && attempt < MAX_ATTEMPTS_PER_MODEL) {
-              await sleep(900 * attempt);
-              continue;
-            }
-            break;
-          }
-
-          response = res;
-          geminiModel = candidateModel;
-          break;
-        } catch (err) {
-          textLastError = `${candidateModel}: ${err instanceof Error ? err.message : String(err)}`;
-          console.error("Gemini stream error:", textLastError);
-          if (attempt < MAX_ATTEMPTS_PER_MODEL) {
-            await sleep(900 * attempt);
-            continue;
-          }
-          break;
-        }
-      }
+    if (message.startsWith('MISSING_KEY:')) {
+      const missingKey = message.split(':')[1] || 'API_KEY';
+      return jsonResponse(
+        {
+          ok: false,
+          error: 'Chave de API não configurada no Supabase.',
+          details: `Configure o secret ${missingKey}.`,
+          allowed_providers: ['gemini', 'chatgpt'],
+        },
+        503,
+      );
     }
 
-    if (!response || !response.ok) {
-      if (textRateLimited) {
-        return new Response(JSON.stringify({ error: "Limite de requisições excedido. Aguarde alguns segundos e tente novamente." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      throw new Error(textLastError || "Erro no serviço de IA");
+    if (message.startsWith('UPSTREAM_OPENAI:') || message.startsWith('UPSTREAM_GEMINI:')) {
+      return jsonResponse(
+        {
+          ok: false,
+          error: 'Falha no provedor de IA.',
+          details: message,
+          allowed_providers: ['gemini', 'chatgpt'],
+        },
+        502,
+      );
     }
 
-    const streamResponse = response;
-
-    // Transform Gemini SSE to OpenAI-compatible SSE
-    const { readable, writable } = new TransformStream();
-    const writer = writable.getWriter();
-    const encoder = new TextEncoder();
-
-    (async () => {
-      try {
-        const reader = streamResponse.body!.getReader();
-        const decoder = new TextDecoder();
-        let buffer = "";
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          buffer += decoder.decode(value, { stream: true });
-
-          let idx: number;
-          while ((idx = buffer.indexOf("\n")) !== -1) {
-            let line = buffer.slice(0, idx);
-            buffer = buffer.slice(idx + 1);
-            if (line.endsWith("\r")) line = line.slice(0, -1);
-            if (!line.startsWith("data: ")) continue;
-            const json = line.slice(6).trim();
-            if (json === "[DONE]") continue;
-            try {
-              const parsed = JSON.parse(json);
-              const text = parsed.candidates?.[0]?.content?.parts?.[0]?.text;
-              if (text) {
-                const chunk = JSON.stringify({ choices: [{ delta: { content: text } }] });
-                await writer.write(encoder.encode(`data: ${chunk}\n\n`));
-              }
-            } catch { /* partial json */ }
-          }
-        }
-        await writer.write(encoder.encode("data: [DONE]\n\n"));
-      } catch (e) {
-        console.error("Stream transform error:", e);
-      } finally {
-        await writer.close();
-      }
-    })();
-
-    return new Response(readable, {
-      headers: {
-        ...corsHeaders,
-        "Content-Type": "text/event-stream",
-        "X-Model-Used": geminiModel,
+    return jsonResponse(
+      {
+        ok: false,
+        error: 'Falha ao processar solicitação de IA.',
+        details: message,
+        allowed_providers: ['gemini', 'chatgpt'],
       },
-    });
-  } catch (e) {
-    console.error("ai-chat error:", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Erro desconhecido" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+      500,
+    );
   }
 });
