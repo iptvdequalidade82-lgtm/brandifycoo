@@ -306,7 +306,8 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
             { role: "system", content: `Você é um copywriter especialista em redes sociais da agência Brandify. Receba a ideia bruta do cliente e aprimore em um prompt detalhado e profissional para gerar um post de Instagram. Mantenha a essência da ideia original mas adicione detalhes visuais e de copywriting. Responda APENAS com a copy (legenda) aprimorada, sem explicações. Use emojis estrategicamente. Máximo 3 parágrafos curtos.${antiRepetition}` },
             { role: "user", content: text }
           ],
-          model: "google/gemini-2.5-flash",
+          provider: "gemini",
+          model: "gemini-2.5-flash",
         }),
       });
       if (!res.ok) {
@@ -822,7 +823,7 @@ function ChatTab({ user }: { user: User | null }) {
         try {
           const imgController = new AbortController();
           const imgTimeout = setTimeout(() => imgController.abort(), 120000);
-          const resp = await fetch(CHAT_URL, { method: "POST", headers, body: JSON.stringify({ messages: apiMessages, model: "auto", conversationId: convId, generateImage: true }), signal: imgController.signal });
+          const resp = await fetch(CHAT_URL, { method: "POST", headers, body: JSON.stringify({ messages: apiMessages, provider: "gemini", model: "gemini-2.5-flash", conversationId: convId, generateImage: true }), signal: imgController.signal });
           clearTimeout(imgTimeout);
           if (!resp.ok) {
             const err = await resp.json().catch(() => ({ error: "Erro" }));
@@ -836,7 +837,7 @@ function ChatTab({ user }: { user: User | null }) {
           if (convId && user) { supabase.from("ai_messages").insert({ conversation_id: convId, role: "assistant", content: assistantMsg.content, image_urls: data.imageUrl ? [data.imageUrl.slice(0, 100) + "...(base64)"] : null, model_used: data.model }); }
         } finally { setIsGeneratingImage(false); }
       } else {
-        const resp = await fetch(CHAT_URL, { method: "POST", headers, body: JSON.stringify({ messages: apiMessages, model: "auto", conversationId: convId }) });
+        const resp = await fetch(CHAT_URL, { method: "POST", headers, body: JSON.stringify({ messages: apiMessages, provider: "gemini", model: "gemini-2.5-flash", conversationId: convId }) });
         if (!resp.ok) {
           const err = await resp.json().catch(() => ({ error: "Erro" }));
           if (resp.status === 429) throw new Error("Limite de requisições excedido. Aguarde um momento.");

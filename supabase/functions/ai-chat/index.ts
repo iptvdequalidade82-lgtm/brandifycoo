@@ -40,6 +40,19 @@ function normalizeProvider(raw: unknown): Provider | null {
   return PROVIDER_ALIASES[key] ?? null;
 }
 
+function normalizeModel(raw: unknown): string | undefined {
+  if (!isNonEmptyString(raw)) return undefined;
+  const trimmed = raw.trim();
+  const lowered = trimmed.toLowerCase();
+
+  if (lowered === 'auto' || lowered === 'default') return undefined;
+
+  if (lowered.startsWith('google/')) return trimmed.slice(7);
+  if (lowered.startsWith('openai/')) return trimmed.slice(7);
+
+  return trimmed;
+}
+
 function normalizeMessages(input: unknown): ChatMessage[] {
   if (!Array.isArray(input)) return [];
 
@@ -262,7 +275,9 @@ Deno.serve(async (req) => {
       );
     }
 
-    const provider: Provider = normalizedRequestedProvider ?? 'gemini';
+    const model = normalizeModel(body.model);
+    const inferredProvider: Provider = model?.toLowerCase().startsWith('gpt') ? 'chatgpt' : 'gemini';
+    const provider: Provider = normalizedRequestedProvider ?? inferredProvider;
     const history = normalizeMessages(body.messages ?? body.history ?? body.conversation);
     const message = extractMessage(body, history);
 
@@ -275,8 +290,6 @@ Deno.serve(async (req) => {
       : 'Você é um assistente útil, objetivo e confiável. Responda em português do Brasil.';
 
     const temperature = clampTemperature(body.temperature);
-    const model = isNonEmptyString(body.model) ? body.model.trim() : undefined;
-
     const result =
       provider === 'chatgpt'
         ? await callChatGPT({ message, history, systemPrompt, model, temperature })
