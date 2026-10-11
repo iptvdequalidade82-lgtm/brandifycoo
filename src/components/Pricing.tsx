@@ -1,7 +1,6 @@
-import { Check, Star, Info, ChevronDown, X, Eye } from "lucide-react";
+import { Check, Star, Info, ChevronDown, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import TiltCard from "@/components/TiltCard";
 import earthMoonBg from "@/assets/earth-moon-bg.jpg";
 
@@ -270,20 +269,6 @@ export default function Pricing() {
                   Solicitar Orçamento
                 </motion.a>
                 
-                <Link
-                  to={`/preview-site?plano=${plan.name.toLowerCase()}`}
-                  className="group relative mt-5 block w-full overflow-hidden rounded-xl"
-                >
-                  <motion.div
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="relative flex items-center justify-center gap-2.5 py-4 px-6 rounded-xl font-black text-sm uppercase tracking-wider bg-gradient-to-r from-brand-accent to-brand-accent-deep text-white shadow-lg shadow-brand-accent/25 hover:shadow-xl hover:shadow-brand-accent/40 transition-all duration-300"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none" />
-                    <Eye size={16} />
-                    <span>prévia grátis — teste agora</span>
-                  </motion.div>
-                </Link>
               </div>
               </TiltCard>
             </motion.div>
@@ -372,17 +357,6 @@ export default function Pricing() {
               </motion.a>
             </div>
             
-            <Link to="/preview-loja" className="group block w-full overflow-hidden rounded-xl">
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="relative flex items-center justify-center gap-2.5 py-4 px-6 rounded-xl font-black text-sm uppercase tracking-wider bg-gradient-to-r from-brand-accent to-brand-accent-deep text-white shadow-lg shadow-brand-accent/25 hover:shadow-xl hover:shadow-brand-accent/40 transition-all duration-300"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none" />
-                <Eye size={16} />
-                <span>prévia grátis da loja — teste agora</span>
-              </motion.div>
-            </Link>
 
             <p className="text-xs text-white/30 leading-relaxed">
               <span className="text-white/50 font-medium">Domínio é cobrado à parte:</span> a partir de R$ 40,00/ano. O registro fica na conta do próprio cliente.
