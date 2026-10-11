@@ -40,8 +40,6 @@ import Planos from "./pages/Planos";
 import AdminContabilidade from "./pages/AdminContabilidade";
 import AdminPreviews from "./pages/AdminPreviews";
 import AdminConteudo from "./pages/AdminConteudo";
-import PreviewSite from "./pages/PreviewSite";
-import PreviewLoja from "./pages/PreviewLoja";
 import AdminIAs from "./pages/AdminIAs";
 import AuthLogin from "./pages/AuthLogin";
 import AuthSignup from "./pages/AuthSignup";
@@ -74,8 +72,6 @@ const App = () => (
             <Route path="/tools/planejamento" element={<LazyPage><ToolsPlanejamento /></LazyPage>} />
             <Route path="/tools/simulador" element={<LazyPage><ToolsSimulador /></LazyPage>} />
             <Route path="/projetos" element={<Projetos />} />
-            <Route path="/preview-site" element={<PreviewSite />} />
-            <Route path="/preview-loja" element={<PreviewLoja />} />
             
             <Route path="/curso" element={<Curso />} />
             <Route path="/planos" element={<Planos />} />
