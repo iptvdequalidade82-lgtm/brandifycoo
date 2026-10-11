@@ -1,3 +1,4 @@
+import { aiFetch, requireAIResponse, AIServiceError } from "../_shared/ai-fetch.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -32,12 +33,13 @@ Seu trabalho é criar copys de alta conversão, persuasivas e prontas para uso.
 
 REGRAS:
 - Escreva SEMPRE em português brasileiro natural e fluente
-- Use gatilhos mentais (urgência, escassez, prova social, autoridade) de forma sutil
+- Use apenas informações fornecidas. NÃO invente depoimentos, números de clientes, resultados, garantias, descontos, estoque limitado ou prazos.
+- Urgência, escassez e prova social somente quando comprovadas na oferta.
 - Adapte o tom conforme solicitado
 - Cada variação deve ter um ÂNGULO COMPLETAMENTE DIFERENTE (não apenas trocar palavras)
 - Variação A: abordagem emocional/storytelling
 - Variação B: abordagem racional/benefícios diretos  
-- Variação C: abordagem de urgência/escassez
+- Variação C: ação direta; urgência/escassez apenas se explicitamente informadas
 - Use emojis com moderação e estratégia
 - Formato limpo e fácil de copiar/colar`;
 
@@ -59,7 +61,7 @@ Retorne EXATAMENTE neste formato (sem markdown extra):
 ---VARIAÇÃO C---
 [copy completa C]`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+    const response = await aiFetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -68,16 +70,7 @@ Retorne EXATAMENTE neste formato (sem markdown extra):
       }),
     });
 
-    if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Limite de requisições atingido. Tente novamente em alguns segundos." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      const t = await response.text();
-      console.error("Gemini error:", response.status, t);
-      throw new Error("Erro no serviço de IA");
-    }
+    await requireAIResponse(response);
 
     const data = await response.json();
     const content = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
@@ -89,9 +82,8 @@ Retorne EXATAMENTE neste formato (sem markdown extra):
       variations.push(part.trim());
     }
 
-    // Ensure we always return 3
-    while (variations.length < 3) {
-      variations.push("Variação não gerada. Tente novamente.");
+    if (variations.length !== 3 || variations.some(v => !v.trim())) {
+      throw new Error("A IA retornou um resultado incompleto. Tente novamente.");
     }
 
     return new Response(JSON.stringify({ variations: variations.slice(0, 3) }), {
@@ -100,7 +92,7 @@ Retorne EXATAMENTE neste formato (sem markdown extra):
   } catch (e) {
     console.error("generate-copy error:", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Erro desconhecido" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: e instanceof AIServiceError ? e.status : 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });

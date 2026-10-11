@@ -1,3 +1,4 @@
+import { aiFetch } from "../_shared/ai-fetch.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -309,20 +310,22 @@ ${prompt}`;
       if (match) geminiParts.push({ inlineData: { mimeType: match[1], data: match[2] } });
     }
 
-    const imageModels = ["gemini-3.1-flash-image-preview", "gemini-3-pro-image-preview", "gemini-2.5-flash-image"];
-    const MAX_ATTEMPTS = 2;
+    const configuredModels = Deno.env.get("GEMINI_IMAGE_MODELS");
+    const imageModels = configuredModels ? configuredModels.split(",").map(m => m.trim()).filter(Boolean) : ["gemini-3.1-flash-image-preview", "gemini-3-pro-image-preview", "gemini-2.5-flash-image"];
+    const MAX_ATTEMPTS = 1;
+    const deadline = Date.now() + 85000;
     let sawRateLimit = false;
 
     for (const model of imageModels) {
-      if (imageUrl) break;
+      if (imageUrl || Date.now() >= deadline) break;
 
       for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
         console.log(`Trying direct Gemini: ${model} (attempt ${attempt})`);
         try {
           const controller = new AbortController();
-          const timeout = setTimeout(() => controller.abort(), 120000);
+          const timeout = setTimeout(() => controller.abort(), Math.min(80000, deadline - Date.now()));
 
-          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`, {
+          const res = await aiFetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             signal: controller.signal,
@@ -330,14 +333,17 @@ ${prompt}`;
               contents: [{ parts: geminiParts }],
               generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
             }),
-          });
+          }, Math.min(80000, deadline - Date.now()));
           clearTimeout(timeout);
 
           if (res.status === 429) {
             sawRateLimit = true;
             console.warn(`Rate limited on ${model}, attempt ${attempt}`);
             if (attempt < MAX_ATTEMPTS) { await sleep(1500 * attempt); continue; }
-            break;
+            // Quota failures should not trigger calls to every alternative model.
+            return new Response(JSON.stringify({ error: "A geração de imagens atingiu o limite do provedor. Tente mais tarde. Se persistir, o administrador precisa revisar a cota e o faturamento da API Gemini." }), {
+              status: 429, headers: { ...corsHeaders, "Content-Type": "application/json", "Retry-After": "60" },
+            });
           }
 
           if (res.ok) {

@@ -27,9 +27,9 @@ export function SimuladorContent() {
     const returningClients = Math.round((clients * retention) / 100);
     const totalClients = newClients + returningClients;
     const monthlyRevenue = totalClients * ticket;
-    const annualRevenue = monthlyRevenue * 12;
+
     const profit = monthlyRevenue * (1 - costs / 100);
-    const annualProfit = profit * 12;
+
 
     const monthlyData = Array.from({ length: 12 }, (_, i) => {
       const growthFactor = 1 + (i * 0.03);
@@ -42,6 +42,8 @@ export function SimuladorContent() {
       };
     });
 
+    const annualRevenue = monthlyData.reduce((sum, month) => sum + month.receita, 0);
+    const annualProfit = monthlyData.reduce((sum, month) => sum + month.lucro, 0);
     return { newClients, returningClients, totalClients, monthlyRevenue, annualRevenue, profit, annualProfit, monthlyData };
   }, [clients, ticket, conversion, leads, retention, costs]);
 
@@ -119,7 +121,7 @@ export function SimuladorContent() {
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
           <div>
             <h2 className="font-['Playfair_Display'] font-bold text-xl mb-1">Simulador de Faturamento</h2>
-            <p className="text-white/40 text-sm">Ajuste os parâmetros e veja a projeção em tempo real.</p>
+            <p className="text-white/40 text-sm">Ajuste os parâmetros e veja a projeção em tempo real. O gráfico considera crescimento linear hipotético de 3% da receita inicial por mês; o total anual soma os 12 meses.</p>
           </div>
 
           {/* Sliders */}

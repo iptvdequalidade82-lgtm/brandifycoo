@@ -1,3 +1,4 @@
+import { aiFetch, requireAIResponse, AIServiceError } from "../_shared/ai-fetch.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -27,9 +28,9 @@ RETORNE EXATAMENTE no formato JSON abaixo (sem markdown, sem \`\`\`):
     { "title": "Benefício 2", "description": "Descrição curta" },
     { "title": "Benefício 3", "description": "Descrição curta" }
   ],
-  "socialProof": "Frase de prova social (ex: +500 clientes atendidos)",
+  "socialProof": "Somente prova social fornecida pelo cliente; se ausente, string vazia",
   "aboutSection": "Parágrafo sobre a empresa/serviço (2-3 frases)",
-  "urgency": "Frase de urgência/escassez para antes do CTA final",
+  "urgency": "Somente prazo ou escassez informados pelo cliente; se ausentes, string vazia",
   "finalCta": "Texto do CTA final (máx 6 palavras)"
 }
 
@@ -37,6 +38,7 @@ REGRAS:
 - Português brasileiro natural e persuasivo
 - Use gatilhos mentais sutilmente
 - Adapte ao segmento e público informados
+- NÃO invente número de clientes, depoimentos, resultados, prazos, escassez, características ou garantias.
 - Todos os textos devem ser prontos para usar`;
 
     const userPrompt = `Gere os textos da landing page para:
@@ -50,7 +52,7 @@ ESTILO: ${style || "Profissional e moderno"}`;
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 90000);
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+    const response = await aiFetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       signal: controller.signal,
@@ -62,16 +64,7 @@ ESTILO: ${style || "Profissional e moderno"}`;
 
     clearTimeout(timeout);
 
-    if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Limite de requisições atingido. Tente novamente em alguns segundos." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      const t = await response.text();
-      console.error("Gemini error:", response.status, t);
-      throw new Error("Erro no serviço de IA");
-    }
+    await requireAIResponse(response);
 
     const data = await response.json();
     let content = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
@@ -80,6 +73,12 @@ ESTILO: ${style || "Profissional e moderno"}`;
     content = content.replace(/```json\s*/gi, "").replace(/```\s*/gi, "").trim();
 
     const landing = JSON.parse(content);
+    const required = ["headline", "subheadline", "cta", "aboutSection", "finalCta"];
+    if (!landing || required.some(k => typeof landing[k] !== "string" || !landing[k].trim()) || !Array.isArray(landing.benefits) || landing.benefits.length === 0 || landing.benefits.some((b: any) => typeof b.title !== "string" || typeof b.description !== "string")) {
+      throw new Error("A IA retornou textos incompletos. Tente novamente.");
+    }
+    landing.socialProof = typeof landing.socialProof === "string" ? landing.socialProof : "";
+    landing.urgency = typeof landing.urgency === "string" ? landing.urgency : "";
 
     return new Response(JSON.stringify({ landing }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -87,7 +86,7 @@ ESTILO: ${style || "Profissional e moderno"}`;
   } catch (e) {
     console.error("generate-landing error:", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Erro desconhecido" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: e instanceof AIServiceError ? e.status : 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });

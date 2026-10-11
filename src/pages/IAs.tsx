@@ -303,7 +303,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
         method: "POST", headers,
         body: JSON.stringify({
           messages: [
-            { role: "system", content: `Você é um copywriter especialista em redes sociais da agência Brandify. Receba a ideia bruta do cliente e aprimore em um prompt detalhado e profissional para gerar um post de Instagram. Mantenha a essência da ideia original mas adicione detalhes visuais e de copywriting. Responda APENAS com a copy (legenda) aprimorada, sem explicações. Use emojis estrategicamente. Máximo 3 parágrafos curtos.${antiRepetition}` },
+            { role: "system", content: `Você é um copywriter especialista em redes sociais da agência Brandify. Receba a ideia bruta do cliente e aprimore em um prompt detalhado e profissional para gerar um post de Instagram. Mantenha a essência da ideia original mas adicione detalhes visuais e de copywriting. Responda APENAS com a copy (legenda) aprimorada, sem explicações. Use emojis estrategicamente. Máximo 3 parágrafos curtos. Não invente depoimentos, resultados, descontos, garantias, estoque ou prazos não fornecidos.${antiRepetition}` },
             { role: "user", content: text }
           ],
           provider: "gemini",
@@ -319,18 +319,24 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
       if (!reader) throw new Error("Sem resposta");
       const decoder = new TextDecoder();
       let fullText = "";
+      let buffer = "";
       while (true) {
         const { done, value } = await reader.read();
-        if (done) break;
-        const chunk = decoder.decode(value, { stream: true });
-        for (const line of chunk.split("\n")) {
-          if (line.startsWith("data: ")) {
-            const jsonStr = line.slice(6).trim();
-            if (jsonStr === "[DONE]") continue;
-            try { const d = JSON.parse(jsonStr).choices?.[0]?.delta?.content; if (d) fullText += d; } catch {}
-          }
+        buffer += done ? decoder.decode() : decoder.decode(value, { stream: true });
+        if (done && buffer && !buffer.endsWith("\n")) buffer += "\n";
+        let index: number;
+        while ((index = buffer.indexOf("\n")) !== -1) {
+          const line = buffer.slice(0, index).trimEnd();
+          buffer = buffer.slice(index + 1);
+          if (!line.startsWith("data: ")) continue;
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") continue;
+          const content = JSON.parse(jsonStr).choices?.[0]?.delta?.content;
+          if (content) fullText += content;
         }
+        if (done) break;
       }
+      if (!fullText.trim()) throw new Error("A IA não retornou texto. Tente novamente.");
       setGeneratedCopy(fullText || "");
     } catch (e: any) {
       toast({ title: "Erro", description: e.message, variant: "destructive" });
@@ -353,7 +359,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
       clearTimeout(imgTimeout);
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: "Erro" }));
-        if (res.status === 429) throw new Error("Limite de requisições excedido. Aguarde um momento.");
+        if (res.status === 429) throw new Error(err.error || "Geração de imagens temporariamente limitada. Tente novamente mais tarde.");
         if (res.status === 402) throw new Error("Créditos de IA insuficientes.");
         throw new Error(err.error || `Erro ${res.status}`);
       }
@@ -383,7 +389,7 @@ function PostGenerator({ user, userPlan }: { user: User | null; userPlan: string
       clearTimeout(editTimeout);
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: "Erro" }));
-        if (res.status === 429) throw new Error("Limite de requisições excedido. Aguarde um momento.");
+        if (res.status === 429) throw new Error(err.error || "Geração de imagens temporariamente limitada. Tente novamente mais tarde.");
         if (res.status === 402) throw new Error("Créditos de IA insuficientes.");
         throw new Error(err.error || "Erro ao editar");
       }

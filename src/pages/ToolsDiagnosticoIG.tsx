@@ -140,7 +140,7 @@ const normalizeDiagnosis = (raw: any): Diagnosis => {
       weaknesses[2] ?? "Faltam sinais claros de otimização contínua para engajamento e conversão.",
     ],
     actionPlan,
-    _dataSource: raw?._dataSource === "real" ? "real" : "general",
+    _dataSource: raw?._dataSource === "real" ? "real" : raw?._dataSource === "partial" ? "partial" : "general",
   };
 };
 
@@ -493,16 +493,17 @@ export function DiagnosticoContent() {
         <AnimatePresence>
           {diagnosis && !loading && (
             <motion.div key="results" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="space-y-6">
-              {diagnosis._dataSource === "general" && (
+              {diagnosis._dataSource !== "real" && (
                 <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-amber-500/[0.06] border border-amber-500/15 backdrop-blur-sm">
                   <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                  <span className="text-xs text-amber-300/80">Análise baseada em recomendações gerais. Adicione suas métricas para um diagnóstico mais preciso.</span>
+                  <span className="text-xs text-amber-300/80">Dados públicos insuficientes ou não verificados. A pontuação não foi validada; adicione suas métricas para uma análise mais precisa.</span>
                 </motion.div>
               )}
 
               <div ref={resultsRef} className="space-y-6 bg-black p-1">
 
                 {/* ═══ TOP ROW: Score + Radar Chart ═══ */}
+                {diagnosis._dataSource === "real" && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.97 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -571,6 +572,7 @@ export function DiagnosticoContent() {
                     </ResponsiveContainer>
                   </div>
                 </motion.div>
+                )}
 
                 {/* ═══ SUMMARY ═══ */}
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>

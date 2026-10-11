@@ -1,3 +1,4 @@
+import { normalizeBrazilianPhone, timeOptions, validSlots } from "@/lib/scheduler";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -87,8 +88,8 @@ export function AgendadorContent() {
       .replace("{servico}", selectedService || "consulta")
       .replace("{dia}", selectedDay || "a combinar")
       .replace("{hora}", selectedTime || "a combinar");
-    const phone = config.whatsapp.replace(/\D/g, "");
-    return `https://wa.me/55${phone}?text=${encodeURIComponent(msg)}`;
+    const phone = normalizeBrazilianPhone(config.whatsapp);
+    return phone ? `https://wa.me/${phone}?text=${encodeURIComponent(msg)}` : "";
   }, [config.message, config.whatsapp, selectedService, selectedDay, selectedTime]);
 
   const copyLink = useCallback(() => {
@@ -99,17 +100,17 @@ export function AgendadorContent() {
   }, [generateWhatsAppLink, toast]);
 
   const canProceed = useMemo(() => {
-    if (step === 0) return config.businessName.trim() && config.whatsapp.trim();
+    if (step === 0) return config.businessName.trim() && normalizeBrazilianPhone(config.whatsapp);
     if (step === 1) return config.services.some(s => s.trim());
-    if (step === 2) return config.slots.length > 0;
+    if (step === 2) return validSlots(config.slots);
     return true;
   }, [step, config]);
 
   const completedSteps = useMemo(() => {
     const c = new Set<number>();
-    if (config.businessName.trim() && config.whatsapp.trim()) c.add(0);
+    if (config.businessName.trim() && normalizeBrazilianPhone(config.whatsapp)) c.add(0);
     if (config.services.some(s => s.trim())) c.add(1);
-    if (config.slots.length > 0) c.add(2);
+    if (validSlots(config.slots)) c.add(2);
     if (config.message.trim()) c.add(3);
     c.add(4); // style always complete
     return c;
@@ -733,16 +734,7 @@ export function AgendadorContent() {
               >
                 <label className="text-[10px] uppercase tracking-widest text-white/20 font-semibold">Escolha o horário</label>
                 <div className="grid grid-cols-4 sm:grid-cols-5 gap-1.5">
-                  {config.slots.filter(s => s.day === selectedDay).flatMap(slot => {
-                    const startH = parseInt(slot.start.split(":")[0]);
-                    const endH = parseInt(slot.end.split(":")[0]);
-                    const times: string[] = [];
-                    for (let h = startH; h < endH; h++) {
-                      times.push(`${String(h).padStart(2, "0")}:00`);
-                      times.push(`${String(h).padStart(2, "0")}:30`);
-                    }
-                    return times;
-                  }).map(t => (
+                  {timeOptions(config.slots.filter(s => s.day === selectedDay)).map(t => (
                     <motion.button
                       key={t}
                       onClick={() => setSelectedTime(t)}

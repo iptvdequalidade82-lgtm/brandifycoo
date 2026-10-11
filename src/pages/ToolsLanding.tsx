@@ -234,7 +234,7 @@ export function LandingContent() {
                     {/* Social Proof */}
                     <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-6 text-center">
                       <span className="text-[10px] uppercase tracking-wider text-white/30 font-semibold">PROVA SOCIAL</span>
-                      <p className="text-white/60 text-sm mt-3 italic">"{landing.socialProof}"</p>
+                      {landing.socialProof && <p className="text-white/60 text-sm mt-3 italic">"{landing.socialProof}"</p>}
                     </div>
 
                     {/* About */}

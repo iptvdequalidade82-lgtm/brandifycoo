@@ -1,3 +1,4 @@
+import { aiFetch, requireAIResponse, AIServiceError } from "../_shared/ai-fetch.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -30,7 +31,9 @@ REGRAS DE ATENDIMENTO:
 - Use emojis com moderação (1-2 por mensagem no máximo)
 - Mantenha respostas concisas (máx 3 parágrafos)
 - Tente sempre levar para uma ação (agendar, comprar, visitar)
-- NÃO invente informações que não foram fornecidas sobre o negócio`;
+- NÃO invente informações que não foram fornecidas sobre o negócio
+- Se houver apenas horas de funcionamento, NÃO deduza dias da semana. Informe apenas as horas e diga que os dias precisam ser confirmados.
+- Não prometa integração automática com WhatsApp, reserva efetiva ou confirmação de agendamento.`;
 
     // Convert messages to Gemini format
     const geminiContents = (messages || []).map((m: any) => ({
@@ -38,7 +41,7 @@ REGRAS DE ATENDIMENTO:
       parts: [{ text: m.content }],
     }));
 
-    const response = await fetch(
+    const response = await aiFetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse&key=${GEMINI_API_KEY}`,
       {
         method: "POST",
@@ -51,16 +54,7 @@ REGRAS DE ATENDIMENTO:
       }
     );
 
-    if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Limite de requisições atingido." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      const t = await response.text();
-      console.error("Gemini error:", response.status, t);
-      throw new Error("Erro no serviço de IA");
-    }
+    await requireAIResponse(response);
 
     // Transform Gemini SSE to OpenAI-compatible SSE
     const { readable, writable } = new TransformStream();
@@ -110,7 +104,7 @@ REGRAS DE ATENDIMENTO:
   } catch (e) {
     console.error("atendedor-chat error:", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Erro desconhecido" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: e instanceof AIServiceError ? e.status : 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
