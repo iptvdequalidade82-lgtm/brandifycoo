@@ -85,7 +85,6 @@ export default function Footer() {
             <ul className="space-y-2.5">
               <li><Link to="/ias" className="text-sm text-white/40 hover:text-white gentle-animation">IA Studio ✨</Link></li>
               <li><Link to="/curso" className="text-sm text-white/40 hover:text-white gentle-animation">Cursos</Link></li>
-              <li><Link to="/preview-site" className="text-sm text-white/40 hover:text-white gentle-animation">Prévia Grátis</Link></li>
               <li><Link to="/trabalhe-conosco" className="text-sm text-white/40 hover:text-white gentle-animation">Trabalhe Conosco</Link></li>
               <li><Link to="/privacidade" className="text-sm text-white/40 hover:text-white gentle-animation">Política de Privacidade</Link></li>
             </ul>
