@@ -298,13 +298,20 @@ ${referenceInstruction}
 ## TOPIC/HEADLINE
 ${prompt}`;
 
-    const imageUrl = await generatePostImage({
-      apiKey: OPENAI_API_KEY,
-      model: Deno.env.get("OPENAI_POST_IMAGE_MODEL") || undefined,
-      prompt: imagePrompt,
-      story: isStory,
-      referenceImage,
-    });
+    let imageUrl: string;
+    try {
+      imageUrl = await generatePostImage({
+        apiKey: OPENAI_API_KEY,
+        model: Deno.env.get("OPENAI_POST_IMAGE_MODEL") || undefined,
+        prompt: imagePrompt,
+        story: isStory,
+        referenceImage,
+      });
+    } catch (primaryError) {
+      // Fallback: Gemini direto (cota gratuita) quando a OpenAI falhar
+      console.warn("OpenAI image failed, trying Gemini fallback:", primaryError);
+      imageUrl = await generateWithGemini(imagePrompt, isStory);
+    }
 
     return new Response(JSON.stringify({ imageUrl }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
