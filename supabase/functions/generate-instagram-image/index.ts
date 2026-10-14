@@ -184,6 +184,48 @@ const NICHE_VISUAL_DNA: Record<string, { props: string; environment: string; pal
   },
 };
 
+// ── Gemini direct fallback (free quota) ──
+async function generateWithGemini(prompt: string, isStory: boolean): Promise<string> {
+  const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") || "";
+  if (!GEMINI_API_KEY) throw new PostImageError(503, "Nenhum provedor de imagem disponível no momento. Tente novamente mais tarde.");
+  const models = ["gemini-3.1-flash-image-preview", "gemini-3-pro-image-preview", "gemini-2.5-flash-image"];
+  let lastError: Error | null = null;
+  for (const model of models) {
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        console.log(`Trying direct Gemini: ${model} (attempt ${attempt})`);
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: {
+                responseModalities: ["IMAGE"],
+                imageConfig: { aspectRatio: isStory ? "9:16" : "1:1" },
+              },
+            }),
+          }
+        );
+        const data = await res.json().catch(() => null);
+        if (!res.ok) {
+          const msg = data?.error?.message || `HTTP ${res.status}`;
+          if (res.status === 429) { console.warn(`Rate limited on ${model}, attempt ${attempt}`); lastError = new Error(msg); continue; }
+          throw new Error(msg);
+        }
+        const parts = data?.candidates?.[0]?.content?.parts || [];
+        const imgPart = parts.find((p: any) => p?.inlineData?.data);
+        if (imgPart) return `data:${imgPart.inlineData.mimeType || "image/png"};base64,${imgPart.inlineData.data}`;
+        throw new Error("Gemini não retornou imagem.");
+      } catch (e) {
+        lastError = e instanceof Error ? e : new Error(String(e));
+      }
+    }
+  }
+  throw new PostImageError(429, "A geração de imagens está temporariamente limitada. Aguarde alguns minutos e tente novamente.");
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
