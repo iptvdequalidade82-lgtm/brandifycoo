@@ -1,4 +1,4 @@
-import { aiFetch } from "../_shared/ai-fetch.ts";
+import { generatePostImage, PostImageError } from "../_shared/openai-post-image.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -201,12 +201,11 @@ serve(async (req) => {
       });
     }
 
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY not configured");
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY") || "";
 
     const isStory = type === "story" || type === "stories";
     const aspectRatio = isStory ? "9:16" : "1:1";
-    const dimensions = isStory ? "1080x1920" : "1080x1080";
+    const dimensions = isStory ? "1152x2048" : "1024x1024";
 
     // 12 curated visual styles
     const styles = [
@@ -299,89 +298,13 @@ ${referenceInstruction}
 ## TOPIC/HEADLINE
 ${prompt}`;
 
-    let imageUrl: string | undefined;
-
-    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-    // Build Gemini parts
-    const geminiParts: any[] = [{ text: imagePrompt }];
-    if (referenceImage) {
-      const match = referenceImage.match(/^data:(image\/\w+);base64,(.+)$/);
-      if (match) geminiParts.push({ inlineData: { mimeType: match[1], data: match[2] } });
-    }
-
-    const configuredModels = Deno.env.get("GEMINI_IMAGE_MODELS");
-    const imageModels = configuredModels ? configuredModels.split(",").map(m => m.trim()).filter(Boolean) : ["gemini-3.1-flash-image-preview", "gemini-3-pro-image-preview", "gemini-2.5-flash-image"];
-    const MAX_ATTEMPTS = 1;
-    const deadline = Date.now() + 85000;
-    let sawRateLimit = false;
-
-    for (const model of imageModels) {
-      if (imageUrl || Date.now() >= deadline) break;
-
-      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-        console.log(`Trying direct Gemini: ${model} (attempt ${attempt})`);
-        try {
-          const controller = new AbortController();
-          const timeout = setTimeout(() => controller.abort(), Math.min(80000, deadline - Date.now()));
-
-          const res = await aiFetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            signal: controller.signal,
-            body: JSON.stringify({
-              contents: [{ parts: geminiParts }],
-              generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
-            }),
-          }, Math.min(80000, deadline - Date.now()));
-          clearTimeout(timeout);
-
-          if (res.status === 429) {
-            sawRateLimit = true;
-            console.warn(`Rate limited on ${model}, attempt ${attempt}`);
-            if (attempt < MAX_ATTEMPTS) { await sleep(1500 * attempt); continue; }
-            // Quota failures should not trigger calls to every alternative model.
-            return new Response(JSON.stringify({ error: "A geração de imagens atingiu o limite do provedor. Tente mais tarde. Se persistir, o administrador precisa revisar a cota e o faturamento da API Gemini." }), {
-              status: 429, headers: { ...corsHeaders, "Content-Type": "application/json", "Retry-After": "60" },
-            });
-          }
-
-          if (res.ok) {
-            const data = await res.json();
-            const parts = data.candidates?.[0]?.content?.parts;
-            if (parts) {
-              for (const part of parts) {
-                if (part.inlineData?.mimeType?.startsWith("image/")) {
-                  imageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-                  console.log(`Direct Gemini ${model} succeeded`);
-                  break;
-                }
-              }
-            }
-            if (imageUrl) break;
-          } else {
-            const t = await res.text();
-            console.error(`${model} failed:`, res.status, t.slice(0, 300));
-          }
-
-          if (attempt < MAX_ATTEMPTS) { await sleep(900 * attempt); continue; }
-          break;
-        } catch (e) {
-          console.error(`${model} threw:`, e);
-          if (attempt < MAX_ATTEMPTS) { await sleep(900 * attempt); continue; }
-          break;
-        }
-      }
-    }
-
-    if (!imageUrl) {
-      if (sawRateLimit) {
-        return new Response(JSON.stringify({ error: "Limite de requisições excedido. Aguarde um momento e tente novamente." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      throw new Error("Serviços de IA temporariamente indisponíveis. Tente novamente em alguns minutos.");
-    }
+    const imageUrl = await generatePostImage({
+      apiKey: OPENAI_API_KEY,
+      model: Deno.env.get("OPENAI_POST_IMAGE_MODEL") || undefined,
+      prompt: imagePrompt,
+      story: isStory,
+      referenceImage,
+    });
 
     return new Response(JSON.stringify({ imageUrl }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -389,7 +312,7 @@ ${prompt}`;
   } catch (e) {
     console.error("generate-instagram-image error:", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Erro desconhecido" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: e instanceof PostImageError ? e.status : 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
