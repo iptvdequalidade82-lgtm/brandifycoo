@@ -70,7 +70,7 @@ Crie 3-4 fases. Responda APENAS com JSON válido, sem markdown.`;
     const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
     let cleaned = responseText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-    cleaned = cleaned.replace(/[\x00-\x1F\x7F]/g, (c) => c === "\n" || c === "\r" || c === "\t" ? c : "");
+    cleaned = cleaned.replace(/[\x00-\x1F\x7F]/g, (c: string) => c === "\n" || c === "\r" || c === "\t" ? c : "");
     cleaned = cleaned.replace(/,\s*([}\]])/g, "$1");
 
     const plan = JSON.parse(cleaned);
