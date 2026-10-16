@@ -25,7 +25,7 @@ export async function generatePostImage(options: Options): Promise<string> {
         contents: [{role: "user", parts}],
         generationConfig: {
           responseModalities: ["TEXT", "IMAGE"],
-          responseFormat: {image: {aspectRatio: options.story ? "9:16" : "1:1", imageSize: "1K"}},
+          imageConfig: {aspectRatio: options.story ? "9:16" : "1:1", imageSize: "1K"},
         },
       }),
     });
@@ -34,7 +34,17 @@ export async function generatePostImage(options: Options): Promise<string> {
       if (response.status === 429) throw new PostImageError(429, "A cota da API Gemini foi atingida. Revise os limites e o faturamento do projeto no Google AI Studio.");
       if ([401, 403].includes(response.status)) throw new PostImageError(503, "Revise a chave Gemini, as permissões e o faturamento do projeto.");
       if (response.status === 404) throw new PostImageError(503, "O modelo Gemini configurado não está disponível. Revise GEMINI_POST_IMAGE_MODEL.");
-      if (response.status === 400) throw new PostImageError(400, "O Gemini recusou a solicitação. Revise o texto e a imagem de referência.");
+      if (response.status === 400) {
+        const message = typeof data?.error?.message === "string" ? data.error.message : "";
+        const reasons = Array.isArray(data?.error?.details) ? data.error.details.map((detail: {reason?: string}) => detail.reason) : [];
+        if (reasons.includes("API_KEY_INVALID") || /api key not valid|invalid api key/i.test(message)) {
+          throw new PostImageError(503, "A chave Gemini é inválida. Atualize GEMINI_API_KEY nos segredos do ambiente que hospeda esta função.");
+        }
+        if (/unknown name|invalid json payload|invalid value at|not supported|unsupported/i.test(message)) {
+          throw new PostImageError(503, "O Gemini rejeitou os parâmetros da integração. O administrador precisa revisar o modelo e atualizar a função.");
+        }
+        throw new PostImageError(400, "O Gemini recusou a solicitação (HTTP 400). Isso pode envolver a configuração da API ou os dados enviados.");
+      }
       throw new PostImageError(502, "O Gemini está indisponível. Aguarde antes de tentar novamente.");
     }
     const image = data?.candidates?.[0]?.content?.parts?.find(

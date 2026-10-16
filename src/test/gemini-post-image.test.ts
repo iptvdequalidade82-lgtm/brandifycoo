@@ -19,7 +19,7 @@ it("encaminha referência e proporção e ignora imagens de raciocínio", async 
     expect(request.headers["x-goog-api-key"]).toBe("test");
     const body=JSON.parse(request.body);
     expect(body.contents[0].parts[1].inlineData.data).toBe("aW1hZ2U=");
-    expect(body.generationConfig.responseFormat.image).toEqual({aspectRatio:story?"9:16":"1:1",imageSize:"1K"});
+    expect(body.generationConfig.imageConfig).toEqual({aspectRatio:story?"9:16":"1:1",imageSize:"1K"});
   }
 });
 it("preserva erro de cota sem repetir ou chamar outro provedor", async () => {
@@ -31,4 +31,14 @@ it("distingue modelo indisponível e resposta sem imagem", async () => {
   const fetch=vi.fn().mockResolvedValueOnce(new Response("{}",{status:404})).mockResolvedValueOnce(new Response("{}")); vi.stubGlobal("fetch",fetch);
   await expect(generatePostImage({apiKey:"test",prompt:"pizza",story:false})).rejects.toMatchObject({status:503});
   await expect(generatePostImage({apiKey:"test",prompt:"pizza",story:false})).rejects.toMatchObject({status:422});
+});
+
+it("distingue chave inválida e parâmetros incompatíveis de problemas no conteúdo", async () => {
+  const fetch = vi.fn()
+    .mockResolvedValueOnce(new Response(JSON.stringify({error:{message:"API key not valid"}}),{status:400}))
+    .mockResolvedValueOnce(new Response(JSON.stringify({error:{message:'Invalid JSON payload received. Unknown name "responseFormat".'}}),{status:400}));
+  vi.stubGlobal("fetch", fetch);
+  await expect(generatePostImage({apiKey:"test",prompt:"pizza",story:false})).rejects.toMatchObject({status:503, message:expect.stringContaining("chave Gemini é inválida")});
+  await expect(generatePostImage({apiKey:"test",prompt:"pizza",story:false})).rejects.toMatchObject({status:503, message:expect.stringContaining("parâmetros da integração")});
+  expect(fetch).toHaveBeenCalledTimes(2);
 });
