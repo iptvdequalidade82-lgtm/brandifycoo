@@ -1,5 +1,6 @@
-import { ShoppingBag, HeartPulse, Gavel, Building2, Utensils, GraduationCap, Dumbbell, Scissors } from "lucide-react";
+import { ShoppingBag, HeartPulse, Gavel, Building2, Utensils, GraduationCap, Dumbbell, Scissors, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const segments = [
   { icon: ShoppingBag, label: "Lojas & Comércios", desc: "E-commerces e vitrines digitais para vender mais." },
@@ -27,11 +28,11 @@ export default function Portfolio() {
           className="text-center mb-16"
         >
           <h2 className="font-display text-3xl md:text-5xl lg:text-6xl font-black tracking-tight mb-4 text-white">
-            Diversos{" "}
-            <span className="italic bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">segmentos</span>
+            Sites para o seu{" "}
+            <span className="italic bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">segmento</span>
           </h2>
           <p className="text-white/50 max-w-xl mx-auto">
-            Experiência comprovada nos mais variados nichos de mercado.
+            Cada nicho tem um público diferente. Criamos o seu site pensando em quem você quer atrair.
           </p>
         </motion.div>
 
@@ -58,6 +59,16 @@ export default function Portfolio() {
             );
           })}
         </motion.div>
+
+        <div className="mt-10 text-center">
+          <Link
+            to="/projetos"
+            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl border border-white/20 text-white font-semibold hover:bg-white/10 gentle-animation"
+          >
+            Ver projetos
+            <ArrowRight size={16} />
+          </Link>
+        </div>
       </div>
     </section>
   );

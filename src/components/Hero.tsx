@@ -71,17 +71,17 @@ export default function Hero() {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.5 }}
-          className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-extrabold leading-[0.95] mb-8 tracking-[-0.04em] text-white"
+          className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1] mb-8 tracking-[-0.04em] text-white"
         >
           <StaggeredReveal
-            text="Criamos sites do futuro"
-            highlightWords={["futuro"]}
+            text="Sites profissionais que trazem clientes para o seu negócio"
+            highlightWords={["clientes"]}
             delay={0.5}
           />
         </motion.h1>
 
         <TextGenerateEffect
-          words="Cansado de sites ultrapassados que espantam seus clientes? Nós criamos experiências digitais que vendem por você."
+          words="Para clínicas, lojas, advocacias e empresas: sites rápidos, bonitos no celular e feitos para gerar contatos pelo WhatsApp."
           className="text-lg md:text-xl mb-14 max-w-2xl mx-auto leading-relaxed"
           duration={0.6}
         />
