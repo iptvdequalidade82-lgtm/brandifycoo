@@ -4,6 +4,12 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
+// Modelos padrão. Podem ser trocados sem alterar o código, pelos secrets do Supabase:
+// GEMINI_CHAT_MODEL, OPENAI_CHAT_MODEL e GEMINI_IMAGE_MODEL.
+// (gemini-1.5-flash foi aposentado pelo Google e não deve mais ser usado.)
+const DEFAULT_GEMINI_CHAT_MODEL = Deno.env.get('GEMINI_CHAT_MODEL')?.trim() || 'gemini-2.5-flash';
+const DEFAULT_OPENAI_CHAT_MODEL = Deno.env.get('OPENAI_CHAT_MODEL')?.trim() || 'gpt-4o-mini';
+
 type Provider = 'gemini' | 'chatgpt';
 type ChatRole = 'system' | 'user' | 'assistant';
 
@@ -177,7 +183,7 @@ async function callChatGPT(params: {
     throw new Error('MISSING_KEY:OPENAI_API_KEY');
   }
 
-  const model = isNonEmptyString(params.model) ? params.model : 'gpt-4o-mini';
+  const model = isNonEmptyString(params.model) ? params.model : DEFAULT_OPENAI_CHAT_MODEL;
 
   const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [];
 
@@ -244,7 +250,7 @@ async function streamChatGPT(params: {
     throw new Error('MISSING_KEY:OPENAI_API_KEY');
   }
 
-  const model = isNonEmptyString(params.model) ? params.model : 'gpt-4o-mini';
+  const model = isNonEmptyString(params.model) ? params.model : DEFAULT_OPENAI_CHAT_MODEL;
 
   const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [];
 
@@ -309,7 +315,7 @@ async function callGemini(params: {
     throw new Error('MISSING_KEY:GEMINI_API_KEY');
   }
 
-  const model = isNonEmptyString(params.model) ? params.model : 'gemini-1.5-flash';
+  const model = isNonEmptyString(params.model) ? params.model : DEFAULT_GEMINI_CHAT_MODEL;
 
   const contents: Array<{ role: 'user' | 'model'; parts: Array<{ text: string }> }> = [];
 
@@ -394,7 +400,7 @@ async function streamGemini(params: {
     throw new Error('MISSING_KEY:GEMINI_API_KEY');
   }
 
-  const model = isNonEmptyString(params.model) ? params.model : 'gemini-1.5-flash';
+  const model = isNonEmptyString(params.model) ? params.model : DEFAULT_GEMINI_CHAT_MODEL;
 
   const contents: Array<{ role: 'user' | 'model'; parts: Array<{ text: string }> }> = [];
 
@@ -510,7 +516,14 @@ async function generateGeminiImage(params: {
     throw new Error('MISSING_KEY:GEMINI_API_KEY');
   }
 
-  const models = ['gemini-3.1-flash-image-preview', 'gemini-3-pro-image-preview', 'gemini-2.5-flash-image'];
+  // Os modelos *-preview anteriores (gemini-3.1-flash-image-preview e gemini-3-pro-image-preview)
+  // foram desligados pelo Google em 25/06/2026 e sempre retornavam erro 404.
+  const configuredImageModel = Deno.env.get('GEMINI_IMAGE_MODEL')?.trim();
+  const models = [
+    ...(configuredImageModel ? [configuredImageModel] : []),
+    'gemini-3.1-flash-image',
+    'gemini-2.5-flash-image',
+  ].filter((model, index, all) => all.indexOf(model) === index);
   const parts: Array<Record<string, unknown>> = [{ text: params.prompt.trim() }];
 
   if (isNonEmptyString(params.referenceImage)) {
