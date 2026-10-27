@@ -3,11 +3,11 @@ import Footer from "@/components/Footer";
 
 export default function Privacidade() {
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="b26 b26-legal-page">
       <Header />
-      <main className="pt-24 pb-20 px-6">
-        <article className="max-w-3xl mx-auto">
-          <h1 className="font-display text-3xl md:text-4xl font-black mb-8 text-white">Política de <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">Privacidade</span></h1>
+      <main className="b26-legal-main">
+        <article className="b26-shell b26-legal-article">
+          <h1 className="b26-legal-title">Política de <span className="b26-legal-highlight">Privacidade</span></h1>
           <p className="text-white/40 text-sm mb-2">Última atualização: Fevereiro de 2026</p>
 
           <section className="mt-8 space-y-6 text-sm text-white/60 leading-relaxed">
