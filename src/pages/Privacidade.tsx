@@ -5,7 +5,7 @@ export default function Privacidade() {
   return (
     <div className="bcv3 bcv3-legal">
       <header className="bcv3-header">
-        <a href="/" className="bcv3-brand"><span aria-hidden="true" className="bcv3-brand-mark">✳</span>brandify<span className="bcv3-brand-dot">.</span></a>
+        <a href="/" className="bcv3-brand"><img className="bcv3-brand-logo" src="/brandify-mark-black.svg" alt="" /><span className="bcv3-brand-word">brandify<span className="bcv3-brand-dot">.</span></span></a>
         <a href="/" className="bcv3-header-cta"><ArrowLeft size={16}/> VOLTAR AO SITE</a>
       </header>
       <main className="bcv3-legal-main">
