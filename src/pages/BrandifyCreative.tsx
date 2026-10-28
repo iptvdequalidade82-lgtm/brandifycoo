@@ -192,7 +192,7 @@ export default function BrandifyCreative() {
 
             <Reveal className="bcv3-work-heading"><h2>UM PROJETO.<br /><em>MUITO PROPÓSITO.</em></h2><p>Um trabalho real que mostra nossa abordagem para transformar uma ideia em uma experiência digital.</p></Reveal>
             <div className="bcv3-projects">
-              {projects.map((project, idx) => (
+              {projects.map((project) => (
                 <Reveal key={project.name} className={"bcv3-project bcv3-project-" + project.layout}>
                   <a href={project.link} target="_blank" rel="noopener noreferrer" aria-label={"Abrir projeto " + project.name} className="bcv3-project-media">
                     <div className="bcv3-project-scene">
@@ -208,6 +208,10 @@ export default function BrandifyCreative() {
                 </Reveal>
               ))}
             </div>
+            <Reveal className="bcv3-case-editorial">
+              <h4>UM PROJETO.<br/><em>VÁRIAS POSSIBILIDADES.</em></h4>
+              <p>No Forge Fit, a experiência reúne exercícios ilustrados, organização de treinos e conteúdos de apoio em uma interface pensada para ser utilizada no dia a dia. É um exemplo concreto de como estrutura, design e desenvolvimento trabalham juntos.</p>
+            </Reveal>
             <Reveal className="bcv3-project-closer"><p>SEU PROJETO TAMBÉM PODE GANHAR FORMA.</p><a href={generalContact} target="_blank" rel="noopener noreferrer">VAMOS CRIAR ALGO JUNTOS <ArrowUpRight size={18} /></a></Reveal>
           </div>
         </section>
