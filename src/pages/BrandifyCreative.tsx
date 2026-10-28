@@ -8,13 +8,13 @@ import "./BrandifyCreative.css";
 
 const contactNumber = "5543991065129";
 const wa = (text: string) => "https://wa.me/" + contactNumber + "?text=" + encodeURIComponent(text);
-const generalContact = wa("Olá! Conheci a Brandify pelo site e gostaria de conversar sobre um projeto.");
+const generalContact = wa("Olá! Vi o site da Brandify e quero entender qual tipo de site faz sentido para minha empresa. Podemos conversar?");
 const marqueeMessages = [
-  "PRESENÇA COM PERSONALIDADE",
-  "DESIGN COM INTENÇÃO",
-  "SITES FEITOS PARA SE DESTACAR",
-  "CRIATIVIDADE QUE SE VÊ",
-  "DO CONCEITO À PUBLICAÇÃO",
+  "SEU NEGÓCIO BEM APRESENTADO",
+  "UM SITE QUE PASSA CONFIANÇA",
+  "SERVIÇOS FÁCEIS DE ENCONTRAR",
+  "UM CONTATO MAIS SIMPLES",
+  "FEITO PARA FUNCIONAR NO CELULAR",
 ];
 
 const plans = [
@@ -83,7 +83,7 @@ export default function BrandifyCreative() {
           <a href="#pacotes" onClick={() => setOpen(false)}>Pacotes</a>
         </nav>
         <a href={generalContact} className="bcv3-header-cta" target="_blank" rel="noopener noreferrer">
-          VAMOS CONVERSAR <ArrowUpRight size={17} strokeWidth={1.8} />
+          PEDIR UMA PROPOSTA <ArrowUpRight size={17} strokeWidth={1.8} />
         </a>
         <button aria-label={open ? "Fechar menu" : "Abrir menu"} aria-expanded={open} type="button" className="bcv3-mobile-toggle" onClick={() => setOpen(!open)}>
           {open ? <X size={25} /> : <Menu size={25} />}
@@ -112,8 +112,8 @@ export default function BrandifyCreative() {
 
             <div className="bcv3-intro-grid">
               <Reveal className="bcv3-intro-heading">
-                <h2>O PRIMEIRO<br />CONTATO <span className="bcv3-intro-blue">IMPORTA.</span></h2>
-                <p>Uma boa presença digital não é sobre estar em todos os lugares. É sobre causar a impressão certa onde seu cliente encontra você.</p>
+                <h2>ANTES DE<br />LIGAR, <span className="bcv3-intro-blue">PESQUISAM.</span></h2>
+                <p>Se as informações estão confusas ou o visual parece improvisado, o visitante pode sair antes mesmo de conversar com você.</p>
               </Reveal>
               <Reveal className="bcv3-intro-editorial" delay={0.12}>
                 <div className="bcv3-intro-image"><img src={editorialPhoto} alt="Referência visual editorial de design digital" loading="lazy" /></div>
@@ -122,7 +122,7 @@ export default function BrandifyCreative() {
             </div>
             <Reveal className="bcv3-intro-manifesto">
               
-              <p>Seu site não deveria apenas existir.<br /><strong>Ele deveria dizer alguma coisa sobre você.</strong></p>
+              <p>Você cuida da qualidade do seu trabalho.<br /><strong>Seu site precisa deixar isso claro para quem chega.</strong></p>
             </Reveal>
           </div>
         </section>
