@@ -226,6 +226,61 @@
 .bcv3-footer-base {display:flex;justify-content:space-between;gap:15px;border-top:1px solid #aaa;padding-top:17px;color:#676767;font-size:10px;font-weight:800;letter-spacing:.08em;}
 .bcv3-floating-contact {position:fixed;z-index:95;right:22px;bottom:20px;background:#fff;color:#141414!important;display:flex;gap:19px;align-items:center;justify-content:space-between;padding:14px 17px;border:1px solid #111;box-shadow:0 8px 24px #0002;font-size:11px;font-weight:800;letter-spacing:.03em;transition:transform .2s, background .2s;}
 .bcv3-floating-contact:hover {transform:translateY(-3px);background:#e5e9ff;}
+
+/* Editorial refinement — official mark, clearer CTA and less visual noise */
+.bcv3-brand-logo {width:34px;height:44px;object-fit:contain;display:block;flex-shrink:0;}
+.bcv3-brand-word {display:inline-block;line-height:1;letter-spacing:-.095em;}
+.bcv3-footer-logo {display:inline-flex;align-items:center;gap:16px;}
+.bcv3-footer-mark {width:64px;height:78px;object-fit:contain;flex-shrink:0;}
+.bcv3-hero-body {padding-top:72px;}
+.bcv3-hero-lead {gap:0;max-width:520px;}
+.bcv3-hero-lead p {font-size:15px;line-height:1.7;max-width:465px;color:#f0f0f3;}
+.bcv3-hero-cta {
+  background:#155dfc;color:#fff!important;
+  min-width:365px;min-height:74px;padding:11px 12px 11px 24px;
+  letter-spacing:.055em;font-size:13px;gap:20px;
+  box-shadow:0 12px 38px #0008,0 5px 30px #155dfc44;
+  transition:transform .25s,background .25s,box-shadow .25s;
+}
+.bcv3-hero-cta:hover {background:#034acc;box-shadow:0 18px 48px #0009,0 10px 35px #155dfc66;transform:translateY(-4px);}
+.bcv3-cta-icon {width:52px;height:52px;display:grid;place-items:center;flex-shrink:0;background:#fff;color:#111;transition:transform .25s;}
+.bcv3-hero-cta:hover .bcv3-cta-icon {transform:rotate(45deg);}
+.bcv3-marquee {padding:18px 0;background:#eeeee9;border-bottom:0;}
+.bcv3-marquee-track {display:flex;align-items:center;gap:0;animation:bcv3-scroll 25s linear infinite;will-change:transform;}
+.bcv3-marquee-loop {display:flex;align-items:center;flex:0 0 auto;gap:clamp(54px,6vw,110px);padding-right:clamp(54px,6vw,110px);}
+.bcv3-marquee-message {display:inline-block;font:800 clamp(12px,1.1vw,16px)/1 'DM Sans',sans-serif;letter-spacing:.075em;white-space:nowrap;color:#111;}
+.bcv3-marquee-message.is-accent {color:#155dfc;}
+.bcv3-intro-grid {padding-top:0;}
+.bcv3-intro-manifesto {border:0;padding:0;margin-top:88px;gap:0;}
+.bcv3-intro-manifesto p {font-size:clamp(20px,2.3vw,33px);}
+.bcv3-services-heading {margin-top:0;}
+.bcv3-work-heading {margin-top:0;}
+.bcv3-projects {display:block;}
+.bcv3-project-forge {grid-column:auto;}
+.bcv3-project-forge .bcv3-project-media {min-height:625px;}
+.bcv3-project-closer {border-top:0;padding-top:0;margin-top:68px;}
+.bcv3-statement h2 {margin-top:0;}
+.bcv3-statement-bottom {border:0;padding-top:0;justify-content:flex-end;}
+.bcv3-statement-bottom p {max-width:575px;font-size:18px;}
+.bcv3-process-heading {margin-top:0;}
+.bcv3-process-rows {border-top:0;}
+.bcv3-process-row {border-bottom:0;padding:24px 22px;margin-inline:-22px;transition:background .25s;}
+.bcv3-process-row:hover {background:#f5f4f0;}
+.bcv3-plans-heading {margin-top:0;}
+.bcv3-plan-list {border-top:0;}
+.bcv3-plan-row {border-bottom:0;margin-bottom:16px;padding:44px 28px;background:rgba(255,255,255,.035);}
+.bcv3-plan-row:hover {background:rgba(255,255,255,.07);}
+.bcv3-faq-list {border-top:0;}
+.bcv3-faq-item {border-bottom:1px solid #dadad4;}
+.bcv3-close h2 {margin-top:32px;}
+.bcv3-close-bottom {border-top:0;padding-top:0;}
+.bcv3-footer-top {border-bottom:0;padding-bottom:36px;}
+.bcv3-footer-base {border-top:1px solid #deded9;}
+.bcv3-case-editorial {display:grid;grid-template-columns:.85fr 1.15fr;gap:9%;padding:38px 0 0;}
+.bcv3-case-editorial h4 {font:800 clamp(35px,4.5vw,65px)/.97 'Barlow Condensed',Impact,sans-serif;letter-spacing:-.015em;text-transform:uppercase;}
+.bcv3-case-editorial h4 em {font:italic 400 1.03em 'Instrument Serif',Georgia,serif;}
+.bcv3-case-editorial p {font-size:15px;line-height:1.7;color:#bbbcc2;max-width:530px;}
+
 @media(max-width:1200px) {
  .bcv3-container {width:min(calc(100% - 68px),1540px);}
  .bcv3-header {padding:0 3%;}
@@ -394,3 +449,39 @@
 .bcv3-legal-back {border-top:1px solid #aaa;margin-top:70px;padding-top:30px;display:flex;justify-content:flex-end;}
 .bcv3-legal-back a {display:flex;align-items:center;gap:20px;font-size:12px;font-weight:800;background:#111;color:#fff;padding:18px;}
 @media(max-width:650px){.bcv3-legal-main{padding:63px 0 83px;}.bcv3-legal-main h1{font-size:clamp(69px,14vw,105px);}.bcv3-legal-grid{grid-template-columns:1fr;gap:30px;margin-top:56px;}.bcv3-legal-grid section p{font-size:13px;}}
+
+/* Responsive fine-tuning for the simplified edition */
+@media(max-width:900px){
+  .bcv3-brand-logo {width:30px;height:38px;}
+  .bcv3-footer-mark {width:45px;height:62px;}
+  .bcv3-case-editorial {gap:40px;}
+  .bcv3-hero-cta {min-width:320px;}
+}
+@media(max-width:650px){
+  .bcv3-brand-logo {width:27px;height:35px;}
+  .bcv3-brand-word {font-size:26px;}
+  .bcv3-footer-logo {gap:8px;}
+  .bcv3-footer-mark {width:36px;height:52px;}
+  .bcv3-hero-body {padding-top:56px;}
+  .bcv3-hero-lead p {font-size:13px;line-height:1.6;}
+  .bcv3-hero-cta {min-width:0;width:100%;min-height:62px;padding:9px 9px 9px 14px;gap:9px;font-size:11px;}
+  .bcv3-cta-icon {width:44px;height:44px;}
+  .bcv3-marquee {padding:15px 0;}
+  .bcv3-marquee-loop {gap:35px;padding-right:35px;}
+  .bcv3-marquee-message {font-size:11px;letter-spacing:.045em;}
+  .bcv3-intro-grid {padding-top:0;}
+  .bcv3-intro-manifesto {margin-top:60px;}
+  .bcv3-intro-manifesto p {font-size:19px;}
+  .bcv3-work-heading,.bcv3-services-heading,.bcv3-process-heading,.bcv3-plans-heading {margin-top:0;}
+  .bcv3-project-forge .bcv3-project-media {min-height:335px;}
+  .bcv3-case-editorial {grid-template-columns:1fr;gap:15px;padding-top:24px;}
+  .bcv3-case-editorial h4 {font-size:42px;}
+  .bcv3-case-editorial p {font-size:13px;}
+  .bcv3-statement h2 {margin-top:0;}
+  .bcv3-statement-bottom p {font-size:13px;}
+  .bcv3-process-row {margin-inline:0;padding:25px 0;}
+  .bcv3-plan-row {padding:28px 20px;margin-bottom:12px;}
+  .bcv3-close h2 {margin-top:28px;}
+  .bcv3-footer-top {padding-bottom:25px;}
+}
+@media(prefers-reduced-motion:reduce){.bcv3-marquee-track {animation:none!important;}}
