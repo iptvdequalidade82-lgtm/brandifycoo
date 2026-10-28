@@ -20,21 +20,24 @@ const marqueeMessages = [
 const plans = [
   {
     name: "START",
-    audience: "Para começar bem.",
-    intro: "Uma página com personalidade para apresentar seu negócio e facilitar novos contatos.",
-    features: ["Página de apresentação personalizada", "Design responsivo", "Informações essenciais do negócio", "Contato direto pelo WhatsApp", "Plaquinha NFC"],
+    audience: "Para quem precisa começar a aparecer com profissionalismo.",
+    intro: "Uma página para mostrar o que você faz, apresentar seu negócio e facilitar o primeiro contato.",
+    features: ["Página com a identidade do seu negócio", "Layout preparado para celular", "Serviços e informações principais em destaque", "Contato direto pelo WhatsApp", "Plaquinha NFC para acesso ao site"],
+    cta: "CONHECER O START",
   },
   {
     name: "BUSINESS",
-    audience: "Para crescer com presença.",
-    intro: "Um site institucional com estrutura para valorizar seus serviços e reforçar credibilidade.",
-    features: ["Estrutura institucional de múltiplas páginas", "Identidade visual aplicada ao site", "Navegação pensada para seus clientes", "Formulário ou canais de contato", "Plaquinha NFC"],
+    audience: "Para empresas com mais serviços e informações para apresentar.",
+    intro: "Um site institucional para explicar melhor sua empresa, organizar os serviços e ajudar o cliente a encontrar o que procura.",
+    features: ["Páginas para apresentar diferentes informações", "Visual alinhado à identidade da empresa", "Navegação organizada por assunto", "Formulário ou canal de contato", "Plaquinha NFC para acesso ao site"],
+    cta: "PEDIR PROPOSTA BUSINESS",
   },
   {
     name: "STORE",
-    audience: "Para vender online.",
-    intro: "Uma loja virtual organizada, com uma jornada de compra prática e profissional.",
-    features: ["Configuração da loja virtual", "Vitrine e categorias de produtos", "Estrutura para pagamento e envio", "Experiência adaptada ao celular", "Plaquinha NFC"],
+    audience: "Para quem quer apresentar e vender produtos pela internet.",
+    intro: "Uma loja com catálogo organizado e informações de compra mais fáceis de encontrar.",
+    features: ["Estrutura de loja virtual", "Produtos e categorias organizados", "Configuração de opções de pagamento e envio", "Navegação adaptada ao celular", "Plaquinha NFC para acesso à loja"],
+    cta: "ORÇAR MINHA LOJA",
   },
 ];
 
@@ -217,10 +220,10 @@ export default function BrandifyCreative() {
               {plans.map((plan, index) => <Reveal className={"bcv3-plan-row " + (index === 1 ? "bcv3-plan-featured" : "")} key={plan.name}>
                 <div className="bcv3-plan-identity"><h3>{plan.name}<span className="bcv3-plan-dot">.</span></h3><p>{plan.audience}</p></div>
                 <div className="bcv3-plan-features"><p>{plan.intro}</p><ul>{plan.features.map((f) => <li key={f}><Check size={15} /> {f}</li>)}</ul></div>
-                <a href={wa("Olá! Quero receber uma proposta para o pacote Brandify " + plan.name + ".")} target="_blank" rel="noopener noreferrer" className="bcv3-plan-cta">PEDIR PROPOSTA <ArrowUpRight size={21} /></a>
+                <a href={wa("Olá! Quero receber uma proposta para o pacote Brandify " + plan.name + ".")} target="_blank" rel="noopener noreferrer" className="bcv3-plan-cta">{plan.cta} <ArrowUpRight size={21} /></a>
               </Reveal>)}
             </div>
-            <p className="bcv3-plan-disclaimer">O escopo detalhado, a plaquinha NFC, os custos de domínio, hospedagem, plataformas e eventuais serviços adicionais serão confirmados formalmente na proposta comercial.</p>
+            <p className="bcv3-plan-disclaimer">O que está incluído, os limites de cada pacote, a plaquinha NFC e eventuais custos de domínio, hospedagem ou plataformas serão detalhados na proposta. Não há contratação nesta página.</p>
           </div>
         </section>
 
