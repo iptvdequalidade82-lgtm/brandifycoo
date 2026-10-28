@@ -9,54 +9,39 @@ import "./BrandifyCreative.css";
 const contactNumber = "5543991065129";
 const wa = (text: string) => "https://wa.me/" + contactNumber + "?text=" + encodeURIComponent(text);
 const generalContact = wa("Olá! Conheci a Brandify pelo site e gostaria de conversar sobre um projeto.");
+const marqueeMessages = [
+  "PRESENÇA COM PERSONALIDADE",
+  "DESIGN COM INTENÇÃO",
+  "SITES FEITOS PARA SE DESTACAR",
+  "CRIATIVIDADE QUE SE VÊ",
+  "DO CONCEITO À PUBLICAÇÃO",
+];
 
 const projects = [
   {
-    number: "01",
     name: "Forge Fit",
     type: "EXPERIÊNCIA DIGITAL · FITNESS",
-    description: "Treino, organização e conteúdo em uma experiência digital pensada para uso real.",
+    description: "Uma experiência digital com biblioteca de exercícios, organização de treinos e conteúdo para acompanhar a rotina.",
     link: "https://foorgefit.lovable.app/",
     image: "https://image.thum.io/get/width/1440/crop/900/https://foorgefit.lovable.app/",
     layout: "forge",
-  },
-  {
-    number: "02",
-    name: "Eric Pimentel",
-    type: "SITE INSTITUCIONAL",
-    description: "Uma presença web para apresentar uma marca com clareza e confiança.",
-    link: "https://ericpimentel.lovable.app/",
-    image: "https://image.thum.io/get/width/1080/crop/900/https://ericpimentel.lovable.app/",
-    layout: "eric",
-  },
-  {
-    number: "03",
-    name: "Barber 043",
-    type: "PRESENÇA DIGITAL · SERVIÇOS",
-    description: "Identidade e serviços apresentados em um ambiente digital próprio.",
-    link: "https://barber043.lovable.app/",
-    image: "https://image.thum.io/get/width/1080/crop/900/https://barber043.lovable.app/",
-    layout: "barber",
   },
 ];
 
 const plans = [
   {
-    index: "01",
     name: "START",
     audience: "Para começar bem.",
     intro: "Uma página com personalidade para apresentar seu negócio e facilitar novos contatos.",
     features: ["Página de apresentação personalizada", "Design responsivo", "Informações essenciais do negócio", "Contato direto pelo WhatsApp", "Plaquinha NFC"],
   },
   {
-    index: "02",
     name: "BUSINESS",
     audience: "Para crescer com presença.",
     intro: "Um site institucional com estrutura para valorizar seus serviços e reforçar credibilidade.",
     features: ["Estrutura institucional de múltiplas páginas", "Identidade visual aplicada ao site", "Navegação pensada para seus clientes", "Formulário ou canais de contato", "Plaquinha NFC"],
   },
   {
-    index: "03",
     name: "STORE",
     audience: "Para vender online.",
     intro: "Uma loja virtual organizada, com uma jornada de compra prática e profissional.",
@@ -99,7 +84,8 @@ export default function BrandifyCreative() {
       <a href="#conteudo" className="bcv3-skip">Ir para o conteúdo</a>
       <header className="bcv3-header">
         <a href="/#inicio" aria-label="Brandify — início" className="bcv3-brand">
-          <span className="bcv3-brand-mark" aria-hidden="true">✳</span>brandify<span className="bcv3-brand-dot">.</span>
+          <img className="bcv3-brand-logo" src="/brandify-mark-black.svg" alt="" />
+          <span className="bcv3-brand-word">brandify<span className="bcv3-brand-dot">.</span></span>
         </a>
         <nav aria-label="Menu principal" className={open ? "bcv3-nav active" : "bcv3-nav"}>
           <a href="#sobre" onClick={() => setOpen(false)}>Estúdio</a>
@@ -119,14 +105,7 @@ export default function BrandifyCreative() {
         <section id="inicio" className="bcv3-hero">
           <div className="bcv3-hero-image" style={{ backgroundImage: "url(" + heroPhoto + ")" }} aria-hidden="true" />
           <div className="bcv3-hero-scrim" />
-          <div className="bcv3-hero-top">
-            <span>BRANDIFY® / DIGITAL DESIGN STUDIO</span>
-            <span>JACAREZINHO — BRASIL / 2026</span>
-          </div>
           <div className="bcv3-hero-body">
-            <motion.p className="bcv3-hero-kicker" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18, duration: 0.6 }}>
-              WEBSITES / LANDING PAGES / E-COMMERCE
-            </motion.p>
             <motion.h1 initial={{ opacity: 0, y: 68 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.24, duration: 1, ease: [0.2, 0.8, 0.2, 1] }}>
               SUA MARCA<br />
               NÃO NASCEU<br />
@@ -134,27 +113,34 @@ export default function BrandifyCreative() {
             </motion.h1>
             <motion.div className="bcv3-hero-bottom" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8, duration: 0.6 }}>
               <div className="bcv3-hero-lead">
-                <span className="bcv3-diamond" aria-hidden="true">✳</span>
+                
                 <p>Criamos sites, landing pages e lojas virtuais com design de verdade — para negócios que querem ser percebidos.</p>
               </div>
               <a className="bcv3-hero-cta" href={generalContact} target="_blank" rel="noopener noreferrer">
-                TIRAR MEU PROJETO DO PAPEL <ArrowUpRight size={20} />
+                <span>TIRAR MEU PROJETO DO PAPEL</span><span className="bcv3-cta-icon"><ArrowUpRight size={20} /></span>
               </a>
             </motion.div>
           </div>
           <a href="#sobre" className="bcv3-hero-down" aria-label="Descobrir mais"><ArrowDownRight size={30} /></a>
         </section>
 
-        <div className="bcv3-marquee" aria-label="Criação de sites, design e desenvolvimento">
+        <div className="bcv3-marquee" aria-label="Presença com personalidade, design com intenção, sites feitos para se destacar e projetos com propósito">
           <div className="bcv3-marquee-track" aria-hidden="true">
-            DESIGN COM INTENÇÃO <span>✳</span> PRESENÇA COM PERSONALIDADE <span>✳</span> DESENVOLVIMENTO WEB <span>✳</span>
-            DESIGN COM INTENÇÃO <span>✳</span> PRESENÇA COM PERSONALIDADE <span>✳</span> DESENVOLVIMENTO WEB <span>✳</span>
+            {[0, 1].map((cycle) => (
+              <div className="bcv3-marquee-loop" key={cycle}>
+                {marqueeMessages.map((message, idx) => (
+                  <span className={idx % 2 === 1 ? "bcv3-marquee-message is-accent" : "bcv3-marquee-message"} key={message}>
+                    {message}
+                  </span>
+                ))}
+              </div>
+            ))}
           </div>
         </div>
 
         <section id="sobre" className="bcv3-intro bcv3-pad">
           <div className="bcv3-container">
-            <div className="bcv3-eyebrow"><span>01 / NÃO É SÓ UM SITE.</span><span>É COMO O MUNDO ENXERGA O SEU NEGÓCIO.</span></div>
+
             <div className="bcv3-intro-grid">
               <Reveal className="bcv3-intro-heading">
                 <h2>O PRIMEIRO<br />CONTATO <span className="bcv3-intro-blue">IMPORTA.</span></h2>
@@ -166,7 +152,7 @@ export default function BrandifyCreative() {
               </Reveal>
             </div>
             <Reveal className="bcv3-intro-manifesto">
-              <span className="bcv3-asterisk" aria-hidden="true">✳</span>
+              
               <p>Seu site não deveria apenas existir.<br /><strong>Ele deveria dizer alguma coisa sobre você.</strong></p>
             </Reveal>
           </div>
@@ -174,7 +160,7 @@ export default function BrandifyCreative() {
 
         <section id="servicos" className="bcv3-services bcv3-pad">
           <div className="bcv3-container">
-            <div className="bcv3-eyebrow"><span>02 / O QUE CRIAMOS</span><span>TRÊS CAMINHOS. UMA MARCA MAIS FORTE.</span></div>
+
             <Reveal className="bcv3-services-heading">
               <h2>DO PRIMEIRO CLIQUE<br />À <em>ÚLTIMA IMPRESSÃO.</em></h2>
               <p>Cada negócio tem uma necessidade. Nenhum merece uma presença digital genérica.</p>
@@ -203,8 +189,8 @@ export default function BrandifyCreative() {
 
         <section id="trabalhos" className="bcv3-work bcv3-pad">
           <div className="bcv3-container">
-            <div className="bcv3-eyebrow bcv3-eyebrow-dark"><span>03 / SELEÇÃO DE PROJETOS</span><span>TRABALHO REAL. IDEIAS REAIS.</span></div>
-            <Reveal className="bcv3-work-heading"><h2>NÃO PRECISA<br />IMAGINAR. <em>OLHA.</em></h2><p>Projetos desenvolvidos para necessidades diferentes, com a mesma atenção aos detalhes.</p></Reveal>
+
+            <Reveal className="bcv3-work-heading"><h2>UM PROJETO.<br /><em>MUITO PROPÓSITO.</em></h2><p>Um trabalho real que mostra nossa abordagem para transformar uma ideia em uma experiência digital.</p></Reveal>
             <div className="bcv3-projects">
               {projects.map((project, idx) => (
                 <Reveal key={project.name} className={"bcv3-project bcv3-project-" + project.layout}>
@@ -218,25 +204,25 @@ export default function BrandifyCreative() {
                     </div>
                     <span className="bcv3-project-arrow" aria-hidden="true"><ArrowUpRight size={24}/></span>
                   </a>
-                  <div className="bcv3-project-text"><div><span>{project.number} / {project.type}</span><h3>{project.name}</h3><p>{project.description}</p></div><ArrowUpRight size={25}/></div>
+                  <div className="bcv3-project-text"><div><span>{project.type}</span><h3>{project.name}</h3><p>{project.description}</p></div><ArrowUpRight size={25}/></div>
                 </Reveal>
               ))}
             </div>
-            <Reveal className="bcv3-project-closer"><p>O PRÓXIMO PROJETO PODE SER O SEU.</p><a href={generalContact} target="_blank" rel="noopener noreferrer">VAMOS CRIAR ALGO JUNTOS <ArrowUpRight size={18} /></a></Reveal>
+            <Reveal className="bcv3-project-closer"><p>SEU PROJETO TAMBÉM PODE GANHAR FORMA.</p><a href={generalContact} target="_blank" rel="noopener noreferrer">VAMOS CRIAR ALGO JUNTOS <ArrowUpRight size={18} /></a></Reveal>
           </div>
         </section>
 
         <section className="bcv3-statement">
           <div className="bcv3-container">
-            <div className="bcv3-statement-top"><span>BRANDIFY / MANIFESTO</span><span>DESIGN ≠ DECORAÇÃO</span></div>
+
             <Reveal><h2>UM BOM SITE<br />NÃO É SÓ<br /><span>BONITO.</span><br />ELE TEM<br />PROPÓSITO<span className="bcv3-period">.</span></h2></Reveal>
-            <div className="bcv3-statement-bottom"><span>✳</span><p>A gente une direção visual, estrutura e desenvolvimento para transformar a presença da sua empresa em algo que faz sentido para quem visita.</p></div>
+            <div className="bcv3-statement-bottom"><p>A gente une direção visual, estrutura e desenvolvimento para transformar a presença da sua empresa em algo que faz sentido para quem visita.</p></div>
           </div>
         </section>
 
         <section id="processo" className="bcv3-process bcv3-pad">
           <div className="bcv3-container">
-            <div className="bcv3-eyebrow"><span>04 / NOSSA FORMA DE TRABALHAR</span><span>DA CONVERSA À PUBLICAÇÃO</span></div>
+
             <Reveal className="bcv3-process-heading"><h2>BOAS IDEIAS<br />PEDEM <em>MÉTODO.</em></h2><p>Um processo objetivo, com decisões claras e acompanhamento em cada fase.</p></Reveal>
             <div className="bcv3-process-rows">
               {[
@@ -251,11 +237,11 @@ export default function BrandifyCreative() {
 
         <section id="pacotes" className="bcv3-plans bcv3-pad">
           <div className="bcv3-container">
-            <div className="bcv3-eyebrow bcv3-eyebrow-dark"><span>05 / FORMAS DE COMEÇAR</span><span>UMA SOLUÇÃO PARA CADA MOMENTO</span></div>
+
             <Reveal className="bcv3-plans-heading"><h2>QUAL É O SEU<br /><em>PRÓXIMO PASSO?</em></h2><p>Três formatos de projeto. O escopo e o investimento finais são definidos com você antes do início.</p></Reveal>
             <div className="bcv3-plan-list">
               {plans.map((plan, index) => <Reveal className={"bcv3-plan-row " + (index === 1 ? "bcv3-plan-featured" : "")} key={plan.name}>
-                <div className="bcv3-plan-identity"><span>{plan.index} / BRANDIFY</span><h3>{plan.name}<span className="bcv3-plan-dot">.</span></h3><p>{plan.audience}</p></div>
+                <div className="bcv3-plan-identity"><h3>{plan.name}<span className="bcv3-plan-dot">.</span></h3><p>{plan.audience}</p></div>
                 <div className="bcv3-plan-features"><p>{plan.intro}</p><ul>{plan.features.map((f) => <li key={f}><Check size={15} /> {f}</li>)}</ul></div>
                 <a href={wa("Olá! Quero receber uma proposta para o pacote Brandify " + plan.name + ".")} target="_blank" rel="noopener noreferrer" className="bcv3-plan-cta">PEDIR PROPOSTA <ArrowUpRight size={21} /></a>
               </Reveal>)}
@@ -276,7 +262,7 @@ export default function BrandifyCreative() {
 
         <section id="contato" className="bcv3-close">
           <div className="bcv3-container">
-            <div className="bcv3-close-top"><span>07 / SEU PROJETO COMEÇA AQUI</span><span>ATENDEMOS TODO O BRASIL</span></div>
+
             <Reveal><h2>PRONTO PARA<br /><em>SAIR DO</em><br />COMUM<span>?</span></h2></Reveal>
             <div className="bcv3-close-bottom"><p>A sua próxima grande impressão pode começar com uma conversa.</p><a href={generalContact} target="_blank" rel="noopener noreferrer">COMEÇAR MEU PROJETO <ArrowUpRight size={25}/></a></div>
           </div>
@@ -285,13 +271,13 @@ export default function BrandifyCreative() {
 
       <footer className="bcv3-footer">
         <div className="bcv3-container">
-          <div className="bcv3-footer-top"><a href="#inicio" className="bcv3-footer-logo">brandify<span>.</span></a><p>DESIGN, DESENVOLVIMENTO<br />E PRESENÇA DIGITAL.</p></div>
+          <div className="bcv3-footer-top"><a href="#inicio" className="bcv3-footer-logo"><img className="bcv3-footer-mark" src="/brandify-mark-black.svg" alt="" />brandify<span>.</span></a><p>DESIGN, DESENVOLVIMENTO<br />E PRESENÇA DIGITAL.</p></div>
           <div className="bcv3-footer-grid">
             <div><span>NAVEGAÇÃO</span><a href="#sobre">Estúdio</a><a href="#servicos">Serviços</a><a href="#trabalhos">Projetos</a><a href="#pacotes">Pacotes</a></div>
             <div><span>CONTATO</span><a href={generalContact} target="_blank" rel="noopener noreferrer">WhatsApp: (43) 99106-5129 <ArrowUpRight size={14}/></a><a href="mailto:brandifycoo@gmail.com">brandifycoo@gmail.com <Mail size={14}/></a><a href="https://www.instagram.com/brandifycoo" target="_blank" rel="noopener noreferrer">Instagram <Instagram size={14}/></a></div>
             <div><span>LOCALIZAÇÃO</span><p>Jacarezinho — Paraná<br />Brasil</p><a href="/privacidade">Política de privacidade</a></div>
           </div>
-          <div className="bcv3-footer-base"><span>© {new Date().getFullYear()} BRANDIFY. TODOS OS DIREITOS RESERVADOS.</span><span>IDEIAS COM INTENÇÃO. ✳</span></div>
+          <div className="bcv3-footer-base"><span>© {new Date().getFullYear()} BRANDIFY. TODOS OS DIREITOS RESERVADOS.</span><span>IDEIAS COM INTENÇÃO.</span></div>
         </div>
       </footer>
       <a className="bcv3-floating-contact" aria-label="Conversar com a Brandify pelo WhatsApp" href={generalContact} target="_blank" rel="noopener noreferrer">VAMOS CONVERSAR <ArrowUpRight size={17}/></a>
