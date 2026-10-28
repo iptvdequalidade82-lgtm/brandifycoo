@@ -375,3 +375,22 @@
  .bcv3-marquee-track,.bcv3-hero-image {animation:none!important;}
  .bcv3 *, .bcv3 *::before, .bcv3 *::after {transition-duration:.01ms!important;animation-duration:.01ms!important;}
 }
+
+
+/* Privacy page: same brand, no inherited space-age visual styling */
+.bcv3-legal {min-height:100vh;background:#f3f2ef;}
+.bcv3-legal-main {padding:100px 0 130px;}
+.bcv3-legal-kicker {font:800 11px 'DM Sans',sans-serif;letter-spacing:.14em;margin-bottom:31px!important;}
+.bcv3-legal-main h1 {font-size:clamp(88px,11.5vw,180px);margin-bottom:22px;}
+.bcv3-legal-main h1 em {font:italic 400 .86em 'Instrument Serif',Georgia,serif;color:#155dfc;letter-spacing:-.04em;}
+.bcv3-legal-updated {font-size:12px;font-weight:700;color:#777;}
+.bcv3-legal-grid {display:grid;grid-template-columns:.6fr 1fr;gap:13%;margin-top:95px;border-top:1px solid #aaa;padding-top:34px;}
+.bcv3-legal-grid aside {font-size:11px;letter-spacing:.08em;line-height:1.5;font-weight:800;color:#777;}
+.bcv3-legal-grid section {border-bottom:1px solid #aaa;padding-bottom:32px;margin-bottom:34px;}
+.bcv3-legal-grid h2 {font:700 clamp(27px,3vw,43px)/1 'Barlow Condensed',Impact,sans-serif;letter-spacing:-.015em;margin-bottom:13px;}
+.bcv3-legal-grid section p {font-size:14px;line-height:1.8;color:#555;}
+.bcv3-legal-grid section a {font-weight:800;color:#155dfc;text-decoration:underline;}
+.bcv3-legal-note {color:#777;font-size:11px;line-height:1.65;max-width:660px;}
+.bcv3-legal-back {border-top:1px solid #aaa;margin-top:70px;padding-top:30px;display:flex;justify-content:flex-end;}
+.bcv3-legal-back a {display:flex;align-items:center;gap:20px;font-size:12px;font-weight:800;background:#111;color:#fff;padding:18px;}
+@media(max-width:650px){.bcv3-legal-main{padding:63px 0 83px;}.bcv3-legal-main h1{font-size:clamp(69px,14vw,105px);}.bcv3-legal-grid{grid-template-columns:1fr;gap:30px;margin-top:56px;}.bcv3-legal-grid section p{font-size:13px;}}
