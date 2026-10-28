@@ -196,3 +196,8 @@
  .bsi-conclusion h2{font-size:56px;}
 }
 @media(prefers-reduced-motion:reduce){.bsi-scroll-hint svg{animation:none;}}
+
+/* Supporting text that reduces friction without altering the approved hero composition */
+.bsi-primary-wrap{display:flex;flex-direction:column;align-items:flex-start;gap:10px;flex:0 0 auto;}
+.bsi-primary-wrap small{font:500 11px/1.45 'DM Sans',sans-serif;color:#e4e9f6;max-width:350px;}
+@media(max-width:700px){.bsi-primary-wrap{width:100%;margin-top:18px}.bsi-primary-wrap .bsi-primary-action{margin-top:0}.bsi-primary-wrap small{font-size:10px;}}
