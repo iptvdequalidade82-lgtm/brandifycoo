@@ -1,4 +1,3 @@
-import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,13 +7,6 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
-const Dashboard = lazy(() => import("./pages/Dashboard"));
-
-const LazyPage = ({ children }: { children: React.ReactNode }) => (
-  <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center"><div className="w-8 h-8 border-2 border-white/20 border-t-white/80 rounded-full animate-spin" /></div>}>
-    {children}
-  </Suspense>
-);
 
 import Privacidade from "./pages/Privacidade";
 import AdminLogin from "./pages/AdminLogin";
@@ -46,14 +38,14 @@ const App = () => (
             <Route path="/ias" element={<Navigate to="/" replace />} />
             <Route path="/planos-pro" element={<Navigate to="/" replace />} />
             <Route path="/editor" element={<Navigate to="/" replace />} />
-            <Route path="/dashboard" element={<LazyPage><Dashboard /></LazyPage>} />
-            <Route path="/tools/copy" element={<LazyPage><ToolsCopy /></LazyPage>} />
-            <Route path="/tools/landing" element={<LazyPage><ToolsLanding /></LazyPage>} />
-            <Route path="/tools/atendedor" element={<LazyPage><ToolsAtendedor /></LazyPage>} />
-            <Route path="/tools/agendador" element={<LazyPage><ToolsAgendador /></LazyPage>} />
-            <Route path="/tools/diagnostico-ig" element={<LazyPage><ToolsDiagnosticoIG /></LazyPage>} />
-            <Route path="/tools/planejamento" element={<LazyPage><ToolsPlanejamento /></LazyPage>} />
-            <Route path="/tools/simulador" element={<LazyPage><ToolsSimulador /></LazyPage>} />
+            <Route path="/dashboard" element={<Navigate to="/" replace />} />
+            <Route path="/tools/copy" element={<Navigate to="/" replace />} />
+            <Route path="/tools/landing" element={<Navigate to="/" replace />} />
+            <Route path="/tools/atendedor" element={<Navigate to="/" replace />} />
+            <Route path="/tools/agendador" element={<Navigate to="/" replace />} />
+            <Route path="/tools/diagnostico-ig" element={<Navigate to="/" replace />} />
+            <Route path="/tools/planejamento" element={<Navigate to="/" replace />} />
+            <Route path="/tools/simulador" element={<Navigate to="/" replace />} />
             <Route path="/projetos" element={<Navigate to="/#trabalhos" replace />} />
             
             <Route path="/curso" element={<Navigate to="/#servicos" replace />} />
