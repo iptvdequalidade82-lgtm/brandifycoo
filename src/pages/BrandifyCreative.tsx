@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { ArrowDownRight, ArrowRight, ArrowUpRight, Check, ChevronDown, Instagram, Mail, Menu, MoveUpRight, X } from "lucide-react";
 import { motion } from "framer-motion";
-import heroPhoto from "@/assets/reference/ref-11-underwater-laptop.jpg";
 import editorialPhoto from "@/assets/reference/ref-32-designers-website.jpg";
 import creativePhoto from "@/assets/reference/ref-12-agency-grid.jpg";
-import ForgeFitDeviceShowcase from "@/components/ForgeFitDeviceShowcase";
+import BrandifyScrollIntro from "@/components/BrandifyScrollIntro";
 import "./BrandifyCreative.css";
 
 const contactNumber = "5543991065129";
@@ -92,27 +91,7 @@ export default function BrandifyCreative() {
       </header>
 
       <main id="conteudo">
-        <section id="inicio" className="bcv3-hero">
-          <div className="bcv3-hero-image" style={{ backgroundImage: "url(" + heroPhoto + ")" }} aria-hidden="true" />
-          <div className="bcv3-hero-scrim" />
-          <div className="bcv3-hero-body">
-            <motion.h1 initial={{ opacity: 0, y: 68 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.24, duration: 1, ease: [0.2, 0.8, 0.2, 1] }}>
-              SUA MARCA<br />
-              NÃO NASCEU<br />
-              PRA SER <em>COMUM.</em>
-            </motion.h1>
-            <motion.div className="bcv3-hero-bottom" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8, duration: 0.6 }}>
-              <div className="bcv3-hero-lead">
-                
-                <p>Criamos sites, landing pages e lojas virtuais com design de verdade — para negócios que querem ser percebidos.</p>
-              </div>
-              <a className="bcv3-hero-cta" href={generalContact} target="_blank" rel="noopener noreferrer">
-                <span>TIRAR MEU PROJETO DO PAPEL</span><span className="bcv3-cta-icon"><ArrowUpRight size={20} /></span>
-              </a>
-            </motion.div>
-          </div>
-          <a href="#sobre" className="bcv3-hero-down" aria-label="Descobrir mais"><ArrowDownRight size={30} /></a>
-        </section>
+        <BrandifyScrollIntro />
 
         <div className="bcv3-marquee" aria-label="Presença com personalidade, design com intenção, sites feitos para se destacar e projetos com propósito">
           <div className="bcv3-marquee-track" aria-hidden="true">
@@ -179,12 +158,31 @@ export default function BrandifyCreative() {
 
         <section id="trabalhos" className="bcv3-work bcv3-pad">
           <div className="bcv3-container">
-            <ForgeFitDeviceShowcase />
-            <Reveal className="bcv3-case-editorial">
-              <h4>DO SITE AO CELULAR.<br/><em>SEM PERDER A EXPERIÊNCIA.</em></h4>
-              <p>O Forge Fit reúne organização de treinos, biblioteca de exercícios e conteúdos para a rotina fitness. Uma demonstração de como a Brandify pensa em clareza, apresentação e uso em diferentes telas.</p>
+            <Reveal className="bcv3-work-heading">
+              <h2>O PROJETO<br/><em>POR TRÁS DA CENA.</em></h2>
+              <p>Uma experiência real da Brandify, apresentada sem distrações.</p>
             </Reveal>
-            <Reveal className="bcv3-project-closer"><p>SEU PROJETO TAMBÉM PODE GANHAR FORMA.</p><a href={generalContact} target="_blank" rel="noopener noreferrer">VAMOS CRIAR ALGO JUNTOS <ArrowUpRight size={18} /></a></Reveal>
+            <Reveal className="bcv3-project bcv3-project-forge">
+              <a href="https://foorgefit.life/" className="bcv3-project-media" target="_blank" rel="noopener noreferrer" aria-label="Visitar o projeto Forge Fit">
+                <div className="bcv3-project-scene">
+                  <div className="bcv3-project-screen">
+                    <div className="bcv3-project-screenbar"><span>● ● ●</span><small>foorgefit.life</small><ArrowUpRight size={13}/></div>
+                    <img loading="lazy" src="https://image.thum.io/get/width/1440/crop/900/noanimate/https://foorgefit.life/" alt="Captura da página pública do Forge Fit" />
+                  </div>
+                  <div className="bcv3-project-label" aria-hidden="true">FORGE FIT</div>
+                </div>
+                <span className="bcv3-project-arrow" aria-hidden="true"><ArrowUpRight size={24}/></span>
+              </a>
+              <div className="bcv3-project-text">
+                <div><span>EXPERIÊNCIA DIGITAL · FITNESS</span><h3>Forge Fit</h3><p>Organização de treinos, exercícios e conteúdos para acompanhar a rotina fitness.</p></div>
+                <ArrowUpRight size={25}/>
+              </div>
+            </Reveal>
+            <Reveal className="bcv3-case-editorial">
+              <h4>DO CONCEITO<br/><em>À EXPERIÊNCIA.</em></h4>
+              <p>Uma plataforma construída para tornar os treinos mais organizados, com biblioteca de exercícios e conteúdos complementares. A sequência imersiva no início desta página ilustra como experiências digitais podem se adaptar a diferentes telas.</p>
+            </Reveal>
+            <Reveal className="bcv3-project-closer"><p>SEU PROJETO TAMBÉM PODE GANHAR FORMA.</p><a href={generalContact} target="_blank" rel="noopener noreferrer">VAMOS CRIAR ALGO JUNTOS <ArrowUpRight size={18}/></a></Reveal>
           </div>
         </section>
 
