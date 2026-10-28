@@ -20,14 +20,14 @@ const marqueeMessages = [
 const plans = [
   {
     name: "START",
-    audience: "Para quem precisa começar a aparecer com profissionalismo.",
+    audience: "Para quem precisa de um primeiro site profissional.",
     intro: "Uma página para mostrar o que você faz, apresentar seu negócio e facilitar o primeiro contato.",
     features: ["Página com a identidade do seu negócio", "Layout preparado para celular", "Serviços e informações principais em destaque", "Contato direto pelo WhatsApp", "Plaquinha NFC para acesso ao site"],
-    cta: "CONHECER O START",
+    cta: "PEDIR ORÇAMENTO START",
   },
   {
     name: "BUSINESS",
-    audience: "Para empresas com mais serviços e informações para apresentar.",
+    audience: "Para apresentar sua empresa com mais detalhes.",
     intro: "Um site institucional para explicar melhor sua empresa, organizar os serviços e ajudar o cliente a encontrar o que procura.",
     features: ["Páginas para apresentar diferentes informações", "Visual alinhado à identidade da empresa", "Navegação organizada por assunto", "Formulário ou canal de contato", "Plaquinha NFC para acesso ao site"],
     cta: "PEDIR PROPOSTA BUSINESS",
