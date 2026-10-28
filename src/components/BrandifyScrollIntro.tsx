@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { ArrowDown, ArrowRight, ArrowUpRight, CalendarDays, Dumbbell, UtensilsCrossed } from "lucide-react";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import type { MotionValue } from "framer-motion";
 import heroPhoto from "@/assets/reference/ref-11-underwater-laptop.jpg";
 import "./BrandifyScrollIntro.css";
 
@@ -9,9 +10,9 @@ const projectContact = "https://wa.me/" + contactNumber + "?text=" + encodeURICo
 const forgeFitUrl = "https://foorgefit.life/";
 const forgeFitSnapshot = "https://image.thum.io/get/width/1200/crop/850/noanimate/https://foorgefit.life/";
 
-function PrimaryAction({ className = "" }: { className?: string }) {
+function PrimaryAction({ className = "", tabIndex }: { className?: string; tabIndex?: number }) {
   return (
-    <a className={"bsi-primary-action " + className} href={projectContact} target="_blank" rel="noopener noreferrer">
+    <a className={"bsi-primary-action " + className} href={projectContact} target="_blank" rel="noopener noreferrer" tabIndex={tabIndex}>
       <span>TIRAR MEU PROJETO DO PAPEL</span>
       <span className="bsi-primary-icon"><ArrowUpRight size={22} aria-hidden="true" /></span>
     </a>
@@ -42,7 +43,7 @@ function DesktopPreview() {
   );
 }
 
-function PhonePreview({ progress01, progress12 }: { progress01: ReturnType<typeof useTransform<number, number>>; progress12: ReturnType<typeof useTransform<number, number>> }) {
+function PhonePreview({ progress01, progress12 }: { progress01: MotionValue<number>; progress12: ReturnType<typeof useTransform<number, number>> }) {
   return (
     <div className="bsi-phone" aria-label="Conceito visual ilustrativo do Forge Fit em celular">
       <div className="bsi-phone-glass">
@@ -105,6 +106,8 @@ function ReducedMotionIntro() {
 export default function BrandifyScrollIntro() {
   const storyRef = useRef<HTMLElement>(null);
   const reducedMotion = useReducedMotion();
+  const [heroInteractive, setHeroInteractive] = useState(true);
+  const [conclusionInteractive, setConclusionInteractive] = useState(false);
   const { scrollYProgress } = useScroll({ target: storyRef, offset: ["start start", "end end"] });
 
   const heroOpacity = useTransform(scrollYProgress, [0, .13, .30], [1, 1, 0]);
@@ -127,6 +130,10 @@ export default function BrandifyScrollIntro() {
   const phoneA = useTransform(scrollYProgress, [.59, .68, .70], [1, 1, 0]);
   const phoneB = useTransform(scrollYProgress, [.63, .73, .85], [0, 1, 1]);
   const progressFill = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+  useMotionValueEvent(scrollYProgress, "change", latest => {
+    setHeroInteractive(latest < .22);
+    setConclusionInteractive(latest > .85);
+  });
 
   if (reducedMotion) return <ReducedMotionIntro />;
 
@@ -137,12 +144,12 @@ export default function BrandifyScrollIntro() {
         <div className="bsi-scene-wash" aria-hidden="true"/>
         <div className="bsi-scene-light" aria-hidden="true"/>
 
-        <motion.div className="bsi-opening" style={{ opacity: heroOpacity, y: heroLift }}>
+        <motion.div className="bsi-opening" aria-hidden={!heroInteractive} style={{ opacity: heroOpacity, y: heroLift, pointerEvents: heroInteractive ? "auto" : "none" }}>
           <div className="bsi-opening-body">
             <h1>SUA MARCA<br />NÃO NASCEU<br />PRA SER <em>COMUM.</em></h1>
             <div className="bsi-opening-foot">
               <p>Criamos sites, landing pages e lojas virtuais com design de verdade — para negócios que querem ser percebidos.</p>
-              <PrimaryAction />
+              <PrimaryAction tabIndex={heroInteractive ? undefined : -1} />
             </div>
           </div>
         </motion.div>
@@ -167,12 +174,12 @@ export default function BrandifyScrollIntro() {
           <p>A mesma atenção aos detalhes em cada tamanho de tela.</p>
         </motion.div>
 
-        <motion.div className="bsi-conclusion" style={{ opacity: closeOpacity, y: closeY }}>
+        <motion.div className="bsi-conclusion" aria-hidden={!conclusionInteractive} style={{ opacity: closeOpacity, y: closeY, pointerEvents: conclusionInteractive ? "auto" : "none" }}>
           <span>DESIGN QUE FUNCIONA EM CADA TELA</span>
           <h2>AGORA, IMAGINE<br /><em>O SEU NEGÓCIO AQUI.</em></h2>
           <div className="bsi-conclusion-links">
-            <PrimaryAction />
-            <a href={forgeFitUrl} target="_blank" rel="noopener noreferrer">VER O PROJETO REAL <ArrowUpRight size={19} aria-hidden="true" /></a>
+            <PrimaryAction tabIndex={conclusionInteractive ? undefined : -1} />
+            <a tabIndex={conclusionInteractive ? undefined : -1} href={forgeFitUrl} target="_blank" rel="noopener noreferrer">VER O PROJETO REAL <ArrowUpRight size={19} aria-hidden="true" /></a>
           </div>
         </motion.div>
 
