@@ -159,8 +159,8 @@ export default function BrandifyCreative() {
         <section id="trabalhos" className="bcv3-work bcv3-pad">
           <div className="bcv3-container">
             <Reveal className="bcv3-work-heading">
-              <h2>O PROJETO<br/><em>POR TRÁS DA CENA.</em></h2>
-              <p>Uma experiência real da Brandify, apresentada sem distrações.</p>
+              <h2>QUER VER<br/><em>NA PRÁTICA?</em></h2>
+              <p>Conheça o Forge Fit, um projeto real em que conteúdo e navegação foram organizados para uso no dia a dia.</p>
             </Reveal>
             <Reveal className="bcv3-project bcv3-project-forge">
               <a href="https://foorgefit.life/" className="bcv3-project-media" target="_blank" rel="noopener noreferrer" aria-label="Visitar o projeto Forge Fit">
@@ -174,23 +174,23 @@ export default function BrandifyCreative() {
                 <span className="bcv3-project-arrow" aria-hidden="true"><ArrowUpRight size={24}/></span>
               </a>
               <div className="bcv3-project-text">
-                <div><span>EXPERIÊNCIA DIGITAL · FITNESS</span><h3>Forge Fit</h3><p>Organização de treinos, exercícios e conteúdos para acompanhar a rotina fitness.</p></div>
+                <div><span>EXPERIÊNCIA DIGITAL · FITNESS</span><h3>Forge Fit</h3><p>Exercícios, cronograma de treinos e conteúdos de apoio organizados em uma plataforma.</p></div>
                 <ArrowUpRight size={25}/>
               </div>
             </Reveal>
             <Reveal className="bcv3-case-editorial">
-              <h4>DO CONCEITO<br/><em>À EXPERIÊNCIA.</em></h4>
-              <p>Uma plataforma construída para tornar os treinos mais organizados, com biblioteca de exercícios e conteúdos complementares. A sequência imersiva no início desta página ilustra como experiências digitais podem se adaptar a diferentes telas.</p>
+              <h4>CONTEÚDO CERTO.<br/><em>NO LUGAR CERTO.</em></h4>
+              <p>No Forge Fit, reunimos exercícios, organização semanal e materiais de apoio em uma experiência para computador e celular. A apresentação animada no início do site ilustra essas funcionalidades.</p>
             </Reveal>
-            <Reveal className="bcv3-project-closer"><p>SEU PROJETO TAMBÉM PODE GANHAR FORMA.</p><a href={generalContact} target="_blank" rel="noopener noreferrer">VAMOS CRIAR ALGO JUNTOS <ArrowUpRight size={18}/></a></Reveal>
+            <Reveal className="bcv3-project-closer"><p>QUER APRESENTAR ASSIM O SEU NEGÓCIO?</p><a href={generalContact} target="_blank" rel="noopener noreferrer">CONVERSAR SOBRE MEU SITE <ArrowUpRight size={18}/></a></Reveal>
           </div>
         </section>
 
         <section className="bcv3-statement">
           <div className="bcv3-container">
 
-            <Reveal><h2>UM BOM SITE<br />NÃO É SÓ<br /><span>BONITO.</span><br />ELE TEM<br />PROPÓSITO<span className="bcv3-period">.</span></h2></Reveal>
-            <div className="bcv3-statement-bottom"><p>A gente une direção visual, estrutura e desenvolvimento para transformar a presença da sua empresa em algo que faz sentido para quem visita.</p></div>
+            <Reveal><h2>UM SITE<br />PODE SER<br /><span>BONITO.</span><br />MAS PRECISA<br />SER CLARO<span className="bcv3-period">.</span></h2></Reveal>
+            <div className="bcv3-statement-bottom"><p>Fotos, textos e navegação têm uma tarefa: ajudar o visitante a entender seu negócio e encontrar o próximo passo.</p></div>
           </div>
         </section>
 
