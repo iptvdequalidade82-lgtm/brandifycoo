@@ -92,7 +92,7 @@ function ReducedMotionIntro() {
       <div className="bsi-static-hero">
         <h1>SEU NEGÓCIO<br/>MERECE UM SITE<br/>À <em>ALTURA.</em></h1>
         <p>Criamos sites, landing pages e lojas virtuais para apresentar melhor sua empresa e facilitar o contato com clientes.</p>
-        <PrimaryAction/>
+        <div className="bsi-primary-wrap"><PrimaryAction/><small>Uma conversa inicial, sem compromisso.</small></div>
       </div>
     </section>
   );
@@ -144,7 +144,10 @@ export default function BrandifyScrollIntro() {
             <h1>SEU NEGÓCIO<br />MERECE UM SITE<br />À <em>ALTURA.</em></h1>
             <div className="bsi-opening-foot">
               <p>Criamos sites, landing pages e lojas virtuais para apresentar melhor sua empresa e facilitar o contato com clientes.</p>
-              <PrimaryAction tabIndex={heroInteractive ? undefined : -1} />
+              <div className="bsi-primary-wrap">
+                <PrimaryAction tabIndex={heroInteractive ? undefined : -1} />
+                <small>Primeiro, uma conversa para entender seu projeto. Sem compromisso.</small>
+              </div>
             </div>
           </div>
         </motion.div>
