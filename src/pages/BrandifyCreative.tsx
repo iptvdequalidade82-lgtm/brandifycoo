@@ -118,7 +118,7 @@ export default function BrandifyCreative() {
 
             <div className="bcv3-intro-grid">
               <Reveal className="bcv3-intro-heading">
-                <h2>ANTES DE<br />LIGAR, <span className="bcv3-intro-blue">PESQUISAM.</span></h2>
+                <h2>ANTES DE<br />CONFIAR,<br /><span className="bcv3-intro-blue">PESQUISAM.</span></h2>
                 <p>Se as informações estão confusas ou o visual parece improvisado, o visitante pode sair antes mesmo de conversar com você.</p>
               </Reveal>
               <Reveal className="bcv3-intro-editorial" delay={0.12}>
@@ -144,17 +144,17 @@ export default function BrandifyCreative() {
               <Reveal className="bcv3-service-item bcv3-service-one">
                 <div className="bcv3-service-photo" style={{ backgroundImage: "url(" + creativePhoto + ")" }} />
                 
-                <div className="bcv3-service-copy"><span>SITES INSTITUCIONAIS</span><h3>MOSTRE<br />O VALOR<br /><em>DO SEU NEGÓCIO.</em></h3><p>Apresente seus serviços, explique como sua empresa trabalha e mostre ao cliente como entrar em contato.</p></div>
+                <div className="bcv3-service-copy"><span>SITES INSTITUCIONAIS</span><h3>MOSTRE<br />SEU VALOR<br /><em>ONLINE.</em></h3><p>Apresente seus serviços, explique como sua empresa trabalha e mostre ao cliente como entrar em contato.</p></div>
               </Reveal>
               <div className="bcv3-service-right">
                 <Reveal className="bcv3-service-item bcv3-service-two" delay={0.12}>
                   
-                  <div className="bcv3-service-copy"><span>LANDING PAGES</span><h3>SUA OFERTA.<br /><em>SEM DISTRAÇÕES.</em></h3><p>Uma página focada em explicar sua oferta e conduzir o visitante ao próximo passo: pedir informações ou comprar.</p></div>
+                  <div className="bcv3-service-copy"><span>LANDING PAGES</span><h3>SUA OFERTA.<br /><em>EM FOCO.</em></h3><p>Uma página focada em explicar sua oferta e conduzir o visitante ao próximo passo: pedir informações ou comprar.</p></div>
                   <div className="bcv3-service-type" aria-hidden="true">CLICK<span>↗</span></div>
                 </Reveal>
                 <Reveal className="bcv3-service-item bcv3-service-three" delay={0.16}>
                   
-                  <div className="bcv3-service-copy"><span>LOJAS VIRTUAIS</span><h3>SEUS PRODUTOS.<br />SUA LOJA.<br /><em>ONLINE.</em></h3><p>Organize produtos e categorias para o cliente encontrar o que procura e entender como comprar.</p></div>
+                  <div className="bcv3-service-copy"><span>LOJAS VIRTUAIS</span><h3>SUA LOJA.<br />SEU CATÁLOGO.<br /><em>ONLINE.</em></h3><p>Organize produtos e categorias para o cliente encontrar o que procura e entender como comprar.</p></div>
                   <div className="bcv3-service-horizontal-line" aria-hidden="true"/>
                 </Reveal>
               </div>
@@ -218,7 +218,7 @@ export default function BrandifyCreative() {
         <section id="pacotes" className="bcv3-plans bcv3-pad">
           <div className="bcv3-container">
 
-            <Reveal className="bcv3-plans-heading"><h2>QUAL FORMATO<br /><em>COMBINA COM VOCÊ?</em></h2><p>O tipo de site depende do momento do seu negócio. Você recebe uma proposta com as entregas e os custos antes de contratar.</p></Reveal>
+            <Reveal className="bcv3-plans-heading"><h2>QUAL SITE<br /><em>FAZ SENTIDO?</em></h2><p>O tipo de site depende do momento do seu negócio. Você recebe uma proposta com as entregas e os custos antes de contratar.</p></Reveal>
             <div className="bcv3-plan-list">
               {plans.map((plan, index) => <Reveal className={"bcv3-plan-row " + (index === 1 ? "bcv3-plan-featured" : "")} key={plan.name}>
                 <div className="bcv3-plan-identity"><h3>{plan.name}<span className="bcv3-plan-dot">.</span></h3><p>{plan.audience}</p></div>
@@ -232,7 +232,7 @@ export default function BrandifyCreative() {
 
         <section className="bcv3-faq bcv3-pad" id="duvidas">
           <div className="bcv3-container bcv3-faq-layout">
-            <div className="bcv3-faq-heading"><h2>O QUE VOCÊ<br />PRECISA <em>SABER?</em></h2><p>Investimento, prazo e suporte: veja o que costuma gerar dúvidas antes da contratação.</p></div>
+            <div className="bcv3-faq-heading"><h2>VAMOS<br /><em>ESCLARECER?</em></h2><p>Investimento, prazo e suporte: veja o que costuma gerar dúvidas antes da contratação.</p></div>
             <div className="bcv3-faq-list">{faqs.map(([q, a], i) => <div className="bcv3-faq-item" key={q}>
               <button type="button" aria-expanded={activeFaq === i} aria-controls={"faq-bcv3-" + i} onClick={() => setActiveFaq(activeFaq === i ? null : i)}><span>{q}</span><ChevronDown size={18} className={activeFaq === i ? "rotated" : ""}/></button>
               {activeFaq === i && <p id={"faq-bcv3-" + i}>{a}</p>}
