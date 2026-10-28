@@ -255,7 +255,7 @@ export default function BrandifyCreative() {
           <div className="bcv3-footer-grid">
             <div><span>NAVEGAÇÃO</span><a href="#sobre">Estúdio</a><a href="#servicos">Serviços</a><a href="#trabalhos">Projetos</a><a href="#pacotes">Pacotes</a></div>
             <div><span>CONTATO</span><a href={generalContact} target="_blank" rel="noopener noreferrer">WhatsApp: (43) 99106-5129 <ArrowUpRight size={14}/></a><a href="mailto:brandifycoo@gmail.com">brandifycoo@gmail.com <Mail size={14}/></a><a href="https://www.instagram.com/brandifycoo" target="_blank" rel="noopener noreferrer">Instagram <Instagram size={14}/></a></div>
-            <div><span>LOCALIZAÇÃO</span><p>Jacarezinho — Paraná<br />Brasil</p><a href="/privacidade">Política de privacidade</a></div>
+            <div><span>LOCALIZAÇÃO</span><p>Jacarezinho — Paraná<br />Brasil</p><a href="/privacidade">Privacidade</a><a href="/termos">Termos de uso</a><a href="/cookies">Cookies</a></div>
           </div>
           <div className="bcv3-footer-base"><span>© {new Date().getFullYear()} BRANDIFY. TODOS OS DIREITOS RESERVADOS.</span><span>SUA EMPRESA MERECE SER BEM APRESENTADA.</span></div>
         </div>
