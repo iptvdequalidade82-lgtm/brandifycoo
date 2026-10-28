@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import heroPhoto from "@/assets/reference/ref-11-underwater-laptop.jpg";
 import editorialPhoto from "@/assets/reference/ref-32-designers-website.jpg";
 import creativePhoto from "@/assets/reference/ref-12-agency-grid.jpg";
+import ForgeFitDeviceShowcase from "@/components/ForgeFitDeviceShowcase";
 import "./BrandifyCreative.css";
 
 const contactNumber = "5543991065129";
@@ -15,17 +16,6 @@ const marqueeMessages = [
   "SITES FEITOS PARA SE DESTACAR",
   "CRIATIVIDADE QUE SE VÊ",
   "DO CONCEITO À PUBLICAÇÃO",
-];
-
-const projects = [
-  {
-    name: "Forge Fit",
-    type: "EXPERIÊNCIA DIGITAL · FITNESS",
-    description: "Uma experiência digital com biblioteca de exercícios, organização de treinos e conteúdo para acompanhar a rotina.",
-    link: "https://foorgefit.lovable.app/",
-    image: "https://image.thum.io/get/width/1440/crop/900/https://foorgefit.lovable.app/",
-    layout: "forge",
-  },
 ];
 
 const plans = [
@@ -189,28 +179,10 @@ export default function BrandifyCreative() {
 
         <section id="trabalhos" className="bcv3-work bcv3-pad">
           <div className="bcv3-container">
-
-            <Reveal className="bcv3-work-heading"><h2>UM PROJETO.<br /><em>MUITO PROPÓSITO.</em></h2><p>Um trabalho real que mostra nossa abordagem para transformar uma ideia em uma experiência digital.</p></Reveal>
-            <div className="bcv3-projects">
-              {projects.map((project) => (
-                <Reveal key={project.name} className={"bcv3-project bcv3-project-" + project.layout}>
-                  <a href={project.link} target="_blank" rel="noopener noreferrer" aria-label={"Abrir projeto " + project.name} className="bcv3-project-media">
-                    <div className="bcv3-project-scene">
-                      <div className="bcv3-project-screen">
-                        <div className="bcv3-project-screenbar"><span>● ● ●</span><small>{project.link.replace("https://", "")}</small><ArrowUpRight size={13}/></div>
-                        <img loading="lazy" src={project.image} alt={"Captura do site do projeto " + project.name} onError={(ev) => { ev.currentTarget.style.visibility = "hidden"; }}/>
-                      </div>
-                      <div className="bcv3-project-label" aria-hidden="true">{project.name.toUpperCase()}</div>
-                    </div>
-                    <span className="bcv3-project-arrow" aria-hidden="true"><ArrowUpRight size={24}/></span>
-                  </a>
-                  <div className="bcv3-project-text"><div><span>{project.type}</span><h3>{project.name}</h3><p>{project.description}</p></div><ArrowUpRight size={25}/></div>
-                </Reveal>
-              ))}
-            </div>
+            <ForgeFitDeviceShowcase />
             <Reveal className="bcv3-case-editorial">
-              <h4>UM PROJETO.<br/><em>VÁRIAS POSSIBILIDADES.</em></h4>
-              <p>No Forge Fit, a experiência reúne exercícios ilustrados, organização de treinos e conteúdos de apoio em uma interface pensada para ser utilizada no dia a dia. É um exemplo concreto de como estrutura, design e desenvolvimento trabalham juntos.</p>
+              <h4>DO SITE AO CELULAR.<br/><em>SEM PERDER A EXPERIÊNCIA.</em></h4>
+              <p>O Forge Fit reúne organização de treinos, biblioteca de exercícios e conteúdos para a rotina fitness. Uma demonstração de como a Brandify pensa em clareza, apresentação e uso em diferentes telas.</p>
             </Reveal>
             <Reveal className="bcv3-project-closer"><p>SEU PROJETO TAMBÉM PODE GANHAR FORMA.</p><a href={generalContact} target="_blank" rel="noopener noreferrer">VAMOS CRIAR ALGO JUNTOS <ArrowUpRight size={18} /></a></Reveal>
           </div>
