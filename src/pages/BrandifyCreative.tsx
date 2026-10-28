@@ -197,13 +197,13 @@ export default function BrandifyCreative() {
         <section id="processo" className="bcv3-process bcv3-pad">
           <div className="bcv3-container">
 
-            <Reveal className="bcv3-process-heading"><h2>BOAS IDEIAS<br />PEDEM <em>MÉTODO.</em></h2><p>Um processo objetivo, com decisões claras e acompanhamento em cada fase.</p></Reveal>
+            <Reveal className="bcv3-process-heading"><h2>COMO SEU SITE<br /><em>SAI DO PAPEL.</em></h2><p>Você sabe o que vamos criar, quais materiais serão necessários e o que está previsto antes de começar.</p></Reveal>
             <div className="bcv3-process-rows">
               {[
-                ["01", "CONVERSA", "Entendemos o negócio, o público e o objetivo do projeto."],
-                ["02", "DIREÇÃO", "Definimos estrutura, referências e linguagem visual."],
-                ["03", "CRIAÇÃO", "Desenvolvemos a experiência com atenção ao desktop e ao celular."],
-                ["04", "ENTREGA", "Revisamos, validamos e organizamos a publicação."],
+                ["01", "ENTENDER", "Você conta sobre a empresa, os serviços e o que espera do site."],
+                ["02", "PLANEJAR", "Organizamos páginas, conteúdos e referências para alinhar a proposta."],
+                ["03", "CRIAR", "Desenvolvemos o site considerando a navegação no computador e no celular."],
+                ["04", "PUBLICAR", "Revisamos o projeto e alinhamos o que é necessário para colocá-lo no ar."],
               ].map((step) => <Reveal className="bcv3-process-row" key={step[0]}><span>{step[0]} /</span><h3>{step[1]}</h3><p>{step[2]}</p><MoveUpRight size={28} aria-hidden="true"/></Reveal>)}
             </div>
           </div>
@@ -212,7 +212,7 @@ export default function BrandifyCreative() {
         <section id="pacotes" className="bcv3-plans bcv3-pad">
           <div className="bcv3-container">
 
-            <Reveal className="bcv3-plans-heading"><h2>QUAL É O SEU<br /><em>PRÓXIMO PASSO?</em></h2><p>Três formatos de projeto. O escopo e o investimento finais são definidos com você antes do início.</p></Reveal>
+            <Reveal className="bcv3-plans-heading"><h2>QUAL FORMATO<br /><em>COMBINA COM VOCÊ?</em></h2><p>O tipo de site depende do momento do seu negócio. Você recebe uma proposta com as entregas e os custos antes de contratar.</p></Reveal>
             <div className="bcv3-plan-list">
               {plans.map((plan, index) => <Reveal className={"bcv3-plan-row " + (index === 1 ? "bcv3-plan-featured" : "")} key={plan.name}>
                 <div className="bcv3-plan-identity"><h3>{plan.name}<span className="bcv3-plan-dot">.</span></h3><p>{plan.audience}</p></div>
