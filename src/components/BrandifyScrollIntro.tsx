@@ -94,11 +94,6 @@ function ReducedMotionIntro() {
         <p>Criamos sites, landing pages e lojas virtuais com design de verdade — para negócios que querem ser percebidos.</p>
         <PrimaryAction/>
       </div>
-      <div className="bsi-static-proof">
-        <h2>DO DESKTOP<br/><em>AO CELULAR.</em></h2>
-        <p>Experiências digitais pensadas para funcionar em cada tela. Conheça um projeto real da Brandify.</p>
-        <a href={forgeFitUrl} target="_blank" rel="noopener noreferrer">CONHECER FORGE FIT <ArrowUpRight size={17}/></a>
-      </div>
     </section>
   );
 }
