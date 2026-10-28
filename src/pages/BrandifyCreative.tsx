@@ -148,7 +148,7 @@ export default function BrandifyCreative() {
               </Reveal>
               <Reveal className="bcv3-intro-editorial" delay={0.12}>
                 <div className="bcv3-intro-image"><img src={editorialPhoto} alt="Referência visual editorial de design digital" loading="lazy" /></div>
-                <div className="bcv3-intro-editorial-footer"><span>BRANDIFY / VISUAL LANGUAGE</span><span>CRIATIVIDADE QUE SE VÊ.</span></div>
+                
               </Reveal>
             </div>
             <Reveal className="bcv3-intro-manifesto">
@@ -168,17 +168,17 @@ export default function BrandifyCreative() {
             <div className="bcv3-service-grid">
               <Reveal className="bcv3-service-item bcv3-service-one">
                 <div className="bcv3-service-photo" style={{ backgroundImage: "url(" + creativePhoto + ")" }} />
-                <div className="bcv3-service-top"><span>01 / PRESENÇA</span><ArrowUpRight size={24} /></div>
+                
                 <div className="bcv3-service-copy"><span>SITES INSTITUCIONAIS</span><h3>PARA SER<br />LEVADO A<br /><em>SÉRIO.</em></h3><p>Sites que apresentam sua empresa, seus serviços e sua história de forma clara e memorável.</p></div>
               </Reveal>
               <div className="bcv3-service-right">
                 <Reveal className="bcv3-service-item bcv3-service-two" delay={0.12}>
-                  <div className="bcv3-service-top"><span>02 / CONVERSÃO</span><ArrowUpRight size={24} /></div>
+                  
                   <div className="bcv3-service-copy"><span>LANDING PAGES</span><h3>UMA IDEIA.<br /><em>UMA AÇÃO.</em></h3><p>Páginas estratégicas para apresentar ofertas e gerar oportunidades de contato.</p></div>
                   <div className="bcv3-service-type" aria-hidden="true">CLICK<span>↗</span></div>
                 </Reveal>
                 <Reveal className="bcv3-service-item bcv3-service-three" delay={0.16}>
-                  <div className="bcv3-service-top"><span>03 / COMÉRCIO DIGITAL</span><ArrowUpRight size={24} /></div>
+                  
                   <div className="bcv3-service-copy"><span>LOJAS VIRTUAIS</span><h3>DO SEU<br />NEGÓCIO PARA<br /><em>O MUNDO.</em></h3><p>Vitrine, produtos e navegação em uma loja preparada para receber clientes.</p></div>
                   <div className="bcv3-service-horizontal-line" aria-hidden="true"/>
                 </Reveal>
@@ -252,7 +252,7 @@ export default function BrandifyCreative() {
 
         <section className="bcv3-faq bcv3-pad" id="duvidas">
           <div className="bcv3-container bcv3-faq-layout">
-            <div className="bcv3-faq-heading"><div className="bcv3-eyebrow"><span>06 / PERGUNTAS FREQUENTES</span></div><h2>AINDA<br />TEM <em>DÚVIDAS?</em></h2><p>As respostas que você precisa antes de começar.</p></div>
+            <div className="bcv3-faq-heading"><h2>AINDA<br />TEM <em>DÚVIDAS?</em></h2><p>As respostas que você precisa antes de começar.</p></div>
             <div className="bcv3-faq-list">{faqs.map(([q, a], i) => <div className="bcv3-faq-item" key={q}>
               <button type="button" aria-expanded={activeFaq === i} aria-controls={"faq-bcv3-" + i} onClick={() => setActiveFaq(activeFaq === i ? null : i)}><span>{q}</span><ChevronDown size={18} className={activeFaq === i ? "rotated" : ""}/></button>
               {activeFaq === i && <p id={"faq-bcv3-" + i}>{a}</p>}
