@@ -3,19 +3,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
 const Dashboard = lazy(() => import("./pages/Dashboard"));
-const ToolsCopy = lazy(() => import("./pages/ToolsCopy"));
-const ToolsLanding = lazy(() => import("./pages/ToolsLanding"));
-const ToolsAtendedor = lazy(() => import("./pages/ToolsAtendedor"));
-const ToolsAgendador = lazy(() => import("./pages/ToolsAgendador"));
-const ToolsDiagnosticoIG = lazy(() => import("./pages/ToolsDiagnosticoIG"));
-const ToolsPlanejamento = lazy(() => import("./pages/ToolsPlanejamento"));
-const ToolsSimulador = lazy(() => import("./pages/ToolsSimulador"));
 
 const LazyPage = ({ children }: { children: React.ReactNode }) => (
   <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center"><div className="w-8 h-8 border-2 border-white/20 border-t-white/80 rounded-full animate-spin" /></div>}>
@@ -23,8 +16,6 @@ const LazyPage = ({ children }: { children: React.ReactNode }) => (
   </Suspense>
 );
 
-import TrabalheConosco from "./pages/TrabalheConosco";
-import QuemSomos from "./pages/QuemSomos";
 import Privacidade from "./pages/Privacidade";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -34,18 +25,10 @@ import AdminLogs from "./pages/AdminLogs";
 import AdminLeads from "./pages/AdminLeads";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PixPayment from "./pages/PixPayment";
-import Projetos from "./pages/Projetos";
-import Curso from "./pages/Curso";
-import Planos from "./pages/Planos";
 import AdminContabilidade from "./pages/AdminContabilidade";
 import AdminPreviews from "./pages/AdminPreviews";
 import AdminConteudo from "./pages/AdminConteudo";
 import AdminIAs from "./pages/AdminIAs";
-import AuthLogin from "./pages/AuthLogin";
-import AuthSignup from "./pages/AuthSignup";
-import IAs from "./pages/IAs";
-import PlanosPro from "./pages/PlanosPro";
-import Editor from "./pages/Editor";
 
 const queryClient = new QueryClient();
 
@@ -58,11 +41,11 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/login" element={<AuthLogin />} />
-            <Route path="/cadastro" element={<AuthSignup />} />
-            <Route path="/ias" element={<IAs />} />
-            <Route path="/planos-pro" element={<PlanosPro />} />
-            <Route path="/editor" element={<Editor />} />
+            <Route path="/login" element={<Navigate to="/" replace />} />
+            <Route path="/cadastro" element={<Navigate to="/" replace />} />
+            <Route path="/ias" element={<Navigate to="/" replace />} />
+            <Route path="/planos-pro" element={<Navigate to="/" replace />} />
+            <Route path="/editor" element={<Navigate to="/" replace />} />
             <Route path="/dashboard" element={<LazyPage><Dashboard /></LazyPage>} />
             <Route path="/tools/copy" element={<LazyPage><ToolsCopy /></LazyPage>} />
             <Route path="/tools/landing" element={<LazyPage><ToolsLanding /></LazyPage>} />
@@ -71,13 +54,13 @@ const App = () => (
             <Route path="/tools/diagnostico-ig" element={<LazyPage><ToolsDiagnosticoIG /></LazyPage>} />
             <Route path="/tools/planejamento" element={<LazyPage><ToolsPlanejamento /></LazyPage>} />
             <Route path="/tools/simulador" element={<LazyPage><ToolsSimulador /></LazyPage>} />
-            <Route path="/projetos" element={<Projetos />} />
+            <Route path="/projetos" element={<Navigate to="/#trabalhos" replace />} />
             
-            <Route path="/curso" element={<Curso />} />
-            <Route path="/planos" element={<Planos />} />
+            <Route path="/curso" element={<Navigate to="/#servicos" replace />} />
+            <Route path="/planos" element={<Navigate to="/#pacotes" replace />} />
             
-            <Route path="/trabalhe-conosco" element={<TrabalheConosco />} />
-            <Route path="/quem-somos" element={<QuemSomos />} />
+            <Route path="/trabalhe-conosco" element={<Navigate to="/#contato" replace />} />
+            <Route path="/quem-somos" element={<Navigate to="/#sobre" replace />} />
             <Route path="/privacidade" element={<Privacidade />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminDashboard />} />
