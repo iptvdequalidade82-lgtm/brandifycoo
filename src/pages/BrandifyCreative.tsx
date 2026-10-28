@@ -42,12 +42,15 @@ const plans = [
 ];
 
 const faqs = [
-  ["Quanto custa um projeto?", "Cada projeto tem necessidades diferentes. A Brandify prepara uma proposta com escopo e investimento após entender seu negócio. Não há valores ocultos ou preços inventados nesta página."],
-  ["O domínio e a hospedagem estão incluídos?", "Domínio, hospedagem e possíveis mensalidades de plataformas são discriminados na proposta antes da contratação."],
-  ["O site funciona bem no celular?", "Sim. O projeto é desenvolvido com layout responsivo e atenção à experiência em telas menores."],
-  ["Quais materiais preciso enviar?", "Informações sobre a empresa, serviços ou produtos, logotipo, textos e fotos disponíveis. Nós explicamos o que é necessário durante o briefing."],
-  ["Qual é o prazo de entrega?", "O prazo depende das páginas, integrações e materiais envolvidos. Ele é acordado na proposta antes do início do desenvolvimento."],
-  ["Como funciona a manutenção?", "A manutenção e os ajustes após a entrega são definidos no escopo contratado. Podemos avaliar necessidades adicionais em separado."],
+  ["Quanto custa criar um site?", "O valor depende do tipo de site, das páginas e dos recursos necessários. Depois de entender sua ideia, apresentamos uma proposta com o investimento e o que será entregue."],
+  ["Como sei se vou gostar do resultado?", "Antes do desenvolvimento, alinhamos o objetivo, as referências e a estrutura do site. Também combinamos como funcionam as revisões. Você pode conhecer um projeto real no nosso portfólio."],
+  ["Preciso ter logo, textos e fotos prontos?", "Conte o que você já tem. Na conversa inicial, explicamos quais materiais são necessários e o que ainda precisa ser preparado."],
+  ["Domínio, hospedagem e mensalidades estão incluídos?", "Esses custos dependem da solução escolhida. A proposta informa o que está incluído e quais despesas podem ser cobradas separadamente."],
+  ["Em quanto tempo meu site fica pronto?", "O prazo varia conforme o escopo e a disponibilidade dos materiais. Você recebe uma previsão de entrega antes de contratar."],
+  ["O site funciona no celular?", "Sim. Planejamos a navegação para computador e celular, com conteúdo organizado para diferentes tamanhos de tela."],
+  ["E se eu já tiver um site?", "Podemos avaliar o que existe e conversar sobre melhorias ou uma nova estrutura. A indicação depende dos seus objetivos e das condições técnicas do projeto."],
+  ["Um site garante mais vendas?", "Não. Um site bem construído facilita a apresentação do negócio e o contato com clientes, mas o resultado depende também da oferta, da divulgação e do atendimento."],
+  ["E depois que o site for publicado?", "O suporte, a manutenção e os ajustes posteriores dependem do que for combinado. Essas condições devem aparecer claramente na proposta."],
 ];
 
 const Reveal = ({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) => (
@@ -229,7 +232,7 @@ export default function BrandifyCreative() {
 
         <section className="bcv3-faq bcv3-pad" id="duvidas">
           <div className="bcv3-container bcv3-faq-layout">
-            <div className="bcv3-faq-heading"><h2>AINDA<br />TEM <em>DÚVIDAS?</em></h2><p>As respostas que você precisa antes de começar.</p></div>
+            <div className="bcv3-faq-heading"><h2>O QUE VOCÊ<br />PRECISA <em>SABER?</em></h2><p>Investimento, prazo e suporte: veja o que costuma gerar dúvidas antes da contratação.</p></div>
             <div className="bcv3-faq-list">{faqs.map(([q, a], i) => <div className="bcv3-faq-item" key={q}>
               <button type="button" aria-expanded={activeFaq === i} aria-controls={"faq-bcv3-" + i} onClick={() => setActiveFaq(activeFaq === i ? null : i)}><span>{q}</span><ChevronDown size={18} className={activeFaq === i ? "rotated" : ""}/></button>
               {activeFaq === i && <p id={"faq-bcv3-" + i}>{a}</p>}
@@ -240,24 +243,24 @@ export default function BrandifyCreative() {
         <section id="contato" className="bcv3-close">
           <div className="bcv3-container">
 
-            <Reveal><h2>PRONTO PARA<br /><em>SAIR DO</em><br />COMUM<span>?</span></h2></Reveal>
-            <div className="bcv3-close-bottom"><p>A sua próxima grande impressão pode começar com uma conversa.</p><a href={generalContact} target="_blank" rel="noopener noreferrer">COMEÇAR MEU PROJETO <ArrowUpRight size={25}/></a></div>
+            <Reveal><h2>VAMOS FALAR<br /><em>SOBRE O</em><br />SEU SITE<span>?</span></h2></Reveal>
+            <div className="bcv3-close-bottom"><p>Conte o que sua empresa faz e o que precisa. A gente conversa sobre o formato mais adequado antes de preparar uma proposta.</p><a href={generalContact} target="_blank" rel="noopener noreferrer">PEDIR UMA PROPOSTA <ArrowUpRight size={25}/></a></div>
           </div>
         </section>
       </main>
 
       <footer className="bcv3-footer">
         <div className="bcv3-container">
-          <div className="bcv3-footer-top"><a href="#inicio" className="bcv3-footer-logo"><img className="bcv3-footer-mark" src="/brandify-mark-black.svg" alt="" />brandify<span>.</span></a><p>DESIGN, DESENVOLVIMENTO<br />E PRESENÇA DIGITAL.</p></div>
+          <div className="bcv3-footer-top"><a href="#inicio" className="bcv3-footer-logo"><img className="bcv3-footer-mark" src="/brandify-mark-black.svg" alt="" />brandify<span>.</span></a><p>SITES PARA APRESENTAR<br />MELHOR SUA EMPRESA.</p></div>
           <div className="bcv3-footer-grid">
             <div><span>NAVEGAÇÃO</span><a href="#sobre">Estúdio</a><a href="#servicos">Serviços</a><a href="#trabalhos">Projetos</a><a href="#pacotes">Pacotes</a></div>
             <div><span>CONTATO</span><a href={generalContact} target="_blank" rel="noopener noreferrer">WhatsApp: (43) 99106-5129 <ArrowUpRight size={14}/></a><a href="mailto:brandifycoo@gmail.com">brandifycoo@gmail.com <Mail size={14}/></a><a href="https://www.instagram.com/brandifycoo" target="_blank" rel="noopener noreferrer">Instagram <Instagram size={14}/></a></div>
             <div><span>LOCALIZAÇÃO</span><p>Jacarezinho — Paraná<br />Brasil</p><a href="/privacidade">Política de privacidade</a></div>
           </div>
-          <div className="bcv3-footer-base"><span>© {new Date().getFullYear()} BRANDIFY. TODOS OS DIREITOS RESERVADOS.</span><span>IDEIAS COM INTENÇÃO.</span></div>
+          <div className="bcv3-footer-base"><span>© {new Date().getFullYear()} BRANDIFY. TODOS OS DIREITOS RESERVADOS.</span><span>SUA EMPRESA MERECE SER BEM APRESENTADA.</span></div>
         </div>
       </footer>
-      <a className="bcv3-floating-contact" aria-label="Conversar com a Brandify pelo WhatsApp" href={generalContact} target="_blank" rel="noopener noreferrer">VAMOS CONVERSAR <ArrowUpRight size={17}/></a>
+      <a className="bcv3-floating-contact" aria-label="Pedir proposta à Brandify pelo WhatsApp" href={generalContact} target="_blank" rel="noopener noreferrer">PEDIR PROPOSTA <ArrowUpRight size={17}/></a>
     </div>
   );
 }
