@@ -9,6 +9,8 @@ import NotFound from "./pages/NotFound";
 
 
 import Privacidade from "./pages/Privacidade";
+import Termos from "./pages/Termos";
+import Cookies from "./pages/Cookies";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminProjects from "./pages/AdminProjects";
@@ -54,6 +56,8 @@ const App = () => (
             <Route path="/trabalhe-conosco" element={<Navigate to="/#contato" replace />} />
             <Route path="/quem-somos" element={<Navigate to="/#sobre" replace />} />
             <Route path="/privacidade" element={<Privacidade />} />
+            <Route path="/termos" element={<Termos />} />
+            <Route path="/cookies" element={<Cookies />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/projetos" element={<AdminProjects />} />
