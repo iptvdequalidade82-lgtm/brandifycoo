@@ -58,7 +58,7 @@ export default function BrandifyCreative() {
   const [activeFaq, setActiveFaq] = useState<number | null>(0);
 
   useEffect(() => {
-    document.title = "Brandify — Sites com identidade. Presença que marca.";
+    document.title = "Criação de Sites para Empresas | Brandify";
     const jump = () => {
       const hash = location.hash.slice(1);
       if (hash) document.getElementById(hash)?.scrollIntoView();
