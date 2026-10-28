@@ -6,14 +6,14 @@ import heroPhoto from "@/assets/reference/ref-11-underwater-laptop.jpg";
 import "./BrandifyScrollIntro.css";
 
 const contactNumber = "5543991065129";
-const projectContact = "https://wa.me/" + contactNumber + "?text=" + encodeURIComponent("Olá! Conheci a Brandify e quero tirar meu projeto do papel.");
+const projectContact = "https://wa.me/" + contactNumber + "?text=" + encodeURIComponent("Olá! Quero uma proposta de site para minha empresa. Posso explicar o que preciso?");
 const forgeFitUrl = "https://foorgefit.life/";
 const forgeFitSnapshot = "https://image.thum.io/get/width/1200/crop/850/noanimate/https://foorgefit.life/";
 
 function PrimaryAction({ className = "", tabIndex }: { className?: string; tabIndex?: number }) {
   return (
     <a className={"bsi-primary-action " + className} href={projectContact} target="_blank" rel="noopener noreferrer" tabIndex={tabIndex}>
-      <span>TIRAR MEU PROJETO DO PAPEL</span>
+      <span>PEDIR PROPOSTA DO MEU SITE</span>
       <span className="bsi-primary-icon"><ArrowUpRight size={22} aria-hidden="true" /></span>
     </a>
   );
@@ -90,8 +90,8 @@ function ReducedMotionIntro() {
     <section id="inicio" className="bsi-static" aria-label="Apresentação da Brandify">
       <div className="bsi-static-bg" style={{ backgroundImage: "url(" + heroPhoto + ")" }} aria-hidden="true" />
       <div className="bsi-static-hero">
-        <h1>SUA MARCA<br/>NÃO NASCEU<br/>PRA SER <em>COMUM.</em></h1>
-        <p>Criamos sites, landing pages e lojas virtuais com design de verdade — para negócios que querem ser percebidos.</p>
+        <h1>SEU NEGÓCIO<br/>MERECE UM SITE<br/>À <em>ALTURA.</em></h1>
+        <p>Criamos sites, landing pages e lojas virtuais para apresentar melhor sua empresa e facilitar o contato com clientes.</p>
         <PrimaryAction/>
       </div>
     </section>
@@ -141,9 +141,9 @@ export default function BrandifyScrollIntro() {
 
         <motion.div className="bsi-opening" aria-hidden={!heroInteractive} style={{ opacity: heroOpacity, y: heroLift, pointerEvents: heroInteractive ? "auto" : "none" }}>
           <div className="bsi-opening-body">
-            <h1>SUA MARCA<br />NÃO NASCEU<br />PRA SER <em>COMUM.</em></h1>
+            <h1>SEU NEGÓCIO<br />MERECE UM SITE<br />À <em>ALTURA.</em></h1>
             <div className="bsi-opening-foot">
-              <p>Criamos sites, landing pages e lojas virtuais com design de verdade — para negócios que querem ser percebidos.</p>
+              <p>Criamos sites, landing pages e lojas virtuais para apresentar melhor sua empresa e facilitar o contato com clientes.</p>
               <PrimaryAction tabIndex={heroInteractive ? undefined : -1} />
             </div>
           </div>
@@ -159,27 +159,27 @@ export default function BrandifyScrollIntro() {
         </div>
 
         <motion.div className="bsi-caption bsi-caption-desktop" style={{ opacity: messageOne }}>
-          <span className="bsi-caption-tag">DESIGN + DESENVOLVIMENTO</span>
-          <h2>PRIMEIRO,<br /><em>IMPRESSÃO.</em></h2>
-          <p>Um site profissional começa com uma presença que faz as pessoas prestarem atenção.</p>
+          <span className="bsi-caption-tag">APRESENTE BEM A SUA EMPRESA</span>
+          <h2>MOSTRE<br /><em>QUEM VOCÊ É.</em></h2>
+          <p>Serviços claros, informações organizadas e um jeito simples de encontrar sua empresa.</p>
         </motion.div>
         <motion.div className="bsi-caption bsi-caption-mobile" style={{ opacity: messageTwo }}>
-          <span className="bsi-caption-tag">DO DESKTOP AO CELULAR</span>
-          <h2>DEPOIS,<br /><em>EXPERIÊNCIA.</em></h2>
-          <p>A mesma atenção aos detalhes em cada tamanho de tela.</p>
+          <span className="bsi-caption-tag">NAVEGAÇÃO EM DIFERENTES TELAS</span>
+          <h2>FÁCIL DE VER.<br /><em>FÁCIL DE USAR.</em></h2>
+          <p>Quem visita pelo celular também precisa entender sua oferta e encontrar o contato.</p>
         </motion.div>
 
         <motion.div className="bsi-conclusion" aria-hidden={!conclusionInteractive} style={{ opacity: closeOpacity, y: closeY, pointerEvents: conclusionInteractive ? "auto" : "none" }}>
-          <span>DESIGN QUE FUNCIONA EM CADA TELA</span>
-          <h2>AGORA, IMAGINE<br /><em>O SEU NEGÓCIO AQUI.</em></h2>
+          <span>UM SITE QUE REPRESENTA SEU NEGÓCIO</span>
+          <h2>AGORA, VAMOS<br /><em>FALAR DO SEU SITE.</em></h2>
           <div className="bsi-conclusion-links">
             <PrimaryAction tabIndex={conclusionInteractive ? undefined : -1} />
-            <a tabIndex={conclusionInteractive ? undefined : -1} href={forgeFitUrl} target="_blank" rel="noopener noreferrer">VER O PROJETO REAL <ArrowUpRight size={19} aria-hidden="true" /></a>
+            <a tabIndex={conclusionInteractive ? undefined : -1} href={forgeFitUrl} target="_blank" rel="noopener noreferrer">CONHECER O FORGE FIT <ArrowUpRight size={19} aria-hidden="true" /></a>
           </div>
         </motion.div>
 
-        <div className="bsi-scroll-hint" aria-hidden="true"><ArrowDown size={18}/><span>ROLE PARA EXPLORAR</span></div>
-        <a href="#sobre" className="bsi-skip-story">PULAR APRESENTAÇÃO <ArrowUpRight size={14}/></a>
+        <div className="bsi-scroll-hint" aria-hidden="true"><ArrowDown size={18}/><span>ROLE PARA VER COMO FUNCIONA</span></div>
+        <a href="#sobre" className="bsi-skip-story">IR DIRETO AOS SERVIÇOS <ArrowUpRight size={14}/></a>
         <div className="bsi-progress" aria-hidden="true"><motion.span style={{ height: progressFill }}/></div>
         <div className="bsi-screen-note" aria-hidden="true">TELAS ILUSTRATIVAS · PROJETO FORGE FIT</div>
       </div>
