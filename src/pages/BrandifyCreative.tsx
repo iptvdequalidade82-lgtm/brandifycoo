@@ -116,7 +116,7 @@ export default function BrandifyCreative() {
                 <p>Se as informações estão confusas ou o visual parece improvisado, o visitante pode sair antes mesmo de conversar com você.</p>
               </Reveal>
               <Reveal className="bcv3-intro-editorial" delay={0.12}>
-                <div className="bcv3-intro-image"><img src={editorialPhoto} alt="Referência visual editorial de design digital" loading="lazy" /></div>
+                <div className="bcv3-intro-image"><img src={editorialPhoto} alt="Composição editorial usada para ilustrar a criação de sites profissionais" loading="lazy" /></div>
                 
               </Reveal>
             </div>
@@ -131,24 +131,24 @@ export default function BrandifyCreative() {
           <div className="bcv3-container">
 
             <Reveal className="bcv3-services-heading">
-              <h2>DO PRIMEIRO CLIQUE<br />À <em>ÚLTIMA IMPRESSÃO.</em></h2>
-              <p>Cada negócio tem uma necessidade. Nenhum merece uma presença digital genérica.</p>
+              <h2>QUAL SITE FAZ<br /><em>SENTIDO PARA VOCÊ?</em></h2>
+              <p>Nem toda empresa precisa da mesma estrutura. O ponto de partida é entender o que seu cliente precisa encontrar.</p>
             </Reveal>
             <div className="bcv3-service-grid">
               <Reveal className="bcv3-service-item bcv3-service-one">
                 <div className="bcv3-service-photo" style={{ backgroundImage: "url(" + creativePhoto + ")" }} />
                 
-                <div className="bcv3-service-copy"><span>SITES INSTITUCIONAIS</span><h3>PARA SER<br />LEVADO A<br /><em>SÉRIO.</em></h3><p>Sites que apresentam sua empresa, seus serviços e sua história de forma clara e memorável.</p></div>
+                <div className="bcv3-service-copy"><span>SITES INSTITUCIONAIS</span><h3>MOSTRE<br />O VALOR<br /><em>DO SEU NEGÓCIO.</em></h3><p>Apresente seus serviços, explique como sua empresa trabalha e mostre ao cliente como entrar em contato.</p></div>
               </Reveal>
               <div className="bcv3-service-right">
                 <Reveal className="bcv3-service-item bcv3-service-two" delay={0.12}>
                   
-                  <div className="bcv3-service-copy"><span>LANDING PAGES</span><h3>UMA IDEIA.<br /><em>UMA AÇÃO.</em></h3><p>Páginas estratégicas para apresentar ofertas e gerar oportunidades de contato.</p></div>
+                  <div className="bcv3-service-copy"><span>LANDING PAGES</span><h3>SUA OFERTA.<br /><em>SEM DISTRAÇÕES.</em></h3><p>Uma página focada em explicar sua oferta e conduzir o visitante ao próximo passo: pedir informações ou comprar.</p></div>
                   <div className="bcv3-service-type" aria-hidden="true">CLICK<span>↗</span></div>
                 </Reveal>
                 <Reveal className="bcv3-service-item bcv3-service-three" delay={0.16}>
                   
-                  <div className="bcv3-service-copy"><span>LOJAS VIRTUAIS</span><h3>DO SEU<br />NEGÓCIO PARA<br /><em>O MUNDO.</em></h3><p>Vitrine, produtos e navegação em uma loja preparada para receber clientes.</p></div>
+                  <div className="bcv3-service-copy"><span>LOJAS VIRTUAIS</span><h3>SEUS PRODUTOS.<br />SUA LOJA.<br /><em>ONLINE.</em></h3><p>Organize produtos e categorias para o cliente encontrar o que procura e entender como comprar.</p></div>
                   <div className="bcv3-service-horizontal-line" aria-hidden="true"/>
                 </Reveal>
               </div>
