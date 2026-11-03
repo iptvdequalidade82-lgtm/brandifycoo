@@ -1,6 +1,6 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { ArrowDown, ArrowUpRight } from "lucide-react";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import type { MotionValue } from "framer-motion";
 import referenceSprite from "./brandifyReferenceSprite";
 import heroPhoto from "@/assets/reference/ref-11-underwater-laptop.jpg";
@@ -20,9 +20,9 @@ const cards = [
   { name: "Presença", position: "0% 100%", source: "Referência: design esportivo" },
 ];
 
-function Action({ className = "" }: { className?: string }) {
+function Action({ className = "", tabIndex }: { className?: string; tabIndex?: number }) {
   return (
-    <a href={wa} target="_blank" rel="noopener noreferrer" className={"bvr-action " + className}>
+    <a href={wa} target="_blank" rel="noopener noreferrer" className={"bvr-action " + className} tabIndex={tabIndex}>
       <span>PEDIR PROPOSTA DO MEU SITE</span>
       <span className="bvr-action-icon"><ArrowUpRight size={20} aria-hidden="true" /></span>
     </a>
@@ -81,6 +81,8 @@ function StaticIntro() {
 export default function BrandifyRibbonScroll() {
   const section = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
+  const [heroActive, setHeroActive] = useState(true);
+  const [closingActive, setClosingActive] = useState(false);
   const { scrollYProgress } = useScroll({ target:section, offset:["start start","end end"] });
   const heroOpacity = useTransform(scrollYProgress, [0,.13,.28], [1,1,0]);
   const heroY = useTransform(scrollYProgress, [0,.28], [0,-110]);
@@ -91,6 +93,10 @@ export default function BrandifyRibbonScroll() {
   const closeOpacity = useTransform(scrollYProgress, [.82,.92,1], [0,1,1]);
   const closeY = useTransform(scrollYProgress, [.84,1], [55,0]);
   const progress = useTransform(scrollYProgress, [0,1], ["0%","100%"]);
+  useMotionValueEvent(scrollYProgress, "change", v => {
+    setHeroActive(v < .23);
+    setClosingActive(v > .9);
+  });
   if (reduced) return <StaticIntro />;
 
   return (
@@ -98,12 +104,12 @@ export default function BrandifyRibbonScroll() {
       <div className="bvr-stage">
         <motion.div className="bvr-photo" style={{ backgroundImage:"url(" + heroPhoto + ")", opacity:photoOpacity }} aria-hidden="true" />
         <div className="bvr-vignette" aria-hidden="true" />
-        <motion.div className="bvr-hero" style={{ opacity:heroOpacity,y:heroY }}>
+        <motion.div className="bvr-hero" aria-hidden={!heroActive} style={{ opacity:heroOpacity,y:heroY,pointerEvents:heroActive?"auto":"none" }}>
           <div className="bvr-hero-inner">
             <h1>SEU NEGÓCIO<br />MERECE UM SITE<br />À <em>ALTURA.</em></h1>
             <div className="bvr-hero-bottom">
               <p>Criamos sites, landing pages e lojas virtuais para apresentar melhor sua empresa e facilitar o contato com clientes.</p>
-              <div><Action /><small>Primeiro, uma conversa para entender seu projeto. Sem compromisso.</small></div>
+              <div><Action tabIndex={heroActive?undefined:-1} /><small>Primeiro, uma conversa para entender seu projeto. Sem compromisso.</small></div>
             </div>
           </div>
         </motion.div>
@@ -112,14 +118,15 @@ export default function BrandifyRibbonScroll() {
           <motion.span style={{ x:topTitleX }}>IDEIAS QUE</motion.span>
           <motion.span className="bvr-title-alt" style={{ x:titleX }}>SAEM DA TELA.</motion.span>
         </motion.div>
+        <motion.p className="bvr-disclosure" style={{opacity:titleOpacity}}>REFERÊNCIAS DE OUTROS SITES · INSPIRAÇÃO VISUAL, NÃO PORTFÓLIO DA BRANDIFY</motion.p>
         <div className="bvr-card-space" aria-hidden="true">
           {cards.map((_,i) => <RibbonCard key={i} index={i} progress={scrollYProgress} />)}
         </div>
-        <motion.div className="bvr-close" style={{opacity:closeOpacity,y:closeY}}>
+        <motion.div className="bvr-close" aria-hidden={!closingActive} style={{opacity:closeOpacity,y:closeY,pointerEvents:closingActive?"auto":"none"}}>
           <span className="bvr-close-kicker">DO CONCEITO AO SEU PRÓPRIO SITE</span>
           <h2>AGORA, A SUA<br /><em>MARCA EM DESTAQUE.</em></h2>
           <p>As referências inspiram. O projeto precisa ter a identidade do seu negócio.</p>
-          <Action />
+          <Action tabIndex={closingActive?undefined:-1} />
         </motion.div>
         <div className="bvr-bottom">
           <span className="bvr-scroll-tip"><ArrowDown size={16} /> ROLE PARA EXPLORAR</span>
