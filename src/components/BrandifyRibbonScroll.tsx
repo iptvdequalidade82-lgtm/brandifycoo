@@ -54,26 +54,32 @@ function RibbonCard({ index, progress }: { index: number; progress: MotionValue<
   );
 }
 
-function StaticIntro() {
+function StaticIntro({ onEnable }: { onEnable: () => void }) {
   return (
-    <section id="inicio" className="bvr-static">
-      <div className="bvr-static-hero" style={{ backgroundImage: "linear-gradient(95deg,#05060de8,#1014238f),url(" + heroPhoto + ")" }}>
+    <section id="inicio" className="bvr-static bvr-static-premium" aria-label="Apresentação da Brandify">
+      <div className="bvr-static-cover" style={{ backgroundImage: "url(" + heroPhoto + ")" }} aria-hidden="true" />
+      <div className="bvr-static-overlay" aria-hidden="true" />
+      <div className="bvr-static-visuals" aria-hidden="true">
+        {cards.slice(0, 4).map((item, index) => (
+          <div className={"bvr-static-fan bvr-static-fan-" + index} key={item.name}>
+            <div className="bvr-static-fan-image" style={{ backgroundImage: "url(" + referenceSprite + ")", backgroundPosition: item.position }} />
+            <span>{item.name}</span>
+          </div>
+        ))}
+      </div>
+      <div className="bvr-static-copy">
+        <span className="bvr-static-overline">BRANDIFY / ESTÚDIO DE SITES</span>
         <h1>SEU NEGÓCIO<br />MERECE UM SITE<br />À <em>ALTURA.</em></h1>
         <p>Criamos sites, landing pages e lojas virtuais para apresentar melhor sua empresa e facilitar o contato com clientes.</p>
-        <Action />
-      </div>
-      <div className="bvr-static-reference">
-        <h2>IDEIAS QUE<br /><em>SAEM DA TELA.</em></h2>
-        <div className="bvr-static-gallery">
-          {cards.slice(0,4).map((item, i) => (
-            <div className="bvr-static-card" key={item.name}>
-              <div style={{ backgroundImage:"url(" + referenceSprite + ")", backgroundPosition:item.position }} />
-              <span>{String(i+1).padStart(2,"0")} — {item.name}</span>
-            </div>
-          ))}
+        <div className="bvr-static-buttons">
+          <button className="bvr-activate" type="button" onClick={onEnable}>
+            ATIVAR EXPERIÊNCIA 3D <ArrowUpRight size={19} aria-hidden="true" />
+          </button>
+          <Action />
         </div>
-        <p>Referências visuais de terceiros, utilizadas como inspiração. Os projetos reais da Brandify são apresentados no portfólio.</p>
+        <small>Seu navegador está com movimento reduzido. Ative a experiência para ver os cards acompanhando a rolagem.</small>
       </div>
+      <p className="bvr-static-note">Imagens de referência, não projetos da Brandify.</p>
     </section>
   );
 }
@@ -81,6 +87,7 @@ function StaticIntro() {
 export default function BrandifyRibbonScroll() {
   const section = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
+  const [motionOptIn, setMotionOptIn] = useState(false);
   const [heroActive, setHeroActive] = useState(true);
   const [closingActive, setClosingActive] = useState(false);
   const { scrollYProgress } = useScroll({ target:section, offset:["start start","end end"] });
@@ -97,7 +104,7 @@ export default function BrandifyRibbonScroll() {
     setHeroActive(v < .23);
     setClosingActive(v > .9);
   });
-  if (reduced) return <StaticIntro />;
+  if (reduced && !motionOptIn) return <StaticIntro onEnable={() => { window.scrollTo({ top: 0, behavior: "instant" }); setMotionOptIn(true); }} />;
 
   return (
     <section id="inicio" ref={section} className="bvr-story" aria-label="Apresentação da Brandify com referências visuais em movimento">
