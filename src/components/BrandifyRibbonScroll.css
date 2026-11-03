@@ -170,3 +170,10 @@
  .bvr-card-image{height:calc(100% - 33px);}
  .bvr-card-meta{height:33px;}
 }
+
+
+.bvr-bottom-controls{display:flex;align-items:center;gap:22px;}
+.bvr-bottom-controls>a{color:#eff2fb!important;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;padding-bottom:4px;border-bottom:1px solid #ffffff5b;}
+.bvr-reduce{background:transparent;color:#d3daee;border:0;border-bottom:1px solid #ffffff54;padding:0 0 4px;font:800 9px/1.5 'DM Sans',sans-serif;letter-spacing:.04em;white-space:nowrap;cursor:pointer;}
+.bvr-reduce:hover{color:#fff;}
+@media(max-width:700px){.bvr-bottom-controls{gap:13px;}.bvr-reduce{font-size:8px;}.bvr-bottom-controls>a{font-size:8px;}}
