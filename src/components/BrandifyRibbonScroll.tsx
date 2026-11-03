@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { ArrowDown, ArrowUpRight } from "lucide-react";
-import { motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { motion, useMotionValueEvent, useScroll, useTransform } from "framer-motion";
 import type { MotionValue } from "framer-motion";
 import referenceSprite from "./brandifyReferenceSprite";
 import heroPhoto from "@/assets/reference/ref-11-underwater-laptop.jpg";
@@ -77,7 +77,7 @@ function StaticIntro({ onEnable }: { onEnable: () => void }) {
           </button>
           <Action />
         </div>
-        <small>Seu navegador está com movimento reduzido. Ative a experiência para ver os cards acompanhando a rolagem.</small>
+        <small>A apresentação 3D está desativada. Se quiser, reative para ver os cards acompanhando a rolagem.</small>
       </div>
       <p className="bvr-static-note">Imagens de referência, não projetos da Brandify.</p>
     </section>
@@ -86,8 +86,7 @@ function StaticIntro({ onEnable }: { onEnable: () => void }) {
 
 export default function BrandifyRibbonScroll() {
   const section = useRef<HTMLElement>(null);
-  const reduced = useReducedMotion();
-  const [motionOptIn, setMotionOptIn] = useState(false);
+  const [manualReduced, setManualReduced] = useState(false);
   const [heroActive, setHeroActive] = useState(true);
   const [closingActive, setClosingActive] = useState(false);
   const { scrollYProgress } = useScroll({ target:section, offset:["start start","end end"] });
@@ -104,7 +103,7 @@ export default function BrandifyRibbonScroll() {
     setHeroActive(v < .23);
     setClosingActive(v > .9);
   });
-  if (reduced && !motionOptIn) return <StaticIntro onEnable={() => { window.scrollTo({ top: 0, behavior: "instant" }); setMotionOptIn(true); }} />;
+  if (manualReduced) return <StaticIntro onEnable={() => { window.scrollTo({ top: 0, behavior: "auto" }); setManualReduced(false); }} />;
 
   return (
     <section id="inicio" ref={section} className="bvr-story" aria-label="Apresentação da Brandify com referências visuais em movimento">
@@ -138,7 +137,7 @@ export default function BrandifyRibbonScroll() {
         <div className="bvr-bottom">
           <span className="bvr-scroll-tip"><ArrowDown size={16} /> ROLE PARA EXPLORAR</span>
           <span>REFERÊNCIAS VISUAIS DE TERCEIROS — NÃO SÃO PROJETOS DA BRANDIFY</span>
-          <a href="#sobre">PULAR APRESENTAÇÃO <ArrowUpRight size={14}/></a>
+          <div className="bvr-bottom-controls"><button type="button" className="bvr-reduce" onClick={() => { window.scrollTo({ top: 0, behavior: "auto" }); setManualReduced(true); }}>REDUZIR ANIMAÇÃO</button><a href="#sobre">PULAR APRESENTAÇÃO <ArrowUpRight size={14}/></a></div>
         </div>
         <div className="bvr-progress" aria-hidden="true"><motion.span style={{height:progress}} /></div>
       </div>
