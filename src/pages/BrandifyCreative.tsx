@@ -3,7 +3,7 @@ import { ArrowDownRight, ArrowRight, ArrowUpRight, Check, ChevronDown, Instagram
 import { motion } from "framer-motion";
 import editorialPhoto from "@/assets/reference/ref-32-designers-website.jpg";
 import creativePhoto from "@/assets/reference/ref-12-agency-grid.jpg";
-import BrandifyScrollIntro from "@/components/BrandifyScrollIntro";
+import BrandifyRibbonScroll from "@/components/BrandifyRibbonScroll";
 import "./BrandifyCreative.css";
 
 const contactNumber = "5543991065129";
@@ -97,7 +97,7 @@ export default function BrandifyCreative() {
       </header>
 
       <main id="conteudo">
-        <BrandifyScrollIntro />
+        <BrandifyRibbonScroll />
 
         <div className="bcv3-marquee" aria-label="Presença com personalidade, design com intenção, sites feitos para se destacar e projetos com propósito">
           <div className="bcv3-marquee-track" aria-hidden="true">
