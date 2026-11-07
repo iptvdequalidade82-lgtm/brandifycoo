@@ -274,7 +274,8 @@ export function WorksWheel({
       frame = 0
       const rect = scene.getBoundingClientRect()
       const travel = Math.max(scene.offsetHeight - window.innerHeight, 1)
-      const progress = clamp((80 - rect.top) / travel, 0, 1)
+      const header = parseFloat(getComputedStyle(scene).getPropertyValue("--bcw-header")) || 80
+      const progress = clamp((header - rect.top) / travel, 0, 1)
       to(progress * (last + 1))
     }
     const schedule = () => { if (!frame) frame = requestAnimationFrame(update) }
@@ -297,7 +298,8 @@ export function WorksWheel({
     if (!scene) return
     const sceneTop = window.scrollY + scene.getBoundingClientRect().top
     const travel = Math.max(scene.offsetHeight - window.innerHeight, 1)
-    window.scrollTo({ top: sceneTop - 80 + step / (last + 1) * travel, behavior: reduced ? "auto" : "smooth" })
+    const header = parseFloat(getComputedStyle(scene).getPropertyValue("--bcw-header")) || 80
+    window.scrollTo({ top: sceneTop - header + step / (last + 1) * travel, behavior: reduced ? "auto" : "smooth" })
   }, [scrollDriven, last, reduced, to])
 
   // Ouvinte nativo, porque a rolagem tem de poder ser cancelada; e ela só é cancelada enquanto a roda ainda tem para
