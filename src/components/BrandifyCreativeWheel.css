@@ -1,0 +1,106 @@
+/* Full-bleed, unframed scrollytelling visual — Brandify identity. */
+.bcw-scroll-scene{
+  --bcw-header:80px;
+  position:relative;
+  isolation:isolate;
+  height:620svh;
+  min-height:3100px;
+  width:100%;
+  margin:0;
+  padding:0;
+  color:#fff;
+  background:#070911;
+}
+.bcw-viewport{
+  position:sticky;
+  top:var(--bcw-header);
+  height:calc(100svh - var(--bcw-header));
+  min-height:430px;
+  width:100%;
+  margin:0;
+  padding:0;
+  border:0;
+  background:radial-gradient(ellipse at 50% 51%,#111a2c 0%,#080a12 59%,#04060a 100%);
+  overflow:hidden;
+  isolation:isolate;
+}
+.bcw-viewport::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  background:linear-gradient(to bottom,#060812a3 0%,transparent 26%,transparent 80%,#0608127d 100%);
+}
+.bcw-viewport .ww-root{
+  position:absolute;
+  inset:0;
+  height:100%;
+  width:100%;
+  min-height:0;
+  border:0;
+  background:transparent;
+  --ww-bg:transparent;
+  --ww-fg:#fafafa;
+  --ww-muted:#b3b9c8;
+  --ww-shadow:rgba(116,143,238,.22);
+  --ww-chip:#0c101aaa;
+  font-family:"DM Sans",sans-serif;
+}
+.bcw-viewport .ww-stage,
+.bcw-viewport .ww-stage:active{cursor:default;touch-action:pan-y;}
+.bcw-viewport .ww-face{
+  border-radius:12px;
+  outline:1px solid rgba(255,255,255,.16);
+  box-shadow:0 35px 65px -24px #000b,0 0 0 1px #ffffff20;
+}
+.bcw-viewport .ww-img{filter:saturate(.93) contrast(1.02);}
+.bcw-viewport .ww-label{
+  font-family:"Barlow Condensed",Impact,sans-serif;
+  font-weight:800;
+  letter-spacing:-.025em;
+  text-transform:uppercase;
+}
+.bcw-viewport .ww-title{
+  left:7%;
+  font-family:"Instrument Serif",Georgia,serif;
+  font-style:italic;
+  font-weight:400;
+  color:#d7dfff;
+  letter-spacing:-.035em;
+}
+.bcw-viewport .ww-index{display:none!important;}
+.bcw-overlay-heading{
+  position:absolute;
+  z-index:4;
+  top:clamp(28px,5vh,70px);
+  left:4%;
+  width:min(380px,32vw);
+  pointer-events:none;
+}
+.bcw-overlay-heading h2{
+  font:800 clamp(49px,4.8vw,84px)/.88 "Barlow Condensed",Impact,sans-serif;
+  letter-spacing:-.025em;
+  margin:0;
+}
+.bcw-overlay-heading h2 em{
+  font:italic 400 .9em "Instrument Serif",Georgia,serif;
+  color:#d6e0ff;
+  letter-spacing:-.04em;
+  white-space:nowrap;
+}
+@media(max-width:1050px){
+  .bcw-overlay-heading{width:min(350px,36vw);}
+  .bcw-overlay-heading h2{font-size:clamp(44px,5vw,66px);}
+  .bcw-viewport .ww-title{left:4%;}
+}
+@media(max-width:700px){
+  .bcw-scroll-scene{--bcw-header:64px;height:540svh;min-height:2100px;}
+  .bcw-viewport{min-height:380px;}
+  .bcw-overlay-heading{top:23px;left:18px;right:18px;width:auto;max-width:340px;}
+  .bcw-overlay-heading h2{font-size:clamp(44px,9vw,60px);}
+  .bcw-viewport .ww-title{left:5%;top:44%;font-size:16px!important;max-width:40%;white-space:normal;}
+  .bcw-viewport .ww-label{font-size:clamp(23px,5vw,37px)!important;}
+}
+@media(max-width:390px){.bcw-overlay-heading h2{font-size:40px;}}
+@media(prefers-reduced-motion:reduce){.bcw-scroll-scene{height:340svh;min-height:1300px;}}
