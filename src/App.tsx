@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound";
 import Privacidade from "./pages/Privacidade";
 import Termos from "./pages/Termos";
 import Cookies from "./pages/Cookies";
+import HalftoneFooterPreview from "./pages/HalftoneFooterPreview";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminProjects from "./pages/AdminProjects";
@@ -58,6 +59,7 @@ const App = () => (
             <Route path="/privacidade" element={<Privacidade />} />
             <Route path="/termos" element={<Termos />} />
             <Route path="/cookies" element={<Cookies />} />
+            <Route path="/demo/rodape-halftone" element={<HalftoneFooterPreview />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/projetos" element={<AdminProjects />} />
