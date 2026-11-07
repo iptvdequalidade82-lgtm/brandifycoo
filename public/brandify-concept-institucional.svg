@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="560" viewBox="0 0 840 560" role="img" aria-label="INSTITUCIONAL — conceito de interface de site">
+<defs><clipPath id="screen"><rect x="18" y="20" width="804" height="520" rx="15"/></clipPath><linearGradient id="subtle" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#E8EDF3"/><stop offset="1" stop-color="#3456BB" stop-opacity=".16"/></linearGradient><filter id="shadow" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity=".14"/></filter></defs>
+<rect width="840" height="560" fill="#222733"/>
+<rect x="18" y="20" width="804" height="520" rx="15" fill="#E8EDF3" filter="url(#shadow)"/>
+<g clip-path="url(#screen)">
+<path d="M18 20h804v520H18z" fill="url(#subtle)"/>
+<rect x="18" y="20" width="804" height="62" fill="#E8EDF3"/>
+<text x="55" y="59" font-family="Arial,sans-serif" font-weight="900" font-size="26" letter-spacing="-1.5" fill="#101727">NORTH</text>
+<text x="490" y="57" font-family="Arial,sans-serif" font-size="12" font-weight="600" fill="#101727">Sobre</text>
+<text x="560" y="57" font-family="Arial,sans-serif" font-size="12" font-weight="600" fill="#101727">Serviços</text>
+<text x="640" y="57" font-family="Arial,sans-serif" font-size="12" font-weight="600" fill="#101727">Contato</text>
+<rect x="716" y="37" width="78" height="28" rx="14" fill="#3456BB"/><text x="755" y="55" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="10" fill="#FFFFFF">CONHECER</text>
+<text x="55" y="151" font-family="Arial,sans-serif" font-weight="700" font-size="13" letter-spacing="2" fill="#3456BB">INSTITUCIONAL</text>
+<rect x="410" y="100" width="350" height="305" rx="8" fill="#B6C5D9"/><g transform="translate(409 100)"><path d="M82 235V55L205 8L335 71V235z" fill="#DCE2DD"/><path d="M132 235V75L256 48V235z" fill="#9DADA8"/><path d="M201 32v203" stroke="#F7FAF7" stroke-width="7"/><path d="M112 100h180M112 142h180M112 185h180" stroke="#F7FAF7" stroke-width="7"/><rect x="308" y="94" width="47" height="141" fill="#5B6D78"/></g><path d="M410 381q113 -35 350 -1v24H410z" fill="#3456BB" opacity=".22"/>
+<text x="53" y="213" font-family="Arial,sans-serif" font-weight="900" font-size="47" letter-spacing="-2.5" fill="#101727">MAIS PRESENÇA.</text>
+<text x="55" y="251" font-family="Arial,sans-serif" font-size="18" fill="#101727" opacity=".77">Uma empresa bem apresentada.</text>
+<rect x="55" y="284" width="174" height="42" rx="21" fill="#3456BB"/><text x="142" y="311" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="13" fill="#FFFFFF">SAIBA MAIS</text>
+<path d="M54 369H348" stroke="#101727" opacity=".19"/>
+<text x="55" y="400" font-family="Arial,sans-serif" font-weight="800" font-size="13" fill="#101727">Um projeto feito para você.</text>
+<text x="55" y="425" font-family="Arial,sans-serif" font-size="12" fill="#101727" opacity=".62">Conteúdo organizado. Navegação simples.</text>
+<rect x="54" y="471" width="742" height="38" rx="8" fill="#3456BB" opacity=".11"/>
+<rect x="68" y="482" width="177" height="14" rx="7" fill="#3456BB" opacity=".36"/>
+<rect x="261" y="482" width="130" height="14" rx="7" fill="#3456BB" opacity=".2"/>
+<rect x="409" y="482" width="172" height="14" rx="7" fill="#3456BB" opacity=".3"/>
+</g>
+</svg>
