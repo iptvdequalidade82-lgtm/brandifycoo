@@ -170,7 +170,7 @@ export default function BrandifyCreative() {
             </Reveal>
             <Reveal className="bcv3-case-editorial">
               <h4>CONTEÚDO CERTO.<br/><em>NO LUGAR CERTO.</em></h4>
-              <p>No Forge Fit, reunimos exercícios, organização semanal e materiais de apoio em uma experiência para computador e celular. A apresentação animada no início do site ilustra essas funcionalidades.</p>
+              <p>No Forge Fit, reunimos exercícios, organização semanal e materiais de apoio em uma experiência para computador e celular. É um exemplo real de como conteúdo e navegação podem trabalhar juntos.</p>
             </Reveal>
             <Reveal className="bcv3-project-closer"><p>QUER APRESENTAR ASSIM O SEU NEGÓCIO?</p><a href={generalContact} target="_blank" rel="noopener noreferrer">CONVERSAR SOBRE MEU SITE <ArrowUpRight size={18}/></a></Reveal>
           </div>
