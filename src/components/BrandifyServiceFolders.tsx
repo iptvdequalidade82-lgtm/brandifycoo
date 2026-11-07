@@ -54,7 +54,7 @@ export default function BrandifyServiceFolders() {
                 type="button"
                 className="bsf-folder-button"
                 aria-label={"Explorar: " + service.name}
-                aria-expanded={selected === index}
+                aria-expanded={open}
                 aria-controls="bsf-selected-service"
                 onMouseEnter={() => setHovered(index)}
                 onMouseLeave={() => setHovered(null)}
