@@ -2,8 +2,7 @@ import { ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
 
 const sites = [
-  { url: "https://ericpimentel.lovable.app", label: "ericpimentel.lovable.app", title: "Site Institucional" },
-  { url: "https://barber043.lovable.app/", label: "barber043.lovable.app", title: "Site para Barbearia" },
+  { url: "https://foorgefit.lovable.app/", label: "foorgefit.lovable.app", title: "Forge Fit — experiência digital" },
 ];
 
 const container = { hidden: {}, show: { transition: { staggerChildren: 0.15 } } };
@@ -31,7 +30,7 @@ export default function SitePreview() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-white/50 max-w-xl mx-auto"
           >
-            Clique para acessar os sites que já criamos para nossos clientes.
+            Conheça uma experiência digital desenvolvida pela Brandify.
           </motion.p>
         </div>
 
