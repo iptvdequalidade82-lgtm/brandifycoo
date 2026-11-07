@@ -1,35 +1,23 @@
 import { useRef } from "react";
-import { motion, useScroll } from "framer-motion";
-import { ArrowDown } from "lucide-react";
+import { useScroll } from "framer-motion";
 import { WorksWheel, type WorksWheelItem } from "@/components/ui/works-wheel";
-import editorial from "@/assets/reference/ref-32-designers-website.jpg";
-import contrast from "@/assets/reference/ref-10-nike-editorial.jpg";
-import detail from "@/assets/reference/ref-21-blue-metallic.jpg";
-import image from "@/assets/reference/ref-12-agency-grid.jpg";
-import color from "@/assets/reference/ref-23-cores-verde.jpg";
-import motionImage from "@/assets/reference/ref-20-basketball-sports.jpg";
-import composition from "@/assets/reference/ref-15-retro-beach.jpg";
-import character from "@/assets/reference/ref-33-rabbit-color-inspiration.jpg";
 import "./BrandifyCreativeWheel.css";
 
-/** Visual directions, not client work or a list of delivered projects. */
+/** Original interface concepts created for the Brandify visual presentation. */
 const directions: WorksWheelItem[] = [
-  { title: "Tipografia", image: editorial, alt: "Composição editorial com diferentes elementos de design" },
-  { title: "Contraste", image: contrast, alt: "Referência visual de alto contraste" },
-  { title: "Detalhe", image: detail, alt: "Composição metálica azul com profundidade" },
-  { title: "Imagem", image, alt: "Mosaico de referências para direção de arte" },
-  { title: "Cor", image: color, alt: "Estudo de cores e composição visual" },
-  { title: "Movimento", image: motionImage, alt: "Referência de ação esportiva e composição dinâmica" },
-  { title: "Composição", image: composition, alt: "Referência de estética retrô e organização de elementos" },
-  { title: "Personalidade", image: character, alt: "Referência de criação visual com personalidade" },
+  { title: "Institucional", image: "/brandify-concept-institucional.svg", alt: "Conceito de site institucional com apresentação empresarial e contato" },
+  { title: "Landing Page", image: "/brandify-concept-landing.svg", alt: "Conceito de landing page com oferta e botão de ação" },
+  { title: "Loja Virtual", image: "/brandify-concept-loja.svg", alt: "Conceito de loja virtual com produtos e navegação de catálogo" },
+  { title: "Saúde", image: "/brandify-concept-clinica.svg", alt: "Conceito de site de clínica com informações de atendimento" },
+  { title: "Imóveis", image: "/brandify-concept-imoveis.svg", alt: "Conceito de site imobiliário com apresentação de imóveis" },
+  { title: "Gastronomia", image: "/brandify-concept-restaurante.svg", alt: "Conceito de página para restaurante com chamada de reserva" },
+  { title: "Tecnologia", image: "/brandify-concept-tecnologia.svg", alt: "Conceito de página de tecnologia com uma interface digital" },
+  { title: "Moda", image: "/brandify-concept-moda.svg", alt: "Conceito de e-commerce de moda com apresentação de produtos" },
 ];
 
 export default function BrandifyCreativeWheel() {
   const sceneRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: sceneRef,
-    offset: ["start start", "end end"],
-  });
+  useScroll({ target: sceneRef, offset: ["start start", "end end"] });
 
   return (
     <section
@@ -46,29 +34,10 @@ export default function BrandifyCreativeWheel() {
           theme="dark"
           action=""
           label="IDEIAS"
-          aria-label="Oito referências visuais avançam conforme você rola a página"
+          aria-label="Exemplos de oito conceitos visuais de sites que avançam conforme a rolagem"
         />
-
         <div className="bcw-overlay-heading">
-          <p className="bcw-kicker">VISUAL. INTERAÇÃO. IDENTIDADE.</p>
           <h2 id="bcw-heading">IDEIAS QUE<br /><em>GANHAM FORMA.</em></h2>
-          <p className="bcw-overlay-description">
-            O detalhe certo muda como uma marca é percebida.
-          </p>
-        </div>
-
-        <div className="bcw-overlay-bottom" aria-hidden="true">
-          <div className="bcw-scroll-hint">
-            <ArrowDown size={17} strokeWidth={1.6} />
-            <span>CONTINUE DESCENDO PARA EXPLORAR</span>
-          </div>
-          <span className="bcw-reference-note">
-            REFERÊNCIAS VISUAIS, NÃO PROJETOS DA BRANDIFY
-          </span>
-        </div>
-
-        <div className="bcw-progress" aria-hidden="true">
-          <motion.div className="bcw-progress-fill" style={{ scaleY: scrollYProgress }} />
         </div>
       </div>
     </section>
