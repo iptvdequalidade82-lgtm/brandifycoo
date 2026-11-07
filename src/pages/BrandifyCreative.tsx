@@ -140,7 +140,7 @@ export default function BrandifyCreative() {
           <div className="bcv3-container">
             <Reveal className="bcv3-services-heading">
               <h2>QUAL SITE FAZ<br /><em>SENTIDO PARA VOCÊ?</em></h2>
-              <p>Abra uma pasta para conhecer o formato ideal para o seu projeto. Cada opção foi pensada para uma necessidade diferente.</p>
+              <p>Sites institucionais, landing pages e lojas virtuais. Escolha o que sua empresa precisa.</p>
             </Reveal>
             <BrandifyServiceFolders />
           </div>
@@ -164,7 +164,7 @@ export default function BrandifyCreative() {
                 <span className="bcv3-project-arrow" aria-hidden="true"><ArrowUpRight size={24}/></span>
               </a>
               <div className="bcv3-project-text">
-                <div><span>EXPERIÊNCIA DIGITAL · FITNESS</span><h3>Forge Fit</h3><p>Exercícios, cronograma de treinos e conteúdos de apoio organizados em uma plataforma.</p></div>
+                <div><h3>Forge Fit</h3><p>Exercícios, cronograma de treinos e conteúdos de apoio organizados em uma plataforma.</p></div>
                 <ArrowUpRight size={25}/>
               </div>
             </Reveal>
@@ -172,7 +172,7 @@ export default function BrandifyCreative() {
               <h4>CONTEÚDO CERTO.<br/><em>NO LUGAR CERTO.</em></h4>
               <p>No Forge Fit, reunimos exercícios, organização semanal e materiais de apoio em uma experiência para computador e celular. É um exemplo real de como conteúdo e navegação podem trabalhar juntos.</p>
             </Reveal>
-            <Reveal className="bcv3-project-closer"><p>QUER APRESENTAR ASSIM O SEU NEGÓCIO?</p><a href={generalContact} target="_blank" rel="noopener noreferrer">CONVERSAR SOBRE MEU SITE <ArrowUpRight size={18}/></a></Reveal>
+            <Reveal className="bcv3-project-closer"><a href={generalContact} target="_blank" rel="noopener noreferrer">CONVERSAR SOBRE MEU SITE <ArrowUpRight size={18}/></a></Reveal>
           </div>
         </section>
 
