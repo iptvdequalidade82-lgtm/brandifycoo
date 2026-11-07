@@ -1,0 +1,98 @@
+/* Precise, non-destructive visual refinements for the original Brandify V3. */
+
+/* The editorial "Designers Website" image remains monochrome at rest and on hover. */
+.bcv3-intro-image img,
+.bcv3-intro-editorial:hover .bcv3-intro-image img,
+.bcv3-intro-editorial:focus-within .bcv3-intro-image img {
+  filter: grayscale(1) saturate(0) contrast(1.12) brightness(.94) !important;
+}
+.bcv3-intro-editorial:hover .bcv3-intro-image img{
+  transform:scale(1.025);
+}
+.bcv3-intro-image::after{
+  background:linear-gradient(180deg,transparent 46%,rgba(0,0,0,.28) 100%);
+}
+
+/* Gentle cinematic blurs: only behind content, never on readable copy. */
+.bcv3-hero-scrim::before{
+  content:"";
+  position:absolute;
+  z-index:0;
+  pointer-events:none;
+  width:min(570px,60vw);
+  height:min(450px,48vw);
+  right:-12%;
+  bottom:-19%;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(32,65,141,.19) 0%,rgba(32,65,141,.05) 42%,transparent 69%);
+  filter:blur(65px);
+}
+.bcv3-intro{
+  background:
+    radial-gradient(ellipse at 89% 23%,rgba(195,197,199,.22) 0%,transparent 40%),
+    var(--paper);
+}
+.bcv3-services{
+  position:relative;
+  isolation:isolate;
+}
+.bcv3-services::before{
+  content:"";
+  position:absolute;
+  pointer-events:none;
+  z-index:-1;
+  right:-14%;
+  top:4%;
+  width:min(650px,70vw);
+  height:380px;
+  background:radial-gradient(ellipse,#dce0e9 4%,transparent 70%);
+  opacity:.26;
+  filter:blur(50px);
+}
+.bcv3-close{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+}
+.bcv3-close::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  right:-18%;
+  bottom:-37%;
+  width:min(820px,78vw);
+  height:520px;
+  border-radius:50%;
+  opacity:.23;
+  background:radial-gradient(ellipse,#294269 0%,transparent 65%);
+  filter:blur(85px);
+  pointer-events:none;
+}
+
+/* A serious legal setting button, respecting the same graphic identity. */
+.bcv3-cookie-settings-button{
+  border:1px solid #c4c8d1;
+  background:#15171a;
+  color:#fff;
+  min-height:52px;
+  display:inline-flex;
+  gap:21px;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px 19px;
+  cursor:pointer;
+  margin:20px 0 10px;
+  font:800 11px/1.4 'DM Sans',Arial,sans-serif;
+  letter-spacing:.025em;
+  transition:background .2s;
+}
+.bcv3-cookie-settings-button:hover{background:#2b354d;}
+.bcv3-legal-grid section p + p{margin-top:13px;}
+.bcv3-legal-grid code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em;}
+@media(max-width:650px){
+ .bcv3-hero-scrim::before{right:-35%;bottom:-6%;filter:blur(42px);}
+ .bcv3-close::before{right:-35%;filter:blur(60px);}
+}
+@media(prefers-reduced-motion:reduce){
+ .bcv3-intro-image img{transition:none!important;}
+}
