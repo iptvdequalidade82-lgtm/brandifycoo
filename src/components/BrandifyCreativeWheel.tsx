@@ -1,4 +1,6 @@
-import { ArrowDownRight, ArrowUpRight } from "lucide-react";
+import { useRef } from "react";
+import { motion, useScroll } from "framer-motion";
+import { ArrowDown } from "lucide-react";
 import { WorksWheel, type WorksWheelItem } from "@/components/ui/works-wheel";
 import editorial from "@/assets/reference/ref-32-designers-website.jpg";
 import contrast from "@/assets/reference/ref-10-nike-editorial.jpg";
@@ -23,22 +25,51 @@ const directions: WorksWheelItem[] = [
 ];
 
 export default function BrandifyCreativeWheel() {
+  const sceneRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sceneRef,
+    offset: ["start start", "end end"],
+  });
+
   return (
-    <section id="direcoes" className="bcw-section" aria-labelledby="bcw-heading">
-      <div className="bcw-header">
-        <div>
-          <p className="bcw-kicker">VISUAL, INTERAÇÃO E IDENTIDADE</p>
-          <h2 id="bcw-heading">UMA IDEIA<br /><em>NUNCA É SÓ UMA IDEIA.</em></h2>
+    <section
+      id="direcoes"
+      ref={sceneRef}
+      data-ww-scroll-scene
+      className="bcw-scroll-scene"
+      aria-labelledby="bcw-heading"
+    >
+      <div className="bcw-viewport">
+        <WorksWheel
+          items={directions}
+          scrollDriven
+          theme="dark"
+          action=""
+          label="IDEIAS"
+          aria-label="Oito referências visuais avançam conforme você rola a página"
+        />
+
+        <div className="bcw-overlay-heading">
+          <p className="bcw-kicker">VISUAL. INTERAÇÃO. IDENTIDADE.</p>
+          <h2 id="bcw-heading">IDEIAS QUE<br /><em>GANHAM FORMA.</em></h2>
+          <p className="bcw-overlay-description">
+            O detalhe certo muda como uma marca é percebida.
+          </p>
         </div>
-        <p>Tipografia, cor, movimento e composição mudam como uma marca é percebida. Explore algumas direções visuais que inspiram nosso olhar.</p>
-      </div>
-      <div className="bcw-wheel-frame">
-        <WorksWheel items={directions} theme="dark" action="" label="EXPLORAR" aria-label="Roda interativa de oito referências visuais" />
-        <div className="bcw-gesture" aria-hidden="true"><ArrowDownRight size={16} /> ROLE, ARRASTE OU USE AS SETAS</div>
-      </div>
-      <div className="bcw-footer">
-        <p>Imagens de referência visual. Não representam projetos entregues pela Brandify.</p>
-        <a href="#servicos">CONHECER NOSSOS SERVIÇOS <ArrowUpRight size={17} aria-hidden="true" /></a>
+
+        <div className="bcw-overlay-bottom" aria-hidden="true">
+          <div className="bcw-scroll-hint">
+            <ArrowDown size={17} strokeWidth={1.6} />
+            <span>CONTINUE DESCENDO PARA EXPLORAR</span>
+          </div>
+          <span className="bcw-reference-note">
+            REFERÊNCIAS VISUAIS, NÃO PROJETOS DA BRANDIFY
+          </span>
+        </div>
+
+        <div className="bcw-progress" aria-hidden="true">
+          <motion.div className="bcw-progress-fill" style={{ scaleY: scrollYProgress }} />
+        </div>
       </div>
     </section>
   );
