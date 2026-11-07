@@ -1,0 +1,15 @@
+.bcw-section{background:#090a10;color:#fff;padding:110px clamp(20px,5vw,90px) 92px;position:relative;isolation:isolate;}
+.bcw-header{max-width:1460px;margin:0 auto;display:grid;grid-template-columns:1.5fr .5fr;gap:8%;align-items:end;}
+.bcw-kicker{font:800 11px/1.4 "DM Sans",sans-serif;letter-spacing:.13em;color:#9eb6ff;margin:0 0 27px;}
+.bcw-header h2{font:800 clamp(67px,8.5vw,142px)/.85 "Barlow Condensed",Impact,sans-serif;letter-spacing:-.03em;margin:0;}
+.bcw-header h2 em{font:italic 400 .83em "Instrument Serif",Georgia,serif;color:#c0ccff;letter-spacing:-.04em;}
+.bcw-header>p{font:400 clamp(13px,1.12vw,16px)/1.65 "DM Sans",sans-serif;color:#b6b9c8;margin:0 0 8px;max-width:320px;}
+.bcw-wheel-frame{position:relative;margin:44px auto 0;max-width:1460px;height:min(76svh,720px);min-height:455px;border:1px solid rgba(255,255,255,.13);overflow:hidden;background:#0a0b12;}
+.bcw-wheel-frame .ww-root{--ww-bg:#0a0b12;--ww-fg:#f8f8fa;--ww-muted:#b4b6c4;--ww-chip:rgba(8,10,16,.88);}
+.bcw-gesture{pointer-events:none;position:absolute;bottom:20px;left:24px;display:flex;align-items:center;gap:12px;font:800 10px/1.5 "DM Sans",sans-serif;letter-spacing:.08em;color:#cbd4ed;z-index:5;}
+.bcw-footer{max-width:1460px;margin:23px auto 0;display:flex;align-items:center;justify-content:space-between;gap:23px;}
+.bcw-footer p{color:#969cae;font:500 11px/1.6 "DM Sans",sans-serif;max-width:490px;}
+.bcw-footer a{color:#fff;display:flex;align-items:center;gap:15px;border-bottom:1px solid #ffffff85;padding:0 0 7px;font:800 11px/1.3 "DM Sans",sans-serif;letter-spacing:.05em;transition:color .2s;}
+.bcw-footer a:hover{color:#a8bcff;}
+@media(max-width:850px){.bcw-section{padding-top:76px;padding-bottom:70px;}.bcw-header{grid-template-columns:1fr;gap:21px;}.bcw-header h2{font-size:clamp(63px,10vw,100px);}.bcw-header>p{max-width:560px;}.bcw-wheel-frame{height:66svh;min-height:420px;}.bcw-footer{flex-wrap:wrap;}}
+@media(max-width:580px){.bcw-section{padding:65px 17px 60px;}.bcw-kicker{font-size:9px;margin-bottom:16px;}.bcw-header h2{font-size:clamp(54px,12vw,76px);}.bcw-header>p{font-size:13px;}.bcw-wheel-frame{margin-top:28px;height:61svh;min-height:380px;max-height:550px;}.bcw-gesture{font-size:8px;bottom:12px;left:12px;}.bcw-footer{align-items:start;gap:14px;}.bcw-footer p{font-size:10px;}.bcw-footer a{font-size:10px;}}
