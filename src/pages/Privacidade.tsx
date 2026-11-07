@@ -1,71 +1,33 @@
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import "./BrandifyCreative.css";
 
 export default function Privacidade() {
   return (
-    <div className="min-h-screen bg-black text-white">
-      <Header />
-      <main className="pt-24 pb-20 px-6">
-        <article className="max-w-3xl mx-auto">
-          <h1 className="font-display text-3xl md:text-4xl font-black mb-8 text-white">Política de <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-accent to-brand-accent-deep">Privacidade</span></h1>
-          <p className="text-white/40 text-sm mb-2">Última atualização: Fevereiro de 2026</p>
-
-          <section className="mt-8 space-y-6 text-sm text-white/60 leading-relaxed">
+    <div className="bcv3 bcv3-legal">
+      <header className="bcv3-header">
+        <a href="/" className="bcv3-brand"><img className="bcv3-brand-logo" src="/brandify-mark-black.svg" alt="" /><span className="bcv3-brand-word">brandify<span className="bcv3-brand-dot">.</span></span></a>
+        <a href="/" className="bcv3-header-cta"><ArrowLeft size={16}/> VOLTAR AO SITE</a>
+      </header>
+      <main className="bcv3-legal-main">
+        <div className="bcv3-container">
+          <p className="bcv3-legal-kicker">TRANSPARÊNCIA / PRIVACIDADE</p>
+          <h1>SEUS DADOS.<br/><em>SUA PRIVACIDADE.</em></h1>
+          <p className="bcv3-legal-updated">Política de privacidade — versão de outubro de 2026.</p>
+          <div className="bcv3-legal-grid">
+            <aside>BRANDIFY® / INFORMAÇÕES SOBRE O TRATAMENTO DE DADOS</aside>
             <div>
-              <h2 className="font-display text-lg font-bold text-white mb-2">1. Informações que Coletamos</h2>
-              <p>Coletamos as informações que você nos fornece diretamente através do formulário de contato do nosso site, incluindo: nome, endereço de e-mail e mensagem. Também podemos coletar dados de navegação automaticamente, como endereço IP, tipo de navegador e páginas visitadas.</p>
+              <section><h2>01 / Informações que podem ser coletadas</h2><p>Quando você entra em contato por WhatsApp ou e-mail, recebemos as informações fornecidas na conversa. Também podem ser coletados dados técnicos de navegação e eventos por ferramentas de medição presentes no site.</p></section>
+              <section><h2>02 / Finalidades</h2><p>Utilizamos as informações para responder solicitações, elaborar propostas, prestar nossos serviços, cumprir obrigações legais e entender o uso do site. Não divulgamos informações comerciais de clientes sem autorização.</p></section>
+              <section><h2>03 / Serviços de terceiros</h2><p>O site pode usar o Meta Pixel para mensuração de visitas e campanhas e links externos para WhatsApp e Instagram. Esses provedores podem tratar dados de acordo com suas próprias políticas. Quando aplicável, o uso de cookies não essenciais deve observar as escolhas e direitos do visitante.</p></section>
+              <section><h2>04 / Compartilhamento e retenção</h2><p>Dados podem ser tratados por prestadores necessários à operação e execução dos serviços, sempre conforme a finalidade aplicável. Mantemos informações pelo período necessário ao atendimento, ao contrato ou às obrigações legais.</p></section>
+              <section><h2>05 / Direitos dos titulares</h2><p>Nos termos da Lei Geral de Proteção de Dados, você pode solicitar informações sobre o tratamento, acesso, correção ou eliminação de dados quando cabível, entre outros direitos. Solicitações serão avaliadas conforme as disposições legais.</p></section>
+              <section><h2>06 / Contato</h2><p>Para dúvidas relacionadas à privacidade, escreva para <a href="mailto:brandifycoo@gmail.com">brandifycoo@gmail.com</a>. Atendemos em Jacarezinho, Paraná, e remotamente em todo o Brasil.</p></section>
+              <p className="bcv3-legal-note">Este texto descreve as práticas previstas na experiência pública atual e deve ser revisado antes de publicação definitiva, especialmente em relação a cookies e ferramentas de publicidade.</p>
             </div>
-
-            <div>
-              <h2 className="font-display text-lg font-bold text-white mb-2">2. Como Usamos Suas Informações</h2>
-              <p>Utilizamos as informações coletadas para:</p>
-              <ul className="list-disc pl-5 mt-2 space-y-1">
-                <li>Responder às suas solicitações de contato e orçamento;</li>
-                <li>Enviar comunicações relacionadas aos nossos serviços;</li>
-                <li>Melhorar nosso site e a experiência do usuário;</li>
-                <li>Cumprir obrigações legais.</li>
-              </ul>
-            </div>
-
-            <div>
-              <h2 className="font-display text-lg font-bold text-white mb-2">3. Compartilhamento de Dados</h2>
-              <p>Não vendemos, alugamos ou compartilhamos suas informações pessoais com terceiros, exceto quando necessário para prestação dos nossos serviços (como processadores de pagamento) ou quando exigido por lei.</p>
-            </div>
-
-            <div>
-              <h2 className="font-display text-lg font-bold text-white mb-2">4. Segurança dos Dados</h2>
-              <p>Adotamos medidas técnicas e organizacionais para proteger suas informações pessoais contra acesso não autorizado, perda ou destruição. Utilizamos criptografia SSL em todo o nosso site.</p>
-            </div>
-
-            <div>
-              <h2 className="font-display text-lg font-bold text-white mb-2">5. Seus Direitos (LGPD)</h2>
-              <p>De acordo com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018), você tem direito a:</p>
-              <ul className="list-disc pl-5 mt-2 space-y-1">
-                <li>Solicitar acesso aos seus dados pessoais;</li>
-                <li>Corrigir dados incompletos ou desatualizados;</li>
-                <li>Solicitar a exclusão dos seus dados;</li>
-                <li>Revogar seu consentimento a qualquer momento.</li>
-              </ul>
-            </div>
-
-            <div>
-              <h2 className="font-display text-lg font-bold text-white mb-2">6. Cookies</h2>
-              <p>Nosso site pode utilizar cookies para melhorar a experiência de navegação. Você pode configurar seu navegador para recusar cookies, embora isso possa afetar algumas funcionalidades do site.</p>
-            </div>
-
-            <div>
-              <h2 className="font-display text-lg font-bold text-white mb-2">7. Contato</h2>
-              <p>Para exercer seus direitos ou esclarecer dúvidas sobre esta política, entre em contato conosco:</p>
-              <ul className="list-none mt-2 space-y-1">
-                <li><strong className="text-white">E-mail:</strong> brandifycoo@gmail.com</li>
-                <li><strong className="text-white">WhatsApp:</strong> (43) 99106-5129</li>
-                <li><strong className="text-white">Localização:</strong> Jacarezinho, PR</li>
-              </ul>
-            </div>
-          </section>
-        </article>
+          </div>
+          <div className="bcv3-legal-back"><a href="/">VOLTAR À BRANDIFY <ArrowUpRight size={20}/></a></div>
+        </div>
       </main>
-      <Footer />
     </div>
   );
 }
