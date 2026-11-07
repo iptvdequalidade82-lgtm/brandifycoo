@@ -146,35 +146,6 @@ export default function BrandifyCreative() {
           </div>
         </section>
 
-        <section id="trabalhos" className="bcv3-work bcv3-pad">
-          <div className="bcv3-container">
-            <Reveal className="bcv3-work-heading">
-              <h2>QUER VER<br/><em>NA PRÁTICA?</em></h2>
-              <p>Conheça o Forge Fit, um projeto real em que conteúdo e navegação foram organizados para uso no dia a dia.</p>
-            </Reveal>
-            <Reveal className="bcv3-project bcv3-project-forge">
-              <a href="https://foorgefit.life/" className="bcv3-project-media" target="_blank" rel="noopener noreferrer" aria-label="Visitar o projeto Forge Fit">
-                <div className="bcv3-project-scene">
-                  <div className="bcv3-project-screen">
-                    <div className="bcv3-project-screenbar"><span>● ● ●</span><small>foorgefit.life</small><ArrowUpRight size={13}/></div>
-                    <img loading="lazy" src="https://image.thum.io/get/width/1440/crop/900/noanimate/https://foorgefit.life/" alt="Captura da página pública do Forge Fit" />
-                  </div>
-                  <div className="bcv3-project-label" aria-hidden="true">FORGE FIT</div>
-                </div>
-                <span className="bcv3-project-arrow" aria-hidden="true"><ArrowUpRight size={24}/></span>
-              </a>
-              <div className="bcv3-project-text">
-                <div><h3>Forge Fit</h3><p>Exercícios, cronograma de treinos e conteúdos de apoio organizados em uma plataforma.</p></div>
-                <ArrowUpRight size={25}/>
-              </div>
-            </Reveal>
-            <Reveal className="bcv3-case-editorial">
-              <h4>CONTEÚDO CERTO.<br/><em>NO LUGAR CERTO.</em></h4>
-              <p>No Forge Fit, reunimos exercícios, organização semanal e materiais de apoio em uma experiência para computador e celular. É um exemplo real de como conteúdo e navegação podem trabalhar juntos.</p>
-            </Reveal>
-            <Reveal className="bcv3-project-closer"><a href={generalContact} target="_blank" rel="noopener noreferrer">CONVERSAR SOBRE MEU SITE <ArrowUpRight size={18}/></a></Reveal>
-          </div>
-        </section>
 
         <section className="bcv3-statement">
           <div className="bcv3-container">
