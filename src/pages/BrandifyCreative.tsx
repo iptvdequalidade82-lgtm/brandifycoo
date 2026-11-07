@@ -6,6 +6,7 @@ import BrandifyCreativeWheel from "@/components/BrandifyCreativeWheel";
 import BrandifyServiceFolders from "@/components/BrandifyServiceFolders";
 import BrandifyHalftoneFooter from "@/components/BrandifyHalftoneFooter";
 import "./BrandifyCreative.css";
+import "./BrandifyEditorialV11.css";
 
 const contactNumber = "5543991065129";
 const wa = (text: string) => "https://wa.me/" + contactNumber + "?text=" + encodeURIComponent(text);
