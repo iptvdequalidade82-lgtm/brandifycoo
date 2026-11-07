@@ -86,7 +86,7 @@ export default function BrandifyCreative() {
         <nav aria-label="Menu principal" className={open ? "bcv3-nav active" : "bcv3-nav"}>
           <a href="#sobre" onClick={() => setOpen(false)}>Estúdio</a>
           <a href="#servicos" onClick={() => setOpen(false)}>Serviços</a>
-          <a href="#trabalhos" onClick={() => setOpen(false)}>Projetos</a>
+          
           <a href="#pacotes" onClick={() => setOpen(false)}>Pacotes</a>
         </nav>
         <a href={generalContact} className="bcv3-header-cta" target="_blank" rel="noopener noreferrer">
@@ -146,35 +146,6 @@ export default function BrandifyCreative() {
           </div>
         </section>
 
-        <section id="trabalhos" className="bcv3-work bcv3-pad">
-          <div className="bcv3-container">
-            <Reveal className="bcv3-work-heading">
-              <h2>QUER VER<br/><em>NA PRÁTICA?</em></h2>
-              <p>Conheça o Forge Fit, um projeto real em que conteúdo e navegação foram organizados para uso no dia a dia.</p>
-            </Reveal>
-            <Reveal className="bcv3-project bcv3-project-forge">
-              <a href="https://foorgefit.life/" className="bcv3-project-media" target="_blank" rel="noopener noreferrer" aria-label="Visitar o projeto Forge Fit">
-                <div className="bcv3-project-scene">
-                  <div className="bcv3-project-screen">
-                    <div className="bcv3-project-screenbar"><span>● ● ●</span><small>foorgefit.life</small><ArrowUpRight size={13}/></div>
-                    <img loading="lazy" src="https://image.thum.io/get/width/1440/crop/900/noanimate/https://foorgefit.life/" alt="Captura da página pública do Forge Fit" />
-                  </div>
-                  <div className="bcv3-project-label" aria-hidden="true">FORGE FIT</div>
-                </div>
-                <span className="bcv3-project-arrow" aria-hidden="true"><ArrowUpRight size={24}/></span>
-              </a>
-              <div className="bcv3-project-text">
-                <div><h3>Forge Fit</h3><p>Exercícios, cronograma de treinos e conteúdos de apoio organizados em uma plataforma.</p></div>
-                <ArrowUpRight size={25}/>
-              </div>
-            </Reveal>
-            <Reveal className="bcv3-case-editorial">
-              <h4>CONTEÚDO CERTO.<br/><em>NO LUGAR CERTO.</em></h4>
-              <p>No Forge Fit, reunimos exercícios, organização semanal e materiais de apoio em uma experiência para computador e celular. É um exemplo real de como conteúdo e navegação podem trabalhar juntos.</p>
-            </Reveal>
-            <Reveal className="bcv3-project-closer"><a href={generalContact} target="_blank" rel="noopener noreferrer">CONVERSAR SOBRE MEU SITE <ArrowUpRight size={18}/></a></Reveal>
-          </div>
-        </section>
 
         <section className="bcv3-statement">
           <div className="bcv3-container">
@@ -237,7 +208,7 @@ export default function BrandifyCreative() {
         <div className="bcv3-container">
           <div className="bcv3-footer-top"><a href="#inicio" className="bcv3-footer-logo"><img className="bcv3-footer-mark" src="/brandify-mark-black.svg" alt="" />brandify<span>.</span></a><p>SITES PARA APRESENTAR<br />MELHOR SUA EMPRESA.</p></div>
           <div className="bcv3-footer-grid">
-            <div><span>NAVEGAÇÃO</span><a href="#sobre">Estúdio</a><a href="#servicos">Serviços</a><a href="#trabalhos">Projetos</a><a href="#pacotes">Pacotes</a></div>
+            <div><span>NAVEGAÇÃO</span><a href="#sobre">Estúdio</a><a href="#servicos">Serviços</a><a href="#pacotes">Pacotes</a></div>
             <div><span>CONTATO</span><a href={generalContact} target="_blank" rel="noopener noreferrer">WhatsApp: (43) 99106-5129 <ArrowUpRight size={14}/></a><a href="mailto:brandifycoo@gmail.com">brandifycoo@gmail.com <Mail size={14}/></a><a href="https://www.instagram.com/brandifycoo" target="_blank" rel="noopener noreferrer">Instagram <Instagram size={14}/></a></div>
             <div><span>LOCALIZAÇÃO</span><p>Jacarezinho — Paraná<br />Brasil</p><a href="/privacidade">Privacidade</a><a href="/termos">Termos de uso</a><a href="/cookies">Cookies</a></div>
           </div>
