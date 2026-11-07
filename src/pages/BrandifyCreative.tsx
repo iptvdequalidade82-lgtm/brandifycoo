@@ -3,7 +3,9 @@ import { ArrowDownRight, ArrowRight, ArrowUpRight, Check, ChevronDown, Instagram
 import { motion } from "framer-motion";
 import editorialPhoto from "@/assets/reference/ref-32-designers-website.jpg";
 import creativePhoto from "@/assets/reference/ref-12-agency-grid.jpg";
+import BrandifyHalftoneFooter from "@/components/BrandifyHalftoneFooter";
 import "./BrandifyCreative.css";
+import "./BrandifyRefinements.css";
 
 const contactNumber = "5543991065129";
 const wa = (text: string) => "https://wa.me/" + contactNumber + "?text=" + encodeURIComponent(text);
@@ -232,17 +234,7 @@ export default function BrandifyCreative() {
         </section>
       </main>
 
-      <footer className="bcv3-footer">
-        <div className="bcv3-container">
-          <div className="bcv3-footer-top"><a href="#inicio" className="bcv3-footer-logo"><img className="bcv3-footer-mark" src="/brandify-mark-black.svg" alt="" />brandify<span>.</span></a><p>DESIGN, DESENVOLVIMENTO<br />E PRESENÇA DIGITAL.</p></div>
-          <div className="bcv3-footer-grid">
-            <div><span>NAVEGAÇÃO</span><a href="#sobre">Estúdio</a><a href="#servicos">Serviços</a><a href="#pacotes">Pacotes</a></div>
-            <div><span>CONTATO</span><a href={generalContact} target="_blank" rel="noopener noreferrer">WhatsApp: (43) 99106-5129 <ArrowUpRight size={14}/></a><a href="mailto:brandifycoo@gmail.com">brandifycoo@gmail.com <Mail size={14}/></a><a href="https://www.instagram.com/brandifycoo" target="_blank" rel="noopener noreferrer">Instagram <Instagram size={14}/></a></div>
-            <div><span>LOCALIZAÇÃO</span><p>Jacarezinho — Paraná<br />Brasil</p><a href="/privacidade">Política de privacidade</a></div>
-          </div>
-          <div className="bcv3-footer-base"><span>© {new Date().getFullYear()} BRANDIFY. TODOS OS DIREITOS RESERVADOS.</span><span>IDEIAS COM INTENÇÃO.</span></div>
-        </div>
-      </footer>
+      <BrandifyHalftoneFooter />
       <a className="bcv3-floating-contact" aria-label="Conversar com a Brandify pelo WhatsApp" href={generalContact} target="_blank" rel="noopener noreferrer">VAMOS CONVERSAR <ArrowUpRight size={17}/></a>
     </div>
   );
