@@ -1,5 +1,3 @@
-import { useRef } from "react";
-import { useScroll } from "framer-motion";
 import { WorksWheel, type WorksWheelItem } from "@/components/ui/works-wheel";
 import "./BrandifyCreativeWheel.css";
 
@@ -16,13 +14,9 @@ const directions: WorksWheelItem[] = [
 ];
 
 export default function BrandifyCreativeWheel() {
-  const sceneRef = useRef<HTMLElement>(null);
-  useScroll({ target: sceneRef, offset: ["start start", "end end"] });
-
   return (
     <section
       id="direcoes"
-      ref={sceneRef}
       data-ww-scroll-scene
       className="bcw-scroll-scene"
       aria-labelledby="bcw-heading"
