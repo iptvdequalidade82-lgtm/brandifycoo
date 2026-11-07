@@ -9,6 +9,9 @@ import NotFound from "./pages/NotFound";
 
 
 import Privacidade from "./pages/Privacidade";
+import Cookies from "./pages/Cookies";
+import Termos from "./pages/Termos";
+import CookieConsent from "@/components/CookieConsent";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminProjects from "./pages/AdminProjects";
@@ -31,6 +34,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <CookieConsent />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Navigate to="/" replace />} />
@@ -54,6 +58,8 @@ const App = () => (
             <Route path="/trabalhe-conosco" element={<Navigate to="/#contato" replace />} />
             <Route path="/quem-somos" element={<Navigate to="/#sobre" replace />} />
             <Route path="/privacidade" element={<Privacidade />} />
+            <Route path="/cookies" element={<Cookies />} />
+            <Route path="/termos" element={<Termos />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/projetos" element={<AdminProjects />} />
