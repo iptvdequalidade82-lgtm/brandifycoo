@@ -17,3 +17,5 @@ jobs:
         run: npm install --no-audit --no-fund --package-lock=false
       - name: Build app
         run: npm run build
+      - name: Verify TypeScript
+        run: npx tsc -b --pretty false
