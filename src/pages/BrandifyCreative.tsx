@@ -78,7 +78,7 @@ export default function BrandifyCreative() {
         <nav aria-label="Menu principal" className={open ? "bcv3-nav active" : "bcv3-nav"}>
           <a href="#sobre" onClick={() => setOpen(false)}>Estúdio</a>
           <a href="#servicos" onClick={() => setOpen(false)}>Serviços</a>
-          <a href="#trabalhos" onClick={() => setOpen(false)}>Projetos</a>
+
           <a href="#pacotes" onClick={() => setOpen(false)}>Pacotes</a>
         </nav>
         <a href={generalContact} className="bcv3-header-cta" target="_blank" rel="noopener noreferrer">
@@ -236,7 +236,7 @@ export default function BrandifyCreative() {
         <div className="bcv3-container">
           <div className="bcv3-footer-top"><a href="#inicio" className="bcv3-footer-logo"><img className="bcv3-footer-mark" src="/brandify-mark-black.svg" alt="" />brandify<span>.</span></a><p>DESIGN, DESENVOLVIMENTO<br />E PRESENÇA DIGITAL.</p></div>
           <div className="bcv3-footer-grid">
-            <div><span>NAVEGAÇÃO</span><a href="#sobre">Estúdio</a><a href="#servicos">Serviços</a><a href="#trabalhos">Projetos</a><a href="#pacotes">Pacotes</a></div>
+            <div><span>NAVEGAÇÃO</span><a href="#sobre">Estúdio</a><a href="#servicos">Serviços</a><a href="#pacotes">Pacotes</a></div>
             <div><span>CONTATO</span><a href={generalContact} target="_blank" rel="noopener noreferrer">WhatsApp: (43) 99106-5129 <ArrowUpRight size={14}/></a><a href="mailto:brandifycoo@gmail.com">brandifycoo@gmail.com <Mail size={14}/></a><a href="https://www.instagram.com/brandifycoo" target="_blank" rel="noopener noreferrer">Instagram <Instagram size={14}/></a></div>
             <div><span>LOCALIZAÇÃO</span><p>Jacarezinho — Paraná<br />Brasil</p><a href="/privacidade">Política de privacidade</a></div>
           </div>
