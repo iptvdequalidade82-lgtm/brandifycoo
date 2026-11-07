@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import { ArrowDownRight, ArrowRight, ArrowUpRight, Check, ChevronDown, Instagram, Mail, Menu, MoveUpRight, X } from "lucide-react";
 import { motion } from "framer-motion";
-import heroPhoto from "@/assets/reference/ref-11-underwater-laptop.jpg";
 import editorialPhoto from "@/assets/reference/ref-32-designers-website.jpg";
 import creativePhoto from "@/assets/reference/ref-12-agency-grid.jpg";
-import ForgeFitDeviceShowcase from "@/components/ForgeFitDeviceShowcase";
 import "./BrandifyCreative.css";
 
 const contactNumber = "5543991065129";
@@ -80,7 +78,7 @@ export default function BrandifyCreative() {
         <nav aria-label="Menu principal" className={open ? "bcv3-nav active" : "bcv3-nav"}>
           <a href="#sobre" onClick={() => setOpen(false)}>Estúdio</a>
           <a href="#servicos" onClick={() => setOpen(false)}>Serviços</a>
-          <a href="#trabalhos" onClick={() => setOpen(false)}>Projetos</a>
+
           <a href="#pacotes" onClick={() => setOpen(false)}>Pacotes</a>
         </nav>
         <a href={generalContact} className="bcv3-header-cta" target="_blank" rel="noopener noreferrer">
@@ -93,7 +91,7 @@ export default function BrandifyCreative() {
 
       <main id="conteudo">
         <section id="inicio" className="bcv3-hero">
-          <div className="bcv3-hero-image" style={{ backgroundImage: "url(" + heroPhoto + ")" }} aria-hidden="true" />
+          <div className="bcv3-hero-image" style={{ background: "#000" }} aria-hidden="true" />
           <div className="bcv3-hero-scrim" />
           <div className="bcv3-hero-body">
             <motion.h1 initial={{ opacity: 0, y: 68 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.24, duration: 1, ease: [0.2, 0.8, 0.2, 1] }}>
@@ -177,17 +175,6 @@ export default function BrandifyCreative() {
           </div>
         </section>
 
-        <section id="trabalhos" className="bcv3-work bcv3-pad">
-          <div className="bcv3-container">
-            <ForgeFitDeviceShowcase />
-            <Reveal className="bcv3-case-editorial">
-              <h4>DO SITE AO CELULAR.<br/><em>SEM PERDER A EXPERIÊNCIA.</em></h4>
-              <p>O Forge Fit reúne organização de treinos, biblioteca de exercícios e conteúdos para a rotina fitness. Uma demonstração de como a Brandify pensa em clareza, apresentação e uso em diferentes telas.</p>
-            </Reveal>
-            <Reveal className="bcv3-project-closer"><p>SEU PROJETO TAMBÉM PODE GANHAR FORMA.</p><a href={generalContact} target="_blank" rel="noopener noreferrer">VAMOS CRIAR ALGO JUNTOS <ArrowUpRight size={18} /></a></Reveal>
-          </div>
-        </section>
-
         <section className="bcv3-statement">
           <div className="bcv3-container">
 
@@ -249,7 +236,7 @@ export default function BrandifyCreative() {
         <div className="bcv3-container">
           <div className="bcv3-footer-top"><a href="#inicio" className="bcv3-footer-logo"><img className="bcv3-footer-mark" src="/brandify-mark-black.svg" alt="" />brandify<span>.</span></a><p>DESIGN, DESENVOLVIMENTO<br />E PRESENÇA DIGITAL.</p></div>
           <div className="bcv3-footer-grid">
-            <div><span>NAVEGAÇÃO</span><a href="#sobre">Estúdio</a><a href="#servicos">Serviços</a><a href="#trabalhos">Projetos</a><a href="#pacotes">Pacotes</a></div>
+            <div><span>NAVEGAÇÃO</span><a href="#sobre">Estúdio</a><a href="#servicos">Serviços</a><a href="#pacotes">Pacotes</a></div>
             <div><span>CONTATO</span><a href={generalContact} target="_blank" rel="noopener noreferrer">WhatsApp: (43) 99106-5129 <ArrowUpRight size={14}/></a><a href="mailto:brandifycoo@gmail.com">brandifycoo@gmail.com <Mail size={14}/></a><a href="https://www.instagram.com/brandifycoo" target="_blank" rel="noopener noreferrer">Instagram <Instagram size={14}/></a></div>
             <div><span>LOCALIZAÇÃO</span><p>Jacarezinho — Paraná<br />Brasil</p><a href="/privacidade">Política de privacidade</a></div>
           </div>
