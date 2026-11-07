@@ -46,6 +46,8 @@ export interface WorksWheelProps extends Omit<React.ComponentPropsWithoutRef<"se
   autoPlay?: boolean
   /** Com autoPlay, os milissegundos em cada parada (no anel, uma vez e meia isso). */
   interval?: number
+  /** Drive the wheel using the scroll of the page instead of a nested wheel listener. */
+  scrollDriven?: boolean
 }
 
 /* A geometria. O cartão se mede pela roda; todo o resto se mede pelo cartão, então numa roda estreita, em que o cartão
@@ -120,6 +122,7 @@ export function WorksWheel({
   theme = "dark",
   autoPlay = false,
   interval = 1800,
+  scrollDriven = false,
   className,
   ...props
 }: WorksWheelProps) {
@@ -260,11 +263,48 @@ export function WorksWheel({
     [last],
   )
 
+  // Continuous page scroll is the single source of truth. The section is pinned
+  // by CSS but the browser keeps handling scroll and touch naturally.
+  React.useEffect(() => {
+    if (!scrollDriven) return
+    const scene = stageRef.current?.closest<HTMLElement>("[data-ww-scroll-scene]")
+    if (!scene) return
+    let frame = 0
+    const update = () => {
+      frame = 0
+      const rect = scene.getBoundingClientRect()
+      const travel = Math.max(scene.offsetHeight - window.innerHeight, 1)
+      const progress = clamp((80 - rect.top) / travel, 0, 1)
+      to(progress * (last + 1))
+    }
+    const schedule = () => { if (!frame) frame = requestAnimationFrame(update) }
+    update()
+    window.addEventListener("scroll", schedule, { passive: true })
+    window.addEventListener("resize", schedule)
+    return () => {
+      window.removeEventListener("scroll", schedule)
+      window.removeEventListener("resize", schedule)
+      cancelAnimationFrame(frame)
+    }
+  }, [scrollDriven, last, to])
+
+  // The index and keyboard can seek within the story without changing the
+  // navigation model: they move the document instead of a nested carousel.
+  const navigateTo = React.useCallback((next: number) => {
+    const step = clamp(next, 0, last + 1)
+    if (!scrollDriven) return to(step)
+    const scene = stageRef.current?.closest<HTMLElement>("[data-ww-scroll-scene]")
+    if (!scene) return
+    const sceneTop = window.scrollY + scene.getBoundingClientRect().top
+    const travel = Math.max(scene.offsetHeight - window.innerHeight, 1)
+    window.scrollTo({ top: sceneTop - 80 + step / (last + 1) * travel, behavior: reduced ? "auto" : "smooth" })
+  }, [scrollDriven, last, reduced, to])
+
   // Ouvinte nativo, porque a rolagem tem de poder ser cancelada; e ela só é cancelada enquanto a roda ainda tem para
   // onde ir, então nas pontas a página continua rolando em vez de prender quem lê.
   React.useEffect(() => {
     const el = stageRef.current
-    if (!el) return
+    if (!el || scrollDriven) return
     let settling = 0
     // onde a rajada de rolagem começou
     let from: number | null = null
@@ -295,12 +335,12 @@ export function WorksWheel({
       el.removeEventListener("wheel", onWheel)
       window.clearTimeout(settling)
     }
-  }, [to, last])
+  }, [to, last, scrollDriven])
 
   // autoPlay: anel, cada peça na frente, e de volta ao anel; só enquanto a roda está na tela
   React.useEffect(() => {
     const el = stageRef.current
-    if (!el || !autoPlay || reduced || !count) return
+    if (!el || !autoPlay || reduced || !count || scrollDriven) return
     let timer = 0
     const hold = (at: number) => (at === 0 ? interval * 1.5 : interval)
     const tick = () => {
@@ -321,12 +361,12 @@ export function WorksWheel({
       io.disconnect()
       window.clearTimeout(timer)
     }
-  }, [autoPlay, reduced, count, last, interval, to])
+  }, [autoPlay, reduced, count, last, interval, to, scrollDriven])
 
   return (
     <section
       aria-label={label}
-      className={"ww-root" + (className ? " " + className : "")}
+      className={"ww-root" + (scrollDriven ? " ww-scroll-driven" : "") + (className ? " " + className : "")}
       data-theme={theme}
       {...props}
     >
@@ -341,7 +381,7 @@ export function WorksWheel({
         className="ww-stage"
         style={{ perspective: `${metrics.depth}px` }}
         onPointerDown={(event) => {
-          if (event.button !== 0) return
+          if (scrollDriven || event.button !== 0) return
           // a altura na tela, com o transform em volta: é nela que o ponteiro anda
           const px = Math.max(event.currentTarget.getBoundingClientRect().height * DRAG_SHARE, 1)
           drag.current = {
@@ -355,6 +395,7 @@ export function WorksWheel({
           dragged.current = false
         }}
         onPointerMove={(event) => {
+          if (scrollDriven) return
           const d = drag.current
           if (!d || d.id !== event.pointerId) return
           if (!d.moved) {
@@ -369,6 +410,7 @@ export function WorksWheel({
           d.y = event.clientY
         }}
         onPointerUp={(event) => {
+          if (scrollDriven) return
           const d = drag.current
           if (!d || d.id !== event.pointerId) return
           drag.current = null
@@ -383,22 +425,23 @@ export function WorksWheel({
           window.setTimeout(() => (dragged.current = false), 0)
         }}
         onPointerCancel={() => {
+          if (scrollDriven) return
           if (drag.current?.moved) to(Math.round(target.current))
           drag.current = null
           dragged.current = false
         }}
         onClickCapture={(event) => {
-          if (!dragged.current) return
+          if (scrollDriven || !dragged.current) return
           dragged.current = false
           event.preventDefault()
           event.stopPropagation()
         }}
         onKeyDown={(event) => {
           const at = Math.round(target.current)
-          if (event.key === "ArrowDown") to(at + 1)
-          else if (event.key === "ArrowUp") to(at - 1)
-          else if (event.key === "Home") to(0)
-          else if (event.key === "End") to(last + 1)
+          if (event.key === "ArrowDown") navigateTo(at + 1)
+          else if (event.key === "ArrowUp") navigateTo(at - 1)
+          else if (event.key === "Home") navigateTo(0)
+          else if (event.key === "End") navigateTo(last + 1)
           else if (event.key === "Enter" && at >= 1) cardRefs.current[at - 1]?.click()
           else return
           taken.current = true
@@ -426,7 +469,7 @@ export function WorksWheel({
                 if (Math.round(target.current) === i + 1) return
                 event.preventDefault()
                 taken.current = true
-                to(i + 1)
+                navigateTo(i + 1)
               },
             }
             const face = (
@@ -480,7 +523,7 @@ export function WorksWheel({
               aria-current={i === active || undefined}
               onClick={() => {
                 taken.current = true
-                to(i + 1)
+                navigateTo(i + 1)
               }}
             >
               {item.title}
@@ -554,6 +597,7 @@ const WW_CSS = `
   outline: none;
 }
 .ww-stage:active { cursor: grabbing; }
+.ww-scroll-driven .ww-stage, .ww-scroll-driven .ww-stage:active { cursor: default; touch-action: pan-y; }
 .ww-stage:focus-visible { outline: 2px solid var(--ww-fg); outline-offset: -4px; }
 .ww-wheel { position: absolute; top: 50%; left: 50%; margin: 0; transform-style: preserve-3d; }
 
