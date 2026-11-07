@@ -177,3 +177,44 @@
 .bvr-reduce{background:transparent;color:#d3daee;border:0;border-bottom:1px solid #ffffff54;padding:0 0 4px;font:800 9px/1.5 'DM Sans',sans-serif;letter-spacing:.04em;white-space:nowrap;cursor:pointer;}
 .bvr-reduce:hover{color:#fff;}
 @media(max-width:700px){.bvr-bottom-controls{gap:13px;}.bvr-reduce{font-size:8px;}.bvr-bottom-controls>a{font-size:8px;}}
+
+
+/* V9: contextual interface screens and no decorative helper labels. */
+.bvr-card{
+  aspect-ratio:1.45;
+  border:1px solid rgba(255,255,255,.20);
+  background:#f4f4f3;
+  overflow:hidden;
+  border-radius:15px;
+  box-shadow:0 32px 80px #000d,0 0 28px #436ac31a;
+}
+.bvr-card-image{
+  width:100%;
+  height:100%;
+  background-repeat:no-repeat;
+  background-size:cover;
+  background-position:center;
+  filter:none;
+}
+.bvr-skip-accessible{
+  position:absolute;
+  z-index:20;
+  left:-10000px;
+  top:auto;
+  width:1px;
+  height:1px;
+  overflow:hidden;
+}
+.bvr-skip-accessible:focus-visible{
+  left:20px;top:18px;
+  width:auto;height:auto;
+  padding:13px 17px;
+  background:#fff;
+  color:#121722;
+  font:800 12px/1.4 'DM Sans',sans-serif;
+  outline:3px solid #7298ff;
+}
+@media(max-width:700px){
+ .bvr-card{aspect-ratio:1.45;}
+ .bvr-card-image{height:100%;background-size:cover;}
+}
