@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import { ArrowDownRight, ArrowRight, ArrowUpRight, Check, ChevronDown, Instagram, Mail, Menu, MoveUpRight, X } from "lucide-react";
 import { motion } from "framer-motion";
-import heroPhoto from "@/assets/reference/ref-11-underwater-laptop.jpg";
 import editorialPhoto from "@/assets/reference/ref-32-designers-website.jpg";
 import creativePhoto from "@/assets/reference/ref-12-agency-grid.jpg";
-import ForgeFitDeviceShowcase from "@/components/ForgeFitDeviceShowcase";
 import "./BrandifyCreative.css";
 
 const contactNumber = "5543991065129";
@@ -93,7 +91,7 @@ export default function BrandifyCreative() {
 
       <main id="conteudo">
         <section id="inicio" className="bcv3-hero">
-          <div className="bcv3-hero-image" style={{ backgroundImage: "url(" + heroPhoto + ")" }} aria-hidden="true" />
+          <div className="bcv3-hero-image" style={{ background: "#000" }} aria-hidden="true" />
           <div className="bcv3-hero-scrim" />
           <div className="bcv3-hero-body">
             <motion.h1 initial={{ opacity: 0, y: 68 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.24, duration: 1, ease: [0.2, 0.8, 0.2, 1] }}>
@@ -174,17 +172,6 @@ export default function BrandifyCreative() {
                 </Reveal>
               </div>
             </div>
-          </div>
-        </section>
-
-        <section id="trabalhos" className="bcv3-work bcv3-pad">
-          <div className="bcv3-container">
-            <ForgeFitDeviceShowcase />
-            <Reveal className="bcv3-case-editorial">
-              <h4>DO SITE AO CELULAR.<br/><em>SEM PERDER A EXPERIÊNCIA.</em></h4>
-              <p>O Forge Fit reúne organização de treinos, biblioteca de exercícios e conteúdos para a rotina fitness. Uma demonstração de como a Brandify pensa em clareza, apresentação e uso em diferentes telas.</p>
-            </Reveal>
-            <Reveal className="bcv3-project-closer"><p>SEU PROJETO TAMBÉM PODE GANHAR FORMA.</p><a href={generalContact} target="_blank" rel="noopener noreferrer">VAMOS CRIAR ALGO JUNTOS <ArrowUpRight size={18} /></a></Reveal>
           </div>
         </section>
 
