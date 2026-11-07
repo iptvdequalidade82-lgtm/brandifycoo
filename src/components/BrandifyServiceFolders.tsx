@@ -9,7 +9,7 @@ import "./BrandifyServiceFolders.css";
 const number = "5543991065129";
 const services = [
   {
-    id: "institucional", number: "01", name: "SITE INSTITUCIONAL", short: "Sua empresa, bem apresentada.",
+    id: "institucional", number: "01", name: "SITE INSTITUCIONAL", folderTitle: "SITES", short: "Sua empresa, bem apresentada.",
     icon: LayoutTemplate, color: "blue", visual: editorial, doc: ["Sua história", "Serviços", "Contato"],
     description: "Mostre quem é sua empresa, o que ela faz e como o cliente pode falar com você.",
     details: ["Páginas organizadas por assunto", "Visual alinhado ao seu negócio", "Boa navegação no celular"],
@@ -17,7 +17,7 @@ const services = [
     message: "Olá! Vi a apresentação de sites institucionais na Brandify e quero conversar sobre o meu projeto.",
   },
   {
-    id: "landing", number: "02", name: "LANDING PAGE", short: "Sua oferta, sem distrações.",
+    id: "landing", number: "02", name: "LANDING PAGE", folderTitle: "LANDING", short: "Sua oferta, sem distrações.",
     icon: MousePointerClick, color: "light", visual: art, doc: ["Oferta", "Benefícios", "Próximo passo"],
     description: "Uma página para explicar a sua oferta e facilitar que o visitante peça informações ou compre.",
     details: ["Mensagem principal fácil de entender", "Conteúdo focado na oferta", "Chamada clara para ação"],
@@ -25,7 +25,7 @@ const services = [
     message: "Olá! Vi as landing pages da Brandify e gostaria de uma proposta para minha oferta.",
   },
   {
-    id: "loja", number: "03", name: "LOJA VIRTUAL", short: "Seus produtos à vista.",
+    id: "loja", number: "03", name: "LOJA VIRTUAL", folderTitle: "LOJAS", short: "Seus produtos à vista.",
     icon: ShoppingBag, color: "dark", visual: collections, doc: ["Catálogo", "Produtos", "Compra"],
     description: "Apresente produtos e categorias em uma loja preparada para receber visitantes de diferentes telas.",
     details: ["Catálogo organizado", "Informações de pagamento e envio", "Experiência adaptada ao celular"],
@@ -83,7 +83,7 @@ export default function BrandifyServiceFolders() {
                 <span className="bsf-folder-cover">
                   <span className="bsf-folder-inner">
                     <span className="bsf-folder-top"><span>BRANDIFY / {service.number}</span><Icon size={21} strokeWidth={1.6} /></span>
-                    <span className="bsf-folder-title">{service.name}</span>
+                    <span className="bsf-folder-title">{service.folderTitle}</span>
                     <span className="bsf-folder-bottom"><span>{service.short}</span><span className="bsf-folder-round"><ArrowUpRight size={23} aria-hidden="true" /></span></span>
                   </span>
                 </span>
