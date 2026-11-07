@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { ArrowDownRight, ArrowRight, ArrowUpRight, Check, ChevronDown, Instagram, Mail, Menu, MoveUpRight, X } from "lucide-react";
 import { motion } from "framer-motion";
 import editorialPhoto from "@/assets/reference/ref-32-designers-website.jpg";
-import creativePhoto from "@/assets/reference/ref-12-agency-grid.jpg";
 import BrandifyRibbonScroll from "@/components/BrandifyRibbonScroll";
+import BrandifyCreativeWheel from "@/components/BrandifyCreativeWheel";
+import BrandifyServiceFolders from "@/components/BrandifyServiceFolders";
 import "./BrandifyCreative.css";
 
 const contactNumber = "5543991065129";
@@ -133,32 +134,15 @@ export default function BrandifyCreative() {
           </div>
         </section>
 
+        <BrandifyCreativeWheel />
+
         <section id="servicos" className="bcv3-services bcv3-pad">
           <div className="bcv3-container">
-
             <Reveal className="bcv3-services-heading">
               <h2>QUAL SITE FAZ<br /><em>SENTIDO PARA VOCÊ?</em></h2>
-              <p>Nem toda empresa precisa da mesma estrutura. O ponto de partida é entender o que seu cliente precisa encontrar.</p>
+              <p>Abra uma pasta para conhecer o formato ideal para o seu projeto. Cada opção foi pensada para uma necessidade diferente.</p>
             </Reveal>
-            <div className="bcv3-service-grid">
-              <Reveal className="bcv3-service-item bcv3-service-one">
-                <div className="bcv3-service-photo" style={{ backgroundImage: "url(" + creativePhoto + ")" }} />
-                
-                <div className="bcv3-service-copy"><span>SITES INSTITUCIONAIS</span><h3>MOSTRE<br />SEU VALOR<br /><em>ONLINE.</em></h3><p>Apresente seus serviços, explique como sua empresa trabalha e mostre ao cliente como entrar em contato.</p></div>
-              </Reveal>
-              <div className="bcv3-service-right">
-                <Reveal className="bcv3-service-item bcv3-service-two" delay={0.12}>
-                  
-                  <div className="bcv3-service-copy"><span>LANDING PAGES</span><h3>SUA OFERTA.<br /><em>EM FOCO.</em></h3><p>Uma página focada em explicar sua oferta e conduzir o visitante ao próximo passo: pedir informações ou comprar.</p></div>
-                  <div className="bcv3-service-type" aria-hidden="true">CLICK<span>↗</span></div>
-                </Reveal>
-                <Reveal className="bcv3-service-item bcv3-service-three" delay={0.16}>
-                  
-                  <div className="bcv3-service-copy"><span>LOJAS VIRTUAIS</span><h3>SUA LOJA.<br />SEU CATÁLOGO.<br /><em>ONLINE.</em></h3><p>Organize produtos e categorias para o cliente encontrar o que procura e entender como comprar.</p></div>
-                  <div className="bcv3-service-horizontal-line" aria-hidden="true"/>
-                </Reveal>
-              </div>
-            </div>
+            <BrandifyServiceFolders />
           </div>
         </section>
 
