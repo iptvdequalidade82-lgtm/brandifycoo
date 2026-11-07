@@ -7,7 +7,7 @@ import contrast from "@/assets/reference/ref-10-nike-editorial.jpg";
 import detail from "@/assets/reference/ref-21-blue-metallic.jpg";
 import image from "@/assets/reference/ref-12-agency-grid.jpg";
 import color from "@/assets/reference/ref-23-cores-verde.jpg";
-import motion from "@/assets/reference/ref-20-basketball-sports.jpg";
+import motionImage from "@/assets/reference/ref-20-basketball-sports.jpg";
 import composition from "@/assets/reference/ref-15-retro-beach.jpg";
 import character from "@/assets/reference/ref-33-rabbit-color-inspiration.jpg";
 import "./BrandifyCreativeWheel.css";
@@ -19,7 +19,7 @@ const directions: WorksWheelItem[] = [
   { title: "Detalhe", image: detail, alt: "Composição metálica azul com profundidade" },
   { title: "Imagem", image, alt: "Mosaico de referências para direção de arte" },
   { title: "Cor", image: color, alt: "Estudo de cores e composição visual" },
-  { title: "Movimento", image: motion, alt: "Referência de ação esportiva e composição dinâmica" },
+  { title: "Movimento", image: motionImage, alt: "Referência de ação esportiva e composição dinâmica" },
   { title: "Composição", image: composition, alt: "Referência de estética retrô e organização de elementos" },
   { title: "Personalidade", image: character, alt: "Referência de criação visual com personalidade" },
 ];
