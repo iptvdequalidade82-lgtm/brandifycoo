@@ -23,21 +23,7 @@
     <meta property="og:description" content="A Brandify cria sites institucionais, landing pages e lojas virtuais com design e personalidade para empresas de todo o Brasil.">
     <meta name="twitter:description" content="A Brandify cria sites institucionais, landing pages e lojas virtuais com design e personalidade para empresas de todo o Brasil.">
 
-    <!-- Meta Pixel Code -->
-    <script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '1228233442818339');
-    fbq('track', 'PageView');
-    </script>
-    <!-- Meta Pixel noscript fallback moved to body -->
-    <!-- End Meta Pixel Code -->
+    <!-- O pixel publicitário é injetado pelo React somente após consentimento explícito. -->
 
     <!-- JSON-LD: Negócio Local -->
     <script type="application/ld+json">
@@ -58,21 +44,12 @@
       "areaServed": "BR",
       "sameAs": [
         "https://www.instagram.com/brandifycoo"
-      ],
-      "openingHoursSpecification": {
-        "@type": "OpeningHoursSpecification",
-        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
-        "opens": "09:00",
-        "closes": "18:00"
-      }
+      ]
     }
     </script>
   </head>
 
   <body>
-    <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=1228233442818339&ev=PageView&noscript=1"
-    /></noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
