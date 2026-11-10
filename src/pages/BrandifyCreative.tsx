@@ -23,19 +23,19 @@ const plans = [
     name: "START",
     audience: "Para começar bem.",
     intro: "Uma página com personalidade para apresentar seu negócio e facilitar novos contatos.",
-    features: ["Página de apresentação personalizada", "Design responsivo", "Informações essenciais do negócio", "Contato direto pelo WhatsApp", "Plaquinha NFC"],
+    features: ["Página de apresentação personalizada", "Design responsivo", "Informações essenciais do negócio", "Contato direto pelo WhatsApp"],
   },
   {
     name: "BUSINESS",
     audience: "Para crescer com presença.",
     intro: "Um site institucional com estrutura para valorizar seus serviços e reforçar credibilidade.",
-    features: ["Estrutura institucional de múltiplas páginas", "Identidade visual aplicada ao site", "Navegação pensada para seus clientes", "Formulário ou canais de contato", "Plaquinha NFC"],
+    features: ["Estrutura institucional de múltiplas páginas", "Identidade visual aplicada ao site", "Navegação pensada para seus clientes", "Formulário ou canais de contato"],
   },
   {
     name: "STORE",
-    audience: "Para vender online.",
-    intro: "Uma loja virtual organizada, com uma jornada de compra prática e profissional.",
-    features: ["Configuração da loja virtual", "Vitrine e categorias de produtos", "Estrutura para pagamento e envio", "Experiência adaptada ao celular", "Plaquinha NFC"],
+    audience: "Para quem quer uma loja com identidade própria.",
+    intro: "Criamos o design e a aparência da sua loja virtual: layout, vitrine e navegação. O cadastro e a gestão dos produtos ficam por sua conta.",
+    features: ["Design e personalização visual da loja", "Layout da vitrine e apresentação das categorias", "Identidade visual aplicada às páginas", "Aparência adaptada ao celular"],
   },
 ];
 
@@ -45,6 +45,7 @@ const faqs = [
   ["O site funciona bem no celular?", "Sim. O projeto é desenvolvido com layout responsivo e atenção à experiência em telas menores."],
   ["Quais materiais preciso enviar?", "Informações sobre a empresa, serviços ou produtos, logotipo, textos e fotos disponíveis. Nós explicamos o que é necessário durante o briefing."],
   ["Qual é o prazo de entrega?", "O prazo depende das páginas, integrações e materiais envolvidos. Ele é acordado na proposta antes do início do desenvolvimento."],
+  ["Quem cadastra os produtos da loja virtual?", "No Brandify Store, cuidamos somente do design e da aparência da loja. O cliente é responsável por cadastrar e atualizar produtos, fotos, descrições, preços e estoque, além de configurar e administrar pagamentos, frete e demais recursos operacionais da plataforma."],
   ["Como funciona a manutenção?", "A manutenção e os ajustes após a entrega são definidos no escopo contratado. Podemos avaliar necessidades adicionais em separado."],
 ];
 
@@ -169,7 +170,7 @@ export default function BrandifyCreative() {
                 </Reveal>
                 <Reveal className="bcv3-service-item bcv3-service-three" delay={0.16}>
                   
-                  <div className="bcv3-service-copy"><span>LOJAS VIRTUAIS</span><h3>DO SEU<br />NEGÓCIO PARA<br /><em>O MUNDO.</em></h3><p>Vitrine, produtos e navegação em uma loja preparada para receber clientes.</p></div>
+                  <div className="bcv3-service-copy"><span>LOJAS VIRTUAIS</span><h3>DO SEU<br />NEGÓCIO PARA<br /><em>O MUNDO.</em></h3><p>Design da vitrine e das páginas da sua loja. O cadastro dos produtos fica por conta do cliente.</p></div>
                   <div className="bcv3-service-horizontal-line" aria-hidden="true"/>
                 </Reveal>
               </div>
@@ -211,7 +212,7 @@ export default function BrandifyCreative() {
                 <a href={wa("Olá! Quero receber uma proposta para o pacote Brandify " + plan.name + ".")} target="_blank" rel="noopener noreferrer" className="bcv3-plan-cta">PEDIR PROPOSTA <ArrowUpRight size={21} /></a>
               </Reveal>)}
             </div>
-            <p className="bcv3-plan-disclaimer">O escopo detalhado, a plaquinha NFC, os custos de domínio, hospedagem, plataformas e eventuais serviços adicionais serão confirmados formalmente na proposta comercial.</p>
+            <p className="bcv3-plan-disclaimer">O escopo detalhado e os custos de domínio, hospedagem, plataformas e eventuais serviços adicionais serão informados na proposta. No plano Store, entregamos somente a parte visual: cadastro de produtos, fotos, descrições, preços, estoque, meios de pagamento, frete e operação da loja são responsabilidade do cliente.</p>
           </div>
         </section>
 
