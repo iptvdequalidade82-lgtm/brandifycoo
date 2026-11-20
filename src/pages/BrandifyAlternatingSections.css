@@ -290,3 +290,67 @@
     border-top-color: #333840;
   }
 }
+
+
+/* V3 mobile: shared left alignment for supporting copy, including statement.
+   Keep every support paragraph on the same inset as its section heading. */
+@media (max-width: 650px) {
+  .bcv3 .bcv3-statement .bcv3-container {
+    display: block;
+    min-width: 0;
+  }
+
+  /* The statement text was being pushed right by flex-end + max-width:230px. */
+  .bcv3 .bcv3-statement h2 {
+    margin-bottom: 26px;
+  }
+  .bcv3 .bcv3-statement-bottom {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  /* All descriptive copy begins at x=0 of the shared .bcv3-container. */
+  .bcv3 .bcv3-statement-bottom > p,
+  .bcv3 .bcv3-intro-heading > p,
+  .bcv3 .bcv3-services-heading > p,
+  .bcv3 .bcv3-process-heading > p,
+  .bcv3 .bcv3-plans-heading > p,
+  .bcv3 .bcv3-faq-heading > p,
+  .bcv3 .bcv3-close-bottom > p {
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+    text-align: left;
+    text-indent: 0;
+    align-self: start;
+    justify-self: start;
+    font-size: 13px;
+    line-height: 1.65;
+  }
+
+  /* Preserve a predictable gap below headings, without extra side offsets. */
+  .bcv3 .bcv3-intro-heading > p {
+    margin-top: 0;
+  }
+  .bcv3 .bcv3-services-heading > p,
+  .bcv3 .bcv3-process-heading > p,
+  .bcv3 .bcv3-plans-heading > p {
+    margin-top: 18px;
+  }
+  .bcv3 .bcv3-faq-heading > p {
+    margin-top: 17px;
+  }
+  .bcv3 .bcv3-close-bottom > p {
+    margin-top: 0;
+  }
+}
