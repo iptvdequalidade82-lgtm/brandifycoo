@@ -354,3 +354,169 @@
     margin-top: 0;
   }
 }
+
+
+/* Brandify V3 typography QA — prevent colliding editorial headlines.
+   The original 0.75–0.87 line-heights are too tight for Portuguese accents,
+   Instrument Serif italic ascenders and smaller mobile viewport widths.
+   These changes affect only display headlines, not body copy. */
+
+/* Baseline-safe display typography on larger screens too. */
+.bcv3 .bcv3-hero h1,
+.bcv3 .bcv3-intro-heading h2,
+.bcv3 .bcv3-services-heading h2,
+.bcv3 .bcv3-statement h2,
+.bcv3 .bcv3-process-heading h2,
+.bcv3 .bcv3-plans-heading h2,
+.bcv3 .bcv3-faq-heading h2,
+.bcv3 .bcv3-close h2,
+.bcv3 .bcv3-service-copy h3 {
+  line-height: 1.06;
+}
+
+/* Serif words must contribute their real height to the surrounding line box.
+   In particular, accents in "MÉTODO", "AÇÃO" and "DÚVIDAS" need headroom. */
+.bcv3 .bcv3-services-heading h2 em,
+.bcv3 .bcv3-process-heading h2 em,
+.bcv3 .bcv3-plans-heading h2 em,
+.bcv3 .bcv3-faq-heading h2 em,
+.bcv3 .bcv3-close h2 em,
+.bcv3 .bcv3-service-copy h3 em {
+  line-height: 1.16;
+  vertical-align: baseline;
+}
+
+/* Avoid letters touching card edges, or long titles pushing layouts aside. */
+.bcv3 .bcv3-intro-heading h2,
+.bcv3 .bcv3-services-heading h2,
+.bcv3 .bcv3-process-heading h2,
+.bcv3 .bcv3-plans-heading h2,
+.bcv3 .bcv3-faq-heading h2,
+.bcv3 .bcv3-close h2,
+.bcv3 .bcv3-service-copy h3 {
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+/* Make the real typography, not the unrelated text in the image, the focus. */
+.bcv3 .bcv3-service-one::after {
+  background: linear-gradient(180deg,
+    rgba(2,4,9,.60) 0%,
+    rgba(2,4,9,.48) 38%,
+    rgba(2,4,9,.96) 100%);
+}
+.bcv3 .bcv3-service-one .bcv3-service-photo {
+  filter: grayscale(1) contrast(1.06) brightness(.43);
+}
+
+@media (max-width: 900px) {
+  .bcv3 .bcv3-hero h1,
+  .bcv3 .bcv3-intro-heading h2,
+  .bcv3 .bcv3-services-heading h2,
+  .bcv3 .bcv3-statement h2,
+  .bcv3 .bcv3-process-heading h2,
+  .bcv3 .bcv3-plans-heading h2,
+  .bcv3 .bcv3-faq-heading h2,
+  .bcv3 .bcv3-close h2,
+  .bcv3 .bcv3-service-copy h3 {
+    line-height: 1.12;
+  }
+  .bcv3 .bcv3-services-heading h2 em,
+  .bcv3 .bcv3-process-heading h2 em,
+  .bcv3 .bcv3-plans-heading h2 em,
+  .bcv3 .bcv3-faq-heading h2 em,
+  .bcv3 .bcv3-close h2 em,
+  .bcv3 .bcv3-service-copy h3 em {
+    line-height: 1.22;
+  }
+}
+
+/* Phones — deliberate editorial scale, real vertical breathing room.
+   Keep the exact brand fonts and existing manual <br> breaks. */
+@media (max-width: 650px) {
+  .bcv3 .bcv3-hero h1 {
+    font-size: clamp(49px, 12vw, 76px);
+    line-height: 1.10;
+  }
+  .bcv3 .bcv3-intro-heading h2 {
+    font-size: clamp(48px, 12vw, 76px);
+    line-height: 1.14;
+  }
+  .bcv3 .bcv3-services-heading h2 {
+    font-size: clamp(46px, 12vw, 74px);
+    line-height: 1.15;
+  }
+  .bcv3 .bcv3-statement h2 {
+    font-size: clamp(54px, 13.2vw, 83px);
+    line-height: 1.10;
+    margin-top: 0;
+  }
+  .bcv3 .bcv3-process-heading h2 {
+    font-size: clamp(47px, 12.2vw, 74px);
+    line-height: 1.15;
+  }
+  .bcv3 .bcv3-plans-heading h2 {
+    font-size: clamp(47px, 12.2vw, 75px);
+    line-height: 1.15;
+  }
+  .bcv3 .bcv3-faq-heading h2 {
+    font-size: clamp(49px, 12.8vw, 77px);
+    line-height: 1.16;
+  }
+  .bcv3 .bcv3-close h2 {
+    font-size: clamp(53px, 13.5vw, 83px);
+    line-height: 1.12;
+  }
+  .bcv3 .bcv3-service-copy h3 {
+    font-size: clamp(52px, 14vw, 82px);
+    line-height: 1.14;
+    margin-bottom: 24px;
+  }
+  .bcv3 .bcv3-service-two .bcv3-service-copy h3,
+  .bcv3 .bcv3-service-three .bcv3-service-copy h3 {
+    font-size: clamp(45px, 12.4vw, 69px);
+    line-height: 1.15;
+    margin-bottom: 18px;
+  }
+  .bcv3 .bcv3-service-copy h3 em,
+  .bcv3 .bcv3-services-heading h2 em,
+  .bcv3 .bcv3-process-heading h2 em,
+  .bcv3 .bcv3-plans-heading h2 em,
+  .bcv3 .bcv3-faq-heading h2 em,
+  .bcv3 .bcv3-close h2 em {
+    line-height: 1.25;
+  }
+  /* Give accent marks and the final serif line room inside each panel. */
+  .bcv3 .bcv3-service-one,
+  .bcv3 .bcv3-service-two,
+  .bcv3 .bcv3-service-three {
+    height: auto;
+    min-height: 0;
+    padding-top: 28px;
+    padding-bottom: 30px;
+  }
+  .bcv3 .bcv3-service-one {min-height: 540px;}
+  .bcv3 .bcv3-service-two,
+  .bcv3 .bcv3-service-three {min-height: 350px;}
+  .bcv3 .bcv3-service-copy {
+    min-width: 0;
+  }
+  /* Do not crop shadows, accent marks or descenders inside headlines. */
+  .bcv3 .bcv3-services-heading,
+  .bcv3 .bcv3-process-heading,
+  .bcv3 .bcv3-plans-heading,
+  .bcv3 .bcv3-faq-heading {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 360px) {
+  .bcv3 .bcv3-services-heading h2,
+  .bcv3 .bcv3-process-heading h2,
+  .bcv3 .bcv3-plans-heading h2,
+  .bcv3 .bcv3-faq-heading h2 {font-size: 44px;}
+  .bcv3 .bcv3-service-two .bcv3-service-copy h3,
+  .bcv3 .bcv3-service-three .bcv3-service-copy h3 {font-size: 43px;}
+}
