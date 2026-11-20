@@ -1,0 +1,81 @@
+/* SEO service pages: same Brandify typography, restrained black/white rhythm. */
+.bseo-page{color:#151619;background:#f3f2ef;}
+.bseo-page .bcv3-header{position:relative;}
+.bseo-inner{width:min(calc(100% - 112px),1410px);margin:0 auto;}
+.bseo-page h1,.bseo-page h2,.bseo-page h3{overflow-wrap:normal;line-height:1.04;}
+.bseo-nav{display:flex;align-items:center;gap:clamp(16px,3vw,38px);font-size:13px;font-weight:700;}
+.bseo-nav a:hover{color:#155dfc;}
+.bseo-kicker{font-size:10px;font-weight:800;letter-spacing:.11em;margin:0 0 28px;}
+.bseo-breadcrumb{display:flex;gap:12px;align-items:center;font-size:11px;opacity:.76;margin-bottom:100px;}
+.bseo-breadcrumb a{text-decoration:underline;text-underline-offset:3px;}
+.bseo-hero{background:#090a0d;color:#f7f7f6;padding:42px 0 95px;}
+.bseo-hero h1{font-size:clamp(57px,8.6vw,142px);max-width:1240px;letter-spacing:-.03em;line-height:.97;}
+.bseo-hero-bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:55px;margin-top:clamp(70px,12vw,175px);}
+.bseo-hero-bottom p{font-size:clamp(15px,1.4vw,20px);line-height:1.6;max-width:565px;color:#c7c9d0;}
+.bseo-button{display:inline-flex;justify-content:space-between;align-items:center;gap:30px;background:#155dfc;color:#fff!important;padding:20px 24px;font-size:11px;font-weight:800;white-space:nowrap;transition:background .2s,transform .2s;}
+.bseo-button:hover{background:#1043b1;transform:translateY(-2px);}
+.bseo-two-columns{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(40px,7vw,135px);}
+.bseo-two-columns> *{min-width:0;}
+.bseo-about,.bseo-delivery,.bseo-process,.bseo-faq,.bseo-contact{padding:clamp(82px,9vw,140px) 0;}
+.bseo-about h2,.bseo-delivery h2,.bseo-process h2,.bseo-faq h2,.bseo-contact h2{font-size:clamp(54px,6.3vw,102px);line-height:1.04;letter-spacing:-.025em;}
+.bseo-prose p,.bseo-scope p{font-size:clamp(15px,1.2vw,18px);line-height:1.75;color:#50535c;}
+.bseo-prose p+p{margin-top:25px;}
+.bseo-delivery{background:#14161a;color:#f6f7f6;}
+.bseo-delivery .bseo-kicker{color:#b0c2f9;}
+.bseo-list{list-style:none;margin:0;padding:0;border-top:1px solid #464a53;}
+.bseo-list li{font-size:clamp(16px,1.4vw,22px);line-height:1.45;padding:26px 0;border-bottom:1px solid #464a53;}
+.bseo-list li:before{content:"";display:inline-block;vertical-align:middle;width:8px;height:8px;background:#155dfc;border-radius:50%;margin:0 16px 0 0;}
+.bseo-scope{border-top:1px solid #464a53;margin-top:90px;padding-top:32px;display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(40px,7vw,135px);}
+.bseo-scope h3{font-size:clamp(35px,3.6vw,56px);}
+.bseo-scope p{color:#c0c3ce;font-size:14px;}
+.bseo-process{background:#f3f2ef;}
+.bseo-process h2{max-width:1120px;margin:0 0 65px;}
+.bseo-process ol{list-style:none;padding:0;margin:0;border-top:1px solid #c6c7c8;}
+.bseo-process li{display:grid;grid-template-columns:100px minmax(0,1fr) minmax(0,1.05fr);gap:30px;align-items:center;padding:32px 0;border-bottom:1px solid #c6c7c8;}
+.bseo-process li .bseo-number{font-size:50px;font-weight:700;color:#8c939f;}
+.bseo-process h3{font-size:clamp(35px,4.2vw,70px);}
+.bseo-process li p{max-width:430px;font-size:14px;color:#50545d;line-height:1.6;}
+.bseo-faq{background:#e4e5e3;}
+.bseo-qa{border-top:1px solid #bfc1c3;padding:20px 0 25px;}
+.bseo-qa h3{font-family:"DM Sans",Arial,sans-serif;font-size:18px;font-weight:700;letter-spacing:-.02em;line-height:1.35;}
+.bseo-qa p{color:#535861;margin-top:10px;line-height:1.7;font-size:14px;}
+.bseo-contact{background:#0e1014;color:#fff;}
+.bseo-contact h2{max-width:1050px;margin-bottom:45px;}
+.bseo-other{display:flex;gap:20px;flex-wrap:wrap;border-top:1px solid #383e49;margin-top:85px;padding-top:27px;}
+.bseo-other a{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:#d2d6e0;text-decoration:underline;text-underline-offset:4px;}
+.bseo-other a:hover{color:#fff;}
+@media(max-width:900px){
+ .bseo-inner{width:calc(100% - 64px);}
+ .bseo-nav{display:none;}
+ .bseo-hero h1{font-size:clamp(58px,9vw,96px);}
+ .bseo-hero-bottom{margin-top:80px;}
+ .bseo-two-columns,.bseo-scope{grid-template-columns:1fr;gap:36px;}
+ .bseo-process li{grid-template-columns:80px 1fr;}
+ .bseo-process li p{grid-column:2;}
+}
+@media(max-width:650px){
+ .bseo-inner{width:calc(100% - 36px);}
+ .bseo-page .bcv3-header{padding:0 17px;height:64px;}
+ .bseo-page .bcv3-brand{font-size:26px;}
+ .bseo-page .bcv3-header-cta{padding:11px 12px;font-size:9px;gap:7px;}
+ .bseo-hero{padding:22px 0 74px;}
+ .bseo-breadcrumb{margin-bottom:70px;font-size:10px;}
+ .bseo-kicker{font-size:10px;margin-bottom:19px;}
+ .bseo-hero h1{font-size:clamp(51px,11.9vw,72px);line-height:1.08;}
+ .bseo-hero-bottom{flex-direction:column;align-items:stretch;gap:25px;margin-top:75px;}
+ .bseo-hero-bottom p{font-size:15px;}
+ .bseo-button{width:100%;white-space:normal;font-size:10px;gap:14px;padding:18px;}
+ .bseo-about,.bseo-delivery,.bseo-process,.bseo-faq,.bseo-contact{padding:76px 0;}
+ .bseo-about h2,.bseo-delivery h2,.bseo-process h2,.bseo-faq h2,.bseo-contact h2{font-size:clamp(49px,11vw,68px);line-height:1.09;}
+ .bseo-prose p{font-size:15px;}
+ .bseo-list li{font-size:17px;line-height:1.5;padding:22px 0;}
+ .bseo-scope{margin-top:55px;}
+ .bseo-scope h3{font-size:35px;}
+ .bseo-process li{grid-template-columns:55px 1fr;gap:12px;padding:25px 0;}
+ .bseo-process li .bseo-number{font-size:39px;}
+ .bseo-process h3{font-size:35px;}
+ .bseo-process li p{font-size:13px;}
+ .bseo-qa h3{font-size:16px;}
+ .bseo-other{flex-direction:column;gap:18px;margin-top:63px;}
+}
+@media(prefers-reduced-motion:reduce){.bseo-button{transition:none;}}

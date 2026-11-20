@@ -263,7 +263,9 @@ export default function PreviewSite() {
         await supabase.storage.from("site-previews").upload(storagePath, htmlBlob, { upsert: true });
 
         const displayName = mode === "ia" ? (businessName.trim() || `IA — ${segment.trim()}`) : businessName.trim();
-        const { data: insertData } = await supabase.from("site_previews").insert({
+        const newId = crypto.randomUUID();
+        const { error: insertError } = await supabase.from("site_previews").insert({
+          id: newId,
           client_name: displayName,
           client_phone: phone.trim() || null,
           segment: segment.trim() || null,
@@ -271,9 +273,9 @@ export default function PreviewSite() {
           plan,
           color_palette: selectedPalette,
           html_storage_path: storagePath,
-        }).select("id").single();
+        });
 
-        if (insertData) setPreviewId(insertData.id);
+        if (!insertError) setPreviewId(newId);
       } catch (saveErr) {
         console.error("Failed to save preview record:", saveErr);
       }
@@ -291,7 +293,7 @@ export default function PreviewSite() {
   const handleFeedback = async (type: "like" | "dislike") => {
     setFeedbackGiven(type);
     if (previewId) {
-      await supabase.from("site_previews").update({ feedback: type, feedback_at: new Date().toISOString() }).eq("id", previewId);
+      await supabase.rpc("submit_preview_feedback", { _preview_id: previewId, _feedback: type });
     }
     if (type === "like") {
       const name = businessName.trim() || segment.trim();

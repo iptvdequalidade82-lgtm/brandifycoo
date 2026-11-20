@@ -1,0 +1,650 @@
+/*
+ * Brandify V3 — alternating editorial sections
+ * Black / off-white rhythm with accessible contrast.
+ *
+ * Hero                black
+ * Introduction        warm white
+ * Services            black
+ * Brand statement     warm white
+ * Process             black
+ * Packages            warm white, dark package cards
+ * FAQ                 black
+ * Closing CTA         warm white
+ * Halftone footer     black (component retains its own palette)
+ *
+ * The section backgrounds are static: scroll reveals remain one-way to avoid
+ * the flash previously reported. No hard dividers or full-page transition FX.
+ */
+
+.bcv3 {
+  --brandify-night: #0b0c0f;
+  --brandify-night-soft: #111317;
+  --brandify-day: #f3f2ef;
+  --brandify-day-ink: #121419;
+  --brandify-muted-light: #bfc4ce;
+  --brandify-muted-dark: #50555e;
+}
+
+/* 01 — opening: a true dark introduction */
+.bcv3 .bcv3-hero {
+  background: var(--brandify-night);
+  color: #f9fafb;
+}
+/* The moving word ribbon belongs visually to the dark opening. */
+.bcv3 .bcv3-marquee {
+  background: #101115;
+  color: #f3f3f1;
+  border: 0;
+  box-shadow: none;
+}
+.bcv3 .bcv3-marquee-message {
+  color: #e5e5e4;
+}
+.bcv3 .bcv3-marquee-message.is-accent {
+  color: #7fa0ff;
+}
+
+/* 02 — first impression: bright, editorial */
+.bcv3 .bcv3-intro {
+  background:
+    radial-gradient(ellipse at 86% 22%, rgba(199, 206, 218, .15), transparent 42%),
+    var(--brandify-day);
+  color: var(--brandify-day-ink);
+}
+.bcv3 .bcv3-intro-heading p,
+.bcv3 .bcv3-intro-manifesto p {
+  color: #34383e;
+}
+
+/* 03 — services: dark canvas, intentional contrast inside the cards */
+.bcv3 .bcv3-services {
+  background:
+    radial-gradient(ellipse at 83% 5%, rgba(42, 64, 102, .15), transparent 40%),
+    var(--brandify-night);
+  color: #f7f7f7;
+}
+.bcv3 .bcv3-services::before {
+  background: radial-gradient(ellipse, rgba(64, 85, 132, .26) 0%, transparent 72%);
+  opacity: .46;
+  filter: blur(60px);
+}
+.bcv3 .bcv3-services-heading h2 {
+  color: #f4f5f5;
+}
+.bcv3 .bcv3-services-heading > p {
+  color: var(--brandify-muted-light);
+}
+.bcv3 .bcv3-service-one,
+.bcv3 .bcv3-service-three {
+  background-color: #181a20;
+  color: #fff;
+}
+/* Keep one bright card to provide hierarchy instead of three identical tiles. */
+.bcv3 .bcv3-service-two {
+  background: #e8e8e5;
+  color: #14151a;
+}
+.bcv3 .bcv3-service-two .bcv3-service-copy p {
+  color: #464b52;
+}
+.bcv3 .bcv3-service-one .bcv3-service-copy p,
+.bcv3 .bcv3-service-three .bcv3-service-copy p {
+  color: #e2e4e7;
+}
+
+/* 04 — statement: neutral white to reset the eye */
+.bcv3 .bcv3-statement {
+  background: var(--brandify-day);
+  color: var(--brandify-day-ink);
+}
+.bcv3 .bcv3-statement h2 {
+  color: #15171b;
+}
+.bcv3 .bcv3-statement h2 > span:not(.bcv3-period) {
+  -webkit-text-stroke-color: #15171b;
+}
+.bcv3 .bcv3-statement-bottom p {
+  color: #4a4f56;
+}
+
+/* 05 — process: dark editorial list, no white hover flashes */
+.bcv3 .bcv3-process {
+  background:
+    radial-gradient(ellipse at 9% 78%, rgba(39, 62, 100, .12), transparent 48%),
+    var(--brandify-night);
+  color: #f8f8f8;
+}
+.bcv3 .bcv3-process-heading h2 {
+  color: #f6f6f5;
+}
+.bcv3 .bcv3-process-heading > p,
+.bcv3 .bcv3-process-row p {
+  color: var(--brandify-muted-light);
+}
+.bcv3 .bcv3-process-rows {
+  border-top-color: #373c45;
+}
+.bcv3 .bcv3-process-row {
+  border-bottom: 1px solid #333840;
+  color: #f5f5f5;
+  background: transparent;
+}
+.bcv3 .bcv3-process-row h3 {
+  color: #f5f5f5;
+  transition: color .25s ease;
+}
+.bcv3 .bcv3-process-row > span {
+  color: #81a0ff;
+}
+.bcv3 .bcv3-process-row > svg {
+  color: #9ca6b7;
+}
+.bcv3 .bcv3-process-row:hover,
+.bcv3 .bcv3-process-row:focus-within {
+  background: #171b22;
+}
+.bcv3 .bcv3-process-row:hover h3 {
+  color: #a7bbff;
+}
+
+/* 06 — packages: soft white background, three dark offer panels */
+.bcv3 .bcv3-plans {
+  background: var(--brandify-day);
+  color: var(--brandify-day-ink);
+}
+.bcv3 .bcv3-plans-heading h2 {
+  color: #131519;
+}
+.bcv3 .bcv3-plans-heading h2 em {
+  color: #383c43;
+}
+.bcv3 .bcv3-plans-heading > p,
+.bcv3 .bcv3-plan-disclaimer {
+  color: #555b63;
+}
+.bcv3 .bcv3-plan-list {
+  border-top: 0;
+}
+.bcv3 .bcv3-plan-row {
+  background: #17191e;
+  color: #f9fafb;
+  border: 1px solid #292d34;
+  border-radius: 3px;
+  box-shadow: 0 12px 26px rgba(17, 20, 28, .06);
+}
+.bcv3 .bcv3-plan-row:hover {
+  background: #20242b;
+}
+.bcv3 .bcv3-plan-featured {
+  background: #1c222c;
+  border-color: #39475b;
+}
+.bcv3 .bcv3-plan-featured:hover {
+  background: #242c39;
+}
+.bcv3 .bcv3-plan-identity h3,
+.bcv3 .bcv3-plan-featured .bcv3-plan-identity h3 {
+  color: #f9fafb;
+}
+.bcv3 .bcv3-plan-identity p {
+  color: #d3d5da;
+}
+.bcv3 .bcv3-plan-features > p {
+  color: #e2e5ea;
+}
+.bcv3 .bcv3-plan-features li {
+  color: #c1c7d0;
+}
+.bcv3 .bcv3-plan-features li svg {
+  color: #9eb6ff;
+}
+.bcv3 .bcv3-plan-row .bcv3-plan-cta {
+  background: #f7f8f7;
+  color: #151820 !important;
+  border-radius: 2px;
+}
+.bcv3 .bcv3-plan-row .bcv3-plan-cta:hover {
+  background: #dce6ff;
+}
+
+/* 07 — FAQ: clear white questions with restrained separators */
+.bcv3 .bcv3-faq {
+  background: #111317;
+  color: #f5f6f7;
+}
+.bcv3 .bcv3-faq-heading h2 {
+  color: #f5f6f7;
+}
+.bcv3 .bcv3-faq-heading > p {
+  color: var(--brandify-muted-light);
+}
+.bcv3 .bcv3-faq-list {
+  border-top: 1px solid #393e46;
+}
+.bcv3 .bcv3-faq-item {
+  border-bottom: 1px solid #393e46;
+}
+.bcv3 .bcv3-faq-item button {
+  color: #f6f6f6;
+}
+.bcv3 .bcv3-faq-item button:hover,
+.bcv3 .bcv3-faq-item button:focus-visible {
+  color: #c8d7ff;
+}
+.bcv3 .bcv3-faq-item p {
+  color: #c6cad2;
+}
+
+/* 08 — closing CTA: bright, high-contrast conclusion before the black footer */
+.bcv3 .bcv3-close {
+  background: var(--brandify-day);
+  color: var(--brandify-day-ink);
+}
+.bcv3 .bcv3-close::before {
+  background: radial-gradient(ellipse, rgba(114, 145, 207, .26) 0%, transparent 67%);
+  opacity: .23;
+}
+.bcv3 .bcv3-close h2 {
+  color: #16181c;
+}
+.bcv3 .bcv3-close-bottom {
+  border-top-color: #c4c6c9;
+}
+.bcv3 .bcv3-close-bottom > p {
+  color: #4e535b;
+}
+.bcv3 .bcv3-close-bottom a {
+  background: #16191f;
+  color: #fff !important;
+  border-radius: 2px;
+}
+.bcv3 .bcv3-close-bottom a:hover {
+  background: #293a62;
+  color: #fff !important;
+}
+
+/* Keep the one-way entrance animations unchanged across section boundaries.
+   No animated background or opacity on the parent sections. */
+.bcv3 .bcv3-intro,
+.bcv3 .bcv3-services,
+.bcv3 .bcv3-statement,
+.bcv3 .bcv3-process,
+.bcv3 .bcv3-plans,
+.bcv3 .bcv3-faq,
+.bcv3 .bcv3-close {
+  background-attachment: scroll;
+}
+
+/* Robust widths/contrast at mobile sizes without changing section order */
+@media(max-width:650px) {
+  .bcv3 .bcv3-service-grid {
+    gap: 12px;
+  }
+  .bcv3 .bcv3-plan-row {
+    box-shadow: none;
+  }
+  .bcv3 .bcv3-process-row {
+    border-bottom-color: #323741;
+  }
+  .bcv3 .bcv3-faq-list {
+    border-top-color: #333840;
+  }
+}
+
+
+/* V3 mobile: shared left alignment for supporting copy, including statement.
+   Keep every support paragraph on the same inset as its section heading. */
+@media (max-width: 650px) {
+  .bcv3 .bcv3-statement .bcv3-container {
+    display: block;
+    min-width: 0;
+  }
+
+  /* The statement text was being pushed right by flex-end + max-width:230px. */
+  .bcv3 .bcv3-statement h2 {
+    margin-bottom: 26px;
+  }
+  .bcv3 .bcv3-statement-bottom {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  /* All descriptive copy begins at x=0 of the shared .bcv3-container. */
+  .bcv3 .bcv3-statement-bottom > p,
+  .bcv3 .bcv3-intro-heading > p,
+  .bcv3 .bcv3-services-heading > p,
+  .bcv3 .bcv3-process-heading > p,
+  .bcv3 .bcv3-plans-heading > p,
+  .bcv3 .bcv3-faq-heading > p,
+  .bcv3 .bcv3-close-bottom > p {
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+    text-align: left;
+    text-indent: 0;
+    align-self: start;
+    justify-self: start;
+    font-size: 13px;
+    line-height: 1.65;
+  }
+
+  /* Preserve a predictable gap below headings, without extra side offsets. */
+  .bcv3 .bcv3-intro-heading > p {
+    margin-top: 0;
+  }
+  .bcv3 .bcv3-services-heading > p,
+  .bcv3 .bcv3-process-heading > p,
+  .bcv3 .bcv3-plans-heading > p {
+    margin-top: 18px;
+  }
+  .bcv3 .bcv3-faq-heading > p {
+    margin-top: 17px;
+  }
+  .bcv3 .bcv3-close-bottom > p {
+    margin-top: 0;
+  }
+}
+
+
+/* Brandify V3 typography QA — prevent colliding editorial headlines.
+   The original 0.75–0.87 line-heights are too tight for Portuguese accents,
+   Instrument Serif italic ascenders and smaller mobile viewport widths.
+   These changes affect only display headlines, not body copy. */
+
+/* Baseline-safe display typography on larger screens too. */
+.bcv3 .bcv3-hero h1,
+.bcv3 .bcv3-intro-heading h2,
+.bcv3 .bcv3-services-heading h2,
+.bcv3 .bcv3-statement h2,
+.bcv3 .bcv3-process-heading h2,
+.bcv3 .bcv3-plans-heading h2,
+.bcv3 .bcv3-faq-heading h2,
+.bcv3 .bcv3-close h2,
+.bcv3 .bcv3-service-copy h3 {
+  line-height: 1.06;
+}
+
+/* Serif words must contribute their real height to the surrounding line box.
+   In particular, accents in "MÉTODO", "AÇÃO" and "DÚVIDAS" need headroom. */
+.bcv3 .bcv3-services-heading h2 em,
+.bcv3 .bcv3-process-heading h2 em,
+.bcv3 .bcv3-plans-heading h2 em,
+.bcv3 .bcv3-faq-heading h2 em,
+.bcv3 .bcv3-close h2 em,
+.bcv3 .bcv3-service-copy h3 em {
+  line-height: 1.16;
+  vertical-align: baseline;
+}
+
+/* Avoid letters touching card edges, or long titles pushing layouts aside. */
+.bcv3 .bcv3-intro-heading h2,
+.bcv3 .bcv3-services-heading h2,
+.bcv3 .bcv3-process-heading h2,
+.bcv3 .bcv3-plans-heading h2,
+.bcv3 .bcv3-faq-heading h2,
+.bcv3 .bcv3-close h2,
+.bcv3 .bcv3-service-copy h3 {
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+/* Make the real typography, not the unrelated text in the image, the focus. */
+.bcv3 .bcv3-service-one::after {
+  background: linear-gradient(180deg,
+    rgba(2,4,9,.60) 0%,
+    rgba(2,4,9,.48) 38%,
+    rgba(2,4,9,.96) 100%);
+}
+.bcv3 .bcv3-service-one .bcv3-service-photo {
+  filter: grayscale(1) contrast(1.06) brightness(.43);
+}
+
+@media (max-width: 900px) {
+  .bcv3 .bcv3-hero h1,
+  .bcv3 .bcv3-intro-heading h2,
+  .bcv3 .bcv3-services-heading h2,
+  .bcv3 .bcv3-statement h2,
+  .bcv3 .bcv3-process-heading h2,
+  .bcv3 .bcv3-plans-heading h2,
+  .bcv3 .bcv3-faq-heading h2,
+  .bcv3 .bcv3-close h2,
+  .bcv3 .bcv3-service-copy h3 {
+    line-height: 1.12;
+  }
+  .bcv3 .bcv3-services-heading h2 em,
+  .bcv3 .bcv3-process-heading h2 em,
+  .bcv3 .bcv3-plans-heading h2 em,
+  .bcv3 .bcv3-faq-heading h2 em,
+  .bcv3 .bcv3-close h2 em,
+  .bcv3 .bcv3-service-copy h3 em {
+    line-height: 1.22;
+  }
+}
+
+/* Phones — deliberate editorial scale, real vertical breathing room.
+   Keep the exact brand fonts and existing manual <br> breaks. */
+@media (max-width: 650px) {
+  .bcv3 .bcv3-hero h1 {
+    font-size: clamp(49px, 12vw, 76px);
+    line-height: 1.10;
+  }
+  .bcv3 .bcv3-intro-heading h2 {
+    font-size: clamp(48px, 12vw, 76px);
+    line-height: 1.14;
+  }
+  .bcv3 .bcv3-services-heading h2 {
+    font-size: clamp(46px, 12vw, 74px);
+    line-height: 1.15;
+  }
+  .bcv3 .bcv3-statement h2 {
+    font-size: clamp(54px, 13.2vw, 83px);
+    line-height: 1.10;
+    margin-top: 0;
+  }
+  .bcv3 .bcv3-process-heading h2 {
+    font-size: clamp(47px, 12.2vw, 74px);
+    line-height: 1.15;
+  }
+  .bcv3 .bcv3-plans-heading h2 {
+    font-size: clamp(47px, 12.2vw, 75px);
+    line-height: 1.15;
+  }
+  .bcv3 .bcv3-faq-heading h2 {
+    font-size: clamp(49px, 12.8vw, 77px);
+    line-height: 1.16;
+  }
+  .bcv3 .bcv3-close h2 {
+    font-size: clamp(53px, 13.5vw, 83px);
+    line-height: 1.12;
+  }
+  .bcv3 .bcv3-service-copy h3 {
+    font-size: clamp(52px, 14vw, 82px);
+    line-height: 1.14;
+    margin-bottom: 24px;
+  }
+  .bcv3 .bcv3-service-two .bcv3-service-copy h3,
+  .bcv3 .bcv3-service-three .bcv3-service-copy h3 {
+    font-size: clamp(45px, 12.4vw, 69px);
+    line-height: 1.15;
+    margin-bottom: 18px;
+  }
+  .bcv3 .bcv3-service-copy h3 em,
+  .bcv3 .bcv3-services-heading h2 em,
+  .bcv3 .bcv3-process-heading h2 em,
+  .bcv3 .bcv3-plans-heading h2 em,
+  .bcv3 .bcv3-faq-heading h2 em,
+  .bcv3 .bcv3-close h2 em {
+    line-height: 1.25;
+  }
+  /* Give accent marks and the final serif line room inside each panel. */
+  .bcv3 .bcv3-service-one,
+  .bcv3 .bcv3-service-two,
+  .bcv3 .bcv3-service-three {
+    height: auto;
+    min-height: 0;
+    padding-top: 28px;
+    padding-bottom: 30px;
+  }
+  .bcv3 .bcv3-service-one {min-height: 540px;}
+  .bcv3 .bcv3-service-two,
+  .bcv3 .bcv3-service-three {min-height: 350px;}
+  .bcv3 .bcv3-service-copy {
+    min-width: 0;
+  }
+  /* Do not crop shadows, accent marks or descenders inside headlines. */
+  .bcv3 .bcv3-services-heading,
+  .bcv3 .bcv3-process-heading,
+  .bcv3 .bcv3-plans-heading,
+  .bcv3 .bcv3-faq-heading {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 360px) {
+  .bcv3 .bcv3-services-heading h2,
+  .bcv3 .bcv3-process-heading h2,
+  .bcv3 .bcv3-plans-heading h2,
+  .bcv3 .bcv3-faq-heading h2 {font-size: 44px;}
+  .bcv3 .bcv3-service-two .bcv3-service-copy h3,
+  .bcv3 .bcv3-service-three .bcv3-service-copy h3 {font-size: 43px;}
+}
+
+
+/* Remaining display headings audited for the same type-collision class. */
+.bcv3 .bcv3-work-heading h2,
+.bcv3 .bcv3-project-text h3,
+.bcv3 .bcv3-process-row h3,
+.bcv3 .bcv3-legal-main h1 {
+  line-height: 1.08;
+}
+.bcv3 .bcv3-plan-identity h3.bcv3-plan-name {
+  line-height: 1.01;
+}
+
+@media (max-width: 650px) {
+  .bcv3 .bcv3-work-heading h2 {
+    font-size: clamp(47px, 12.2vw, 74px);
+    line-height: 1.16;
+  }
+  .bcv3 .bcv3-project-text h3 {
+    font-size: clamp(40px, 10vw, 62px);
+    line-height: 1.12;
+  }
+  .bcv3 .bcv3-process-row h3 {
+    font-size: clamp(45px, 11vw, 68px);
+    line-height: 1.11;
+  }
+  .bcv3 .bcv3-legal-main h1 {
+    font-size: clamp(48px, 12.5vw, 78px);
+    line-height: 1.12;
+  }
+}
+
+
+/* Mobile service-card art stays behind the lettering instead of competing with it. */
+@media (max-width: 650px) {
+  /* The source photo itself contains typography. Keep atmospheric depth,
+     but suppress the background words beneath "SÉRIO". */
+  .bcv3 .bcv3-service-one .bcv3-service-photo {
+    opacity: .15;
+    filter: grayscale(1) brightness(.3) blur(3px);
+  }
+  .bcv3 .bcv3-service-one::after {
+    background: linear-gradient(180deg, rgba(6,8,14,.82), rgba(6,8,14,.94));
+  }
+  /* The oversized decorative CLICK word was competing with "UMA AÇÃO." */
+  .bcv3 .bcv3-service-type {
+    display: none;
+  }
+  .bcv3 .bcv3-service-three::before,
+  .bcv3 .bcv3-service-three::after {
+    opacity: .24;
+    pointer-events: none;
+  }
+}
+
+
+/* Crawlable service detail links: preserve the existing visual labels. */
+.bcv3 .bcv3-service-copy > a{
+  display:block;
+  width:max-content;
+  max-width:100%;
+  margin-bottom:20px;
+  color:inherit;
+  font:800 11px/1.35 "DM Sans",Arial,sans-serif;
+  letter-spacing:.11em;
+  text-decoration:none;
+  position:relative;
+  z-index:3;
+}
+.bcv3 .bcv3-service-two .bcv3-service-copy > a,
+.bcv3 .bcv3-service-three .bcv3-service-copy > a{margin-bottom:12px;}
+.bcv3 .bcv3-service-copy > a:hover,
+.bcv3 .bcv3-service-copy > a:focus-visible{text-decoration:underline;text-underline-offset:5px;}
+
+
+/* Interactive-sites entrypoint: one editorial row rather than another noisy card. */
+.bcv3 .bcv3-interactive-teaser{
+  margin-top:clamp(26px,3.8vw,58px);
+  padding:clamp(22px,2.8vw,38px) 0;
+  border-top:1px solid #ffffff40;
+  border-bottom:1px solid #ffffff40;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:28px;
+  color:#f8f9fa;
+  text-decoration:none;
+}
+.bcv3 .bcv3-interactive-teaser > span:first-child{display:flex;flex-direction:column;gap:11px;min-width:0;}
+.bcv3 .bcv3-interactive-teaser small{
+  font:700 10px/1.4 'DM Sans',Arial,sans-serif;
+  letter-spacing:.13em;
+  color:#b0b9cb;
+}
+.bcv3 .bcv3-interactive-teaser strong{
+  display:block;
+  font:800 clamp(38px,4.2vw,72px)/1.08 'Barlow Condensed',Impact,sans-serif;
+  letter-spacing:-.02em;
+}
+.bcv3 .bcv3-interactive-teaser strong em{
+  font-family:'Instrument Serif',Georgia,serif;
+  font-weight:400;
+  font-style:italic;
+  color:#a5baff;
+  white-space:normal;
+}
+.bcv3 .bcv3-interactive-arrow{
+  display:grid;
+  flex:0 0 54px;
+  width:54px;height:54px;
+  place-items:center;
+  border:1px solid #ffffff8c;
+  border-radius:50%;
+  transition:background .23s,transform .23s,border-color .23s;
+}
+.bcv3 .bcv3-interactive-teaser:hover .bcv3-interactive-arrow,
+.bcv3 .bcv3-interactive-teaser:focus-visible .bcv3-interactive-arrow{
+  transform:translate(3px,-3px);
+  background:#155dfc;
+  border-color:#155dfc;
+}
+@media(max-width:650px){
+ .bcv3 .bcv3-interactive-teaser{gap:15px;padding:24px 0;}
+ .bcv3 .bcv3-interactive-teaser strong{font-size:clamp(35px,9.6vw,51px);line-height:1.13;}
+ .bcv3 .bcv3-interactive-teaser small{font-size:9px;}
+ .bcv3 .bcv3-interactive-arrow{flex-basis:42px;width:42px;height:42px;}
+ .bcv3 .bcv3-interactive-arrow svg{width:21px;height:21px;}
+}

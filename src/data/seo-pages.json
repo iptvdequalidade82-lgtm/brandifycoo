@@ -1,0 +1,46 @@
+{
+  "/": {
+    "title": "Criação de Sites Profissionais | Brandify",
+    "description": "Sites institucionais, landing pages e design de lojas virtuais para empresas. Conheça a Brandify, estúdio de sites em Jacarezinho, Paraná.",
+    "type": "website"
+  },
+  "/sites-institucionais": {
+    "title": "Sites Institucionais para Empresas | Brandify",
+    "description": "Criação de sites institucionais com identidade visual, navegação clara e experiência responsiva. Conheça o serviço e solicite sua proposta.",
+    "type": "service",
+    "serviceType": "Criação de sites institucionais"
+  },
+  "/landing-pages": {
+    "title": "Criação de Landing Pages | Brandify",
+    "description": "Landing pages com design personalizado, proposta clara e chamadas para contato. Entenda como funciona o projeto e converse com a Brandify.",
+    "type": "service",
+    "serviceType": "Criação de landing pages"
+  },
+  "/lojas-virtuais": {
+    "title": "Design de Lojas Virtuais | Brandify",
+    "description": "Design e aparência de lojas virtuais: vitrine, páginas e navegação responsiva. O cadastro de produtos e a operação ficam com o cliente.",
+    "type": "service",
+    "serviceType": "Design visual de lojas virtuais"
+  },
+  "/privacidade": {
+    "title": "Política de Privacidade | Brandify",
+    "description": "Saiba quais dados pessoais a Brandify trata, as finalidades, seus direitos e como entrar em contato sobre privacidade.",
+    "type": "legal"
+  },
+  "/termos": {
+    "title": "Termos de Uso | Brandify",
+    "description": "Consulte os termos de uso do site da Brandify e as informações gerais sobre propostas, conteúdo e serviços.",
+    "type": "legal"
+  },
+  "/cookies": {
+    "title": "Cookies e Preferências | Brandify",
+    "description": "Veja como a Brandify utiliza cookies, conheça os recursos opcionais de medição publicitária e altere suas preferências.",
+    "type": "legal"
+  },
+  "/sites-interativos": {
+    "title": "Sites Interativos 2D, 3D e Motion | Brandify",
+    "description": "Sites interativos com animações 2D, elementos 3D, motion design e experiências de scroll. Conheça a criação de sites personalizados da Brandify.",
+    "type": "service",
+    "serviceType": "Criação de sites interativos com animações 2D, elementos 3D e motion design"
+  }
+}

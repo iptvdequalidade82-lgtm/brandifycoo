@@ -1,0 +1,309 @@
+/* Precise, non-destructive visual refinements for the original Brandify V3. */
+
+/* The editorial "Designers Website" image remains monochrome at rest and on hover. */
+.bcv3-intro-image img,
+.bcv3-intro-editorial:hover .bcv3-intro-image img,
+.bcv3-intro-editorial:focus-within .bcv3-intro-image img {
+  filter: grayscale(1) saturate(0) contrast(1.12) brightness(.94) !important;
+}
+.bcv3-intro-editorial:hover .bcv3-intro-image img{
+  transform:scale(1.025);
+}
+.bcv3-intro-image::after{
+  background:linear-gradient(180deg,transparent 46%,rgba(0,0,0,.28) 100%);
+}
+
+/* Gentle cinematic blurs: only behind content, never on readable copy. */
+.bcv3-hero-scrim::before{
+  content:"";
+  position:absolute;
+  z-index:0;
+  pointer-events:none;
+  width:min(570px,60vw);
+  height:min(450px,48vw);
+  right:-12%;
+  bottom:-19%;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(32,65,141,.19) 0%,rgba(32,65,141,.05) 42%,transparent 69%);
+  filter:blur(65px);
+}
+.bcv3-intro{
+  background:
+    radial-gradient(ellipse at 89% 23%,rgba(195,197,199,.22) 0%,transparent 40%),
+    var(--paper);
+}
+.bcv3-services{
+  position:relative;
+  isolation:isolate;
+}
+.bcv3-services::before{
+  content:"";
+  position:absolute;
+  pointer-events:none;
+  z-index:-1;
+  right:-14%;
+  top:4%;
+  width:min(650px,70vw);
+  height:380px;
+  background:radial-gradient(ellipse,#dce0e9 4%,transparent 70%);
+  opacity:.26;
+  filter:blur(50px);
+}
+.bcv3-close{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+}
+.bcv3-close::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  right:-18%;
+  bottom:-37%;
+  width:min(820px,78vw);
+  height:520px;
+  border-radius:50%;
+  opacity:.23;
+  background:radial-gradient(ellipse,#294269 0%,transparent 65%);
+  filter:blur(85px);
+  pointer-events:none;
+}
+
+/* A serious legal setting button, respecting the same graphic identity. */
+.bcv3-cookie-settings-button{
+  border:1px solid #c4c8d1;
+  background:#15171a;
+  color:#fff;
+  min-height:52px;
+  display:inline-flex;
+  gap:21px;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px 19px;
+  cursor:pointer;
+  margin:20px 0 10px;
+  font:800 11px/1.4 'DM Sans',Arial,sans-serif;
+  letter-spacing:.025em;
+  transition:background .2s;
+}
+.bcv3-cookie-settings-button:hover{background:#2b354d;}
+.bcv3-legal-grid section p + p{margin-top:13px;}
+.bcv3-legal-grid code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em;}
+@media(max-width:650px){
+ .bcv3-hero-scrim::before{right:-35%;bottom:-6%;filter:blur(42px);}
+ .bcv3-close::before{right:-35%;filter:blur(60px);}
+}
+@media(prefers-reduced-motion:reduce){
+ .bcv3-intro-image img{transition:none!important;}
+}
+
+
+/* V3 — standardized heading alignment, without changing the editorial typography.
+   Pair each heading's first line with the supporting copy's first line. */
+.bcv3-intro-heading{
+  justify-content:flex-start;
+  gap:clamp(22px,2.5vw,39px);
+}
+.bcv3-intro-heading p{
+  margin:0;
+  max-width:420px;
+}
+
+/* Main section headings share one top baseline and consistent column spacing. */
+@media(min-width:901px){
+  .bcv3-services-heading,
+  .bcv3-process-heading,
+  .bcv3-plans-heading,
+  .bcv3-work-heading{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(240px,28%);
+    align-items:start;
+    column-gap:clamp(28px,4vw,65px);
+  }
+  .bcv3-services-heading h2,
+  .bcv3-process-heading h2,
+  .bcv3-plans-heading h2,
+  .bcv3-work-heading h2{
+    min-width:0;
+    margin-top:0;
+  }
+  .bcv3-services-heading > p,
+  .bcv3-process-heading > p,
+  .bcv3-plans-heading > p,
+  .bcv3-work-heading > p{
+    align-self:start;
+    margin:0;
+    padding-top:4px;
+    max-width:100%;
+  }
+}
+.bcv3-faq-layout{align-items:start;}
+.bcv3-faq-heading h2{margin-top:0;}
+
+/* On smaller screens, the short description stays directly below the heading
+   rather than floating with an independent offset. */
+@media(max-width:900px){
+  .bcv3-services-heading,
+  .bcv3-process-heading,
+  .bcv3-plans-heading,
+  .bcv3-work-heading{
+    display:block;
+  }
+  .bcv3-services-heading > p,
+  .bcv3-process-heading > p,
+  .bcv3-plans-heading > p,
+  .bcv3-work-heading > p{
+    margin:clamp(16px,2.5vw,24px) 0 0;
+    padding:0;
+  }
+  .bcv3-faq-heading h2{margin-top:0;}
+}
+@media(max-width:650px){
+  .bcv3-intro-heading{gap:20px;}
+  .bcv3-services-heading > p,
+  .bcv3-process-heading > p,
+  .bcv3-plans-heading > p,
+  .bcv3-work-heading > p{margin-top:18px;}
+}
+
+
+/* The statement also participates in the same top-aligned editorial grid. */
+@media(min-width:901px){
+  .bcv3-statement .bcv3-container{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(240px,28%);
+    align-items:start;
+    column-gap:clamp(28px,4vw,65px);
+  }
+  .bcv3-statement .bcv3-container > div:first-child{min-width:0;}
+  .bcv3-statement h2{
+    font-size:clamp(94px,10.6vw,178px);
+    margin:0;
+  }
+  .bcv3-statement-bottom{
+    align-self:start;
+    margin:0;
+    padding:4px 0 0;
+    border:0;
+    display:block;
+  }
+  .bcv3-statement-bottom p{
+    margin:0;
+    max-width:100%;
+  }
+}
+@media(max-width:900px){
+  .bcv3-statement h2{margin:0 0 32px;}
+  .bcv3-statement-bottom{padding-top:18px;}
+}
+
+
+/* Business / plan cards: keep the full label, dot and CTA inside the card. */
+.bcv3 .bcv3-plan-row{
+  grid-template-columns:minmax(0,1.12fr) minmax(0,1fr) minmax(166px,.46fr);
+  gap:clamp(18px,2.4vw,38px);
+  align-items:start;
+}
+.bcv3 .bcv3-plan-row > *{min-width:0;}
+.bcv3 .bcv3-plan-identity{min-width:0;container-type:inline-size;}
+.bcv3 .bcv3-plan-identity h3.bcv3-plan-name{
+  display:flex;
+  align-items:flex-end;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  white-space:nowrap;
+  font-size:clamp(62px,28cqw,160px);
+  line-height:.82;
+  letter-spacing:-.045em;
+  margin:14px 0 17px;
+}
+.bcv3 .bcv3-plan-identity h3.bcv3-plan-name.is-long{
+  font-size:clamp(45px,23cqw,124px);
+}
+.bcv3 .bcv3-plan-word{
+  display:block;
+  min-width:0;
+  line-height:.82;
+}
+.bcv3 .bcv3-plan-identity h3 .bcv3-plan-dot{
+  position:static;
+  display:block;
+  width:.115em;
+  height:.115em;
+  flex:0 0 .115em;
+  margin:0 0 .08em .025em;
+  padding:0;
+  border-radius:50%;
+  background:var(--blue);
+  transform:none;
+  vertical-align:initial;
+}
+.bcv3 .bcv3-plan-row .bcv3-plan-cta{
+  grid-column:auto;
+  align-self:start;
+  justify-self:stretch;
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  min-width:0;
+  max-width:100%;
+  width:100%;
+  min-height:56px;
+  margin-top:4px;
+  padding:15px clamp(12px,1.35vw,20px);
+  gap:8px;
+  white-space:nowrap;
+  font-size:clamp(9px,.78vw,11px);
+}
+.bcv3 .bcv3-plan-cta span{min-width:0;}
+.bcv3 .bcv3-plan-cta svg{flex-shrink:0;}
+@media(max-width:1200px){
+  .bcv3 .bcv3-plan-row{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:23px;
+  }
+  .bcv3 .bcv3-plan-row .bcv3-plan-cta{
+    grid-column:2;
+    margin-top:0;
+  }
+}
+@media(max-width:650px){
+  .bcv3 .bcv3-plan-row{
+    grid-template-columns:minmax(0,1fr);
+    gap:14px;
+    padding:28px 20px;
+  }
+  .bcv3 .bcv3-plan-row .bcv3-plan-cta{
+    grid-column:1;
+    margin-top:6px;
+    font-size:11px;
+    min-height:55px;
+  }
+}
+
+/* One-way scroll reveals. No recurring animation or initial opacity flash. */
+.bcv3 .bcv3-reveal{
+  opacity:1;
+  transform:none;
+  transition:opacity .58s cubic-bezier(.22,1,.36,1),
+             transform .58s cubic-bezier(.22,1,.36,1);
+}
+.bcv3 .bcv3-reveal[data-reveal="pending"]{
+  opacity:0;
+  transform:translate3d(0,14px,0);
+}
+.bcv3 .bcv3-reveal[data-reveal="shown"]{
+  opacity:1;
+  transform:translate3d(0,0,0);
+}
+@media(prefers-reduced-motion:reduce){
+  .bcv3 .bcv3-reveal,
+  .bcv3 .bcv3-reveal[data-reveal="pending"],
+  .bcv3 .bcv3-reveal[data-reveal="shown"]{
+    opacity:1!important;
+    transform:none!important;
+    transition:none!important;
+  }
+}

@@ -653,6 +653,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      submit_preview_feedback: {
+        Args: { _feedback: string; _preview_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "user"
