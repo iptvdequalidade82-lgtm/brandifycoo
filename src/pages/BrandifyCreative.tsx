@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowDownRight, ArrowRight, ArrowUpRight, Check, ChevronDown, Instagram, Mail, Menu, MoveUpRight, X } from "lucide-react";
 import { motion } from "framer-motion";
 import editorialPhoto from "@/assets/reference/ref-32-designers-website.jpg";
@@ -49,11 +49,38 @@ const faqs = [
   ["Como funciona a manutenção?", "A manutenção e os ajustes após a entrega são definidos no escopo contratado. Podemos avaliar necessidades adicionais em separado."],
 ];
 
-const Reveal = ({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) => (
-  <motion.div className={className} initial={{ opacity: 0, y: 32 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.12 }} transition={{ duration: 0.75, delay, ease: [0.22, 1, 0.36, 1] }}>
-    {children}
-  </motion.div>
-);
+/**
+ * Reveals below-fold sections exactly once. Content starts visible, so page
+ * hydration, rapid scrolling and observer reattachment cannot flash content.
+ * Only sections that have not yet entered the viewport are briefly prepared.
+ */
+const Reveal = ({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node || !("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    // Don't hide sections that are already visible on first paint.
+    if (node.getBoundingClientRect().top <= window.innerHeight - 35) return;
+    node.dataset.reveal = "pending";
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry?.isIntersecting) return;
+      node.dataset.reveal = "shown";
+      observer.disconnect();
+    }, { rootMargin: "0px 0px -25px 0px", threshold: 0.01 });
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className={"bcv3-reveal " + className} style={{ transitionDelay: Math.min(delay, 0.16) + "s" }}>
+      {children}
+    </div>
+  );
+};
 
 export default function BrandifyCreative() {
   const [open, setOpen] = useState(false);
@@ -207,9 +234,9 @@ export default function BrandifyCreative() {
             <Reveal className="bcv3-plans-heading"><h2>QUAL É O SEU<br /><em>PRÓXIMO PASSO?</em></h2><p>Três formatos de projeto. O escopo e o investimento finais são definidos com você antes do início.</p></Reveal>
             <div className="bcv3-plan-list">
               {plans.map((plan, index) => <Reveal className={"bcv3-plan-row " + (index === 1 ? "bcv3-plan-featured" : "")} key={plan.name}>
-                <div className="bcv3-plan-identity"><h3>{plan.name}<span className="bcv3-plan-dot">.</span></h3><p>{plan.audience}</p></div>
+                <div className="bcv3-plan-identity"><h3 className={"bcv3-plan-name" + (plan.name === "BUSINESS" ? " is-long" : "")}><span className="bcv3-plan-word">{plan.name}</span><span className="bcv3-plan-dot" aria-hidden="true" /></h3><p>{plan.audience}</p></div>
                 <div className="bcv3-plan-features"><p>{plan.intro}</p><ul>{plan.features.map((f) => <li key={f}><Check size={15} /> {f}</li>)}</ul></div>
-                <a href={wa("Olá! Quero receber uma proposta para o pacote Brandify " + plan.name + ".")} target="_blank" rel="noopener noreferrer" className="bcv3-plan-cta">PEDIR PROPOSTA <ArrowUpRight size={21} /></a>
+                <a href={wa("Olá! Quero receber uma proposta para o pacote Brandify " + plan.name + ".")} target="_blank" rel="noopener noreferrer" className="bcv3-plan-cta"><span>PEDIR PROPOSTA</span><ArrowUpRight size={21} aria-hidden="true" /></a>
               </Reveal>)}
             </div>
             <p className="bcv3-plan-disclaimer">O escopo detalhado e os custos de domínio, hospedagem, plataformas e eventuais serviços adicionais serão informados na proposta. No plano Store, entregamos somente a parte visual: cadastro de produtos, fotos, descrições, preços, estoque, meios de pagamento, frete e operação da loja são responsabilidade do cliente.</p>
