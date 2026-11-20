@@ -10,7 +10,8 @@ function assert(ok, message) {
 }
 assert(sitemap.includes("<urlset"), "Invalid or missing sitemap root");
 assert(robots.includes("Sitemap: " + origin + "/sitemap.xml"), "Sitemap not declared in robots.txt");
-assert(Object.keys(pages).length === 7, "Unexpected public route count");
+const routeCount = Object.keys(pages).length;
+assert(routeCount >= 8, "Missing SEO route");
 
 for (const [path, page] of Object.entries(pages)) {
   const file = path === "/" ? "dist/index.html" : "dist/" + path.slice(1) + "/index.html";
@@ -37,5 +38,5 @@ for (const [path, page] of Object.entries(pages)) {
     assert(!match, "Irrelevant structured data on " + path);
   }
 }
-assert((sitemap.match(/<loc>/g) ?? []).length === 7, "Sitemap URL count does not match public routes");
-console.log("[SEO] Passed static metadata, canonical, sitemap, robots and JSON-LD checks for 7 public routes.");
+assert((sitemap.match(/<loc>/g) ?? []).length === routeCount, "Sitemap URL count does not match public routes");
+console.log("[SEO] Passed metadata, canonical, sitemap, robots and JSON-LD checks for " + routeCount + " public routes.");
