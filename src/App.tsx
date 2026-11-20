@@ -2,30 +2,31 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 
-import Privacidade from "./pages/Privacidade";
-import Cookies from "./pages/Cookies";
-import Termos from "./pages/Termos";
+const Privacidade = lazy(() => import("./pages/Privacidade"));
+const Cookies = lazy(() => import("./pages/Cookies"));
+const Termos = lazy(() => import("./pages/Termos"));
 import CookieConsent from "@/components/CookieConsent";
 import SeoHead from "@/components/SeoHead";
-import ServicePage from "./pages/ServicePage";
-import AdminLogin from "./pages/AdminLogin";
-import AdminDashboard from "./pages/AdminDashboard";
-import AdminProjects from "./pages/AdminProjects";
-import AdminAgenda from "./pages/AdminAgenda";
-import AdminLogs from "./pages/AdminLogs";
-import AdminLeads from "./pages/AdminLeads";
-import PaymentSuccess from "./pages/PaymentSuccess";
-import PixPayment from "./pages/PixPayment";
-import AdminContabilidade from "./pages/AdminContabilidade";
-import AdminPreviews from "./pages/AdminPreviews";
-import AdminConteudo from "./pages/AdminConteudo";
-import AdminIAs from "./pages/AdminIAs";
+const ServicePage = lazy(() => import("./pages/ServicePage"));
+const AdminLogin = lazy(() => import("./pages/AdminLogin"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AdminProjects = lazy(() => import("./pages/AdminProjects"));
+const AdminAgenda = lazy(() => import("./pages/AdminAgenda"));
+const AdminLogs = lazy(() => import("./pages/AdminLogs"));
+const AdminLeads = lazy(() => import("./pages/AdminLeads"));
+const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
+const PixPayment = lazy(() => import("./pages/PixPayment"));
+const AdminContabilidade = lazy(() => import("./pages/AdminContabilidade"));
+const AdminPreviews = lazy(() => import("./pages/AdminPreviews"));
+const AdminConteudo = lazy(() => import("./pages/AdminConteudo"));
+const AdminIAs = lazy(() => import("./pages/AdminIAs"));
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ const App = () => (
         <BrowserRouter>
           <SeoHead />
           <CookieConsent />
+          <Suspense fallback={<div role="status" aria-live="polite" className="sr-only">Carregando página…</div>}>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Navigate to="/" replace />} />
@@ -81,6 +83,7 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </Suspense>
         </BrowserRouter>
       </AuthProvider>
     </TooltipProvider>
