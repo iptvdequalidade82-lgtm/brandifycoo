@@ -551,3 +551,26 @@
     line-height: 1.12;
   }
 }
+
+
+/* Mobile service-card art stays behind the lettering instead of competing with it. */
+@media (max-width: 650px) {
+  /* The source photo itself contains typography. Keep atmospheric depth,
+     but suppress the background words beneath "SÉRIO". */
+  .bcv3 .bcv3-service-one .bcv3-service-photo {
+    opacity: .15;
+    filter: grayscale(1) brightness(.3) blur(3px);
+  }
+  .bcv3 .bcv3-service-one::after {
+    background: linear-gradient(180deg, rgba(6,8,14,.82), rgba(6,8,14,.94));
+  }
+  /* The oversized decorative CLICK word was competing with "UMA AÇÃO." */
+  .bcv3 .bcv3-service-type {
+    display: none;
+  }
+  .bcv3 .bcv3-service-three::before,
+  .bcv3 .bcv3-service-three::after {
+    opacity: .24;
+    pointer-events: none;
+  }
+}
