@@ -13,6 +13,7 @@ export const brandifyFooterColumns: FooterColumn[] = [
       { label: "Sites institucionais", href: "/sites-institucionais" },
       { label: "Landing pages", href: "/landing-pages" },
       { label: "Lojas virtuais", href: "/lojas-virtuais" },
+      { label: "Sites interativos", href: "/sites-interativos" },
       { label: "Pacotes", href: "/#pacotes" },
     ],
   },
