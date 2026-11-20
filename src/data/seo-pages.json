@@ -36,5 +36,11 @@
     "title": "Cookies e Preferências | Brandify",
     "description": "Veja como a Brandify utiliza cookies, conheça os recursos opcionais de medição publicitária e altere suas preferências.",
     "type": "legal"
+  },
+  "/sites-interativos": {
+    "title": "Sites Interativos 2D, 3D e Motion | Brandify",
+    "description": "Sites interativos com animações 2D, elementos 3D, motion design e experiências de scroll. Conheça a criação de sites personalizados da Brandify.",
+    "type": "service",
+    "serviceType": "Criação de sites interativos com animações 2D, elementos 3D e motion design"
   }
 }
