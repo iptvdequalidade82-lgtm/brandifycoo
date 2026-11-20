@@ -10,6 +10,9 @@ export const brandifyFooterColumns: FooterColumn[] = [
     links: [
       { label: "Estúdio", href: "/#sobre" },
       { label: "Serviços", href: "/#servicos" },
+      { label: "Sites institucionais", href: "/sites-institucionais" },
+      { label: "Landing pages", href: "/landing-pages" },
+      { label: "Lojas virtuais", href: "/lojas-virtuais" },
       { label: "Pacotes", href: "/#pacotes" },
     ],
   },
