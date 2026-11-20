@@ -12,6 +12,8 @@ import Privacidade from "./pages/Privacidade";
 import Cookies from "./pages/Cookies";
 import Termos from "./pages/Termos";
 import CookieConsent from "@/components/CookieConsent";
+import SeoHead from "@/components/SeoHead";
+import ServicePage from "./pages/ServicePage";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminProjects from "./pages/AdminProjects";
@@ -34,6 +36,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <SeoHead />
           <CookieConsent />
           <Routes>
             <Route path="/" element={<Index />} />
@@ -57,6 +60,9 @@ const App = () => (
             
             <Route path="/trabalhe-conosco" element={<Navigate to="/#contato" replace />} />
             <Route path="/quem-somos" element={<Navigate to="/#sobre" replace />} />
+            <Route path="/sites-institucionais" element={<ServicePage service="institucionais" />} />
+            <Route path="/landing-pages" element={<ServicePage service="landing" />} />
+            <Route path="/lojas-virtuais" element={<ServicePage service="lojas" />} />
             <Route path="/privacidade" element={<Privacidade />} />
             <Route path="/cookies" element={<Cookies />} />
             <Route path="/termos" element={<Termos />} />
