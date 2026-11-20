@@ -88,7 +88,6 @@ export default function BrandifyCreative() {
   const [activeFaq, setActiveFaq] = useState<number | null>(0);
 
   useEffect(() => {
-    document.title = "Brandify — Sites com identidade. Presença que marca.";
     const jump = () => {
       const hash = location.hash.slice(1);
       if (hash) document.getElementById(hash)?.scrollIntoView();
@@ -188,17 +187,17 @@ export default function BrandifyCreative() {
               <Reveal className="bcv3-service-item bcv3-service-one">
                 <div className="bcv3-service-photo" style={{ backgroundImage: "url(" + creativePhoto + ")" }} />
                 
-                <div className="bcv3-service-copy"><span>SITES INSTITUCIONAIS</span><h3>PARA SER<br />LEVADO A<br /><em>SÉRIO.</em></h3><p>Sites que apresentam sua empresa, seus serviços e sua história de forma clara e memorável.</p></div>
+                <div className="bcv3-service-copy"><a href="/sites-institucionais" aria-label="Saiba mais sobre sites institucionais">SITES INSTITUCIONAIS</a><h3>PARA SER<br />LEVADO A<br /><em>SÉRIO.</em></h3><p>Sites que apresentam sua empresa, seus serviços e sua história de forma clara e memorável.</p></div>
               </Reveal>
               <div className="bcv3-service-right">
                 <Reveal className="bcv3-service-item bcv3-service-two" delay={0.12}>
                   
-                  <div className="bcv3-service-copy"><span>LANDING PAGES</span><h3>UMA IDEIA.<br /><em>UMA AÇÃO.</em></h3><p>Páginas estratégicas para apresentar ofertas e gerar oportunidades de contato.</p></div>
+                  <div className="bcv3-service-copy"><a href="/landing-pages" aria-label="Saiba mais sobre landing pages">LANDING PAGES</a><h3>UMA IDEIA.<br /><em>UMA AÇÃO.</em></h3><p>Páginas estratégicas para apresentar ofertas e gerar oportunidades de contato.</p></div>
                   <div className="bcv3-service-type" aria-hidden="true">CLICK<span>↗</span></div>
                 </Reveal>
                 <Reveal className="bcv3-service-item bcv3-service-three" delay={0.16}>
                   
-                  <div className="bcv3-service-copy"><span>LOJAS VIRTUAIS</span><h3>DO SEU<br />NEGÓCIO PARA<br /><em>O MUNDO.</em></h3><p>Design da vitrine e das páginas da sua loja. O cadastro dos produtos fica por conta do cliente.</p></div>
+                  <div className="bcv3-service-copy"><a href="/lojas-virtuais" aria-label="Saiba mais sobre lojas virtuais">LOJAS VIRTUAIS</a><h3>DO SEU<br />NEGÓCIO PARA<br /><em>O MUNDO.</em></h3><p>Design da vitrine e das páginas da sua loja. O cadastro dos produtos fica por conta do cliente.</p></div>
                   <div className="bcv3-service-horizontal-line" aria-hidden="true"/>
                 </Reveal>
               </div>
