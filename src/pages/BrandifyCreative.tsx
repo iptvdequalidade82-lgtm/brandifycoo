@@ -6,6 +6,7 @@ import creativePhoto from "@/assets/reference/ref-12-agency-grid.jpg";
 import BrandifyHalftoneFooter from "@/components/BrandifyHalftoneFooter";
 import "./BrandifyCreative.css";
 import "./BrandifyRefinements.css";
+import "./BrandifyAlternatingSections.css";
 
 const contactNumber = "5543991065129";
 const wa = (text: string) => "https://wa.me/" + contactNumber + "?text=" + encodeURIComponent(text);
