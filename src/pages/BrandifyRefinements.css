@@ -196,3 +196,12 @@
   .bcv3-statement h2{margin:0 0 32px;}
   .bcv3-statement-bottom{padding-top:18px;}
 }
+
+
+/* Plan labels: align the brand-blue period optically with the letter baseline. */
+.bcv3-plan-identity h3 .bcv3-plan-dot{
+  position:relative;
+  top:-.105em;
+  margin-left:.015em;
+  vertical-align:baseline;
+}
