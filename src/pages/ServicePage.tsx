@@ -189,6 +189,7 @@ export default function ServicePage({ service }: { service: ServiceKey }) {
             <a href={contact} target="_blank" rel="noopener noreferrer" className="bseo-button">PEDIR UMA PROPOSTA <ArrowUpRight size={20} aria-hidden="true" /></a>
             <nav className="bseo-other" aria-label="Conheça outros serviços">
               {crossLinks.filter(link => link.key !== service).map(link => <a key={link.key} href={link.href}>{link.label} <ArrowUpRight size={15} aria-hidden="true" /></a>)}
+              <a href="/sites-interativos">Sites interativos <ArrowUpRight size={15} aria-hidden="true" /></a>
             </nav>
           </div>
         </section>
