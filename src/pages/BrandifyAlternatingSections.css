@@ -574,3 +574,22 @@
     pointer-events: none;
   }
 }
+
+
+/* Crawlable service detail links: preserve the existing visual labels. */
+.bcv3 .bcv3-service-copy > a{
+  display:block;
+  width:max-content;
+  max-width:100%;
+  margin-bottom:20px;
+  color:inherit;
+  font:800 11px/1.35 "DM Sans",Arial,sans-serif;
+  letter-spacing:.11em;
+  text-decoration:none;
+  position:relative;
+  z-index:3;
+}
+.bcv3 .bcv3-service-two .bcv3-service-copy > a,
+.bcv3 .bcv3-service-three .bcv3-service-copy > a{margin-bottom:12px;}
+.bcv3 .bcv3-service-copy > a:hover,
+.bcv3 .bcv3-service-copy > a:focus-visible{text-decoration:underline;text-underline-offset:5px;}
