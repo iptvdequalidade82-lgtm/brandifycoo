@@ -165,3 +165,34 @@
   .bcv3-plans-heading > p,
   .bcv3-work-heading > p{margin-top:18px;}
 }
+
+
+/* The statement also participates in the same top-aligned editorial grid. */
+@media(min-width:901px){
+  .bcv3-statement .bcv3-container{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(240px,28%);
+    align-items:start;
+    column-gap:clamp(28px,4vw,65px);
+  }
+  .bcv3-statement .bcv3-container > div:first-child{min-width:0;}
+  .bcv3-statement h2{
+    font-size:clamp(94px,10.6vw,178px);
+    margin:0;
+  }
+  .bcv3-statement-bottom{
+    align-self:start;
+    margin:0;
+    padding:4px 0 0;
+    border:0;
+    display:block;
+  }
+  .bcv3-statement-bottom p{
+    margin:0;
+    max-width:100%;
+  }
+}
+@media(max-width:900px){
+  .bcv3-statement h2{margin:0 0 32px;}
+  .bcv3-statement-bottom{padding-top:18px;}
+}
