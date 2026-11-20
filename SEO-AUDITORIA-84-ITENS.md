@@ -128,3 +128,12 @@
 - [Google: otimização para experiências de IA](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide)
 
 A implementação é uma **melhoria técnica de SEO**, não uma promessa de primeira página, snippet, avaliações, tráfego ou citação por IA.
+
+## Validação externa e revisão adicional — 20/11/2026
+
+- **Site publicado não confirmado:** tentativas de abrir `https://brandifycoo.br/`, `/robots.txt` e `/sitemap.xml` por ferramenta externa não tiveram resposta acessível. Isso **não comprova** que o domínio esteja offline, apenas impede validar a publicação por esse método.
+- **Indexação pública não comprovada:** a busca `site:brandifycoo.br` não retornou páginas atribuíveis à BrandifyCoo nesta verificação. A situação oficial deve ser confirmada por Google Search Console.
+- **Endereço do site ainda pendente:** o repositório Lovable contém URL de projeto placeholder no README e não identifica uma URL publicada verificável. A auditoria não deve presumir que `brandifycoo.br` é o domínio ativo.
+- **Dados estruturados renderizados no HTML estático:** após revisão, as páginas de serviços agora incluem `Organization`, `Service` e `BreadcrumbList` também no HTML gerado, sem depender somente de JavaScript.
+- **Teste automático de SEO:** `npm run build` executa `scripts/verify-seo.mjs` depois de gerar os arquivos e verifica as sete URLs, canônicos, metadados, sitemap, robots e JSON-LD. Isso valida os artefatos locais, **não a configuração do servidor público**.
+- **Próximo bloqueio real:** fornecer o link público de produção ou conectar o Search Console. Não configurar verificação de propriedade ou publicar mudanças sem saber o domínio correto.
