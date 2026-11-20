@@ -96,3 +96,72 @@
 @media(prefers-reduced-motion:reduce){
  .bcv3-intro-image img{transition:none!important;}
 }
+
+
+/* V3 — standardized heading alignment, without changing the editorial typography.
+   Pair each heading's first line with the supporting copy's first line. */
+.bcv3-intro-heading{
+  justify-content:flex-start;
+  gap:clamp(22px,2.5vw,39px);
+}
+.bcv3-intro-heading p{
+  margin:0;
+  max-width:420px;
+}
+
+/* Main section headings share one top baseline and consistent column spacing. */
+@media(min-width:901px){
+  .bcv3-services-heading,
+  .bcv3-process-heading,
+  .bcv3-plans-heading,
+  .bcv3-work-heading{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(240px,28%);
+    align-items:start;
+    column-gap:clamp(28px,4vw,65px);
+  }
+  .bcv3-services-heading h2,
+  .bcv3-process-heading h2,
+  .bcv3-plans-heading h2,
+  .bcv3-work-heading h2{
+    min-width:0;
+    margin-top:0;
+  }
+  .bcv3-services-heading > p,
+  .bcv3-process-heading > p,
+  .bcv3-plans-heading > p,
+  .bcv3-work-heading > p{
+    align-self:start;
+    margin:0;
+    padding-top:4px;
+    max-width:100%;
+  }
+}
+.bcv3-faq-layout{align-items:start;}
+.bcv3-faq-heading h2{margin-top:0;}
+
+/* On smaller screens, the short description stays directly below the heading
+   rather than floating with an independent offset. */
+@media(max-width:900px){
+  .bcv3-services-heading,
+  .bcv3-process-heading,
+  .bcv3-plans-heading,
+  .bcv3-work-heading{
+    display:block;
+  }
+  .bcv3-services-heading > p,
+  .bcv3-process-heading > p,
+  .bcv3-plans-heading > p,
+  .bcv3-work-heading > p{
+    margin:clamp(16px,2.5vw,24px) 0 0;
+    padding:0;
+  }
+  .bcv3-faq-heading h2{margin-top:0;}
+}
+@media(max-width:650px){
+  .bcv3-intro-heading{gap:20px;}
+  .bcv3-services-heading > p,
+  .bcv3-process-heading > p,
+  .bcv3-plans-heading > p,
+  .bcv3-work-heading > p{margin-top:18px;}
+}
