@@ -5,6 +5,44 @@ const pages = JSON.parse(readFileSync("src/data/seo-pages.json", "utf8"));
 const base = readFileSync("dist/index.html", "utf8");
 const escape = s => String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
 
+function structuredData(path, meta) {
+  const organization = {
+    "@type": "Organization",
+    "@id": origin + "/#organizacao",
+    name: "Brandify",
+    url: origin + "/",
+    description: "Estúdio de criação de sites institucionais, landing pages e design de lojas virtuais.",
+    email: "brandifycoo@gmail.com",
+    telephone: "+5543991065129",
+    areaServed: { "@type": "Country", name: "Brasil" },
+    sameAs: ["https://www.instagram.com/brandifycoo"],
+  };
+  if (path !== "/" && meta.type === "service") return {
+    "@context": "https://schema.org",
+    "@graph": [
+      organization,
+      {
+        "@type": "Service",
+        "@id": origin + path + "#servico",
+        name: meta.serviceType,
+        serviceType: meta.serviceType,
+        description: meta.description,
+        url: origin + path,
+        provider: { "@id": organization["@id"] },
+        areaServed: { "@type": "Country", name: "Brasil" },
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Início", item: origin + "/" },
+          { "@type": "ListItem", position: 2, name: meta.serviceType, item: origin + path },
+        ],
+      },
+    ],
+  };
+  return null;
+}
+
 function generate(path, meta) {
   let html = base;
   const url = origin + path;
@@ -24,7 +62,12 @@ function generate(path, meta) {
   }
   html = html.replace(/<link rel="canonical" href="[^"]*" \/>/, '<link rel="canonical" href="' + url + '" />');
   if (path !== "/") {
-    html = html.replace(/<script id="brandify-structured-data"[^>]*>[\s\S]*?<\/script>/, "");
+    const data = structuredData(path, meta);
+    const jsonLd = data
+      ? '<script id="brandify-structured-data" type="application/ld+json">' +
+        JSON.stringify(data).replace(/</g, "\\u003c") + '</script>'
+      : "";
+    html = html.replace(/<script id="brandify-structured-data"[^>]*>[\s\S]*?<\/script>/, jsonLd);
   }
   return html;
 }
