@@ -15,6 +15,7 @@ const Termos = lazy(() => import("./pages/Termos"));
 import CookieConsent from "@/components/CookieConsent";
 import SeoHead from "@/components/SeoHead";
 const ServicePage = lazy(() => import("./pages/ServicePage"));
+const InteractiveSites = lazy(() => import("./pages/InteractiveSites"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const AdminProjects = lazy(() => import("./pages/AdminProjects"));
@@ -65,6 +66,7 @@ const App = () => (
             <Route path="/sites-institucionais" element={<ServicePage service="institucionais" />} />
             <Route path="/landing-pages" element={<ServicePage service="landing" />} />
             <Route path="/lojas-virtuais" element={<ServicePage service="lojas" />} />
+            <Route path="/sites-interativos" element={<InteractiveSites />} />
             <Route path="/privacidade" element={<Privacidade />} />
             <Route path="/cookies" element={<Cookies />} />
             <Route path="/termos" element={<Termos />} />
