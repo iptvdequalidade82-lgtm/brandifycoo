@@ -198,10 +198,112 @@
 }
 
 
-/* Plan labels: align the brand-blue period optically with the letter baseline. */
-.bcv3-plan-identity h3 .bcv3-plan-dot{
-  position:relative;
-  top:-.105em;
-  margin-left:.015em;
-  vertical-align:baseline;
+/* Business / plan cards: keep the full label, dot and CTA inside the card. */
+.bcv3 .bcv3-plan-row{
+  grid-template-columns:minmax(0,1.12fr) minmax(0,1fr) minmax(166px,.46fr);
+  gap:clamp(18px,2.4vw,38px);
+  align-items:start;
+}
+.bcv3 .bcv3-plan-row > *{min-width:0;}
+.bcv3 .bcv3-plan-identity{min-width:0;container-type:inline-size;}
+.bcv3 .bcv3-plan-identity h3.bcv3-plan-name{
+  display:flex;
+  align-items:flex-end;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  white-space:nowrap;
+  font-size:clamp(62px,28cqw,160px);
+  line-height:.82;
+  letter-spacing:-.045em;
+  margin:14px 0 17px;
+}
+.bcv3 .bcv3-plan-identity h3.bcv3-plan-name.is-long{
+  font-size:clamp(45px,23cqw,124px);
+}
+.bcv3 .bcv3-plan-word{
+  display:block;
+  min-width:0;
+  line-height:.82;
+}
+.bcv3 .bcv3-plan-identity h3 .bcv3-plan-dot{
+  position:static;
+  display:block;
+  width:.115em;
+  height:.115em;
+  flex:0 0 .115em;
+  margin:0 0 .08em .025em;
+  padding:0;
+  border-radius:50%;
+  background:var(--blue);
+  transform:none;
+  vertical-align:initial;
+}
+.bcv3 .bcv3-plan-row .bcv3-plan-cta{
+  grid-column:auto;
+  align-self:start;
+  justify-self:stretch;
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  min-width:0;
+  max-width:100%;
+  width:100%;
+  min-height:56px;
+  margin-top:4px;
+  padding:15px clamp(12px,1.35vw,20px);
+  gap:8px;
+  white-space:nowrap;
+  font-size:clamp(9px,.78vw,11px);
+}
+.bcv3 .bcv3-plan-cta span{min-width:0;}
+.bcv3 .bcv3-plan-cta svg{flex-shrink:0;}
+@media(max-width:1200px){
+  .bcv3 .bcv3-plan-row{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:23px;
+  }
+  .bcv3 .bcv3-plan-row .bcv3-plan-cta{
+    grid-column:2;
+    margin-top:0;
+  }
+}
+@media(max-width:650px){
+  .bcv3 .bcv3-plan-row{
+    grid-template-columns:minmax(0,1fr);
+    gap:14px;
+    padding:28px 20px;
+  }
+  .bcv3 .bcv3-plan-row .bcv3-plan-cta{
+    grid-column:1;
+    margin-top:6px;
+    font-size:11px;
+    min-height:55px;
+  }
+}
+
+/* One-way scroll reveals. No recurring animation or initial opacity flash. */
+.bcv3 .bcv3-reveal{
+  opacity:1;
+  transform:none;
+  transition:opacity .58s cubic-bezier(.22,1,.36,1),
+             transform .58s cubic-bezier(.22,1,.36,1);
+}
+.bcv3 .bcv3-reveal[data-reveal="pending"]{
+  opacity:0;
+  transform:translate3d(0,14px,0);
+}
+.bcv3 .bcv3-reveal[data-reveal="shown"]{
+  opacity:1;
+  transform:translate3d(0,0,0);
+}
+@media(prefers-reduced-motion:reduce){
+  .bcv3 .bcv3-reveal,
+  .bcv3 .bcv3-reveal[data-reveal="pending"],
+  .bcv3 .bcv3-reveal[data-reveal="shown"]{
+    opacity:1!important;
+    transform:none!important;
+    transition:none!important;
+  }
 }
