@@ -108,6 +108,7 @@ export default function BrandifyCreative() {
         <nav aria-label="Menu principal" className={open ? "bcv3-nav active" : "bcv3-nav"}>
           <a href="#sobre" onClick={() => setOpen(false)}>Estúdio</a>
           <a href="#servicos" onClick={() => setOpen(false)}>Serviços</a>
+          <a href="/sites-interativos" onClick={() => setOpen(false)}>Interativos</a>
 
           <a href="#pacotes" onClick={() => setOpen(false)}>Pacotes</a>
         </nav>
@@ -202,6 +203,11 @@ export default function BrandifyCreative() {
                 </Reveal>
               </div>
             </div>
+
+            <a className="bcv3-interactive-teaser" href="/sites-interativos" aria-label="Conheça os sites interativos com 2D, 3D e motion design">
+              <span><small>UMA NOVA FORMA DE APRESENTAR</small><strong>SITES INTERATIVOS <em>2D · 3D · MOTION</em></strong></span>
+              <span className="bcv3-interactive-arrow" aria-hidden="true"><ArrowUpRight size={26} /></span>
+            </a>
           </div>
         </section>
 
